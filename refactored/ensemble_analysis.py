@@ -2,6 +2,7 @@ from api_client import APIClient
 from utils import extract_tar_gz, read_file
 from ped_entry import PedEntry
 import os
+import mdtraj
 
 class EnsembleAnalysis:
     def __init__(self, ped_entries: PedEntry, data_dir: str):
@@ -45,3 +46,30 @@ class EnsembleAnalysis:
                     print(f"Extracted file {pdb_filename}.")
                 else:
                     print("File already exists. Skipping extracting.")
+
+    def generate_trajectories(self):
+        pdb_dir = os.path.join(self.data_dir, 'pdb_data')
+        traj_dir = os.path.join(self.data_dir, 'traj')
+        os.makedirs(traj_dir, exist_ok=True)
+    
+        for ped_entry in self.ped_entries:
+            ped_id = ped_entry.ped_id
+            ensemble_ids = ped_entry.ensemble_ids
+            for ensemble_id in ensemble_ids:
+                
+                generated_name = f'{ped_id}_{ensemble_id}'
+                pdb_filename = f'{generated_name}.pdb'
+                pdb_file = os.path.join(pdb_dir, pdb_filename)
+
+                traj_dcd = os.path.join(traj_dir, f'{generated_name}.dcd')
+                traj_top = os.path.join(traj_dir, f'{generated_name}.top.pdb')
+
+                # Generate trajectory from pdb if it doesn't exist, otherwise load it.
+                if not os.path.exists(traj_dcd) and not os.path.exists(traj_top):
+                    print(f'Generating trajectory from {pdb_filename}.')
+                    trajectory = mdtraj.load(pdb_file)
+                    print(f'Saving trajectory.')
+                    trajectory.save(traj_dcd)
+                    trajectory[0].save(traj_top)
+                else:
+                    print(f'Trajectory already exists.')
