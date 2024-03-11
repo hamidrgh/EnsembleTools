@@ -3,12 +3,14 @@ from utils import extract_tar_gz, read_file
 from ped_entry import PedEntry
 import os
 import mdtraj
+from featurizer import FeaturizationFactory
 
 class EnsembleAnalysis:
     def __init__(self, ped_entries: PedEntry, data_dir: str):
         self.ped_entries = ped_entries
         self.data_dir = data_dir
         self.api_client = APIClient()
+        self.trajectories = {}
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -72,4 +74,14 @@ class EnsembleAnalysis:
                     trajectory.save(traj_dcd)
                     trajectory[0].save(traj_top)
                 else:
-                    print(f'Trajectory already exists.')
+                    print(f'Trajectory already exists. Loading trajectory.')
+                    trajectory = mdtraj.load(traj_dcd, top=traj_top)
+
+                self.trajectories[(ped_id, ensemble_id)] = trajectory
+
+    def perform_feature_extraction(self, featurization: str):
+        featurizer = FeaturizationFactory.get_featurizer(featurization)
+        for (ped_id, ensemble_id), trajectory in self.trajectories.items():
+            ret = featurizer.featurize(trajectory, get_names=True)
+            print(ret)
+
