@@ -1,5 +1,4 @@
 import requests
-import os
 
 class APIClient:
     def __init__(self):
@@ -22,3 +21,7 @@ class APIClient:
             print("Download complete. Saved to:", save_path)
         except Exception as e:
             print("Error during content download:", e)
+
+    def close_session(self):
+        self.session.close()
+

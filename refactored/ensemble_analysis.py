@@ -1,7 +1,6 @@
 from api_client import APIClient
 import os
-from utils import extract_tar_gz, read_pdb_file
-import gzip
+from utils import extract_tar_gz, read_file
 
 class EnsembleAnalysis:
     def __init__(self, ped_id, ensemble_id, data_dir) -> None:
@@ -23,6 +22,7 @@ class EnsembleAnalysis:
 
             # Download and save the response content to a file
             api_client.download_response_content(response, tar_gz_file)
+            api_client.close_session()
 
             output_dir = os.path.join(data_dir, generated_name)
             pdb_filename = 'pdbfile.pdb'
@@ -30,17 +30,9 @@ class EnsembleAnalysis:
             # Extract the .tar.gz file
             extract_tar_gz(tar_gz_file, output_dir)
 
-            # Access the entire directory or read a single .pdb file
-            if os.path.isdir(os.path.join(output_dir, pdb_filename)):
-                # Access the entire directory
-                print("Entire directory contents:")
-                for entry in os.listdir(os.path.join(output_dir, pdb_filename)):
-                    print(entry)
+            pdb_file = os.path.join(output_dir, pdb_filename)
+            if os.path.exists(pdb_file):
+                print("Reading contents of", pdb_filename)
+                read_file(pdb_file)
             else:
-                # Read a single .pdb file
-                pdb_file = os.path.join(output_dir, pdb_filename)
-                if os.path.exists(pdb_file):
-                    print("Content of", pdb_filename)
-                    print(read_pdb_file(pdb_file))
-                else:
-                    print("File not found:", pdb_file)
+                print("File not found:", pdb_file)
