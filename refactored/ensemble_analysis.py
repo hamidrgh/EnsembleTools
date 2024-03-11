@@ -32,11 +32,10 @@ class EnsembleAnalysis:
                     self.api_client.download_response_content(response, tar_gz_file)
                     self.api_client.close_session()
 
-                    output_dir = os.path.join(self.data_dir, generated_name)
-                    pdb_filename = 'pdbfile.pdb'
-
+                    output_dir = os.path.join(self.data_dir, 'pdb_data')
+                    pdb_filename = f'{generated_name}.pdb'
                     # Extract the .tar.gz file
-                    extract_tar_gz(tar_gz_file, output_dir)
+                    extract_tar_gz(tar_gz_file, output_dir, pdb_filename)
 
                     pdb_file = os.path.join(output_dir, pdb_filename)
                     if os.path.exists(pdb_file):
