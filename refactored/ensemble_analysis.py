@@ -5,6 +5,7 @@ import os
 import mdtraj
 from featurizer import FeaturizationFactory
 import numpy as np
+from dimensionality_reduction import DimensionalityReductionFactory
 
 class EnsembleAnalysis:
     def __init__(self, ped_entries: PedEntry, data_dir: str):
@@ -90,8 +91,8 @@ class EnsembleAnalysis:
         if normalize and featurization == "ca_dist":
             self.normalize_data()
 
-    def extract_features(self, featurization: str, seq_sep:int=2, inverse:bool=False):
-        featurizer = FeaturizationFactory.get_featurizer(featurization, seq_sep=seq_sep, inverse=inverse)
+    def extract_features(self, featurization: str, *args, **kwargs):
+        featurizer = FeaturizationFactory.get_featurizer(featurization, *args, **kwargs)
         get_names = True
         for (ped_id, ensemble_id), trajectory in self.trajectories.items():
             print(f"Performing feature extraction for PED ID: {ped_id}, ensemble ID: {ensemble_id}.")
@@ -130,3 +131,8 @@ class EnsembleAnalysis:
         for traj in self.trajectories.values():
             rg_values_list.extend(self.calculate_rg_for_trajectory(traj))
         return [item[0] * 10 for item in rg_values_list]
+
+    def fit_dimensionality_reduction(self, method: str, *args, **kwargs):
+        reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
+        self.reduce_dim_model = reducer.fit_transform(data=self.concat_features)
+        # TODO: Refactor the analysis that is exclusive to PCA in a way that makes sense

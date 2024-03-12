@@ -8,7 +8,7 @@ class Featurizer(ABC):
         pass
 
 class CADistFeaturizer(Featurizer):
-    def __init__(self, seq_sep, inverse):
+    def __init__(self, seq_sep=2, inverse=False):
         self.seq_sep = seq_sep
         self.inverse = inverse
 
