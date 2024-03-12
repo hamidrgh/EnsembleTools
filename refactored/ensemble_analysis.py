@@ -4,6 +4,8 @@ from ped_entry import PedEntry
 import os
 import mdtraj
 from featurizer import FeaturizationFactory
+import numpy as np
+import streamlit as st
 
 class EnsembleAnalysis:
     def __init__(self, ped_entries: PedEntry, data_dir: str):
@@ -11,6 +13,9 @@ class EnsembleAnalysis:
         self.data_dir = data_dir
         self.api_client = APIClient()
         self.trajectories = {}
+        self.feature_names = []
+        self.featurized_data = {}
+        self.all_labels = []
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -79,9 +84,38 @@ class EnsembleAnalysis:
 
                 self.trajectories[(ped_id, ensemble_id)] = trajectory
 
-    def perform_feature_extraction(self, featurization: str):
-        featurizer = FeaturizationFactory.get_featurizer(featurization)
+    def perform_feature_extraction(self, featurization: str, seq_sep:int=2, inverse:bool=False):
+        featurizer = FeaturizationFactory.get_featurizer(featurization, seq_sep, inverse)
+        get_names = True
         for (ped_id, ensemble_id), trajectory in self.trajectories.items():
-            ret = featurizer.featurize(trajectory, get_names=True)
-            print(ret)
+            print(f"Performing feature extraction for PED ID: {ped_id}, ensemble ID: {ensemble_id}.")
+            if get_names:
+                features, names = featurizer.featurize(trajectory, get_names=get_names)
+                get_names = False
+            else:
+                features = featurizer.featurize(trajectory, get_names=get_names)
+            self.featurized_data[(ped_id, ensemble_id)] = features
+            print("Transformed ensemble shape:", features.shape)
+        self.feature_names = names
+        print("Feature names:", names)
 
+    def concatenate_features(self):
+        concat_features = [features for (_, _), features in self.featurized_data.items()]
+        self.concat_features = np.concatenate(concat_features, axis=0)
+        print("Concatenated featurized ensemble shape:", self.concat_features.shape)
+        
+    def create_all_labels(self):
+        for label, data_points in self.featurized_data.items():
+            num_data_points = len(data_points)
+            self.all_labels.extend([label] * num_data_points)
+
+    def normalize_data(self, use_norm, featurization):
+        if use_norm:
+            if featurization == "ca_dist":
+                mean = self.concat_features.mean(axis=0)
+                std = self.concat_features.std(axis=0)
+                self.concat_features = (self.concat_features - mean) / std
+                for label, features in self.featurized_data.items():
+                    self.featurized_data[label] = (features - mean) / std
+            else:
+                raise NotImplementedError()

@@ -79,7 +79,7 @@ class AAngleFeaturizer(Featurizer):
 
 class FeaturizationFactory:
     @staticmethod
-    def get_featurizer(featurization, seq_sep=2, inverse=False):
+    def get_featurizer(featurization, seq_sep, inverse):
         if featurization == "ca_dist":
             return CADistFeaturizer(seq_sep, inverse)
         elif featurization == "phi_psi":
