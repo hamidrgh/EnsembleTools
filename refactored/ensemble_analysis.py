@@ -84,7 +84,14 @@ class EnsembleAnalysis:
 
                 self.trajectories[(ped_id, ensemble_id)] = trajectory
 
-    def perform_feature_extraction(self, featurization: str, seq_sep:int=2, inverse:bool=False):
+    def perform_feature_extraction(self, featurization: str, seq_sep:int=2, inverse:bool=False, use_norm:bool=False):
+        self.extract_features(featurization, seq_sep, inverse)
+        self.concatenate_features()
+        self.create_all_labels()
+        if use_norm and featurization == "ca_dist":
+            self.normalize_data()
+
+    def extract_features(self, featurization: str, seq_sep:int=2, inverse:bool=False):
         featurizer = FeaturizationFactory.get_featurizer(featurization, seq_sep, inverse)
         get_names = True
         for (ped_id, ensemble_id), trajectory in self.trajectories.items():
@@ -109,13 +116,9 @@ class EnsembleAnalysis:
             num_data_points = len(data_points)
             self.all_labels.extend([label] * num_data_points)
 
-    def normalize_data(self, use_norm, featurization):
-        if use_norm:
-            if featurization == "ca_dist":
-                mean = self.concat_features.mean(axis=0)
-                std = self.concat_features.std(axis=0)
-                self.concat_features = (self.concat_features - mean) / std
-                for label, features in self.featurized_data.items():
-                    self.featurized_data[label] = (features - mean) / std
-            else:
-                raise NotImplementedError()
+    def normalize_data(self):
+        mean = self.concat_features.mean(axis=0)
+        std = self.concat_features.std(axis=0)
+        self.concat_features = (self.concat_features - mean) / std
+        for label, features in self.featurized_data.items():
+            self.featurized_data[label] = (features - mean) / std
