@@ -1,5 +1,5 @@
 from api_client import APIClient
-from utils import extract_tar_gz, read_file
+from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
 import mdtraj

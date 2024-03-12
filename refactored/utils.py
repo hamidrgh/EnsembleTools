@@ -5,7 +5,7 @@ def extract_tar_gz(tar_gz_file, output_dir, new_name=None):
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
     
-    # Extract only the .pdb file
+    # Extract the .pdb file
     with tarfile.open(tar_gz_file, 'r:gz') as tar:
         pdb_member = next((member for member in tar.getmembers() if os.path.basename(member.name) == 'pdbfile.pdb'), None)
         if pdb_member:
@@ -17,10 +17,3 @@ def extract_tar_gz(tar_gz_file, output_dir, new_name=None):
             tar.extract(pdb_member, path=output_dir)
             # Rename the extracted file
             os.rename(os.path.join(output_dir, pdb_member.name), extracted_path)
-
-
-def read_file(file):
-    # Read the content of the .pdb file
-    with open(file, 'r') as f:
-        content = f.read()
-    return content
