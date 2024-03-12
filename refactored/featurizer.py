@@ -9,7 +9,6 @@ class Featurizer(ABC):
 
 class CADistFeaturizer(Featurizer):
     def __init__(self, seq_sep, inverse):
-        super().__init__()
         self.seq_sep = seq_sep
         self.inverse = inverse
 
@@ -79,12 +78,12 @@ class AAngleFeaturizer(Featurizer):
 
 class FeaturizationFactory:
     @staticmethod
-    def get_featurizer(featurization, seq_sep, inverse):
+    def get_featurizer(featurization, *args, **kwargs):
         if featurization == "ca_dist":
-            return CADistFeaturizer(seq_sep, inverse)
+            return CADistFeaturizer(*args, **kwargs)
         elif featurization == "phi_psi":
-            return PhiPsiFeaturizer()
+            return PhiPsiFeaturizer(*args, **kwargs)
         elif featurization == "a_angle":
-            return AAngleFeaturizer()
+            return AAngleFeaturizer(*args, **kwargs)
         else:
-            raise NotImplementedError("Other featurizations could be implemented here.")
+            raise NotImplementedError("Unsupported feature extraction method.")

@@ -5,7 +5,6 @@ import os
 import mdtraj
 from featurizer import FeaturizationFactory
 import numpy as np
-import streamlit as st
 
 class EnsembleAnalysis:
     def __init__(self, ped_entries: PedEntry, data_dir: str):
@@ -84,15 +83,15 @@ class EnsembleAnalysis:
 
                 self.trajectories[(ped_id, ensemble_id)] = trajectory
 
-    def perform_feature_extraction(self, featurization: str, seq_sep:int=2, inverse:bool=False, use_norm:bool=False):
+    def perform_feature_extraction(self, featurization: str, seq_sep:int=2, inverse:bool=False, normalize:bool=False):
         self.extract_features(featurization, seq_sep, inverse)
         self.concatenate_features()
         self.create_all_labels()
-        if use_norm and featurization == "ca_dist":
+        if normalize and featurization == "ca_dist":
             self.normalize_data()
 
     def extract_features(self, featurization: str, seq_sep:int=2, inverse:bool=False):
-        featurizer = FeaturizationFactory.get_featurizer(featurization, seq_sep, inverse)
+        featurizer = FeaturizationFactory.get_featurizer(featurization, seq_sep=seq_sep, inverse=inverse)
         get_names = True
         for (ped_id, ensemble_id), trajectory in self.trajectories.items():
             print(f"Performing feature extraction for PED ID: {ped_id}, ensemble ID: {ensemble_id}.")
@@ -122,3 +121,12 @@ class EnsembleAnalysis:
         self.concat_features = (self.concat_features - mean) / std
         for label, features in self.featurized_data.items():
             self.featurized_data[label] = (features - mean) / std
+
+    def calculate_rg_for_trajectory(self, trajectory):
+        return [mdtraj.compute_rg(frame) for frame in trajectory]
+
+    def rg_calculator(self):
+        rg_values_list = []
+        for traj in self.trajectories.values():
+            rg_values_list.extend(self.calculate_rg_for_trajectory(traj))
+        return [item[0] * 10 for item in rg_values_list]
