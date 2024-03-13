@@ -134,5 +134,12 @@ class EnsembleAnalysis:
 
     def fit_dimensionality_reduction(self, method: str, *args, **kwargs):
         reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
-        self.reduce_dim_model = reducer.fit_transform(data=self.concat_features)
-        # TODO: Refactor the analysis that is exclusive to PCA in a way that makes sense
+        if method == "pca":
+            self.reduce_dim_model = reducer.fit(data=self.concat_features)
+            self.reduce_dim_data = {}
+            for key, data in self.featurized_data.items():
+                self.reduce_dim_data[key] = reducer.transform(data)
+                print("Reduced dimensionality ensemble shape:", self.reduce_dim_data[key].shape)
+            self.concat_reduce_dim_data = reducer.transform(data=self.concat_features)
+        else:
+            self.transformed_data = reducer.fit_transform(data=self.concat_features)

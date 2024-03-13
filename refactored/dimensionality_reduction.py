@@ -9,6 +9,14 @@ from tsne_utils import unit_vector_distance
 
 class DimensionalityReduction(ABC):
     @abstractmethod
+    def fit(self, data):
+        pass
+
+    @abstractmethod
+    def transform(self, data):
+        pass
+    
+    @abstractmethod
     def fit_transform(self, data):
         pass
 
@@ -16,16 +24,31 @@ class PCAReduction(DimensionalityReduction):
     def __init__(self, num_dim):
         self.num_dim = num_dim
 
+    def fit(self, data):
+        self.pca = sklearn.decomposition.PCA(n_components=self.num_dim)
+        self.pca.fit(data)
+        return self.pca
+    
+    def transform(self, data):
+        reduce_dim_data = self.pca.transform(data)
+        return reduce_dim_data
+    
     def fit_transform(self, data):
-        pca = sklearn.decomposition.PCA(n_components=self.num_dim)
-        pca.fit(data)
-        return pca
+        self.pca = sklearn.decomposition.PCA(n_components=self.num_dim)
+        transformed = self.pca.fit_transform(data)
+        return transformed
 
 class TSNEReduction(DimensionalityReduction):
     def __init__(self, perplexityVals=range(2, 10, 2), metric="euclidean", dir="."):
         self.perplexityVals = perplexityVals
         self.metric = metric
         self.dir = dir
+
+    def fit(self, data):
+        return super().fit(data)
+    
+    def transform(self, data):
+        return super().transform(data)
 
     def fit_transform(self, data):
         print("tsne is running...")
@@ -49,6 +72,12 @@ class TSNEReduction(DimensionalityReduction):
         print(f"tsne is done! All files saved in {self.dir}")
 
 class DimenFixReduction(DimensionalityReduction):
+    def fit(self, data):
+        return super().fit(data)
+    
+    def transform(self, data):
+        return super().transform(data)
+    
     def fit_transform(self, data):
         nfs = NeoForceScheme()
         projection = nfs.fit_transform(data)
@@ -59,6 +88,12 @@ class TSNECircularReduction(DimensionalityReduction):
         self.perplexityVals = perplexityVals
         self.metric = metric
         self.dir = dir
+
+    def fit(self, data):
+        return super().fit(data)
+    
+    def transform(self, data):
+        return super().transform(data)
 
     def fit_transform(self, data):
         print("tsne for phi_psi is running...")
@@ -84,6 +119,13 @@ class TSNECircularReduction(DimensionalityReduction):
 class MDSReduction(DimensionalityReduction):
     def __init__(self, num_dim):
         self.num_dim = num_dim
+
+    def fit(self, data):
+        return super().fit(data)
+    
+    def transform(self, data):
+        return super().transform(data)
+    
     def fit_transform(self, data):    
         embedding = MDS(n_components=self.num_dim)
         feature_transformed = embedding.fit_transform(data)
