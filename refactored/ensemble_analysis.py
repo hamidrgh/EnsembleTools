@@ -137,7 +137,8 @@ class EnsembleAnalysis:
         return self.rg
 
     def fit_dimensionality_reduction(self, method: str, *args, **kwargs):
-        reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
+        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        reducer = DimensionalityReductionFactory.get_reducer(method, dim_reduction_dir, *args, **kwargs)
         if method == "pca":
             self.reduce_dim_model = reducer.fit(data=self.concat_features)
             self.reduce_dim_data = {}
@@ -148,36 +149,40 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = reducer.fit_transform(data=self.concat_features)
 
-    def create_tsne_clusters(self, perplexityVals, range_n_clusters, tsne_dir):
-        # TODO: Remove tsne_dir from arguments
+    def create_tsne_clusters(self, perplexityVals, range_n_clusters):
+        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
         for perp in perplexityVals:
-            tsne = np.loadtxt(tsne_dir + '/tsnep'+str(perp))
+            tsne = np.loadtxt(dim_reduction_dir + '/tsnep'+str(perp))
             for n_clusters in range_n_clusters:
                 # print("n_clusters",n_clusters)
                 kmeans = KMeans(n_clusters=n_clusters, n_init= 'auto').fit(tsne)
-                np.savetxt(tsne_dir + '/kmeans_'+str(n_clusters)+'clusters_centers_tsnep'+str(perp), kmeans.cluster_centers_, fmt='%1.3f')
-                np.savetxt(tsne_dir + '/kmeans_'+str(n_clusters)+'clusters_tsnep'+str(perp)+'.dat', kmeans.labels_, fmt='%1.1d')
+                np.savetxt(dim_reduction_dir + '/kmeans_'+str(n_clusters)+'clusters_centers_tsnep'+str(perp), kmeans.cluster_centers_, fmt='%1.3f')
+                np.savetxt(dim_reduction_dir + '/kmeans_'+str(n_clusters)+'clusters_tsnep'+str(perp)+'.dat', kmeans.labels_, fmt='%1.1d')
                 
                 # print("Kmeans",kmeans,kmeans.labels_)
                 #### Compute silhouette score based on low-dim and high-dim distances        
                 silhouette_ld = silhouette_score(tsne, kmeans.labels_)
                 silhouette_hd = silhouette_score(self.concat_features, kmeans.labels_)
                 # print(silhouette_ld)
-                with open(tsne_dir + '/silhouette.txt', 'a') as f:
+                with open(dim_reduction_dir + '/silhouette.txt', 'a') as f:
                     f.write("\n")
                     print(perp, n_clusters, silhouette_ld, silhouette_hd, silhouette_ld*silhouette_hd, file =f)
 
-    def tsne_ramachandran_plot(self, tsne_dir):
-        tsne_ramachandran_plot(tsne_dir, self.concat_features)
+    def tsne_ramachandran_plot(self):
+        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        tsne_ramachandran_plot(dim_reduction_dir, self.concat_features)
 
-    def tsne_ramachandran_plot_density(self, tsne_dir):
-        tsne_ramachandran_plot_density(tsne_dir, self.concat_features)
+    def tsne_ramachandran_plot_density(self):
+        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        tsne_ramachandran_plot_density(dim_reduction_dir, self.concat_features)
 
-    def tsne_scatter_plot(self, tsne_dir):
-        tsne_scatter_plot(tsne_dir, self.all_labels, self.featurized_data.keys(), self.rg)
+    def tsne_scatter_plot(self):
+        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.featurized_data.keys(), self.rg)
 
-    def tsne_scatter_plot_2(self, tsne_dir):
-        tsne_scatter_plot_2(tsne_dir, self.rg)
+    def tsne_scatter_plot_2(self):
+        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        tsne_scatter_plot_2(dim_reduction_dir, self.rg)
 
     def dimenfix_scatter_plot(self):
         dimenfix_scatter_plot(self.transformed_data, self.rg)

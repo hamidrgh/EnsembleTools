@@ -40,7 +40,7 @@ class PCAReduction(DimensionalityReduction):
         return transformed
 
 class TSNEReduction(DimensionalityReduction):
-    def __init__(self, perplexityVals=range(2, 10, 2), metric="euclidean", dir="."):
+    def __init__(self, dir=".", perplexityVals=range(2, 10, 2), metric="euclidean"):
         self.perplexityVals = perplexityVals
         self.metric = metric
         self.dir = dir
@@ -86,7 +86,7 @@ class DimenFixReduction(DimensionalityReduction):
         return projection
 
 class TSNECircularReduction(DimensionalityReduction):
-    def __init__(self, perplexityVals=range(2, 10, 2), metric=unit_vector_distance, dir="."):
+    def __init__(self,  dir=".", perplexityVals=range(2, 10, 2), metric=unit_vector_distance):
         self.perplexityVals = perplexityVals
         self.metric = metric
         self.dir = dir
@@ -136,15 +136,15 @@ class MDSReduction(DimensionalityReduction):
 
 class DimensionalityReductionFactory:
     @staticmethod
-    def get_reducer(method, *args, **kwargs):
+    def get_reducer(method, dir, *args, **kwargs):
         if method == "pca":
             return PCAReduction(*args, **kwargs)
         elif method == "tsne":
-            return TSNEReduction(*args, **kwargs)
+            return TSNEReduction(dir, *args, **kwargs)
         elif method == "dimenfix":
             return DimenFixReduction(*args, **kwargs)
         elif method == "tsne-circular":
-            return TSNECircularReduction(*args, **kwargs)
+            return TSNECircularReduction(dir, *args, **kwargs)
         elif method == "mds":
             return MDSReduction(*args, **kwargs)
         else:
