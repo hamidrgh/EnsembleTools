@@ -10,6 +10,10 @@ from featurizer import FeaturizationFactory
 import numpy as np
 from dimensionality_reduction import DimensionalityReductionFactory
 
+DIM_REDUCTION_DIR = "dim_reduction"
+PDB_DIR = "pdb_data"
+TRAJ_DIR = "traj"
+
 class EnsembleAnalysis:
     def __init__(self, ped_entries: PedEntry, data_dir: str):
         self.ped_entries = ped_entries
@@ -34,7 +38,7 @@ class EnsembleAnalysis:
                 tar_gz_filename = f'{generated_name}.tar.gz'
                 tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
 
-                pdb_dir = os.path.join(self.data_dir, 'pdb_data')
+                pdb_dir = os.path.join(self.data_dir, PDB_DIR)
                 pdb_filename = f'{generated_name}.pdb'
                 pdb_file = os.path.join(pdb_dir, pdb_filename)
 
@@ -58,8 +62,8 @@ class EnsembleAnalysis:
                     print("File already exists. Skipping extracting.")
 
     def generate_trajectories(self):
-        pdb_dir = os.path.join(self.data_dir, 'pdb_data')
-        traj_dir = os.path.join(self.data_dir, 'traj')
+        pdb_dir = os.path.join(self.data_dir, PDB_DIR)
+        traj_dir = os.path.join(self.data_dir, TRAJ_DIR)
         os.makedirs(traj_dir, exist_ok=True)
     
         for ped_entry in self.ped_entries:
@@ -137,7 +141,7 @@ class EnsembleAnalysis:
         return self.rg
 
     def fit_dimensionality_reduction(self, method: str, *args, **kwargs):
-        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         reducer = DimensionalityReductionFactory.get_reducer(method, dim_reduction_dir, *args, **kwargs)
         if method == "pca":
             self.reduce_dim_model = reducer.fit(data=self.concat_features)
@@ -150,7 +154,7 @@ class EnsembleAnalysis:
             self.transformed_data = reducer.fit_transform(data=self.concat_features)
 
     def create_tsne_clusters(self, perplexityVals, range_n_clusters):
-        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         for perp in perplexityVals:
             tsne = np.loadtxt(dim_reduction_dir + '/tsnep'+str(perp))
             for n_clusters in range_n_clusters:
@@ -169,19 +173,19 @@ class EnsembleAnalysis:
                     print(perp, n_clusters, silhouette_ld, silhouette_hd, silhouette_ld*silhouette_hd, file =f)
 
     def tsne_ramachandran_plot(self):
-        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         tsne_ramachandran_plot(dim_reduction_dir, self.concat_features)
 
     def tsne_ramachandran_plot_density(self):
-        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         tsne_ramachandran_plot_density(dim_reduction_dir, self.concat_features)
 
     def tsne_scatter_plot(self):
-        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.featurized_data.keys(), self.rg)
 
     def tsne_scatter_plot_2(self):
-        dim_reduction_dir = os.path.join(self.data_dir, "dim_reduction")
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         tsne_scatter_plot_2(dim_reduction_dir, self.rg)
 
     def dimenfix_scatter_plot(self):
