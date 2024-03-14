@@ -179,14 +179,11 @@ class EnsembleAnalysis:
     def dimenfix_scatter_plot(self):
         dimenfix_scatter_plot(self.transformed_data, self.rg)
 
-    def execute_pipeline(self, method_params):
+    def execute_pipeline(self, featurization_params, reduce_dim_params, clustering_params=None):
         self.download_from_ped()
         self.generate_trajectories()
-        featurization_params = method_params.get('featurization', {})
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
-        reduce_dim_params = method_params.get('dimensionality_reduction', {})
         self.fit_dimensionality_reduction(**reduce_dim_params)
         if reduce_dim_params.get('method') == 'tsne':
-            clustering_params = method_params.get('clustering', {})
             self.create_tsne_clusters(**clustering_params)
