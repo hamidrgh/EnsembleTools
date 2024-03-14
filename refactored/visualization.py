@@ -3,6 +3,7 @@ from matplotlib import cm, pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
 import seaborn as sns
+import plotly.graph_objects as go 
 
 def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     s = np.loadtxt(tsne_kmeans_dir  +'/silhouette.txt')
@@ -100,3 +101,19 @@ def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg):
     ax4.set_title('Density Plot ')
     
     plt.savefig(tsne_dir  +'/tsnep'+str(int(bestP))+'_kmeans'+str(int(bestK))+'.png', dpi=800)
+
+def dimenfix_scatter_plot(data, rg_numbers):
+    fig = go.Figure(data=
+                    go.Scatter(x=data[:, 0],
+                                y=data[:, 1],
+                                mode='markers',
+                                
+                                marker=dict(
+                                    size=16,
+                                    color= rg_numbers,
+                                    colorscale='Viridis',
+                                    showscale=True),
+                                    
+                            )
+                    )
+    fig.show()
