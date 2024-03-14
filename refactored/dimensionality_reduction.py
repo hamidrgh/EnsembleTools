@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import os
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import sklearn
@@ -67,6 +68,7 @@ class TSNEReduction(DimensionalityReduction):
                 angle=0.5,
             )
             tsne = tsneObject.fit_transform(data)
+            os.makedirs(self.dir, exist_ok=True)
             np.savetxt(self.dir + "/tsnep{0}".format(i), tsne)
             print(f"tsne file for the perplexity value of {i} is saved in {dir} ")
         print(f"tsne is done! All files saved in {self.dir}")
@@ -112,6 +114,7 @@ class TSNECircularReduction(DimensionalityReduction):
                 angle=0.5,
             )
             tsne = tsneObject.fit_transform(data)
+            os.makedirs(self.dir, exist_ok=True)
             np.savetxt(self.dir + "/tsnep{0}".format(i), tsne)
             print(f"tsne file for the perplexity value of {i} is saved in {dir} ")
         print(f"tsne is done! All files saved in {self.dir}")

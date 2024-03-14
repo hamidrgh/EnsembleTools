@@ -1,4 +1,7 @@
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 from api_client import APIClient
+from visualization import tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot
 from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
@@ -84,8 +87,8 @@ class EnsembleAnalysis:
 
                 self.trajectories[(ped_id, ensemble_id)] = trajectory
 
-    def perform_feature_extraction(self, featurization: str, seq_sep:int=2, inverse:bool=False, normalize:bool=False):
-        self.extract_features(featurization, seq_sep, inverse)
+    def perform_feature_extraction(self, featurization: str, normalize = False, *args, **kwargs):
+        self.extract_features(featurization, *args, **kwargs)
         self.concatenate_features()
         self.create_all_labels()
         if normalize and featurization == "ca_dist":
@@ -130,7 +133,8 @@ class EnsembleAnalysis:
         rg_values_list = []
         for traj in self.trajectories.values():
             rg_values_list.extend(self.calculate_rg_for_trajectory(traj))
-        return [item[0] * 10 for item in rg_values_list]
+            self.rg = [item[0] * 10 for item in rg_values_list]
+        return self.rg
 
     def fit_dimensionality_reduction(self, method: str, *args, **kwargs):
         reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
@@ -143,3 +147,31 @@ class EnsembleAnalysis:
             self.concat_reduce_dim_data = reducer.transform(data=self.concat_features)
         else:
             self.transformed_data = reducer.fit_transform(data=self.concat_features)
+
+    def create_tsne_clusters(self, perplexityVals, range_n_clusters, tsne_dir):
+        # TODO: Remove tsne_dir from arguments
+        for perp in perplexityVals:
+            tsne = np.loadtxt(tsne_dir + '/tsnep'+str(perp))
+            for n_clusters in range_n_clusters:
+                # print("n_clusters",n_clusters)
+                kmeans = KMeans(n_clusters=n_clusters, n_init= 'auto').fit(tsne)
+                np.savetxt(tsne_dir + '/kmeans_'+str(n_clusters)+'clusters_centers_tsnep'+str(perp), kmeans.cluster_centers_, fmt='%1.3f')
+                np.savetxt(tsne_dir + '/kmeans_'+str(n_clusters)+'clusters_tsnep'+str(perp)+'.dat', kmeans.labels_, fmt='%1.1d')
+                
+                # print("Kmeans",kmeans,kmeans.labels_)
+                #### Compute silhouette score based on low-dim and high-dim distances        
+                silhouette_ld = silhouette_score(tsne, kmeans.labels_)
+                silhouette_hd = silhouette_score(self.concat_features, kmeans.labels_)
+                # print(silhouette_ld)
+                with open(tsne_dir + '/silhouette.txt', 'a') as f:
+                    f.write("\n")
+                    print(perp, n_clusters, silhouette_ld, silhouette_hd, silhouette_ld*silhouette_hd, file =f)
+
+    def tsne_ramachandran_plot(self, tsne_dir):
+        tsne_ramachandran_plot(tsne_dir, self.concat_features)
+
+    def tsne_ramachandran_plot_density(self, tsne_dir):
+        tsne_ramachandran_plot_density(tsne_dir, self.concat_features)
+
+    def tsne_scatter_plot(self, tsne_dir):
+        tsne_scatter_plot(tsne_dir, self.all_labels, self.featurized_data.keys(), self.rg)
