@@ -1,7 +1,7 @@
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from api_client import APIClient
-from visualization import dimenfix_scatter_plot, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot
+from visualization import dimenfix_scatter_plot, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
@@ -175,6 +175,9 @@ class EnsembleAnalysis:
 
     def tsne_scatter_plot(self, tsne_dir):
         tsne_scatter_plot(tsne_dir, self.all_labels, self.featurized_data.keys(), self.rg)
+
+    def tsne_scatter_plot_2(self, tsne_dir):
+        tsne_scatter_plot_2(tsne_dir, self.rg)
 
     def dimenfix_scatter_plot(self):
         dimenfix_scatter_plot(self.transformed_data, self.rg)
