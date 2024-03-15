@@ -129,3 +129,14 @@ def dimenfix_scatter_plot(data, rg_numbers):
                             )
                     )
     fig.show()
+
+def dimenfix_scatter_plot_2(data, all_labels):
+    row = np.arange(len(data))
+    fig = px.scatter(x=data[:, 0], y=data[:, 1], color=all_labels,
+                    hover_data={'Row': row})
+
+    fig.update_traces(marker=dict(size=6,
+                                line=dict(width=2,
+                                            )),
+                    )
+    fig.show()
