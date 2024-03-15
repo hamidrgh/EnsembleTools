@@ -1,5 +1,5 @@
 from api_client import APIClient
-from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
+from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_cumulative_explained_variance, pca_plot_2d_landscapes, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
@@ -99,6 +99,7 @@ class EnsembleAnalysis:
     def extract_features(self, featurization: str, *args, **kwargs):
         featurizer = FeaturizationFactory.get_featurizer(featurization, *args, **kwargs)
         get_names = True
+        self.featurization = featurization
         for (ped_id, ensemble_id), trajectory in self.trajectories.items():
             print(f"Performing feature extraction for PED ID: {ped_id}, ensemble ID: {ensemble_id}.")
             if get_names:
@@ -147,7 +148,7 @@ class EnsembleAnalysis:
             for key, data in self.featurized_data.items():
                 self.reduce_dim_data[key] = self.reducer.transform(data)
                 print("Reduced dimensionality ensemble shape:", self.reduce_dim_data[key].shape)
-            self.concat_reduce_dim_data = self.reducer.transform(data=self.concat_features)
+            self.transformed_data = self.reducer.transform(data=self.concat_features)
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
@@ -179,6 +180,13 @@ class EnsembleAnalysis:
     def dimenfix_cluster_scatter_plot_2(self):
         dimenfix_cluster_scatter_plot_2(self.sil_scores, self.transformed_data, self.featurized_data.keys(), self.all_labels)
 
+    def pca_cumulative_explained_variance(self):
+        pca_cumulative_explained_variance(self.reduce_dim_model)
+
+    def pca_plot_2d_landscapes(self):
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
+        pca_plot_2d_landscapes(list(self.featurized_data.keys()), self.reduce_dim_data, dim_reduction_dir, self.featurization)
+
     def cluster(self, range_n_clusters):
         self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)
 
@@ -188,4 +196,5 @@ class EnsembleAnalysis:
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
-        self.cluster(**clustering_params)
+        if clustering_params:
+            self.cluster(**clustering_params)

@@ -1,3 +1,4 @@
+import os
 import random
 from matplotlib import cm, pyplot as plt
 import numpy as np
@@ -178,4 +179,58 @@ def dimenfix_cluster_scatter_plot_2(sil_scores, data, ens_codes, all_labels):
     legend_labels = list(label_colors.keys())
     legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
     plt.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'upper left', bbox_to_anchor=(1, 1))
+    plt.show()
+
+def pca_cumulative_explained_variance(pca_model):
+    print("- Percentage of variance explained by each of the selected components:")
+    plt.plot(np.cumsum(pca_model.explained_variance_ratio_)*100)
+    plt.xlabel("PCA dimension")
+    plt.ylabel("Cumulative explained variance %")
+    plt.show()
+    print("- First three:", pca_model.explained_variance_ratio_[0:3].sum()*100)
+
+def set_labels(ax, reduce_dim_method, dim_x, dim_y):
+    ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
+    ax.set_ylabel(f"{reduce_dim_method} dim {dim_y+1}")
+
+def pca_plot_2d_landscapes(ens_codes, reduce_dim_data, reduce_dim_dir, featurization):
+    # 2d scatters.
+    dim_x = 0
+    dim_y = 1
+    marker = "."
+    legend_kwargs = {"loc": 'upper right',
+                    "bbox_to_anchor": (1.1, 1.1),
+                    "fontsize": 8}
+
+    # Plot all ensembles at the same time.
+    fig, ax = plt.subplots(len(ens_codes)+1, figsize=(4, 4*len(ens_codes)), dpi=120)
+    ax[0].set_title("all")
+    for code_i in ens_codes:
+        ax[0].scatter(reduce_dim_data[code_i][:,dim_x],
+                    reduce_dim_data[code_i][:,dim_y],
+                    label=code_i, marker=marker)
+    ax[0].legend(**legend_kwargs)
+    set_labels(ax[0], "pca", dim_x, dim_y)
+
+    # Concatenate all reduced dimensionality data from the dictionary
+    all_data = np.concatenate(list(reduce_dim_data.values()))
+
+    # Plot each ensembles.
+    for i, code_i in enumerate(ens_codes):
+        ax[i+1].set_title(code_i)
+        # Plot all data in gray
+        ax[i+1].scatter(all_data[:, dim_x],
+                        all_data[:, dim_y],
+                        label="all", color="gray", alpha=0.25,
+                        marker=marker)
+        # Plot ensemble data in color
+        ax[i+1].scatter(reduce_dim_data[code_i][:,dim_x],
+                        reduce_dim_data[code_i][:,dim_y],
+                        label=code_i, c=f"C{i}",
+                        marker=marker)
+        ax[i+1].legend(**legend_kwargs)
+        set_labels(ax[i+1], "pca", dim_x, dim_y)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(reduce_dim_dir, 'PCA' + featurization + ens_codes[0][0] + ens_codes[0][1]))
     plt.show()
