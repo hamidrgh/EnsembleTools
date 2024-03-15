@@ -1,3 +1,4 @@
+import re
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from api_client import APIClient
@@ -153,9 +154,12 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = reducer.fit_transform(data=self.concat_features)
 
-    def create_tsne_clusters(self, perplexityVals, range_n_clusters):
+    # TODO: Remove perplexityVals either by parsing them from filenames or saving them
+    def create_tsne_clusters(self, range_n_clusters):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        for perp in perplexityVals:
+        perplexity_files = [filename for filename in os.listdir(dim_reduction_dir) if re.match(r'^tsnep\d+$', filename)]
+        for perplexity_file in perplexity_files:
+            perp = int(perplexity_file.replace('tsnep', ''))
             tsne = np.loadtxt(dim_reduction_dir + '/tsnep'+str(perp))
             for n_clusters in range_n_clusters:
                 # print("n_clusters",n_clusters)
