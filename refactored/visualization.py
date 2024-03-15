@@ -234,3 +234,41 @@ def pca_plot_2d_landscapes(ens_codes, reduce_dim_data, reduce_dim_dir, featuriza
     plt.tight_layout()
     plt.savefig(os.path.join(reduce_dim_dir, 'PCA' + featurization + ens_codes[0][0] + ens_codes[0][1]))
     plt.show()
+
+def pca_plot_1d_histograms(ens_codes, concat_reduce_dim_data, reduce_dim_data, reduce_dim_dir, featurization):
+    # 1d histograms. Looking at the scatter plot above can be misleading
+    # to the eye if we want to assess the density of points. Better use
+    # an histogram for a precise evaluation.
+    n_bins = 30
+
+    dpi = 120
+    fig, ax = plt.subplots(len(ens_codes), 1, figsize=(4, 2*len(ens_codes)), dpi=dpi)
+    k = 0
+    bins = np.linspace(concat_reduce_dim_data[:,k].min(),
+                    concat_reduce_dim_data[:,k].max(),
+                    n_bins)
+
+    for i, code_i in enumerate(ens_codes):
+        ax[i].hist(reduce_dim_data[code_i][:,k],
+                label=code_i,
+                bins=bins,
+                density=True,
+                color=f"C{i}",
+                histtype="step")
+        ax[i].hist(concat_reduce_dim_data[:,k],
+                label="all",
+                bins=bins,
+                density=True,
+                color="gray",
+                alpha=0.25,
+                histtype="step")
+        ax[i].legend(loc='upper right',
+                    bbox_to_anchor=(1.1, 1.1),
+                    fontsize=8
+                    )
+        ax[i].set_xlabel(f"Dim {k+1}")
+        ax[i].set_ylabel("Density")
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(reduce_dim_dir, 'PCA_hist' + featurization + ens_codes[0][0] + ens_codes[0][1]))
+    plt.show()
