@@ -54,6 +54,10 @@ class TSNEReduction(DimensionalityReduction):
     def fit_transform(self, data):
         print("tsne is running...")
         for i in self.perplexityVals:
+            tsne_file = os.path.join(self.dir, f"tsnep{i}")
+            if os.path.exists(tsne_file):
+                print(f"Dimensionality reduction for perplexity {i} already performed. Skipping.")
+                continue
             tsneObject = TSNE(
                 n_components=2,
                 perplexity=i,
@@ -69,8 +73,8 @@ class TSNEReduction(DimensionalityReduction):
             )
             tsne = tsneObject.fit_transform(data)
             os.makedirs(self.dir, exist_ok=True)
-            np.savetxt(self.dir + "/tsnep{0}".format(i), tsne)
-            print(f"tsne file for the perplexity value of {i} is saved in {dir} ")
+            np.savetxt(tsne_file, tsne)
+            print(f"tsne file for the perplexity value of {i} is saved in {self.dir} ")
         print(f"tsne is done! All files saved in {self.dir}")
 
 class DimenFixReduction(DimensionalityReduction):
@@ -100,6 +104,10 @@ class TSNECircularReduction(DimensionalityReduction):
     def fit_transform(self, data):
         print("tsne for phi_psi is running...")
         for i in self.perplexityVals:
+            tsne_file = os.path.join(self.dir, f"tsnep{i}")
+            if os.path.exists(tsne_file):
+                print(f"Dimensionality reduction for perplexity {i} already performed. Skipping.")
+                continue
             tsneObject = TSNE(
                 n_components=2,
                 perplexity=i,
@@ -115,8 +123,8 @@ class TSNECircularReduction(DimensionalityReduction):
             )
             tsne = tsneObject.fit_transform(data)
             os.makedirs(self.dir, exist_ok=True)
-            np.savetxt(self.dir + "/tsnep{0}".format(i), tsne)
-            print(f"tsne file for the perplexity value of {i} is saved in {dir} ")
+            np.savetxt(tsne_file, tsne)
+            print(f"tsne file for the perplexity value of {i} is saved in {self.dir} ")
         print(f"tsne is done! All files saved in {self.dir}")
 
 class MDSReduction(DimensionalityReduction):

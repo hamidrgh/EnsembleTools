@@ -154,27 +154,31 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = reducer.fit_transform(data=self.concat_features)
 
-    # TODO: Remove perplexityVals either by parsing them from filenames or saving them
     def create_tsne_clusters(self, range_n_clusters):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
+        
+        # Clear the silhouette file before appending new data
+        silhouette_file_path = os.path.join(dim_reduction_dir, 'silhouette.txt')
+        if os.path.exists(silhouette_file_path):
+            with open(silhouette_file_path, 'w') as f:
+                f.write("")
+        
         perplexity_files = [filename for filename in os.listdir(dim_reduction_dir) if re.match(r'^tsnep\d+$', filename)]
         for perplexity_file in perplexity_files:
             perp = int(perplexity_file.replace('tsnep', ''))
             tsne = np.loadtxt(dim_reduction_dir + '/tsnep'+str(perp))
             for n_clusters in range_n_clusters:
-                # print("n_clusters",n_clusters)
                 kmeans = KMeans(n_clusters=n_clusters, n_init= 'auto').fit(tsne)
                 np.savetxt(dim_reduction_dir + '/kmeans_'+str(n_clusters)+'clusters_centers_tsnep'+str(perp), kmeans.cluster_centers_, fmt='%1.3f')
                 np.savetxt(dim_reduction_dir + '/kmeans_'+str(n_clusters)+'clusters_tsnep'+str(perp)+'.dat', kmeans.labels_, fmt='%1.1d')
-                
-                # print("Kmeans",kmeans,kmeans.labels_)
-                #### Compute silhouette score based on low-dim and high-dim distances        
+                    
+                # Compute silhouette score based on low-dim and high-dim distances        
                 silhouette_ld = silhouette_score(tsne, kmeans.labels_)
                 silhouette_hd = silhouette_score(self.concat_features, kmeans.labels_)
-                # print(silhouette_ld)
-                with open(dim_reduction_dir + '/silhouette.txt', 'a') as f:
-                    f.write("\n")
-                    print(perp, n_clusters, silhouette_ld, silhouette_hd, silhouette_ld*silhouette_hd, file =f)
+                
+                # Append silhouette scores to the file
+                with open(silhouette_file_path, 'a') as f:
+                    f.write(f"{perp} {n_clusters} {silhouette_ld} {silhouette_hd} {silhouette_ld * silhouette_hd}\n")
 
     def tsne_ramachandran_plot(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
