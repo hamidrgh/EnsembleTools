@@ -1,8 +1,5 @@
-import re
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
 from api_client import APIClient
-from visualization import dimenfix_scatter_plot, dimenfix_scatter_plot_2, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
+from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
@@ -143,42 +140,16 @@ class EnsembleAnalysis:
 
     def fit_dimensionality_reduction(self, method: str, *args, **kwargs):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        reducer = DimensionalityReductionFactory.get_reducer(method, dim_reduction_dir, *args, **kwargs)
+        self.reducer = DimensionalityReductionFactory.get_reducer(method, dim_reduction_dir, *args, **kwargs)
         if method == "pca":
-            self.reduce_dim_model = reducer.fit(data=self.concat_features)
+            self.reduce_dim_model = self.reducer.fit(data=self.concat_features)
             self.reduce_dim_data = {}
             for key, data in self.featurized_data.items():
-                self.reduce_dim_data[key] = reducer.transform(data)
+                self.reduce_dim_data[key] = self.reducer.transform(data)
                 print("Reduced dimensionality ensemble shape:", self.reduce_dim_data[key].shape)
-            self.concat_reduce_dim_data = reducer.transform(data=self.concat_features)
+            self.concat_reduce_dim_data = self.reducer.transform(data=self.concat_features)
         else:
-            self.transformed_data = reducer.fit_transform(data=self.concat_features)
-
-    def create_tsne_clusters(self, range_n_clusters):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        
-        # Clear the silhouette file before appending new data
-        silhouette_file_path = os.path.join(dim_reduction_dir, 'silhouette.txt')
-        if os.path.exists(silhouette_file_path):
-            with open(silhouette_file_path, 'w') as f:
-                f.write("")
-        
-        perplexity_files = [filename for filename in os.listdir(dim_reduction_dir) if re.match(r'^tsnep\d+$', filename)]
-        for perplexity_file in perplexity_files:
-            perp = int(perplexity_file.replace('tsnep', ''))
-            tsne = np.loadtxt(dim_reduction_dir + '/tsnep'+str(perp))
-            for n_clusters in range_n_clusters:
-                kmeans = KMeans(n_clusters=n_clusters, n_init= 'auto').fit(tsne)
-                np.savetxt(dim_reduction_dir + '/kmeans_'+str(n_clusters)+'clusters_centers_tsnep'+str(perp), kmeans.cluster_centers_, fmt='%1.3f')
-                np.savetxt(dim_reduction_dir + '/kmeans_'+str(n_clusters)+'clusters_tsnep'+str(perp)+'.dat', kmeans.labels_, fmt='%1.1d')
-                    
-                # Compute silhouette score based on low-dim and high-dim distances        
-                silhouette_ld = silhouette_score(tsne, kmeans.labels_)
-                silhouette_hd = silhouette_score(self.concat_features, kmeans.labels_)
-                
-                # Append silhouette scores to the file
-                with open(silhouette_file_path, 'a') as f:
-                    f.write(f"{perp} {n_clusters} {silhouette_ld} {silhouette_hd} {silhouette_ld * silhouette_hd}\n")
+            self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
     def tsne_ramachandran_plot(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
@@ -202,11 +173,19 @@ class EnsembleAnalysis:
     def dimenfix_scatter_plot_2(self):
         dimenfix_scatter_plot_2(self.transformed_data, self.all_labels)
 
+    def dimenfix_cluster_scatter_plot(self):
+        dimenfix_cluster_scatter_plot(self.sil_scores, self.transformed_data)
+
+    def dimenfix_cluster_scatter_plot_2(self):
+        dimenfix_cluster_scatter_plot_2(self.sil_scores, self.transformed_data, self.featurized_data.keys(), self.all_labels)
+
+    def cluster(self, range_n_clusters):
+        self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)
+
     def execute_pipeline(self, featurization_params, reduce_dim_params, clustering_params=None):
         self.download_from_ped()
         self.generate_trajectories()
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
-        if reduce_dim_params.get('method') == 'tsne':
-            self.create_tsne_clusters(**clustering_params)
+        self.cluster(**clustering_params)

@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 import os
+from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import sklearn
 import numpy as np
 from sklearn.manifold import MDS
 from neo_force_scheme import NeoForceScheme
+from sklearn.metrics import silhouette_score
 from tsne_utils import unit_vector_distance
 
 class DimensionalityReduction(ABC):
@@ -19,6 +21,10 @@ class DimensionalityReduction(ABC):
     
     @abstractmethod
     def fit_transform(self, data):
+        pass
+    
+    @abstractmethod
+    def cluster(self, range_n_clusters):
         pass
 
 class PCAReduction(DimensionalityReduction):
@@ -38,6 +44,9 @@ class PCAReduction(DimensionalityReduction):
         self.pca = sklearn.decomposition.PCA(n_components=self.num_dim)
         transformed = self.pca.fit_transform(data)
         return transformed
+    
+    def cluster(self, range_n_clusters):
+        return super().cluster(range_n_clusters)
 
 class TSNEReduction(DimensionalityReduction):
     def __init__(self, dir=".", perplexityVals=range(2, 10, 2), metric="euclidean"):
@@ -52,6 +61,7 @@ class TSNEReduction(DimensionalityReduction):
         return super().transform(data)
 
     def fit_transform(self, data):
+        self.data = data
         print("tsne is running...")
         for i in self.perplexityVals:
             tsne_file = os.path.join(self.dir, f"tsnep{i}")
@@ -77,6 +87,32 @@ class TSNEReduction(DimensionalityReduction):
             print(f"tsne file for the perplexity value of {i} is saved in {self.dir} ")
         print(f"tsne is done! All files saved in {self.dir}")
 
+    def cluster(self, range_n_clusters):
+        # Clear the silhouette file before appending new data
+        silhouette_file_path = os.path.join(self.dir, 'silhouette.txt')
+        if os.path.exists(silhouette_file_path):
+            with open(silhouette_file_path, 'w') as f:
+                f.write("")
+        
+        for perp in self.perplexityVals:
+            tsne = np.loadtxt(self.dir + '/tsnep'+str(perp))
+            sil_scores = []
+            for n_clusters in range_n_clusters:
+                kmeans = KMeans(n_clusters=n_clusters, n_init= 'auto').fit(tsne)
+                np.savetxt(self.dir + '/kmeans_'+str(n_clusters)+'clusters_centers_tsnep'+str(perp), kmeans.cluster_centers_, fmt='%1.3f')
+                np.savetxt(self.dir + '/kmeans_'+str(n_clusters)+'clusters_tsnep'+str(perp)+'.dat', kmeans.labels_, fmt='%1.1d')
+                    
+                # Compute silhouette score based on low-dim and high-dim distances        
+                silhouette_ld = silhouette_score(tsne, kmeans.labels_)
+                silhouette_hd = silhouette_score(self.data, kmeans.labels_)
+                
+                # Append silhouette scores to the file
+                with open(silhouette_file_path, 'a') as f:
+                    f.write(f"{perp} {n_clusters} {silhouette_ld} {silhouette_hd} {silhouette_ld * silhouette_hd}\n")
+                
+                sil_scores.append((n_clusters, silhouette_ld))
+            return sil_scores
+
 class DimenFixReduction(DimensionalityReduction):
     def fit(self, data):
         return super().fit(data)
@@ -86,8 +122,23 @@ class DimenFixReduction(DimensionalityReduction):
     
     def fit_transform(self, data):
         nfs = NeoForceScheme()
-        projection = nfs.fit_transform(data)
-        return projection
+        self.projection = nfs.fit_transform(data)
+        return self.projection
+    
+    def cluster(self, range_n_clusters):
+        for n_clusters in range_n_clusters:
+            sil_scores = []
+            clusterer = KMeans(n_clusters=n_clusters, n_init="auto", random_state=10)
+            cluster_labels = clusterer.fit_predict(self.projection)
+            silhouette_avg = silhouette_score(self.projection, cluster_labels)
+            sil_scores.append((n_clusters,silhouette_avg))
+            print(
+                "For n_clusters =",
+                n_clusters,
+                "The average silhouette_score is :",
+                silhouette_avg,
+            )
+        return sil_scores
 
 class TSNECircularReduction(DimensionalityReduction):
     def __init__(self,  dir=".", perplexityVals=range(2, 10, 2), metric=unit_vector_distance):
@@ -127,6 +178,9 @@ class TSNECircularReduction(DimensionalityReduction):
             print(f"tsne file for the perplexity value of {i} is saved in {self.dir} ")
         print(f"tsne is done! All files saved in {self.dir}")
 
+    def cluster(self, range_n_clusters):
+        return super().cluster(range_n_clusters)
+
 class MDSReduction(DimensionalityReduction):
     def __init__(self, num_dim):
         self.num_dim = num_dim
@@ -141,6 +195,9 @@ class MDSReduction(DimensionalityReduction):
         embedding = MDS(n_components=self.num_dim)
         feature_transformed = embedding.fit_transform(data)
         return feature_transformed
+    
+    def cluster(self, range_n_clusters):
+        return super().cluster(range_n_clusters)
 
 class DimensionalityReductionFactory:
     @staticmethod

@@ -140,3 +140,42 @@ def dimenfix_scatter_plot_2(data, all_labels):
                                             )),
                     )
     fig.show()
+
+def s_max(sil_scores):
+    s = 0
+    for i in sil_scores:
+        if i[1] > s:
+            s = i[1]
+            k = i[0]
+    return k
+
+def dimenfix_cluster_scatter_plot(sil_scores, data):
+    n_clusters = s_max(sil_scores)
+
+    # Apply K-means clustering
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    labels = kmeans.fit_predict(data)
+
+    # Plot the points with different colors for each cluster
+    plt.scatter(data[:, 0], data[:, 1], s=3 ,c=labels, cmap='viridis')
+    plt.title('K-means Clustering')
+    plt.show()
+
+def dimenfix_cluster_scatter_plot_2(sil_scores, data, ens_codes, all_labels):
+    label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in ens_codes}
+    point_colors = list(map(lambda label: label_colors[label], all_labels))
+
+    n_clusters = s_max(sil_scores)
+
+    # Apply K-means clustering
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    labels = point_colors
+
+    # Plot the points with different colors for each cluster
+    plt.figure(dpi=100)
+    plt.scatter(data[:, 0], data[:, 1], c=labels, s=7)
+    # plt.title('K-means Clustering')
+    legend_labels = list(label_colors.keys())
+    legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
+    plt.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'upper left', bbox_to_anchor=(1, 1))
+    plt.show()
