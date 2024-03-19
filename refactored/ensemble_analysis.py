@@ -1,5 +1,5 @@
 from api_client import APIClient
-from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
+from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
@@ -142,6 +142,7 @@ class EnsembleAnalysis:
     def fit_dimensionality_reduction(self, method: str, *args, **kwargs):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         self.reducer = DimensionalityReductionFactory.get_reducer(method, dim_reduction_dir, *args, **kwargs)
+        self.reduce_dim_method = method
         if method == "pca":
             self.reduce_dim_model = self.reducer.fit(data=self.concat_features)
             self.reduce_dim_data = {}
@@ -153,16 +154,22 @@ class EnsembleAnalysis:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
     def tsne_ramachandran_plot(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        tsne_ramachandran_plot(dim_reduction_dir, self.concat_features)
+        if self.reduce_dim_method == "tsne":
+            dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
+            tsne_ramachandran_plot(dim_reduction_dir, self.concat_features)
+        else:
+            print("Analysis is only valid for t-SNE dimensionality reduction.")
 
     def tsne_ramachandran_plot_density(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         tsne_ramachandran_plot_density(dim_reduction_dir, self.concat_features)
 
     def tsne_scatter_plot(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.ens_codes, self.rg)
+        if self.reduce_dim_method == "tsne":
+            dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
+            tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.ens_codes, self.rg)
+        else:
+            print("Analysis is only valid for t-SNE dimensionality reduction.")
 
     def tsne_scatter_plot_2(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
@@ -181,7 +188,10 @@ class EnsembleAnalysis:
         dimenfix_cluster_scatter_plot_2(self.sil_scores, self.transformed_data, self.ens_codes, self.all_labels)
 
     def pca_cumulative_explained_variance(self):
-        pca_cumulative_explained_variance(self.reduce_dim_model)
+        if self.reduce_dim_method == "pca":
+            pca_cumulative_explained_variance(self.reduce_dim_model)
+        else:
+            print("Analysis is only valid for PCA dimensionality reduction.")
 
     def pca_plot_2d_landscapes(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
@@ -190,6 +200,12 @@ class EnsembleAnalysis:
     def pca_plot_1d_histograms(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         pca_plot_1d_histograms(self.ens_codes, self.transformed_data, self.reduce_dim_data, dim_reduction_dir, self.featurization)
+
+    def pca_correlation_plot(self, num_residues, sel_dims):
+        if self.featurization == "ca_dist":
+            pca_correlation_plot(num_residues, sel_dims, self.feature_names, self.reduce_dim_model)
+        else:
+            print("Analysis is only valid for ca_dist feature extraction.")
 
     def cluster(self, range_n_clusters):
         self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)

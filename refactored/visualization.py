@@ -1,6 +1,6 @@
 import os
 import random
-from matplotlib import cm, pyplot as plt
+from matplotlib import cm, colors, pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
 import seaborn as sns
@@ -271,4 +271,32 @@ def pca_plot_1d_histograms(ens_codes, concat_reduce_dim_data, reduce_dim_data, r
 
     plt.tight_layout()
     plt.savefig(os.path.join(reduce_dim_dir, 'PCA_hist' + featurization + ens_codes[0][0] + ens_codes[0][1]))
+    plt.show()
+
+def pca_correlation_plot(num_residues, sel_dims, feature_names, reduce_dim_model):
+    cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
+    norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted
+                                          # when analyzing other systems via PCA!
+    dpi = 120
+
+    fig_r = 0.8
+    fig, ax = plt.subplots(1, 3, dpi=dpi, figsize=(15*fig_r, 4*fig_r))
+
+    for k, sel_dim in enumerate(sel_dims):
+        feature_ids_sorted_by_weight = np.flip(np.argsort(abs(reduce_dim_model.components_[sel_dim,:])))
+        matrix = np.zeros((num_residues, num_residues))
+        for i in feature_ids_sorted_by_weight:
+            r1, r2 = feature_names[i].split("-")
+            # Note: this should be patched for proteins with resSeq values not starting from 1!
+            matrix[int(r1[3:])-1, int(r2[3:])-1] = reduce_dim_model.components_[sel_dim,i]
+            matrix[int(r2[3:])-1, int(r1[3:])-1] = reduce_dim_model.components_[sel_dim,i]
+        im = ax[k].imshow(matrix, cmap=cmap, norm=norm)  # RdBu, PiYG
+        ax[k].set_xlabel("Residue j")
+        ax[k].set_ylabel("Residue i")
+        ax[k].set_title(r"Weight of $d_{ij}$" + f" for PCA dim {sel_dim+1}")
+        cbar = fig.colorbar(
+            im, ax=ax[k],
+            label="PCA weight"
+        )
+    plt.tight_layout()
     plt.show()
