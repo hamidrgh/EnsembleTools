@@ -1,5 +1,5 @@
 from api_client import APIClient
-from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
+from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, pca_rg_correlation, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
@@ -206,6 +206,10 @@ class EnsembleAnalysis:
             pca_correlation_plot(num_residues, sel_dims, self.feature_names, self.reduce_dim_model)
         else:
             print("Analysis is only valid for ca_dist feature extraction.")
+    
+    def pca_rg_correlation(self):
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
+        pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, dim_reduction_dir)
 
     def cluster(self, range_n_clusters):
         self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)

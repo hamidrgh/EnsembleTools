@@ -6,6 +6,7 @@ from sklearn.cluster import KMeans
 import seaborn as sns
 import plotly.graph_objects as go 
 import plotly.express as px
+import mdtraj
 
 def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     s = np.loadtxt(tsne_kmeans_dir  +'/silhouette.txt')
@@ -299,4 +300,23 @@ def pca_correlation_plot(num_residues, sel_dims, feature_names, reduce_dim_model
             label="PCA weight"
         )
     plt.tight_layout()
+    plt.show()
+
+def pca_rg_correlation(ens_codes, trajectories, reduce_dim_data, reduce_dim_dir):
+    dpi = 120
+    fig, ax = plt.subplots(len(ens_codes), 1, figsize=(3, 3*len(ens_codes)), dpi=dpi)
+    pca_dim = 0
+
+    for i, code_i in enumerate(ens_codes):
+        rg_i = mdtraj.compute_rg(trajectories[code_i])
+        ax[i].scatter(reduce_dim_data[code_i][:,pca_dim],
+                rg_i, label=code_i,
+                color=f"C{i}"
+        )
+        ax[i].legend(fontsize=8)
+        ax[i].set_xlabel(f"Dim {pca_dim+1}")
+        ax[i].set_ylabel("Rg [nm]")
+
+    plt.tight_layout()
+    plt.savefig(reduce_dim_dir + 'PCA_RG' + ens_codes[0][0] + ens_codes[0][1])
     plt.show()
