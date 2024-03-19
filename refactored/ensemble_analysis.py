@@ -153,6 +153,20 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
+    def cluster(self, range_n_clusters):
+        self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)
+
+    def execute_pipeline(self, featurization_params, reduce_dim_params, clustering_params=None):
+        self.download_from_ped()
+        self.generate_trajectories()
+        self.perform_feature_extraction(**featurization_params)
+        self.rg_calculator()
+        self.fit_dimensionality_reduction(**reduce_dim_params)
+        if clustering_params:
+            self.cluster(**clustering_params)
+
+    ##################### Integrated plot function #####################
+
     def tsne_ramachandran_plot(self):
         if self.reduce_dim_method == "tsne":
             dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
@@ -210,15 +224,4 @@ class EnsembleAnalysis:
     def pca_rg_correlation(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, dim_reduction_dir)
-
-    def cluster(self, range_n_clusters):
-        self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)
-
-    def execute_pipeline(self, featurization_params, reduce_dim_params, clustering_params=None):
-        self.download_from_ped()
-        self.generate_trajectories()
-        self.perform_feature_extraction(**featurization_params)
-        self.rg_calculator()
-        self.fit_dimensionality_reduction(**reduce_dim_params)
-        if clustering_params:
-            self.cluster(**clustering_params)
+        
