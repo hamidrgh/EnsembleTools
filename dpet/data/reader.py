@@ -3,11 +3,29 @@ import mdtraj
 
 
 def read_pdb(input_fp: str) -> mdtraj.Trajectory:
+
     raise NotImplementedError()
 
 
-def read_pdb_dir(input_dp: str) -> mdtraj.Trajectory:
-    raise NotImplementedError()
+def read_pdb_dir(input_dp: str,
+                 code: str) -> mdtraj.Trajectory:
+    
+    ens_dcd_i = os.path.join(input_dp, f"{code}.dcd")
+    ens_top_i = os.path.join(input_dp, f"{code}.top.pdb")
+
+    if not os.path.isfile(ens_dcd_i):
+        ens_fp_i = os.path.join(input_dp, f"{code}.pdb")
+        print(f"# Loading {ens_fp_i}.")
+        trajectory_ens_fp_i =  mdtraj.load(ens_fp_i)
+        print("- Saving a DCD file for faster reading next time.")
+        trajectory_ens_fp_i.save(ens_dcd_i)
+        trajectory_ens_fp_i[0].save(ens_top_i)
+        return trajectory_ens_fp_i
+    else:
+        print(f"# Loading {ens_dcd_i}.")
+        trajectory = mdtraj.load(ens_dcd_i, top=ens_top_i)
+        return trajectory
+
 
 
 traj_formats = ("dcd", "xtc", )

@@ -2,7 +2,7 @@
 Module with a class implementing a customizable pipeline for readily analyzing
 structural ensembles.
 """
-
+import os
 from typing import Union, List, Callable, Tuple
 from collections import OrderedDict
 import numpy as np
@@ -95,11 +95,13 @@ class EnsembleAnalysis:
             # TODO: convert to ensemble.
             if format == "pdb":
                 traj_i = read_pdb(
-                    input_fp=os.path.join(input_dp, f"{code}.pdb")
+                    input_fp=os.path.join(input_dp, f"{code_i}.pdb")
+
                 )
             elif format == "pdb_dir":
                 traj_i = read_pdb_dir(
-                    input_dp=input_dp
+                    input_dp=input_dp,
+                    code=code_i
                 )
             elif format == "traj":
                 traj_i = read_traj(
