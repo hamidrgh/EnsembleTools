@@ -9,7 +9,7 @@ import plotly.express as px
 import mdtraj
 from matplotlib.lines import Line2D
 
-from coord import calculate_asphericity, calculate_prolateness, create_consecutive_indices_matrix
+from coord import calculate_asphericity, calculate_prolateness, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
 
 def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     s = np.loadtxt(tsne_kmeans_dir  +'/silhouette.txt')
@@ -447,3 +447,53 @@ def trajectories_plot_rg_comparison(trajectories, n_bins=50, bins_range=(1, 4.5)
     plt.tight_layout()
     plt.show()
 
+def get_ens_dict(trajectories):
+    distance_matrix_ens_dict = {}
+    contact_ens_dict = {}
+    for ens in trajectories:
+        xyz_ens = trajectories[ens].xyz[:,trajectories[ens].topology.select("protein and name CA")]
+        distance_matrix_ens_dict[ens] = get_distance_matrix(xyz_ens)
+        contact_ens_dict[ens] = get_contact_map(distance_matrix_ens_dict[ens])
+    return distance_matrix_ens_dict
+
+def plot_average_dmap_comparison(trajectories, ticks_fontsize=14,
+                                 cbar_fontsize=14,
+                                 title_fontsize=14,
+                                 dpi=96,
+                                 max_d=6.8,
+                                 use_ylabel=True):
+    ens_dict = get_ens_dict(trajectories)
+    num_proteins = len(ens_dict)
+    cols = 2  # Number of columns for subplots
+    rows = (num_proteins + cols - 1) // cols
+    fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+    axes = axes.reshape((rows, cols))  # Reshape axes to ensure it's 2D
+    
+    for i, (protein_name, ens_data) in enumerate(ens_dict.items()):
+        row = i // cols
+        col = i % cols
+        ax = axes[row, col] if num_proteins > 1 else axes[0]  # Ensure correct indexing
+        
+        avg_dmap = np.mean(ens_data, axis=0)
+        tril_ids = np.tril_indices(avg_dmap.shape[0], 0)
+        avg_dmap[tril_ids] = np.nan
+        
+        im = ax.imshow(avg_dmap)
+        ax.set_title(f"Average Distance Map: {protein_name}", fontsize=title_fontsize)
+        ax.tick_params(axis='both', which='major', labelsize=ticks_fontsize)
+        if not use_ylabel:
+            ax.set_yticks([])
+        
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label(r"Average $d_{ij}$ [nm]", fontsize=cbar_fontsize)
+        cbar.ax.tick_params(labelsize=cbar_fontsize)
+        
+        if max_d is not None:
+            im.set_clim(0, max_d)
+    
+    # Remove any empty subplots
+    for i in range(num_proteins, rows * cols):
+        fig.delaxes(axes.flatten()[i])
+    
+    plt.tight_layout()
+    plt.show()
