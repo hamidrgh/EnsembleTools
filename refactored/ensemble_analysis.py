@@ -1,5 +1,5 @@
 from api_client import APIClient
-from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, pca_rg_correlation, plot_average_dmap_comparison, trajectories_plot_asphericity, trajectories_plot_density, trajectories_plot_dihedrals, trajectories_plot_prolateness, trajectories_plot_relative_helix_content_multiple_proteins, trajectories_plot_rg_comparison, trajectories_plot_total_sasa, trajectories_scatter_prolateness, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
+from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, pca_rg_correlation, plot_average_dmap_comparison, plot_cmap_comparison, trajectories_plot_asphericity, trajectories_plot_density, trajectories_plot_dihedrals, trajectories_plot_prolateness, trajectories_plot_relative_helix_content_multiple_proteins, trajectories_plot_rg_comparison, trajectories_plot_total_sasa, trajectories_scatter_prolateness, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
@@ -249,5 +249,21 @@ class EnsembleAnalysis:
     def trajectories_plot_rg_comparison(self, n_bins=50, bins_range=(1, 4.5), dpi=96):
         trajectories_plot_rg_comparison(self.trajectories, n_bins, bins_range, dpi)
 
-    def plot_average_dmap_comparison(self):
-        plot_average_dmap_comparison(self.trajectories)
+    def plot_average_dmap_comparison(self, 
+                                    ticks_fontsize=14,
+                                    cbar_fontsize=14,
+                                    title_fontsize=14,
+                                    dpi=96,
+                                    max_d=6.8,
+                                    use_ylabel=True):
+        plot_average_dmap_comparison(self.trajectories, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
+
+    def plot_cmap_comparison(self,
+                            title,
+                            ticks_fontsize=14,
+                            cbar_fontsize=14,
+                            title_fontsize=14,
+                            dpi=96,
+                            cmap_min=-3.5,
+                            use_ylabel=True):
+        plot_cmap_comparison(self.trajectories, title, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, cmap_min, use_ylabel)

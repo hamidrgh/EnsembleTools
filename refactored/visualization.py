@@ -447,14 +447,21 @@ def trajectories_plot_rg_comparison(trajectories, n_bins=50, bins_range=(1, 4.5)
     plt.tight_layout()
     plt.show()
 
-def get_ens_dict(trajectories):
+def get_distance_matrix_ens_dict(trajectories):
+    distance_matrix_ens_dict = {}
+    for ens in trajectories:
+        xyz_ens = trajectories[ens].xyz[:,trajectories[ens].topology.select("protein and name CA")]
+        distance_matrix_ens_dict[ens] = get_distance_matrix(xyz_ens)
+    return distance_matrix_ens_dict
+
+def get_contact_ens_dict(trajectories):
     distance_matrix_ens_dict = {}
     contact_ens_dict = {}
     for ens in trajectories:
         xyz_ens = trajectories[ens].xyz[:,trajectories[ens].topology.select("protein and name CA")]
         distance_matrix_ens_dict[ens] = get_distance_matrix(xyz_ens)
         contact_ens_dict[ens] = get_contact_map(distance_matrix_ens_dict[ens])
-    return distance_matrix_ens_dict
+    return contact_ens_dict
 
 def plot_average_dmap_comparison(trajectories, ticks_fontsize=14,
                                  cbar_fontsize=14,
@@ -462,7 +469,7 @@ def plot_average_dmap_comparison(trajectories, ticks_fontsize=14,
                                  dpi=96,
                                  max_d=6.8,
                                  use_ylabel=True):
-    ens_dict = get_ens_dict(trajectories)
+    ens_dict = get_distance_matrix_ens_dict(trajectories)
     num_proteins = len(ens_dict)
     cols = 2  # Number of columns for subplots
     rows = (num_proteins + cols - 1) // cols
@@ -472,7 +479,7 @@ def plot_average_dmap_comparison(trajectories, ticks_fontsize=14,
     for i, (protein_name, ens_data) in enumerate(ens_dict.items()):
         row = i // cols
         col = i % cols
-        ax = axes[row, col] if num_proteins > 1 else axes[0]  # Ensure correct indexing
+        ax = axes[row, col] if num_proteins > 1 else axes[0]
         
         avg_dmap = np.mean(ens_data, axis=0)
         tril_ids = np.tril_indices(avg_dmap.shape[0], 0)
@@ -496,4 +503,49 @@ def plot_average_dmap_comparison(trajectories, ticks_fontsize=14,
         fig.delaxes(axes.flatten()[i])
     
     plt.tight_layout()
+    plt.show()
+
+def plot_cmap_comparison(trajectories, title,
+                         ticks_fontsize=14,
+                         cbar_fontsize=14,
+                         title_fontsize=14,
+                         dpi=96,
+                         cmap_min=-3.5,
+                         use_ylabel=True):
+    cmap_ens_dict = get_contact_ens_dict(trajectories)
+    num_proteins = len(cmap_ens_dict)
+    cols = 2  # Number of columns for subplots
+    rows = (num_proteins + cols - 1) // cols
+    fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+    axes = axes.reshape((rows, cols))  # Reshape axes to ensure it's 2D
+    
+    cmap = cm.get_cmap("jet")
+    norm = colors.Normalize(cmap_min, 0)
+    
+    for i, (protein_name, cmap_ens) in enumerate(cmap_ens_dict.items()):
+        row = i // cols
+        col = i % cols
+        ax = axes[row, col] if num_proteins > 1 else axes[0]
+        
+        cmap_ens = np.log10(cmap_ens)
+        cmap_ens = np.triu(cmap_ens)
+        
+        im = ax.imshow(cmap_ens, cmap=cmap, norm=norm)
+        ax.set_title(f"Contact Probability Map: {protein_name}", fontsize=title_fontsize)
+        ax.tick_params(axis='both', which='major', labelsize=ticks_fontsize)
+        if not use_ylabel:
+            ax.set_yticks([])
+        
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label(r'$log_{10}(p_{ij})$', fontsize=cbar_fontsize)
+        cbar.ax.tick_params(labelsize=cbar_fontsize)
+        
+        im.set_clim(cmap_min, 0)
+    
+    # Remove any empty subplots
+    for i in range(num_proteins, rows * cols):
+        fig.delaxes(axes.flatten()[i])
+    
+    plt.tight_layout()
+    plt.suptitle(title, fontsize=title_fontsize)
     plt.show()
