@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from dpet.featurization.distances import calc_ca_dmap
+import mdtraj
 
 
 
@@ -14,7 +15,7 @@ def plot_average_dmap(traj_dict, ticks_fontsize=14,
     Plot the average distance map comparison for multiple proteins.
 
     Parameters:
-        ens_dict (dict): A dictionary where keys are protein names and values are their distance maps with shape (N,L,L).
+        ens_dict (dict): A dictionary where keys are protein names and values are their trajectory.
         ticks_fontsize (int): Font size for ticks. Default is 14.
         cbar_fontsize (int): Font size for color bar ticks. Default is 14.
         title_fontsize (int): Font size for title. Default is 14.
@@ -58,3 +59,15 @@ def plot_average_dmap(traj_dict, ticks_fontsize=14,
     
     plt.tight_layout()
     plt.show()
+
+
+
+def end_to_end_distances_plot(traj_dict, atom_selector ="protein and name CA", bins = 50):
+    ca_indices = traj_dict[next(iter(traj_dict))].topology.select(atom_selector)
+    for ens in traj_dict:
+        plt.hist(mdtraj.compute_distances(traj_dict[ens],[[ca_indices[0], ca_indices[-1]]]).ravel()
+                  , label=ens, bins=bins, edgecolor = 'black', density=True)
+    plt.title("End-to-End distances distribution")
+    plt.legend()
+    plt.show()    
+
