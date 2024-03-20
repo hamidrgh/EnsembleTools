@@ -1,12 +1,15 @@
 import os
 import random
-from matplotlib import cm, colors, pyplot as plt
+from matplotlib import cm, colors, legend, pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
 import seaborn as sns
 import plotly.graph_objects as go 
 import plotly.express as px
 import mdtraj
+from matplotlib.lines import Line2D
+
+from coord import calculate_asphericity, calculate_prolateness, create_consecutive_indices_matrix
 
 def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     s = np.loadtxt(tsne_kmeans_dir  +'/silhouette.txt')
@@ -320,3 +323,127 @@ def pca_rg_correlation(ens_codes, trajectories, reduce_dim_data, reduce_dim_dir)
     plt.tight_layout()
     plt.savefig(reduce_dim_dir + 'PCA_RG' + ens_codes[0][0] + ens_codes[0][1])
     plt.show()
+
+def trajectories_plot_total_sasa(trajectories):
+    for ens in trajectories:
+        sasa = mdtraj.shrake_rupley(trajectories[ens])
+
+
+        total_sasa = sasa.sum(axis=1)
+        plt.plot(trajectories[ens].time, total_sasa,label = ens )
+    plt.xlabel('frame', size=16)
+    plt.ylabel('Total SASA (nm)^2', size=16)
+    plt.legend()
+    plt.show()
+
+def trajectories_plot_asphericity(trajectories):
+    for ens in trajectories:
+        x = mdtraj.compute_rg(trajectories[ens])
+        y = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        
+        plt.scatter(x,y,s=4,label = ens)
+    plt.ylabel("Asphericity")
+    plt.xlabel("Rg [nm]")
+    plt.legend()
+    plt.show()
+
+def trajectories_plot_density(trajectories):
+    for ens in trajectories:
+        asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        sns.kdeplot(asphericity, label = ens)
+    plt.legend()
+    plt.show()
+
+def trajectories_scatter_prolateness(trajectories):
+    for ens in trajectories:
+        x = mdtraj.compute_rg(trajectories[ens])
+        y = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        
+        plt.scatter(x,y,s=4,label = ens)
+    plt.ylabel("prolateness")
+    plt.xlabel("Rg [nm]")
+    plt.legend()
+    plt.show()
+
+def trajectories_plot_prolateness(trajectories):
+    for ens in trajectories:
+        prolatness = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        sns.kdeplot(prolatness, label = ens)
+    plt.legend()
+    plt.show()
+
+def trajectories_plot_dihedrals(trajectories):
+    for ens in trajectories:
+        four_cons_indices_ca = create_consecutive_indices_matrix(trajectories[ens].topology.select("protein and name CA") )
+        ens_dh_ca = mdtraj.compute_dihedrals(trajectories[ens], four_cons_indices_ca).ravel()
+        plt.hist(ens_dh_ca, bins=50, histtype="step", density=True, label=ens)
+    plt.title("the distribution of dihedral angles between four consecutive Cα beads.")    
+    plt.legend()
+    plt.show
+
+def get_protein_dssp_data_dict(trajectories):
+    dssp_data_dict = {}
+    for ens in trajectories:
+        dssp_data_dict[ens] = mdtraj.compute_dssp(trajectories[ens])
+    return dssp_data_dict
+
+def trajectories_plot_relative_helix_content_multiple_proteins(trajectories):
+    protein_dssp_data_dict = get_protein_dssp_data_dict(trajectories)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    bottom = np.zeros(next(iter(protein_dssp_data_dict.values())).shape[1])
+
+    for protein_name, dssp_data in protein_dssp_data_dict.items():
+        # Count the occurrences of 'H' in each column
+        h_counts = np.count_nonzero(dssp_data == 'H', axis=0)
+        
+        # Calculate the total number of residues for each position
+        total_residues = dssp_data.shape[0]
+        
+        # Calculate the relative content of 'H' for each residue
+        relative_h_content = h_counts / total_residues
+        
+        # Plot the relative content for each protein
+        ax.bar(range(len(relative_h_content)), relative_h_content, bottom=bottom, label=f"{protein_name[0]} {protein_name[1]}")
+
+        bottom += relative_h_content
+    
+    ax.set_xlabel('Residue Index')
+    ax.set_ylabel('Relative Content of H (Helix)')
+    ax.set_title('Relative Content of H in Each Residue in the ensembles')
+    ax.legend()
+    plt.show()
+
+def get_rg_data_dict(trajectories):
+    rg_dict = {}
+    for ens in trajectories:
+        #xyz_ens = trajectories[ens].xyz
+        rg_dict[ens] = mdtraj.compute_rg(trajectories[ens])
+    return rg_dict
+
+def trajectories_plot_rg_comparison(trajectories, n_bins=50, bins_range=(1, 4.5), dpi=96):
+    rg_data_dict = get_rg_data_dict(trajectories)
+    h_args = {"histtype": "step", "density": True}
+    n_systems = len(rg_data_dict)
+    bins = np.linspace(bins_range[0], bins_range[1], n_bins + 1)
+    fig, ax = plt.subplots(1, n_systems, figsize=(3 * n_systems, 3), dpi=dpi)
+    
+    for i, (name_i, rg_i) in enumerate(rg_data_dict.items()):
+        ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
+        ax[i].set_title(name_i)
+        if i == 0:
+            ax[i].set_ylabel("Density")
+        ax[i].set_xlabel("Rg [nm]")
+        mean_rg = np.mean(rg_i)
+        median_rg = np.median(rg_i)
+
+        mean_line = ax[i].axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
+        median_line = ax[i].axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
+
+    
+    mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+    median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+    fig.legend(handles=[mean_legend, median_legend], loc='upper right')
+
+    plt.tight_layout()
+    plt.show()
+

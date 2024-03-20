@@ -1,5 +1,5 @@
 from api_client import APIClient
-from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, pca_rg_correlation, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
+from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, pca_rg_correlation, trajectories_plot_asphericity, trajectories_plot_density, trajectories_plot_dihedrals, trajectories_plot_prolateness, trajectories_plot_relative_helix_content_multiple_proteins, trajectories_plot_rg_comparison, trajectories_plot_total_sasa, trajectories_scatter_prolateness, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
 from ped_entry import PedEntry
 import os
@@ -225,3 +225,26 @@ class EnsembleAnalysis:
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, dim_reduction_dir)
         
+    def trajectories_plot_total_sasa(self):
+        trajectories_plot_total_sasa(self.trajectories)
+
+    def trajectories_plot_asphericity(self):
+        trajectories_plot_asphericity(self.trajectories)
+
+    def trajectories_plot_density(self):
+        trajectories_plot_density(self.trajectories)
+
+    def trajectories_scatter_prolateness(self):
+        trajectories_scatter_prolateness(self.trajectories)
+
+    def trajectories_plot_prolateness(self):
+        trajectories_plot_prolateness(self.trajectories)
+    
+    def trajectories_plot_dihedrals(self):
+        trajectories_plot_dihedrals(self.trajectories)
+
+    def trajectories_plot_relative_helix_content_multiple_proteins(self):
+        trajectories_plot_relative_helix_content_multiple_proteins(self.trajectories)
+
+    def trajectories_plot_rg_comparison(self, n_bins=50, bins_range=(1, 4.5), dpi=96):
+        trajectories_plot_rg_comparison(self.trajectories, n_bins, bins_range, dpi)
