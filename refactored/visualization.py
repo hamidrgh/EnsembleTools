@@ -549,3 +549,37 @@ def plot_cmap_comparison(trajectories, title,
     plt.tight_layout()
     plt.suptitle(title, fontsize=title_fontsize)
     plt.show()
+
+def plot_distance_distribution_multiple(trajectories, dpi=96):
+    prot_data_dict = get_distance_matrix_ens_dict(trajectories)
+    num_proteins = len(prot_data_dict)
+    
+    # Set up the subplot grid
+    cols = 2  # Number of columns for subplots
+    rows = (num_proteins + cols - 1) // cols
+    
+    # Create the figure and subplots
+    fig, axes = plt.subplots(rows, cols, figsize=(10, 5 * rows), dpi=dpi)
+    
+    # Flatten and plot the distance distribution for each protein
+    for i, (protein_name, distance_matrix) in enumerate(prot_data_dict.items()):
+        row = i // cols
+        col = i % cols
+        
+        distances_flat = distance_matrix.flatten()
+        
+        # Plot histogram
+        axes_flat = axes.flatten()  # Flatten axes to access them with a single index
+        axes_flat[i].hist(distances_flat, bins=50, color='skyblue', edgecolor='black', density=True)
+        axes_flat[i].set_title(f'Protein {protein_name}')
+        axes_flat[i].set_xlabel('Distance [nm]')
+        axes_flat[i].set_ylabel('Density')
+        axes_flat[i].grid(True)
+    
+    # Remove any empty subplots
+    for i in range(num_proteins, rows * cols):
+        fig.delaxes(axes.flatten()[i])
+    
+    # Adjust layout
+    plt.tight_layout()
+    plt.show()
