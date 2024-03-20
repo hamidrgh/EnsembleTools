@@ -1,3 +1,4 @@
+import re
 from api_client import APIClient
 from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, pca_rg_correlation, plot_average_dmap_comparison, plot_cmap_comparison, plot_distance_distribution_multiple, trajectories_plot_asphericity, trajectories_plot_density, trajectories_plot_dihedrals, trajectories_plot_prolateness, trajectories_plot_relative_helix_content_multiple_proteins, trajectories_plot_rg_comparison, trajectories_plot_total_sasa, trajectories_scatter_prolateness, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
@@ -13,33 +14,29 @@ PDB_DIR = "pdb_data"
 TRAJ_DIR = "traj"
 
 class EnsembleAnalysis:
-    def __init__(self, ped_entries: PedEntry, data_dir: str):
+    def __init__(self, ens_codes, data_dir: str):
         self.data_dir = data_dir
         self.api_client = APIClient()
         self.trajectories = {}
         self.feature_names = []
         self.featurized_data = {}
         self.all_labels = []
-        self.generate_ens_codes(ped_entries)
-        self.ped_entries = ped_entries
+        self.ens_codes = ens_codes
 
     def __del__(self):
         if hasattr(self, 'api_client'):
             self.api_client.close_session()
     
-    def generate_ens_codes(self, ped_entries):
-        self.ens_codes = []
-        for ped_entry in ped_entries:
-            ped_id = ped_entry.ped_id
-            ensemble_ids = ped_entry.ensemble_ids
-            for ensemble_id in ensemble_ids:
-                self.ens_codes.append(f"{ped_id}{ensemble_id}")
-
     def download_from_ped(self):
-        for ped_entry in self.ped_entries:
-            ped_id = ped_entry.ped_id
-            for ensemble_id in ped_entry.ensemble_ids:
-                ens_code = f"{ped_id}{ensemble_id}"
+        # Define the pattern
+        pattern = r'^(PED\d+)(e\d+)$'
+
+        # Filter the ens_codes list using regex
+        for ens_code in self.ens_codes:
+            match = re.match(pattern, ens_code)
+            if match:
+                ped_id = match.group(1)
+                ensemble_id = match.group(2)
                 tar_gz_filename = f'{ens_code}.tar.gz'
                 tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
 
@@ -49,6 +46,7 @@ class EnsembleAnalysis:
 
                 if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
                     url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
+                    print(url)
                     headers = {'accept': '*/*'}
 
                     response = self.api_client.perform_get_request(url, headers=headers)
@@ -65,6 +63,9 @@ class EnsembleAnalysis:
                     print(f"Extracted file {pdb_filename}.")
                 else:
                     print("File already exists. Skipping extracting.")
+            else:
+                print(f"Entry {ens_code} does not match the pattern and will be skipped.")
+
 
     def generate_trajectories(self):
         pdb_dir = os.path.join(self.data_dir, PDB_DIR)
