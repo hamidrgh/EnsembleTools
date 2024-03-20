@@ -236,7 +236,7 @@ def pca_plot_2d_landscapes(ens_codes, reduce_dim_data, reduce_dim_dir, featuriza
         set_labels(ax[i+1], "pca", dim_x, dim_y)
 
     plt.tight_layout()
-    plt.savefig(os.path.join(reduce_dim_dir, 'PCA' + featurization + ens_codes[0][0] + ens_codes[0][1]))
+    plt.savefig(os.path.join(reduce_dim_dir, 'PCA' + featurization + ens_codes[0]))
     plt.show()
 
 def pca_plot_1d_histograms(ens_codes, concat_reduce_dim_data, reduce_dim_data, reduce_dim_dir, featurization):
@@ -274,7 +274,7 @@ def pca_plot_1d_histograms(ens_codes, concat_reduce_dim_data, reduce_dim_data, r
         ax[i].set_ylabel("Density")
 
     plt.tight_layout()
-    plt.savefig(os.path.join(reduce_dim_dir, 'PCA_hist' + featurization + ens_codes[0][0] + ens_codes[0][1]))
+    plt.savefig(os.path.join(reduce_dim_dir, 'PCA_hist' + featurization + ens_codes[0]))
     plt.show()
 
 def pca_correlation_plot(num_residues, sel_dims, feature_names, reduce_dim_model):
@@ -321,7 +321,7 @@ def pca_rg_correlation(ens_codes, trajectories, reduce_dim_data, reduce_dim_dir)
         ax[i].set_ylabel("Rg [nm]")
 
     plt.tight_layout()
-    plt.savefig(reduce_dim_dir + 'PCA_RG' + ens_codes[0][0] + ens_codes[0][1])
+    plt.savefig(reduce_dim_dir + 'PCA_RG' + ens_codes[0])
     plt.show()
 
 def trajectories_plot_total_sasa(trajectories):
@@ -403,7 +403,7 @@ def trajectories_plot_relative_helix_content_multiple_proteins(trajectories):
         relative_h_content = h_counts / total_residues
         
         # Plot the relative content for each protein
-        ax.bar(range(len(relative_h_content)), relative_h_content, bottom=bottom, label=f"{protein_name[0]} {protein_name[1]}")
+        ax.bar(range(len(relative_h_content)), relative_h_content, bottom=bottom, label=protein_name)
 
         bottom += relative_h_content
     

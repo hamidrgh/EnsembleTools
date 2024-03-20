@@ -21,6 +21,7 @@ class EnsembleAnalysis:
         self.featurized_data = {}
         self.all_labels = []
         self.generate_ens_codes(ped_entries)
+        self.ped_entries = ped_entries
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -32,49 +33,50 @@ class EnsembleAnalysis:
             ped_id = ped_entry.ped_id
             ensemble_ids = ped_entry.ensemble_ids
             for ensemble_id in ensemble_ids:
-                self.ens_codes.append((ped_id, ensemble_id))
+                self.ens_codes.append(f"{ped_id}{ensemble_id}")
 
     def download_from_ped(self):
-        for (ped_id, ensemble_id) in self.ens_codes:
-            generated_name = f'{ped_id}_{ensemble_id}'
-            tar_gz_filename = f'{generated_name}.tar.gz'
-            tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
+        for ped_entry in self.ped_entries:
+            ped_id = ped_entry.ped_id
+            for ensemble_id in ped_entry.ensemble_ids:
+                ens_code = f"{ped_id}{ensemble_id}"
+                tar_gz_filename = f'{ens_code}.tar.gz'
+                tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
 
-            pdb_dir = os.path.join(self.data_dir, PDB_DIR)
-            pdb_filename = f'{generated_name}.pdb'
-            pdb_file = os.path.join(pdb_dir, pdb_filename)
+                pdb_dir = os.path.join(self.data_dir, PDB_DIR)
+                pdb_filename = f'{ens_code}.pdb'
+                pdb_file = os.path.join(pdb_dir, pdb_filename)
 
-            if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
-                url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
-                headers = {'accept': '*/*'}
+                if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
+                    url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
+                    headers = {'accept': '*/*'}
 
-                response = self.api_client.perform_get_request(url, headers=headers)
-                if response:
-                    # Download and save the response content to a file
-                    self.api_client.download_response_content(response, tar_gz_file)
-                    print(f"Downloaded file {tar_gz_filename} from PED.")
-            else:
-                print("File already exists. Skipping download.")
+                    response = self.api_client.perform_get_request(url, headers=headers)
+                    if response:
+                        # Download and save the response content to a file
+                        self.api_client.download_response_content(response, tar_gz_file)
+                        print(f"Downloaded file {tar_gz_filename} from PED.")
+                else:
+                    print("File already exists. Skipping download.")
 
-            # Extract the .tar.gz file
-            if not os.path.exists(pdb_file):
-                extract_tar_gz(tar_gz_file, pdb_dir, pdb_filename)
-                print(f"Extracted file {pdb_filename}.")
-            else:
-                print("File already exists. Skipping extracting.")
+                # Extract the .tar.gz file
+                if not os.path.exists(pdb_file):
+                    extract_tar_gz(tar_gz_file, pdb_dir, pdb_filename)
+                    print(f"Extracted file {pdb_filename}.")
+                else:
+                    print("File already exists. Skipping extracting.")
 
     def generate_trajectories(self):
         pdb_dir = os.path.join(self.data_dir, PDB_DIR)
         traj_dir = os.path.join(self.data_dir, TRAJ_DIR)
         os.makedirs(traj_dir, exist_ok=True)
     
-        for (ped_id, ensemble_id) in self.ens_codes:    
-            generated_name = f'{ped_id}_{ensemble_id}'
-            pdb_filename = f'{generated_name}.pdb'
+        for ens_code in self.ens_codes:    
+            pdb_filename = f'{ens_code}.pdb'
             pdb_file = os.path.join(pdb_dir, pdb_filename)
 
-            traj_dcd = os.path.join(traj_dir, f'{generated_name}.dcd')
-            traj_top = os.path.join(traj_dir, f'{generated_name}.top.pdb')
+            traj_dcd = os.path.join(traj_dir, f'{ens_code}.dcd')
+            traj_top = os.path.join(traj_dir, f'{ens_code}.top.pdb')
 
             # Generate trajectory from pdb if it doesn't exist, otherwise load it.
             if not os.path.exists(traj_dcd) and not os.path.exists(traj_top):
@@ -87,7 +89,7 @@ class EnsembleAnalysis:
                 print(f'Trajectory already exists. Loading trajectory.')
                 trajectory = mdtraj.load(traj_dcd, top=traj_top)
 
-            self.trajectories[(ped_id, ensemble_id)] = trajectory
+            self.trajectories[ens_code] = trajectory
 
     def perform_feature_extraction(self, featurization: str, normalize = False, *args, **kwargs):
         self.extract_features(featurization, *args, **kwargs)
@@ -100,20 +102,20 @@ class EnsembleAnalysis:
         featurizer = FeaturizationFactory.get_featurizer(featurization, *args, **kwargs)
         get_names = True
         self.featurization = featurization
-        for (ped_id, ensemble_id), trajectory in self.trajectories.items():
-            print(f"Performing feature extraction for PED ID: {ped_id}, ensemble ID: {ensemble_id}.")
+        for ens_code, trajectory in self.trajectories.items():
+            print(f"Performing feature extraction for Ensemble: {ens_code}.")
             if get_names:
                 features, names = featurizer.featurize(trajectory, get_names=get_names)
                 get_names = False
             else:
                 features = featurizer.featurize(trajectory, get_names=get_names)
-            self.featurized_data[(ped_id, ensemble_id)] = features
+            self.featurized_data[ens_code] = features
             print("Transformed ensemble shape:", features.shape)
         self.feature_names = names
         print("Feature names:", names)
 
     def concatenate_features(self):
-        concat_features = [features for (_, _), features in self.featurized_data.items()]
+        concat_features = [features for ens_id, features in self.featurized_data.items()]
         self.concat_features = np.concatenate(concat_features, axis=0)
         print("Concatenated featurized ensemble shape:", self.concat_features.shape)
         
