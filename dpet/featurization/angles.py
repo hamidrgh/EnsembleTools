@@ -29,7 +29,7 @@ def featurize_phi_psi(
 
 
 def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True):
-    """
+    
     # Get all C-alpha indices.
     ca_ids = traj.topology.select("protein and name CB")
     atoms = list(traj.topology.atoms)
@@ -52,5 +52,5 @@ def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True):
         return tors, names
     else:
         return tors
-    """
-    raise NotImplementedError()
+    
+    # raise NotImplementedError()
