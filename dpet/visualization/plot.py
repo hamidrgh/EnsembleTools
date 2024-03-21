@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from dpet.featurization.distances import calc_ca_dmap
+from dpet.featurization.distances import *
 from dpet.featurization.glob import *
 from dpet.featurization.angles import *
+from matplotlib import colors, cm
 import mdtraj
 
 
@@ -164,4 +165,31 @@ def plot_rg_comparison(dict_traj, n_bins=50, bins_range=(1, 4.5), dpi=96 ):
     fig.legend(handles=[mean_legend, median_legend], loc='upper right')
 
     plt.tight_layout()
+    plt.show()
+
+def plot_contact_prob(dict_traj,title,threshold = 0.8,dpi = 96):
+    num_proteins = len(dict_traj)
+    cols = 2
+    rows = (num_proteins + cols - 1) // cols
+    fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+    cmap = cm.get_cmap("Blues")
+    for i, (protein_name, traj) in enumerate(dict_traj.items()):
+        row = i // cols
+        col = i % cols
+        ax = axes[row, col] if num_proteins > 1 else axes
+
+        matrtix_p_map = contact_probability_map(traj , threshold=threshold)
+        im = ax.imshow(matrtix_p_map, cmap=cmap )
+        ax.set_title(f"Contact Probability Map: {protein_name}", fontsize=14)
+
+
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label('Frequency', fontsize=14)
+        cbar.ax.tick_params(labelsize=14)
+
+    for i in range(num_proteins, rows * cols):
+        fig.delaxes(axes.flatten()[i])
+    
+    plt.tight_layout()
+    plt.suptitle(title, fontsize=14)
     plt.show()
