@@ -9,7 +9,6 @@ import numpy as np
 from dimensionality_reduction import DimensionalityReductionFactory
 
 DIM_REDUCTION_DIR = "dim_reduction"
-TRAJ_DIR = "trajectories"
 
 class EnsembleAnalysis:
     def __init__(self, ens_codes, data_dir: str):
@@ -65,20 +64,25 @@ class EnsembleAnalysis:
                 print(f"Entry {ens_code} does not match the pattern and will be skipped.")
 
 
-    def generate_trajectories(self):
-        traj_dir = os.path.join(self.data_dir, TRAJ_DIR)
-        os.makedirs(traj_dir, exist_ok=True)
-        
+    def generate_trajectories(self, traj_top=None):
         for ens_code in self.ens_codes:
             pdb_filename = f'{ens_code}.pdb'
             pdb_file = os.path.join(self.data_dir, pdb_filename)
-            traj_dcd = os.path.join(traj_dir, f'{ens_code}.dcd')
-            traj_top = os.path.join(traj_dir, f'{ens_code}.top.pdb')
+            traj_dcd = os.path.join(self.data_dir, f'{ens_code}.dcd')
+            traj_xtc = os.path.join(self.data_dir, f'{ens_code}.xtc')
+            # Like this the function argument toplogy file has priority over the generated topology file
+            # If that produces issues, change the below two lines
+            if traj_top is None:
+                traj_top = os.path.join(self.data_dir, f'{ens_code}.top.pdb')
             ens_dir = os.path.join(self.data_dir, ens_code)
 
             if os.path.exists(traj_dcd) and os.path.exists(traj_top):
                 print(f'Trajectory already exists for ensemble {ens_code}. Loading trajectory.')
                 trajectory = mdtraj.load(traj_dcd, top=traj_top)
+                self.trajectories[ens_code] = trajectory
+            elif os.path.exists(traj_xtc) and os.path.exists(traj_top):
+                print(f'Trajectory already exists for ensemble {ens_code}. Loading trajectory.')
+                trajectory = mdtraj.load(traj_xtc, top=traj_top)
                 self.trajectories[ens_code] = trajectory
             elif os.path.exists(pdb_file):
                 print(f'Generating trajectory from PDB file: {pdb_file}.')
@@ -170,14 +174,14 @@ class EnsembleAnalysis:
     def cluster(self, range_n_clusters):
         self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)
 
-    def execute_pipeline(self, featurization_params, reduce_dim_params, clustering_params=None):
+    def execute_pipeline(self, featurization_params, reduce_dim_params, range_n_clusters=None, traj_top=None):
         self.download_from_ped()
-        self.generate_trajectories()
+        self.generate_trajectories(traj_top)
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
-        if clustering_params:
-            self.cluster(**clustering_params)
+        if range_n_clusters:
+            self.cluster(range_n_clusters)
 
     ##################### Integrated plot function #####################
 
