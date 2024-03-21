@@ -64,16 +64,17 @@ class EnsembleAnalysis:
                 print(f"Entry {ens_code} does not match the pattern and will be skipped.")
 
 
-    def generate_trajectories(self, traj_top=None):
+    def generate_trajectories(self, topology_file=None):
         for ens_code in self.ens_codes:
             pdb_filename = f'{ens_code}.pdb'
             pdb_file = os.path.join(self.data_dir, pdb_filename)
             traj_dcd = os.path.join(self.data_dir, f'{ens_code}.dcd')
             traj_xtc = os.path.join(self.data_dir, f'{ens_code}.xtc')
-            # Like this the function argument toplogy file has priority over the generated topology file
-            # If that produces issues, change the below two lines
-            if traj_top is None:
-                traj_top = os.path.join(self.data_dir, f'{ens_code}.top.pdb')
+            traj_top = os.path.join(self.data_dir, f'{ens_code}.top.pdb')
+
+            if not os.path.exists(traj_top) and topology_file is not None:
+                traj_top = topology_file
+            
             ens_dir = os.path.join(self.data_dir, ens_code)
 
             if os.path.exists(traj_dcd) and os.path.exists(traj_top):
@@ -174,9 +175,9 @@ class EnsembleAnalysis:
     def cluster(self, range_n_clusters):
         self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)
 
-    def execute_pipeline(self, featurization_params, reduce_dim_params, range_n_clusters=None, traj_top=None):
+    def execute_pipeline(self, featurization_params, reduce_dim_params, range_n_clusters=None, topology_file=None):
         self.download_from_ped()
-        self.generate_trajectories(traj_top)
+        self.generate_trajectories(topology_file)
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
