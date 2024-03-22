@@ -3,12 +3,13 @@ import numpy as np
 from dpet.featurization.distances import *
 from dpet.featurization.glob import *
 from dpet.featurization.angles import *
+from dpet.analysis import EnsembleAnalysis
 from matplotlib import colors, cm
 import mdtraj
 
 
 
-def plot_average_dmap(traj_dict, ticks_fontsize=14,
+def plot_average_dmap(ens_analysis:EnsembleAnalysis, ticks_fontsize=14,
                                  cbar_fontsize=14,
                                  title_fontsize=14,
                                  dpi=96,
@@ -29,12 +30,12 @@ def plot_average_dmap(traj_dict, ticks_fontsize=14,
     Returns:
         None
     """
-    num_proteins = len(traj_dict)
+    num_proteins = len(ens_analysis.trajectories)
     cols = 2  # Number of columns for subplots
     rows = (num_proteins + cols - 1) // cols
     fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
     
-    for i, (protein_name, traj) in enumerate(traj_dict.items()):
+    for i, (protein_name, traj) in enumerate(ens_analysis.trajectories.items()):
         row = i // cols
         col = i % cols
         ax = axes[row, col] if num_proteins > 1 else axes
@@ -63,61 +64,61 @@ def plot_average_dmap(traj_dict, ticks_fontsize=14,
     plt.tight_layout()
     plt.show()
 
-def end_to_end_distances_plot(traj_dict, atom_selector ="protein and name CA", bins = 50):
-    ca_indices = traj_dict[next(iter(traj_dict))].topology.select(atom_selector)
-    for ens in traj_dict:
-        plt.hist(mdtraj.compute_distances(traj_dict[ens],[[ca_indices[0], ca_indices[-1]]]).ravel()
+def end_to_end_distances_plot(ens_analysis:EnsembleAnalysis, atom_selector ="protein and name CA", bins = 50):
+    ca_indices = ens_analysis.trajectories[next(iter(ens_analysis.trajectories))].topology.select(atom_selector)
+    for ens in ens_analysis.trajectories:
+        plt.hist(mdtraj.compute_distances(ens_analysis.trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel()
                   , label=ens, bins=bins, edgecolor = 'black', density=True)
     plt.title("End-to-End distances distribution")
     plt.legend()
     plt.show()    
 
-def plot_asphericity_dist(dict_traj, bins = 50):
-    for ens in dict_traj:
-        asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(dict_traj[ens]))
+def plot_asphericity_dist(ens_analysis:EnsembleAnalysis, bins = 50):
+    for ens in ens_analysis.trajectories:
+        asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ens_analysis.trajectories[ens]))
         plt.hist(asphericity, label=ens, bins=bins, edgecolor = 'black', density=True)
     plt.legend()
     plt.show()
 
-def plot_rg_vs_asphericity(dict_traj):
-    for ens in dict_traj:
-        x = rg_calculator(dict_traj[ens])
-        y = calculate_asphericity(mdtraj.compute_gyration_tensor(dict_traj[ens]))
+def plot_rg_vs_asphericity(ens_analysis:EnsembleAnalysis):
+    for ens in ens_analysis.trajectories:
+        x = rg_calculator(ens_analysis.trajectories[ens])
+        y = calculate_asphericity(mdtraj.compute_gyration_tensor(ens_analysis.trajectories[ens]))
         plt.scatter(x, y , s =4, label=ens)
     plt.ylabel("Asphericity")
     plt.xlabel("Rg [nm]")
     plt.legend()
     plt.show()
 
-def plot_prolateness_dist(dict_traj, bins = 50):
-    for ens in dict_traj:
-        prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(dict_traj[ens]))
+def plot_prolateness_dist(ens_analysis:EnsembleAnalysis, bins = 50):
+    for ens in ens_analysis.trajectories:
+        prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ens_analysis.trajectories[ens]))
         plt.hist(prolat, label=ens, bins=bins, edgecolor = 'black', density=True)
     plt.legend()
     plt.show()
 
-def plot_rg_vs_prolateness(dict_traj, bins=50):
-    for ens in dict_traj:
-        x = rg_calculator(dict_traj[ens])
-        y = calculate_prolateness(mdtraj.compute_gyration_tensor(dict_traj[ens]))
+def plot_rg_vs_prolateness(ens_analysis:EnsembleAnalysis, bins=50):
+    for ens in ens_analysis.trajectories:
+        x = rg_calculator(ens_analysis.trajectories[ens])
+        y = calculate_prolateness(mdtraj.compute_gyration_tensor(ens_analysis.trajectories[ens]))
         plt.scatter(x, y, s=4, label=ens)
     plt.ylabel("prolateness")
     plt.xlabel("Rg [nm]")
     plt.legend()
     plt.show()
 
-def plot_alpha_angles_dist(dict_traj, bins =50):
-    for ens in dict_traj:
-        plt.hist(featurize_a_angle(dict_traj[ens])[0].ravel(), bins=bins, histtype="step", density=True, label=ens)
+def plot_alpha_angles_dist(ens_analysis:EnsembleAnalysis, bins =50):
+    for ens in ens_analysis.trajectories:
+        plt.hist(featurize_a_angle(ens_analysis.trajectories[ens])[0].ravel(), bins=bins, histtype="step", density=True, label=ens)
     plt.title("the distribution of dihedral angles between four consecutive Cα beads.")
     plt.legend()
     plt.show()
 
-def plot_relative_helix_content(dict_traj):
+def plot_relative_helix_content(ens_analysis:EnsembleAnalysis):
 
     _dssp_data_dict = {}
-    for ens in dict_traj:
-        _dssp_data_dict[ens] = mdtraj.compute_dssp(dict_traj[ens])
+    for ens in ens_analysis.trajectories:
+        _dssp_data_dict[ens] = mdtraj.compute_dssp(ens_analysis.trajectories[ens])
     fig, ax = plt.subplots(figsize=(10,5))
     bottom = np.zeros(next(iter(_dssp_data_dict.values())).shape[1])
 
@@ -137,11 +138,11 @@ def plot_relative_helix_content(dict_traj):
     ax.legend()
     plt.show()
 
-def plot_rg_comparison(dict_traj, n_bins=50, bins_range=(1, 4.5), dpi=96 ):
+def plot_rg_comparison(ens_analysis:EnsembleAnalysis, n_bins=50, bins_range=(1, 4.5), dpi=96 ):
     from matplotlib.lines import Line2D
     rg_dict = {}
-    for ens in dict_traj:
-        rg_dict[ens] = rg_calculator(dict_traj[ens])
+    for ens in ens_analysis.trajectories:
+        rg_dict[ens] = rg_calculator(ens_analysis.trajectories[ens])
     
     h_args = {"histtype": "step", "density": True}
     n_systems = len(rg_dict)
@@ -167,13 +168,14 @@ def plot_rg_comparison(dict_traj, n_bins=50, bins_range=(1, 4.5), dpi=96 ):
     plt.tight_layout()
     plt.show()
 
-def plot_contact_prob(dict_traj,title,threshold = 0.8,dpi = 96):
-    num_proteins = len(dict_traj)
+def plot_contact_prob(ens_analysis:EnsembleAnalysis,title,threshold = 0.8,dpi = 96):
+
+    num_proteins = len(ens_analysis.trajectories)
     cols = 2
     rows = (num_proteins + cols - 1) // cols
     fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
     cmap = cm.get_cmap("Blues")
-    for i, (protein_name, traj) in enumerate(dict_traj.items()):
+    for i, (protein_name, traj) in enumerate(ens_analysis.trajectories.items()):
         row = i // cols
         col = i % cols
         ax = axes[row, col] if num_proteins > 1 else axes
@@ -193,3 +195,39 @@ def plot_contact_prob(dict_traj,title,threshold = 0.8,dpi = 96):
     plt.tight_layout()
     plt.suptitle(title, fontsize=14)
     plt.show()
+
+def plot_distance_distribution(ens_analysis:EnsembleAnalysis, dpi = 96):
+    distance_matrix_dict = get_contact_map_ensemble(ens_analysis.trajectories)[1]
+    num_proteins = len(ens_analysis.trajectories)
+
+    cols = 2
+    rows = (num_proteins + cols - 1) // cols
+
+    fig, axes = plt.subplots(rows, cols, figsize=(10, 5 * rows), dpi=dpi)
+
+    for i , (protein_name, distance_matrix) in enumerate(distance_matrix_dict.items()):
+
+        row = i // cols
+        col = i % cols
+
+        distance_flat = distance_matrix.flatten()
+
+        axes_flat = axes.flatten()  # Flatten axes to access them with a single index
+        axes_flat[i].hist(distance_flat, bins=50, color='skyblue', edgecolor='black', density=True)
+        axes_flat[i].set_title(f'Protein {protein_name}')
+        axes_flat[i].set_xlabel('Distance [nm]')
+        axes_flat[i].set_ylabel('Density')
+        axes_flat[i].grid(True)
+
+
+    for i in range(num_proteins, rows * cols):
+        fig.delaxes(axes.flatten()[i])
+    
+    # Adjust layout
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+    
