@@ -1,4 +1,7 @@
+from pathlib import Path
 import re
+import shutil
+import zipfile
 from api_client import APIClient
 from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, pca_rg_correlation, plot_average_dmap_comparison, plot_cmap_comparison, plot_distance_distribution_multiple, trajectories_plot_asphericity, trajectories_plot_density, trajectories_plot_dihedrals, trajectories_plot_prolateness, trajectories_plot_relative_helix_content_multiple_proteins, trajectories_plot_rg_comparison, trajectories_plot_total_sasa, trajectories_scatter_prolateness, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
 from utils import extract_tar_gz
@@ -12,7 +15,7 @@ DIM_REDUCTION_DIR = "dim_reduction"
 
 class EnsembleAnalysis:
     def __init__(self, ens_codes, data_dir: str):
-        self.data_dir = data_dir
+        self.data_dir = Path(data_dir)
         self.api_client = APIClient()
         self.trajectories = {}
         self.feature_names = []
@@ -63,17 +66,63 @@ class EnsembleAnalysis:
             else:
                 print(f"Entry {ens_code} does not match the pattern and will be skipped.")
 
+    
+    def download_from_atlas(self):
+        new_ens_codes = []
+        for ens_code in self.ens_codes:
+            print(f"Downloading entry {ens_code} from Atlas.")
+            zip_filename = f'{ens_code}.zip'
+            zip_file = os.path.join(self.data_dir, zip_filename)
 
-    def generate_trajectories(self, topology_file=None):
+            url = f"https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/{ens_code}/{ens_code}_protein.zip"
+            headers = {'accept': '*/*'}
+
+            response = self.api_client.perform_get_request(url, headers=headers)
+            if response:
+                # Download and save the response content to a file
+                self.api_client.download_response_content(response, zip_file)
+                print(f"Downloaded file {zip_filename} from Atlas.")
+                # Unzip.
+                with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                    zip_ref.extractall(self.data_dir)
+                    print(f"Extracted directory {self.data_dir}.")
+
+                # Remove unused files.
+                for unused_path in self.data_dir.glob("*.tpr"):
+                    os.remove(unused_path)
+                os.remove(self.data_dir / "README.txt")
+                os.remove(zip_file)
+
+        # Collect xtc files for updating ens_codes
+        new_ens_codes = ([f.stem for f in self.data_dir.glob("*.xtc")])
+
+        # Copy and rename toplogy files to new ensemble codes
+        for ens_code in self.ens_codes:
+            pdb_file = os.path.join(self.data_dir,f"{ens_code}.pdb")
+            for new_ens_code in new_ens_codes:
+                if new_ens_code.__contains__(ens_code):
+                    new_pdb_file = os.path.join(self.data_dir,f"{new_ens_code}.top.pdb")
+                    shutil.copy(pdb_file, new_pdb_file)
+                    print(f"Copied and renamed {pdb_file} to {new_pdb_file}.")
+            # Delete old topology file
+            os.remove(pdb_file)
+
+        # Update self.ens_codes
+        self.ens_codes = new_ens_codes
+
+    def download_from_database(self, database=None):
+        if database == "ped":
+            self.download_from_ped()
+        elif database == "atlas":
+            self.download_from_atlas()
+
+    def generate_trajectories(self):
         for ens_code in self.ens_codes:
             pdb_filename = f'{ens_code}.pdb'
             pdb_file = os.path.join(self.data_dir, pdb_filename)
             traj_dcd = os.path.join(self.data_dir, f'{ens_code}.dcd')
             traj_xtc = os.path.join(self.data_dir, f'{ens_code}.xtc')
             traj_top = os.path.join(self.data_dir, f'{ens_code}.top.pdb')
-
-            if not os.path.exists(traj_top) and topology_file is not None:
-                traj_top = topology_file
             
             ens_dir = os.path.join(self.data_dir, ens_code)
 
@@ -175,9 +224,9 @@ class EnsembleAnalysis:
     def cluster(self, range_n_clusters):
         self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)
 
-    def execute_pipeline(self, featurization_params, reduce_dim_params, range_n_clusters=None, topology_file=None):
-        self.download_from_ped()
-        self.generate_trajectories(topology_file)
+    def execute_pipeline(self, featurization_params, reduce_dim_params, range_n_clusters=None, database=None):
+        self.download_from_database(database)
+        self.generate_trajectories()
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
