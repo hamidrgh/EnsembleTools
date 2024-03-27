@@ -2,7 +2,7 @@ import numpy as np
 import mdtraj
 
 
-ca_selector = "protein and name CA"
+ca_selector = "name CA"
 
 def calc_ca_dmap(traj: mdtraj.Trajectory):
     ca_ids = traj.topology.select(ca_selector)

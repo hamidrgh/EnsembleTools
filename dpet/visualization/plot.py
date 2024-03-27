@@ -34,11 +34,12 @@ def plot_average_dmap(ens_analysis:EnsembleAnalysis, ticks_fontsize=14,
     cols = 2  # Number of columns for subplots
     rows = (num_proteins + cols - 1) // cols
     fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+    axes = np.atleast_2d(axes)
     
     for i, (protein_name, traj) in enumerate(ens_analysis.trajectories.items()):
         row = i // cols
         col = i % cols
-        ax = axes[row, col] if num_proteins > 1 else axes
+        ax = axes[row, col] if num_proteins > 1 else axes[0,col]
         ens_data = calc_ca_dmap(traj)
         avg_dmap = np.mean(ens_data, axis=0)
         tril_ids = np.tril_indices(avg_dmap.shape[0], 0)
@@ -64,21 +65,47 @@ def plot_average_dmap(ens_analysis:EnsembleAnalysis, ticks_fontsize=14,
     plt.tight_layout()
     plt.show()
 
-def end_to_end_distances_plot(ens_analysis:EnsembleAnalysis, atom_selector ="protein and name CA", bins = 50):
+def end_to_end_distances_plot(ens_analysis:EnsembleAnalysis, atom_selector ="protein and name CA", bins = 50, box_plt = False, means = True, median=True):
     ca_indices = ens_analysis.trajectories[next(iter(ens_analysis.trajectories))].topology.select(atom_selector)
-    for ens in ens_analysis.trajectories:
-        plt.hist(mdtraj.compute_distances(ens_analysis.trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel()
-                  , label=ens, bins=bins, edgecolor = 'black', density=True)
-    plt.title("End-to-End distances distribution")
-    plt.legend()
-    plt.show()    
+    dist_list = []
+    positions = []
+    if box_plt:
+        for ens in ens_analysis.trajectories:
+            positions.append(ens)
+            dist_list.append(mdtraj.compute_distances(ens_analysis.trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel())
+        plt.violinplot(dist_list, showmeans= means, showmedians= median)
+        plt.xticks(ticks= [y + 1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
+        plt.ylabel("End-to-End distance [nm]")
+        plt.title("End-to-End distances distribution")
+        plt.show()  
+    else:
+        for ens in ens_analysis.trajectories:
+            plt.hist(mdtraj.compute_distances(ens_analysis.trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel()
+                    , label=ens, bins=bins, edgecolor = 'black', density=True)
+        plt.title("End-to-End distances distribution")
+        plt.legend()
+        plt.show()    
 
-def plot_asphericity_dist(ens_analysis:EnsembleAnalysis, bins = 50):
-    for ens in ens_analysis.trajectories:
-        asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ens_analysis.trajectories[ens]))
-        plt.hist(asphericity, label=ens, bins=bins, edgecolor = 'black', density=True)
-    plt.legend()
-    plt.show()
+def plot_asphericity_dist(ens_analysis:EnsembleAnalysis, bins = 50, box_plt = True, means = True, median=True):
+    asph_list = []
+    positions = []
+    if box_plt:
+        for ens in ens_analysis.trajectories:
+            asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ens_analysis.trajectories[ens]))
+            asph_list.append(asphericity)
+            positions.append(ens)
+        plt.violinplot(asph_list, showmeans= means, showmedians= median)
+        plt.xticks(ticks= [y +1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
+        plt.ylabel("Asphericity")
+        plt.title("Asphericity distribution")
+        plt.show()
+    else:
+        for ens in ens_analysis.trajectories:
+            plt.hist(asphericity, label=ens, bins=bins, edgecolor = 'black', density=True)
+
+        plt.title("Asphericity distribution")
+        plt.legend()
+        plt.show()
 
 def plot_rg_vs_asphericity(ens_analysis:EnsembleAnalysis):
     for ens in ens_analysis.trajectories:
@@ -90,12 +117,25 @@ def plot_rg_vs_asphericity(ens_analysis:EnsembleAnalysis):
     plt.legend()
     plt.show()
 
-def plot_prolateness_dist(ens_analysis:EnsembleAnalysis, bins = 50):
-    for ens in ens_analysis.trajectories:
-        prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ens_analysis.trajectories[ens]))
-        plt.hist(prolat, label=ens, bins=bins, edgecolor = 'black', density=True)
-    plt.legend()
-    plt.show()
+def plot_prolateness_dist(ens_analysis:EnsembleAnalysis, bins = 50, box_plt = True, mean=True, median= True):
+    prolat_list = []
+    positions = []
+    if box_plt:
+        for ens in ens_analysis.trajectories:
+            prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ens_analysis.trajectories[ens]))
+            prolat_list.append(prolat)
+            positions.append(ens)
+        plt.violinplot(prolat_list, showmeans= mean, showmedians= median) 
+        plt.xticks(ticks= [y +1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
+        plt.ylabel("Prolateness")
+        plt.title("Prolateness distribution")
+        plt.show()
+    else:
+        for ens in ens_analysis.trajectories:
+            plt.hist(prolat, label=ens, bins=bins, edgecolor = 'black', density=True)
+        plt.title("Prolateness distribution")
+        plt.legend()
+        plt.show()
 
 def plot_rg_vs_prolateness(ens_analysis:EnsembleAnalysis, bins=50):
     for ens in ens_analysis.trajectories:
@@ -174,11 +214,12 @@ def plot_contact_prob(ens_analysis:EnsembleAnalysis,title,threshold = 0.8,dpi = 
     cols = 2
     rows = (num_proteins + cols - 1) // cols
     fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+    axes = np.atleast_2d(axes)
     cmap = cm.get_cmap("Blues")
     for i, (protein_name, traj) in enumerate(ens_analysis.trajectories.items()):
         row = i // cols
         col = i % cols
-        ax = axes[row, col] if num_proteins > 1 else axes
+        ax = axes[row, col] if num_proteins > 1 else axes[0,col]
 
         matrtix_p_map = contact_probability_map(traj , threshold=threshold)
         im = ax.imshow(matrtix_p_map, cmap=cmap )
@@ -227,6 +268,16 @@ def plot_distance_distribution(ens_analysis:EnsembleAnalysis, dpi = 96):
     plt.tight_layout()
     plt.show()
 
+def plot_ramachandran_plot(ens_analysis:EnsembleAnalysis):
+    fig , ax = plt.subplots(1,1)
+    for ens in ens_analysis.trajectories:
+        phi = np.degrees(mdtraj.compute_phi(ens_analysis.trajectories[ens])[1])
+        psi = np.degrees(mdtraj.compute_psi(ens_analysis.trajectories[ens])[1])
+        plt.scatter(phi,psi, s=1, label = ens)
+    ax.set_xlabel('Phi (ϕ) Angle (degrees)')
+    ax.set_ylabel('Psi (ψ) Angle (degrees)')
+    plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
+    plt.show()
 
 
 
