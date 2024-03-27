@@ -22,6 +22,8 @@ class EnsembleAnalysis:
         self.featurized_data = {}
         self.all_labels = []
         self.ens_codes = ens_codes
+        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
+        os.makedirs(dim_reduction_dir, exist_ok=True)
 
     def __del__(self):
         if hasattr(self, 'api_client'):

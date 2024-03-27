@@ -28,7 +28,7 @@ class DimensionalityReduction(ABC):
         pass
 
 class PCAReduction(DimensionalityReduction):
-    def __init__(self, num_dim):
+    def __init__(self, num_dim=10):
         self.num_dim = num_dim
 
     def fit(self, data):
@@ -82,7 +82,6 @@ class TSNEReduction(DimensionalityReduction):
                 angle=0.5,
             )
             tsne = tsneObject.fit_transform(data)
-            os.makedirs(self.dir, exist_ok=True)
             np.savetxt(tsne_file, tsne)
             print(f"tsne file for the perplexity value of {i} is saved in {self.dir} ")
         print(f"tsne is done! All files saved in {self.dir}")
@@ -173,7 +172,6 @@ class TSNECircularReduction(DimensionalityReduction):
                 angle=0.5,
             )
             tsne = tsneObject.fit_transform(data)
-            os.makedirs(self.dir, exist_ok=True)
             np.savetxt(tsne_file, tsne)
             print(f"tsne file for the perplexity value of {i} is saved in {self.dir} ")
         print(f"tsne is done! All files saved in {self.dir}")
