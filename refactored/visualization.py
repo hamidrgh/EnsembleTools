@@ -336,7 +336,7 @@ def trajectories_plot_total_sasa(trajectories):
     plt.legend()
     plt.show()
 
-def trajectories_plot_asphericity(trajectories):
+def plot_rg_vs_asphericity(trajectories):
     for ens in trajectories:
         x = mdtraj.compute_rg(trajectories[ens])
         y = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
@@ -354,7 +354,7 @@ def trajectories_plot_density(trajectories):
     plt.legend()
     plt.show()
 
-def trajectories_scatter_prolateness(trajectories):
+def plot_rg_vs_prolateness(trajectories):
     for ens in trajectories:
         x = mdtraj.compute_rg(trajectories[ens])
         y = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
@@ -582,4 +582,27 @@ def plot_distance_distribution_multiple(trajectories, dpi=96):
     
     # Adjust layout
     plt.tight_layout()
+    plt.show()
+
+def end_to_end_distances_plot(trajectories, atom_selector ="protein and name CA", bins = 50):
+    ca_indices = trajectories[next(iter(trajectories))].topology.select(atom_selector)
+    for ens in trajectories:
+        plt.hist(mdtraj.compute_distances(trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel()
+                  , label=ens, bins=bins, edgecolor = 'black', density=True)
+    plt.title("End-to-End distances distribution")
+    plt.legend()
+    plt.show()    
+
+def plot_asphericity_dist(trajectories, bins = 50):
+    for ens in trajectories:
+        asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        plt.hist(asphericity, label=ens, bins=bins, edgecolor = 'black', density=True)
+    plt.legend()
+    plt.show()
+
+def plot_prolateness_dist(trajectories, bins = 50):
+    for ens in trajectories:
+        prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        plt.hist(prolat, label=ens, bins=bins, edgecolor = 'black', density=True)
+    plt.legend()
     plt.show()

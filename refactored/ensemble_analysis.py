@@ -3,7 +3,7 @@ import re
 import shutil
 import zipfile
 from api_client import APIClient
-from visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot, dimenfix_scatter_plot_2, pca_correlation_plot, pca_cumulative_explained_variance, pca_plot_1d_histograms, pca_plot_2d_landscapes, pca_rg_correlation, plot_average_dmap_comparison, plot_cmap_comparison, plot_distance_distribution_multiple, trajectories_plot_asphericity, trajectories_plot_density, trajectories_plot_dihedrals, trajectories_plot_prolateness, trajectories_plot_relative_helix_content_multiple_proteins, trajectories_plot_rg_comparison, trajectories_plot_total_sasa, trajectories_scatter_prolateness, tsne_ramachandran_plot, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_2
+import visualization
 from utils import extract_tar_gz
 import os
 import mdtraj
@@ -240,84 +240,84 @@ class EnsembleAnalysis:
     def tsne_ramachandran_plot(self):
         if self.reduce_dim_method == "tsne":
             dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-            tsne_ramachandran_plot(dim_reduction_dir, self.concat_features)
+            visualization.tsne_ramachandran_plot(dim_reduction_dir, self.concat_features)
         else:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
     def tsne_ramachandran_plot_density(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        tsne_ramachandran_plot_density(dim_reduction_dir, self.concat_features)
+        visualization.tsne_ramachandran_plot_density(dim_reduction_dir, self.concat_features)
 
     def tsne_scatter_plot(self):
         if self.reduce_dim_method == "tsne":
             dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-            tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.ens_codes, self.rg)
+            visualization.tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.ens_codes, self.rg)
         else:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
     def tsne_scatter_plot_2(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        tsne_scatter_plot_2(dim_reduction_dir, self.rg)
+        visualization.tsne_scatter_plot_2(dim_reduction_dir, self.rg)
 
     def dimenfix_scatter_plot(self):
-        dimenfix_scatter_plot(self.transformed_data, self.rg)
+        visualization.dimenfix_scatter_plot(self.transformed_data, self.rg)
 
     def dimenfix_scatter_plot_2(self):
-        dimenfix_scatter_plot_2(self.transformed_data, self.all_labels)
+        visualization.dimenfix_scatter_plot_2(self.transformed_data, self.all_labels)
 
     def dimenfix_cluster_scatter_plot(self):
-        dimenfix_cluster_scatter_plot(self.sil_scores, self.transformed_data)
+        visualization.dimenfix_cluster_scatter_plot(self.sil_scores, self.transformed_data)
 
     def dimenfix_cluster_scatter_plot_2(self):
-        dimenfix_cluster_scatter_plot_2(self.sil_scores, self.transformed_data, self.ens_codes, self.all_labels)
+        visualization.dimenfix_cluster_scatter_plot_2(self.sil_scores, self.transformed_data, self.ens_codes, self.all_labels)
 
     def pca_cumulative_explained_variance(self):
         if self.reduce_dim_method == "pca":
-            pca_cumulative_explained_variance(self.reduce_dim_model)
+            visualization.pca_cumulative_explained_variance(self.reduce_dim_model)
         else:
             print("Analysis is only valid for PCA dimensionality reduction.")
 
     def pca_plot_2d_landscapes(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        pca_plot_2d_landscapes(self.ens_codes, self.reduce_dim_data, dim_reduction_dir, self.featurization)
+        visualization.pca_plot_2d_landscapes(self.ens_codes, self.reduce_dim_data, dim_reduction_dir, self.featurization)
 
     def pca_plot_1d_histograms(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        pca_plot_1d_histograms(self.ens_codes, self.transformed_data, self.reduce_dim_data, dim_reduction_dir, self.featurization)
+        visualization.pca_plot_1d_histograms(self.ens_codes, self.transformed_data, self.reduce_dim_data, dim_reduction_dir, self.featurization)
 
     def pca_correlation_plot(self, num_residues, sel_dims):
         if self.featurization == "ca_dist":
-            pca_correlation_plot(num_residues, sel_dims, self.feature_names, self.reduce_dim_model)
+            visualization.pca_correlation_plot(num_residues, sel_dims, self.feature_names, self.reduce_dim_model)
         else:
             print("Analysis is only valid for ca_dist feature extraction.")
     
     def pca_rg_correlation(self):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, dim_reduction_dir)
+        visualization.pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, dim_reduction_dir)
         
     def trajectories_plot_total_sasa(self):
-        trajectories_plot_total_sasa(self.trajectories)
+        visualization.trajectories_plot_total_sasa(self.trajectories)
 
-    def trajectories_plot_asphericity(self):
-        trajectories_plot_asphericity(self.trajectories)
+    def plot_rg_vs_asphericity(self):
+        visualization.plot_rg_vs_asphericity(self.trajectories)
 
     def trajectories_plot_density(self):
-        trajectories_plot_density(self.trajectories)
+        visualization.trajectories_plot_density(self.trajectories)
 
-    def trajectories_scatter_prolateness(self):
-        trajectories_scatter_prolateness(self.trajectories)
+    def plot_rg_vs_prolateness(self):
+        visualization.plot_rg_vs_prolateness(self.trajectories)
 
     def trajectories_plot_prolateness(self):
-        trajectories_plot_prolateness(self.trajectories)
+        visualization.trajectories_plot_prolateness(self.trajectories)
     
     def trajectories_plot_dihedrals(self):
-        trajectories_plot_dihedrals(self.trajectories)
+        visualization.trajectories_plot_dihedrals(self.trajectories)
 
     def trajectories_plot_relative_helix_content_multiple_proteins(self):
-        trajectories_plot_relative_helix_content_multiple_proteins(self.trajectories)
+        visualization.trajectories_plot_relative_helix_content_multiple_proteins(self.trajectories)
 
     def trajectories_plot_rg_comparison(self, n_bins=50, bins_range=(1, 4.5), dpi=96):
-        trajectories_plot_rg_comparison(self.trajectories, n_bins, bins_range, dpi)
+        visualization.trajectories_plot_rg_comparison(self.trajectories, n_bins, bins_range, dpi)
 
     def plot_average_dmap_comparison(self, 
                                     ticks_fontsize=14,
@@ -326,7 +326,7 @@ class EnsembleAnalysis:
                                     dpi=96,
                                     max_d=6.8,
                                     use_ylabel=True):
-        plot_average_dmap_comparison(self.trajectories, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
+        visualization.plot_average_dmap_comparison(self.trajectories, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
 
     def plot_cmap_comparison(self,
                             title,
@@ -336,7 +336,16 @@ class EnsembleAnalysis:
                             dpi=96,
                             cmap_min=-3.5,
                             use_ylabel=True):
-        plot_cmap_comparison(self.trajectories, title, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, cmap_min, use_ylabel)
+        visualization.plot_cmap_comparison(self.trajectories, title, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, cmap_min, use_ylabel)
 
     def plot_distance_distribution_multiple(self, dpi = 96):
-        plot_distance_distribution_multiple(self.trajectories, dpi)
+        visualization.plot_distance_distribution_multiple(self.trajectories, dpi)
+
+    def end_to_end_distances_plot(self, atom_selector ="protein and name CA", bins = 50):
+        visualization.end_to_end_distances_plot(self.trajectories, atom_selector, bins)
+
+    def plot_asphericity_dist(self, bins = 50):
+        visualization.plot_asphericity_dist(self.trajectories, bins)
+
+    def plot_prolateness_dist(self, bins=50):
+        visualization.plot_prolateness_dist(self.trajectories, bins)
