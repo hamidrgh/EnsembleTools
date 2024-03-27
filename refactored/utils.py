@@ -7,7 +7,7 @@ def extract_tar_gz(tar_gz_file, output_dir, new_name=None):
     
     # Extract the .pdb file
     with tarfile.open(tar_gz_file, 'r:gz') as tar:
-        pdb_member = next((member for member in tar.getmembers() if os.path.basename(member.name) == 'pdbfile.pdb'), None)
+        pdb_member = next((member for member in tar.getmembers() if os.path.splitext(member.name)[1] == '.pdb'), None)
         if pdb_member:
             # Set the extracted file name
             extracted_name = new_name if new_name else 'pdbfile.pdb'

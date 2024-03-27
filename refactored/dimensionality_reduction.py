@@ -65,9 +65,6 @@ class TSNEReduction(DimensionalityReduction):
         print("tsne is running...")
         for i in self.perplexityVals:
             tsne_file = os.path.join(self.dir, f"tsnep{i}")
-            if os.path.exists(tsne_file):
-                print(f"Dimensionality reduction for perplexity {i} already performed. Skipping.")
-                continue
             tsneObject = TSNE(
                 n_components=2,
                 perplexity=i,
@@ -139,46 +136,6 @@ class DimenFixReduction(DimensionalityReduction):
             )
         return sil_scores
 
-class TSNECircularReduction(DimensionalityReduction):
-    def __init__(self,  dir=".", perplexityVals=range(2, 10, 2), metric=unit_vector_distance):
-        self.perplexityVals = perplexityVals
-        self.metric = metric
-        self.dir = dir
-
-    def fit(self, data):
-        return super().fit(data)
-    
-    def transform(self, data):
-        return super().transform(data)
-
-    def fit_transform(self, data):
-        print("tsne for phi_psi is running...")
-        for i in self.perplexityVals:
-            tsne_file = os.path.join(self.dir, f"tsnep{i}")
-            if os.path.exists(tsne_file):
-                print(f"Dimensionality reduction for perplexity {i} already performed. Skipping.")
-                continue
-            tsneObject = TSNE(
-                n_components=2,
-                perplexity=i,
-                early_exaggeration=10.0,
-                learning_rate=100.0,
-                n_iter=3500,
-                metric=self.metric,
-                n_iter_without_progress=300,
-                min_grad_norm=1e-7,
-                init="random",
-                method="barnes_hut",
-                angle=0.5,
-            )
-            tsne = tsneObject.fit_transform(data)
-            np.savetxt(tsne_file, tsne)
-            print(f"tsne file for the perplexity value of {i} is saved in {self.dir} ")
-        print(f"tsne is done! All files saved in {self.dir}")
-
-    def cluster(self, range_n_clusters):
-        return super().cluster(range_n_clusters)
-
 class MDSReduction(DimensionalityReduction):
     def __init__(self, num_dim):
         self.num_dim = num_dim
@@ -206,8 +163,6 @@ class DimensionalityReductionFactory:
             return TSNEReduction(dir, *args, **kwargs)
         elif method == "dimenfix":
             return DimenFixReduction(*args, **kwargs)
-        elif method == "tsne-circular":
-            return TSNECircularReduction(dir, *args, **kwargs)
         elif method == "mds":
             return MDSReduction(*args, **kwargs)
         else:
