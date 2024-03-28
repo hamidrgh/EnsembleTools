@@ -111,6 +111,7 @@ class EnsembleAnalysis:
 
         # Update self.ens_codes
         self.ens_codes = new_ens_codes
+        print("Analysing ensembles:", self.ens_codes)
 
     def download_from_database(self, database=None):
         if database == "ped":
@@ -161,7 +162,7 @@ class EnsembleAnalysis:
 
     def perform_feature_extraction(self, featurization: str, normalize = False, *args, **kwargs):
         self.extract_features(featurization, *args, **kwargs)
-        self.concatenate_features()
+        self.concat_features = self.get_concat_features()
         self.create_all_labels()
         if normalize and featurization == "ca_dist":
             self.normalize_data()
@@ -182,11 +183,6 @@ class EnsembleAnalysis:
         self.feature_names = names
         print("Feature names:", names)
 
-    def concatenate_features(self):
-        concat_features = [features for ens_id, features in self.featurized_data.items()]
-        self.concat_features = np.concatenate(concat_features, axis=0)
-        print("Concatenated featurized ensemble shape:", self.concat_features.shape)
-        
     def create_all_labels(self):
         for label, data_points in self.featurized_data.items():
             num_data_points = len(data_points)
@@ -209,12 +205,23 @@ class EnsembleAnalysis:
             self.rg = [item[0] * 10 for item in rg_values_list]
         return self.rg
 
-    def fit_dimensionality_reduction(self, method: str, *args, **kwargs):
+    def get_concat_features(self, fit_on:list=None):
+        if fit_on is None:
+            fit_on = self.ens_codes
+        
+        concat_features = [features for ens_id, features in self.featurized_data.items() if ens_id in fit_on]
+        concat_features = np.concatenate(concat_features, axis=0)
+        print("Concatenated featurized ensemble shape:", concat_features.shape)
+        return concat_features
+
+
+    def fit_dimensionality_reduction(self, method: str, fit_on: list=None, *args, **kwargs):
         dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
         self.reducer = DimensionalityReductionFactory.get_reducer(method, dim_reduction_dir, *args, **kwargs)
         self.reduce_dim_method = method
         if method == "pca":
-            self.reduce_dim_model = self.reducer.fit(data=self.concat_features)
+            fit_on_data = self.get_concat_features(fit_on=fit_on)
+            self.reduce_dim_model = self.reducer.fit(data=fit_on_data)
             self.reduce_dim_data = {}
             for key, data in self.featurized_data.items():
                 self.reduce_dim_data[key] = self.reducer.transform(data)
