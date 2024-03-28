@@ -313,8 +313,8 @@ class EnsembleAnalysis:
     def trajectories_plot_dihedrals(self):
         visualization.trajectories_plot_dihedrals(self.trajectories)
 
-    def trajectories_plot_relative_helix_content_multiple_proteins(self):
-        visualization.trajectories_plot_relative_helix_content_multiple_proteins(self.trajectories)
+    def plot_relative_helix_content(self):
+        visualization.plot_relative_helix_content(self.trajectories)
 
     def trajectories_plot_rg_comparison(self, n_bins=50, bins_range=(1, 4.5), dpi=96):
         visualization.trajectories_plot_rg_comparison(self.trajectories, n_bins, bins_range, dpi)
@@ -349,3 +349,9 @@ class EnsembleAnalysis:
 
     def plot_prolateness_dist(self, bins=50):
         visualization.plot_prolateness_dist(self.trajectories, bins)
+
+    def plot_alpha_angles_dist(self, bins=50):
+        visualization.plot_alpha_angles_dist(self.trajectories, bins)
+
+    def plot_contact_prob(self,title,threshold = 0.8,dpi = 96):
+        visualization.plot_contact_prob(self.trajectories,title,threshold,dpi)

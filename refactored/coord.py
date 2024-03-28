@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import mdtraj
 
 def get_distance_matrix(xyz):
     """
@@ -93,3 +94,19 @@ def calculate_prolateness(gyration_tensors):
         prolateness_values.append(prolateness)
     
     return prolateness_values
+
+def contact_probability_map(traj, threshold = 0.8):
+    distances = mdtraj.compute_contacts(traj, scheme="ca")[0]
+    res_pair = mdtraj.compute_contacts(traj, scheme="ca")[1]
+    contact_distance = mdtraj.geometry.squareform(distances, res_pair)
+    matrix_contact_prob = np.zeros(contact_distance.shape)
+    threshold = threshold
+    for ens in range(contact_distance.shape[0]):
+        for i in range(contact_distance.shape[1]):
+            for j in range(contact_distance.shape[2]):
+                if contact_distance[ens][i][j] < threshold:
+                    matrix_contact_prob[ens][i][j] = 1
+                else:
+                    matrix_contact_prob[ens][i][j] = 0
+    matrix_prob_avg = np.mean(matrix_contact_prob, axis=0)
+    return matrix_prob_avg

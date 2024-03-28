@@ -9,7 +9,8 @@ import plotly.express as px
 import mdtraj
 from matplotlib.lines import Line2D
 
-from coord import calculate_asphericity, calculate_prolateness, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
+from coord import calculate_asphericity, calculate_prolateness, contact_probability_map, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
+from featurizer import FeaturizationFactory
 
 def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     s = np.loadtxt(tsne_kmeans_dir  +'/silhouette.txt')
@@ -387,7 +388,7 @@ def get_protein_dssp_data_dict(trajectories):
         dssp_data_dict[ens] = mdtraj.compute_dssp(trajectories[ens])
     return dssp_data_dict
 
-def trajectories_plot_relative_helix_content_multiple_proteins(trajectories):
+def plot_relative_helix_content(trajectories):
     protein_dssp_data_dict = get_protein_dssp_data_dict(trajectories)
     fig, ax = plt.subplots(figsize=(10, 5))
     bottom = np.zeros(next(iter(protein_dssp_data_dict.values())).shape[1])
@@ -605,4 +606,40 @@ def plot_prolateness_dist(trajectories, bins = 50):
         prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
         plt.hist(prolat, label=ens, bins=bins, edgecolor = 'black', density=True)
     plt.legend()
+    plt.show()
+
+def plot_alpha_angles_dist(trajectories, bins =50):
+    featurizer = FeaturizationFactory.get_featurizer('a_angle')
+    for ens in trajectories:
+        plt.hist(featurizer.featurize(trajectories[ens]).ravel(), bins=bins, histtype="step", density=True, label=ens)
+    plt.title("the distribution of dihedral angles between four consecutive Cα beads.")
+    plt.legend()
+    plt.show()
+
+def plot_contact_prob(trajectories,title,threshold = 0.8,dpi = 96):
+
+    num_proteins = len(trajectories)
+    cols = 2
+    rows = (num_proteins + cols - 1) // cols
+    fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+    cmap = cm.get_cmap("Blues")
+    for i, (protein_name, traj) in enumerate(trajectories.items()):
+        row = i // cols
+        col = i % cols
+        ax = axes[row, col] if num_proteins > 1 else axes
+
+        matrtix_p_map = contact_probability_map(traj , threshold=threshold)
+        im = ax.imshow(matrtix_p_map, cmap=cmap )
+        ax.set_title(f"Contact Probability Map: {protein_name}", fontsize=14)
+
+
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label('Frequency', fontsize=14)
+        cbar.ax.tick_params(labelsize=14)
+
+    for i in range(num_proteins, rows * cols):
+        fig.delaxes(axes.flatten()[i])
+    
+    plt.tight_layout()
+    plt.suptitle(title, fontsize=14)
     plt.show()
