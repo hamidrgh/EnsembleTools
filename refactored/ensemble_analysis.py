@@ -352,6 +352,19 @@ class EnsembleAnalysis:
                                     dpi=96,
                                     max_d=6.8,
                                     use_ylabel=True):
+        
+        """Plot the average distance maps for selected ensembles.
+        
+        Parameters
+        ----------
+        ticks_fontsize: int
+        cbar_fontsize: int
+        title_fontsize: int
+        dpi: int
+        max_d: float
+        The maximum amount for distance the default value is 6.8
+        use_ylabel: bool
+        """
         visualization.plot_average_dmap_comparison(self.trajectories, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
 
     def plot_cmap_comparison(self,
@@ -367,8 +380,27 @@ class EnsembleAnalysis:
     def plot_distance_distribution_multiple(self, dpi = 96):
         visualization.plot_distance_distribution_multiple(self.trajectories, dpi)
 
-    def end_to_end_distances_plot(self, atom_selector ="protein and name CA", bins = 50):
-        visualization.end_to_end_distances_plot(self.trajectories, atom_selector, bins)
+    def end_to_end_distances_plot(self, atom_selector ="protein and name CA", bins = 50, box_plot=True, means=False, median=True ):
+        """
+        Plot end-to-end distance distributions. 
+
+        Parameters
+        ----------
+        atom_selector: str 
+        The type of atom considered for calculating end-to-end distance
+
+        bins: int
+        The number of bins for bar plot 
+        box_plot: bool 
+        If True box plot is visualized
+
+        means: bool
+        If True mean is showing in the box plot 
+
+        median: bool
+        If True median is showing in the box plot
+        """
+        visualization.end_to_end_distances_plot(self.trajectories, atom_selector, bins, box_plot, means, median)
 
     def plot_asphericity_dist(self, bins = 50):
         visualization.plot_asphericity_dist(self.trajectories, bins)
