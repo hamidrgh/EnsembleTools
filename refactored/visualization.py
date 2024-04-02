@@ -341,12 +341,15 @@ def plot_rg_vs_asphericity(trajectories):
     for ens in trajectories:
         x = mdtraj.compute_rg(trajectories[ens])
         y = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
-        
+        p = np.corrcoef(x , y)
         plt.scatter(x,y,s=4,label = ens)
+        print(f"Pearson coeff for {ens} = {round(p[0][1], 3)}")
     plt.ylabel("Asphericity")
     plt.xlabel("Rg [nm]")
     plt.legend()
     plt.show()
+    
+
 
 def trajectories_plot_density(trajectories):
     for ens in trajectories:
@@ -359,8 +362,9 @@ def plot_rg_vs_prolateness(trajectories):
     for ens in trajectories:
         x = mdtraj.compute_rg(trajectories[ens])
         y = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
-        
+        p = np.corrcoef(x , y)
         plt.scatter(x,y,s=4,label = ens)
+        print(f"Pearson coeff for {ens} = {round(p[0][1], 3)}")
     plt.ylabel("prolateness")
     plt.xlabel("Rg [nm]")
     plt.legend()
@@ -404,14 +408,14 @@ def plot_relative_helix_content(trajectories):
         relative_h_content = h_counts / total_residues
         
         # Plot the relative content for each protein
-        ax.bar(range(len(relative_h_content)), relative_h_content, bottom=bottom, label=protein_name)
+        ax.plot(range(len(relative_h_content)), relative_h_content,marker='o', linestyle='dashed' ,label=protein_name, alpha= 0.5)
 
         bottom += relative_h_content
     
     ax.set_xlabel('Residue Index')
     ax.set_ylabel('Relative Content of H (Helix)')
     ax.set_title('Relative Content of H in Each Residue in the ensembles')
-    ax.legend()
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()
 
 def get_rg_data_dict(trajectories):
@@ -585,11 +589,11 @@ def plot_distance_distribution_multiple(trajectories, dpi=96):
     plt.tight_layout()
     plt.show()
 
-def end_to_end_distances_plot(trajectories, atom_selector ="protein and name CA", bins = 50, box_plot = True, means = True, median = True):
+def end_to_end_distances_plot(trajectories, atom_selector ="protein and name CA", bins = 50, violin_plot = True, means = True, median = True):
     ca_indices = trajectories[next(iter(trajectories))].topology.select(atom_selector)
     dist_list = []
     positions = []
-    if box_plot:
+    if violin_plot:
         for ens in trajectories:
             positions.append(ens)
             dist_list.append(mdtraj.compute_distances(trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel())
@@ -606,24 +610,51 @@ def end_to_end_distances_plot(trajectories, atom_selector ="protein and name CA"
         plt.legend()
         plt.show()    
 
-def plot_asphericity_dist(trajectories, bins = 50):
-    for ens in trajectories:
-        asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
-        plt.hist(asphericity, label=ens, bins=bins, edgecolor = 'black', density=True)
-    plt.legend()
-    plt.show()
+def plot_asphericity_dist(trajectories, bins = 50, violin_plot = True, means = True, median = True ):
+    asph_list = []
+    positions = []
+    if violin_plot:
+        for ens in trajectories:
+            asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
+            asph_list.append(asphericity)
+            positions.append(ens)
+        plt.violinplot(asph_list, showmeans=means, showmedians= median)
+        plt.xticks(ticks= [y +1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
+        plt.ylabel("Asphericity")
+        plt.title("Asphericity distribution")
+        plt.show()
+    else:
+        for ens in trajectories:
+            plt.hist(asphericity, label=ens, bins=bins, edgecolor = 'black', density=True)
+        plt.title("Asphericity distribution")        
+        plt.legend()
+        plt.show()
 
-def plot_prolateness_dist(trajectories, bins = 50):
-    for ens in trajectories:
-        prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
-        plt.hist(prolat, label=ens, bins=bins, edgecolor = 'black', density=True)
-    plt.legend()
-    plt.show()
+def plot_prolateness_dist(trajectories, bins= 50, violin_plot= True, median=False, mean=False  ):
+    prolat_list = []
+    positions = []
+    if violin_plot:
+        for ens in trajectories:
+            prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
+            prolat_list.append(prolat)
+            positions.append(ens)
+        plt.violinplot(prolat_list, showmeans= mean, showmedians= median)
+        plt.xticks(ticks= [y +1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
+        plt.ylabel("Prolateness")
+        plt.title("Prolateness distribution")
+        plt.show()
+    else:
+        for ens in trajectories:
+            plt.hist(prolat, label=ens, bins=bins, edgecolor = 'black', density=True)
+        plt.title("Prolateness distribution")
+        plt.legend()
+        plt.show()
 
 def plot_alpha_angles_dist(trajectories, bins =50):
     featurizer = FeaturizationFactory.get_featurizer('a_angle')
     for ens in trajectories:
-        plt.hist(featurizer.featurize(trajectories[ens]).ravel(), bins=bins, histtype="step", density=True, label=ens)
+        plt.hist(featurizer.featurize(trajectories[ens]).ravel(), bins=bins, histtype="step", density=False, label=ens)
+        
     plt.title("the distribution of dihedral angles between four consecutive Cα beads.")
     plt.legend()
     plt.show()

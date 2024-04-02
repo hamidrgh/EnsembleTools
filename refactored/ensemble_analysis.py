@@ -325,12 +325,20 @@ class EnsembleAnalysis:
         visualization.trajectories_plot_total_sasa(self.trajectories)
 
     def plot_rg_vs_asphericity(self):
+        """
+        It plots the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate 
+        the correlation between Rg and Asphericity. 
+        """
         visualization.plot_rg_vs_asphericity(self.trajectories)
 
     def trajectories_plot_density(self):
         visualization.trajectories_plot_density(self.trajectories)
 
     def plot_rg_vs_prolateness(self):
+        """
+        It plots the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
+        the correlation between Rg and Prolateness. 
+        """
         visualization.plot_rg_vs_prolateness(self.trajectories)
 
     def trajectories_plot_prolateness(self):
@@ -340,9 +348,23 @@ class EnsembleAnalysis:
         visualization.trajectories_plot_dihedrals(self.trajectories)
 
     def plot_relative_helix_content(self):
+
+        """
+        Plot the relative helix content in each ensemble for each residue. 
+        """
         visualization.plot_relative_helix_content(self.trajectories)
 
     def trajectories_plot_rg_comparison(self, n_bins=50, bins_range=(1, 4.5), dpi=96):
+        """
+        Plot the distribution of the Rg whithin each ensemble
+        
+        Parameter 
+        ---------
+        n_bins : int 
+        bins_range : tuple
+        change the Rg scale in x-axis 
+        dpi : int
+        """
         visualization.trajectories_plot_rg_comparison(self.trajectories, n_bins, bins_range, dpi)
 
     def plot_average_dmap_comparison(self, 
@@ -380,7 +402,7 @@ class EnsembleAnalysis:
     def plot_distance_distribution_multiple(self, dpi = 96):
         visualization.plot_distance_distribution_multiple(self.trajectories, dpi)
 
-    def end_to_end_distances_plot(self, atom_selector ="protein and name CA", bins = 50, box_plot=True, means=False, median=True ):
+    def end_to_end_distances_plot(self, atom_selector ="protein and name CA", bins = 50, violin_plot=True, means=False, median=True ):
         """
         Plot end-to-end distance distributions. 
 
@@ -391,7 +413,7 @@ class EnsembleAnalysis:
 
         bins: int
         The number of bins for bar plot 
-        box_plot: bool 
+        violin_plot: bool 
         If True box plot is visualized
 
         means: bool
@@ -400,15 +422,60 @@ class EnsembleAnalysis:
         median: bool
         If True median is showing in the box plot
         """
-        visualization.end_to_end_distances_plot(self.trajectories, atom_selector, bins, box_plot, means, median)
+        visualization.end_to_end_distances_plot(self.trajectories, atom_selector, bins, violin_plot, means, median)
 
-    def plot_asphericity_dist(self, bins = 50):
-        visualization.plot_asphericity_dist(self.trajectories, bins)
+    def plot_asphericity_dist(self, bins = 50,violin_plot=True, means=False, median=True ):
+        """
+        Plot asphericity distribution in each ensemble.
+        Asphericity is calculated based on the gyration tensor.  
 
-    def plot_prolateness_dist(self, bins=50):
-        visualization.plot_prolateness_dist(self.trajectories, bins)
+        Parameters
+        ----------
+
+        bins: int
+        The number of bins for bar plot 
+        violint_plot: bool 
+        If True box plot is visualized
+
+        means: bool
+        If True mean is showing in the box plot 
+
+        median: bool
+        If True median is showing in the box plot
+        """
+        visualization.plot_asphericity_dist(self.trajectories ,bins, violin_plot, means, median )
+
+    def plot_prolateness_dist(self, bins=50, violin_plot=True, means=False, median=True):
+        """
+        Plot prolateness distribution in each ensemble.
+        Prolateness is calculated based on the gyration tensor.  
+
+        Parameters
+        ----------
+
+        bins: int
+        The number of bins for bar plot 
+        violint_plot: bool 
+        If True box plot is visualized
+
+        means: bool
+        If True mean is showing in the box plot 
+
+        median: bool
+        If True median is showing in the box plot
+        """
+        visualization.plot_prolateness_dist(self.trajectories, bins, violin_plot, means, median)
 
     def plot_alpha_angles_dist(self, bins=50):
+
+        """
+        It plot the distribution of alpha angles.
+
+        Parameters
+        ----------
+        bins : int
+        The number of bins for bar plot 
+        """
         visualization.plot_alpha_angles_dist(self.trajectories, bins)
 
     def plot_contact_prob(self,title,threshold = 0.8,dpi = 96):
