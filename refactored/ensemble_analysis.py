@@ -30,6 +30,9 @@ class EnsembleAnalysis:
             self.api_client.close_session()
     
     def download_from_ped(self):
+        """Automate Downloading ensembles
+        using PED API 
+        """
         # Define the pattern
         pattern = r'^(PED\d+)(e\d+)$'
 
@@ -70,6 +73,9 @@ class EnsembleAnalysis:
 
     
     def download_from_atlas(self):
+        """ Automate Downloading MD ensembles from
+        Atlas. 
+        """
         new_ens_codes = []
         for ens_code in self.ens_codes:
             print(f"Downloading entry {ens_code} from Atlas.")
@@ -113,13 +119,26 @@ class EnsembleAnalysis:
         self.ens_codes = new_ens_codes
         print("Analysing ensembles:", self.ens_codes)
 
-    def download_from_database(self, database=None):
+    def download_from_database(self, database: str =None):
+        """ Download ensembles from databases
+
+        Parameter
+        ---------
+        databse : str
+        Choose the database you want to download from ('ped'/'atlas')
+        """
         if database == "ped":
             self.download_from_ped()
         elif database == "atlas":
             self.download_from_atlas()
 
     def generate_trajectories(self):
+
+        """
+        Loading trajectory files on to mdtraj object.
+        if only pdb files are existed, the function makes dcd and 
+        topology files for the fast loading next times.
+        """
         for ens_code in self.ens_codes:
             pdb_filename = f'{ens_code}.pdb'
             pdb_file = os.path.join(self.data_dir, pdb_filename)
