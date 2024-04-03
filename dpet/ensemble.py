@@ -3,7 +3,7 @@ import numpy as np
 import mdtraj
 
 from dpet.featurization.distances import featurize_ca_dist
-from dpet.featurization.angles import featurize_phi_psi
+from dpet.featurization.angles import featurize_phi_psi, featurize_tr_angle
 from dpet.featurization.glob import rg_calculator
 
 class Ensemble:
@@ -83,6 +83,20 @@ class Ensemble:
         elif featurization == "a_angle":
             # return featurize_a_angle(traj, get_names=get_names, *args, **kwargs)
             raise NotImplementedError()
+        
+        elif featurization == "tr_omega":
+            return featurize_tr_angle(
+                traj=self.traj,
+                type="omega",
+                get_names=get_names,
+                *args, **kwargs)
+
+        elif featurization == "tr_phi":
+            return featurize_tr_angle(
+                traj=self.traj,
+                type="phi",
+                get_names=get_names,
+                *args, **kwargs)
 
         #-------------------------------------------------
         # Global features, one feature per conformation. -                      

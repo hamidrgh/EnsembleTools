@@ -370,7 +370,7 @@ class EnsembleAnalysis:
         if _all_ensembles:  # Fit on all ensembles.
             fit_on = self.codes
         else:  # Fit only on some user-defined ensembles.
-            if method not in ("pca", ):
+            if method not in ("pca", "kpca"):
                 raise ValueError(
                     f"Can not perform a '{method}' dimensionality reduction on"
                     " only subset of the ensembles. Set the 'fit_on' argument"
@@ -379,10 +379,10 @@ class EnsembleAnalysis:
         if params.get("circular"):
             # Check if dimensionality reduction for circular data can be
             # performed.
-            if method not in ("tsne", ):
+            if method not in ("tsne", "kpca"):
                 raise ValueError(
                     f"{method} is not adapted for angular data in DPET")
-            if self.featurization not in ("phi_psi", ):
+            if self.featurization not in ("phi_psi", "tr_omega", "tr_phi"):
                 raise ValueError(
                     f"The current features ({self.featurization}) are not"
                     f" angular values. Can not perform {method} for circular"
@@ -410,7 +410,7 @@ class EnsembleAnalysis:
 
         # Dimensionality reduction methods that can be fitted on only a part of
         # the ensembles.
-        if method == "pca":
+        if method in ("pca", "kpca"):
             
             # Fit PCA on a set of selected ensembles.
             reduce_dim_model.fit(features=concat_features, **params)

@@ -27,7 +27,7 @@ class DimensionalityReduction:
     keyerr_msg = "Unknown dimensionality reduction method: {}"
 
     def __init__(self, method: str):
-        if not method in ("pca", "tsne"):
+        if not method in ("pca", "kpca", "tsne"):
             self.raise_keyerr(method)
 
         self.method = method
@@ -50,6 +50,8 @@ class DimensionalityReduction:
 
         if self.method == "pca":
             return self.fit_pca(features, *args, **params)
+        if self.method == "kpca":
+            return self.fit_kpca(features, *args, **params)
         elif self.method == "tsne":
             st.write("tsne is your selected dimensionality reduction method!")
             return self.fit_transform_tsne(features, *args, **params)
@@ -61,7 +63,7 @@ class DimensionalityReduction:
         # elif method == "tsne-circular":
         #     return fit_transform_tsne_circular(features, *args, **params)
         else:
-            raise KeyError(f"Unknown dimensionality reduction method: {method}")
+            raise KeyError(f"Unknown dimensionality reduction method: {self.method}")
 
 
     def fit_pca(
@@ -79,6 +81,40 @@ class DimensionalityReduction:
 
         pca = sklearn.decomposition.PCA(n_components=num_dim)
         pca.fit(features)
+        self.model = pca
+        return pca
+    
+    def fit_kpca(
+            self,
+            features: np.ndarray,
+            num_dim: int = 10,
+            kernel: str = "rbf",
+            gamma: float = None,
+            circular: bool = False
+        ) -> sklearn.decomposition.KernelPCA:
+        """
+        TODO.
+        description
+
+        arguments.
+
+        output.
+        """
+        # Use angular features and a custom similarity function.
+        if circular:
+            gamma = 1/features.shape[1] if gamma is None else gamma
+            kernel = lambda a1, a2: unit_vector_kernel(a1, a2, gamma=gamma)
+            pca_in = features
+        # Use raw features.
+        else:
+            pca_in = features
+
+        pca = sklearn.decomposition.KernelPCA(
+            n_components=num_dim,
+            kernel=kernel,
+            gamma=gamma  # Ignored if using circular.
+        )
+        pca.fit(pca_in)
         self.model = pca
         return pca
 
@@ -269,7 +305,7 @@ class DimensionalityReduction:
 
 
     def transform(self, features: np.ndarray):
-        if self.method == "pca":
+        if self.method in ("pca", "kpca"):
             return self.model.transform(features)
         else:
             self.raise_keyerr(self.method)
@@ -324,13 +360,21 @@ def unit_vectorize(a: np.ndarray) -> np.ndarray:
     v = np.concatenate([np.cos(a)[...,None], np.sin(a)[...,None]], axis=-1)
     return v
 
-def unit_vector_distance(a0: np.ndarray, a1: np.ndarray):
+def unit_vector_distance(a0: np.ndarray, a1: np.ndarray, sqrt: bool = True):
     """Compute the sum of distances between two (*, N) arrays storing the
     values of N angles."""
     v0 = unit_vectorize(a0)
     v1 = unit_vectorize(a1)
     # Distance between N pairs of angles.
-    dist = np.sqrt(np.square(v0 - v1).sum(axis=-1))
+    if sqrt:
+        dist = np.sqrt(np.square(v0 - v1).sum(axis=-1))
+    else:
+        dist = np.square(v0 - v1).sum(axis=-1)
     # We sum over the N angles.
     dist = dist.sum(axis=-1)
     return dist
+
+def unit_vector_kernel(a1, a2, gamma):
+    dist = unit_vector_distance(a1, a2, sqrt=False)
+    sim = np.exp(-gamma*dist)
+    return sim
