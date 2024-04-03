@@ -2,14 +2,14 @@ from pathlib import Path
 import re
 import shutil
 import zipfile
-from api_client import APIClient
-import visualization
-from utils import extract_tar_gz
+from dpet.api_client import APIClient
+import dpet.visualization.visualization as visualization
+from dpet.utils import extract_tar_gz
 import os
 import mdtraj
-from featurizer import FeaturizationFactory
+from dpet.featurization.featurizer import FeaturizationFactory
 import numpy as np
-from dimensionality_reduction import DimensionalityReductionFactory
+from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
 
 DIM_REDUCTION_DIR = "dim_reduction"
 

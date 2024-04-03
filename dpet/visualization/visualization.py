@@ -9,8 +9,8 @@ import plotly.express as px
 import mdtraj
 from matplotlib.lines import Line2D
 
-from coord import calculate_asphericity, calculate_prolateness, contact_probability_map, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
-from featurizer import FeaturizationFactory
+from dpet.visualization.coord import calculate_asphericity, calculate_prolateness, contact_probability_map, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
+from dpet.featurization.featurizer import FeaturizationFactory
 
 def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     s = np.loadtxt(tsne_kmeans_dir  +'/silhouette.txt')
