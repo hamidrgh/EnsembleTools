@@ -686,3 +686,35 @@ def plot_contact_prob(trajectories,title,threshold = 0.8,dpi = 96):
     plt.tight_layout()
     plt.suptitle(title, fontsize=14)
     plt.show()
+
+def plot_ramachandran_plot(trajectories, two_d_hist= True, linespaces = (-180, 180, 80)):
+    if two_d_hist:
+        fig, axes = plt.subplots(1, len(trajectories), figsize=(5*len(trajectories), 5))
+        rama_linspace = np.linspace(linespaces[0], linespaces[1], linespaces[2])
+        for ens, ax in zip(trajectories, axes.ravel()):
+            phi_flat = np.degrees(mdtraj.compute_phi(trajectories[ens])[1]).ravel()
+            psi_flat = np.degrees(mdtraj.compute_psi(trajectories[ens])[1]).ravel()
+            hist = ax.hist2d(
+            phi_flat,
+            psi_flat,
+            cmap="viridis",
+            bins=(rama_linspace, rama_linspace), 
+            norm=colors.LogNorm(),
+            density=True)
+
+            ax.set_title(f'Ramachandran Plot for cluster {ens}')
+            ax.set_xlabel('Phi (ϕ) Angle (degrees)')
+            ax.set_ylabel('Psi (ψ) Angle (degrees)')
+
+        plt.tight_layout()
+        plt.show()
+    else:
+        fig,ax = plt.subplots(1,1)
+        for ens in trajectories:
+            phi = np.degrees(mdtraj.compute_phi(trajectories[ens])[1])
+            psi = np.degrees(mdtraj.compute_psi(trajectories[ens])[1])
+            plt.scatter(phi, psi, s=1, label= ens)
+        ax.set_xlabel('Phi (ϕ) Angle (degrees)')
+        ax.set_ylabel('Psi (ψ) Angle (degrees)')
+        plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
+        plt.show()

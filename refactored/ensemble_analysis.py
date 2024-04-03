@@ -480,3 +480,20 @@ class EnsembleAnalysis:
 
     def plot_contact_prob(self,title,threshold = 0.8,dpi = 96):
         visualization.plot_contact_prob(self.trajectories,title,threshold,dpi)
+
+    def plot_ramachandran_plot(self, two_d_hist=True, linespaces= (-180, 180, 80)):
+        """
+        It gets Ramachandran plot. If two_d_hist= True it returns 2D histogram 
+        for each ensembles. If two_d_hist=False it returns a simple scatter plot 
+        for ell ensembles in one plot.
+
+        Parameters
+        ----------
+
+        two_d_hist: bool
+        If True it returns 2D histogram for each ensemble. 
+
+        linespaces: tuple
+        You can customize the bins for 2D histogram
+        """
+        visualization.plot_ramachandran_plot(self.trajectories, two_d_hist, linespaces)
