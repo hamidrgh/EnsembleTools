@@ -48,10 +48,15 @@ class PCAReduction(DimensionalityReduction):
         return super().cluster(range_n_clusters)
 
 class TSNEReduction(DimensionalityReduction):
-    def __init__(self, dir=".", perplexityVals=range(2, 10, 2), metric="euclidean"):
+    def __init__(self, dir:str=".", perplexityVals=range(2, 10, 2), metric:str="euclidean", circular:bool=False, n_components:int=2, learning_rate:float=100.0):
         self.perplexityVals = perplexityVals
-        self.metric = metric
+        if circular:
+            self.metric = unit_vector_distance
+        else:
+            self.metric = metric
         self.dir = dir
+        self.n_components=n_components
+        self.learning_rate = learning_rate
 
     def fit(self, data):
         return super().fit(data)
@@ -65,10 +70,10 @@ class TSNEReduction(DimensionalityReduction):
         for i in self.perplexityVals:
             tsne_file = os.path.join(self.dir, f"tsnep{i}")
             tsneObject = TSNE(
-                n_components=2,
+                n_components=self.n_components,
                 perplexity=i,
                 early_exaggeration=10.0,
-                learning_rate=100.0,
+                learning_rate=self.learning_rate,
                 n_iter=3500,
                 metric=self.metric,
                 n_iter_without_progress=300,
