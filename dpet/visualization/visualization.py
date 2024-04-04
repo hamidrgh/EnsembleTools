@@ -12,34 +12,20 @@ from matplotlib.lines import Line2D
 from dpet.visualization.coord import calculate_asphericity, calculate_prolateness, contact_probability_map, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
 from dpet.featurization.featurizer import FeaturizationFactory
 
-def tsne_ramachandran_plot(concat_feature_phi_psi, bestK, best_kmeans):
-    fig,axes = plt.subplots(1, 2, figsize = (10,5))
-
-    for cluster_id, ax in zip(range(int(bestK)),axes.ravel()):
-        cluster_frames = np.where(best_kmeans.labels_ == cluster_id)[0]
-        print(cluster_frames, cluster_id)
-        
-        phi_psi_cluster_id = np.degrees(concat_feature_phi_psi[cluster_frames]).ravel()
-
-        phi_flat = phi_psi_cluster_id[0::2]
-
-        psi_flat = phi_psi_cluster_id[1::2]
-
-        ax.scatter(phi_flat, psi_flat, alpha=0.5)
-
-        ax.set_title(f'Ramachandran Plot for cluster {cluster_id}')
-        ax.set_xlabel('Phi (ϕ) Angle (degrees)')
-        ax.set_ylabel('Psi (ψ) Angle (degrees)')
-        
-    plt.tight_layout()
-    plt.show()
-
 def tsne_ramachandran_plot_density(concat_features, bestK, best_kmeans):
     rama_bins = 50
     rama_linspace = np.linspace(-180, 180, rama_bins)
-    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+    
+    # Calculate the number of rows and columns for subplots
+    num_rows = 1
+    num_cols = bestK // num_rows if bestK % num_rows == 0 else bestK // num_rows + 1
+    
+    fig, axes = plt.subplots(num_rows, num_cols, figsize=(num_cols * 5, num_rows * 5))
 
-    for cluster_id, ax in zip(range(int(bestK)), axes.flatten()):
+    # Flatten axes if necessary
+    axes = axes.flatten() if isinstance(axes, np.ndarray) else [axes]
+    
+    for cluster_id, ax in zip(range(int(bestK)), axes):
         cluster_frames = np.where(best_kmeans.labels_ == cluster_id)[0]
         print(cluster_frames)
         
@@ -57,6 +43,7 @@ def tsne_ramachandran_plot_density(concat_features, bestK, best_kmeans):
     
     plt.tight_layout()
     return fig
+
 
 def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg, bestK, bestP, best_kmeans, besttsne):
     bestclust = best_kmeans.labels_

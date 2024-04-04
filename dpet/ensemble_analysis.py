@@ -271,12 +271,6 @@ class EnsembleAnalysis:
 
     ##################### Integrated plot function #####################
 
-    def tsne_ramachandran_plot(self):
-        if self.reduce_dim_method == "tsne":
-            visualization.tsne_ramachandran_plot(self.concat_features, self.reducer.bestK, self.reducer.best_kmeans)
-        else:
-            print("Analysis is only valid for t-SNE dimensionality reduction.")
-
     def tsne_ramachandran_plot_density(self):
         visualization.tsne_ramachandran_plot_density(self.concat_features, self.reducer.bestK, self.reducer.best_kmeans)
 
