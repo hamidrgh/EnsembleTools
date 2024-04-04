@@ -35,22 +35,20 @@ def tsne_ramachandran_plot(concat_feature_phi_psi, bestK, best_kmeans):
     plt.show()
 
 def tsne_ramachandran_plot_density(concat_features, bestK, best_kmeans):
-    
     rama_bins = 50
-    rama_linspace = np.linspace(-180,180, rama_bins)
-    fig,axes = plt.subplots(1, 2, figsize = (10,5))
+    rama_linspace = np.linspace(-180, 180, rama_bins)
+    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
 
-    for cluster_id, ax in zip(range(int(bestK)),axes.flatten()):
+    for cluster_id, ax in zip(range(int(bestK)), axes.flatten()):
         cluster_frames = np.where(best_kmeans.labels_ == cluster_id)[0]
         print(cluster_frames)
         
         phi_psi_cluster_id = np.degrees(concat_features[cluster_frames]).flatten()
         phi_flat = phi_psi_cluster_id[0::2]
-
         psi_flat = phi_psi_cluster_id[1::2]
-        hist = ax.hist2d(phi_flat, psi_flat, cmap="viridis", bins=(rama_linspace, rama_linspace),  norm=colors.LogNorm(),density=True  )
+        
+        hist = ax.hist2d(phi_flat, psi_flat, cmap="viridis", bins=(rama_linspace, rama_linspace),  norm=colors.LogNorm(), density=True)
         cbar = fig.colorbar(hist[-1], ax=ax)
-
         cbar.set_label("Density")
         
         ax.set_title(f'Ramachandran Plot for cluster {cluster_id}')
@@ -58,7 +56,7 @@ def tsne_ramachandran_plot_density(concat_features, bestK, best_kmeans):
         ax.set_ylabel('Psi (ψ) Angle (degrees)')
     
     plt.tight_layout()
-    plt.show()
+    return fig
 
 def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg, bestK, bestP, best_kmeans, besttsne):
     bestclust = best_kmeans.labels_
@@ -93,13 +91,18 @@ def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg, bestK, bestP, best_km
     ax4.set_title('Density Plot ')
     
     plt.savefig(tsne_dir  +'/tsnep'+str(int(bestP))+'_kmeans'+str(int(bestK))+'.png', dpi=800)
+    return fig
 
 def tsne_scatter_plot_2(rg_numbers, besttsne):
-    
-    row_numbers = np.arange(len(besttsne))
-    fig1 = px.scatter(x=besttsne[:, 0], y=besttsne[:, 1], color=rg_numbers, labels={'color': 'Rg Labels'},
-                    hover_data={'Row': row_numbers})
-    fig1.show()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    scatter = ax.scatter(besttsne[:, 0], besttsne[:, 1], c=rg_numbers, cmap='viridis', alpha=0.5)
+    cbar = fig.colorbar(scatter, ax=ax)
+    cbar.set_label('Rg Labels')
+    ax.set_xlabel('t-SNE Component 1')
+    ax.set_ylabel('t-SNE Component 2')
+    ax.set_title('Scatter plot with Rg Labels')
+    return fig
+
 
 def dimenfix_scatter_plot(data, rg_numbers):
     fig = go.Figure(data=
