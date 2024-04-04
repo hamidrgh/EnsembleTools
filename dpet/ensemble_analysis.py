@@ -271,20 +271,22 @@ class EnsembleAnalysis:
 
     ##################### Integrated plot function #####################
 
-    def tsne_ramachandran_plot_density(self):
-        visualization.tsne_ramachandran_plot_density(self.concat_features, self.reducer.bestK, self.reducer.best_kmeans)
+    def tsne_ramachandran_plot_density(self, save=False):
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.tsne_ramachandran_plot_density(plot_dir, self.concat_features, self.reducer.bestP, self.reducer.bestK, self.reducer.best_kmeans, save)
 
-    def tsne_scatter_plot(self):
+    def tsne_scatter_plot(self, save=False):
         if self.reduce_dim_method == "tsne":
             plot_dir = os.path.join(self.data_dir, PLOT_DIR)
             visualization.tsne_scatter_plot(plot_dir, self.all_labels, self.ens_codes, self.rg, 
                                             self.reducer.bestK, self.reducer.bestP, self.reducer.best_kmeans, 
-                                            self.reducer.best_tsne)
+                                            self.reducer.best_tsne, save)
         else:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
-    def tsne_scatter_plot_2(self):
-        visualization.tsne_scatter_plot_2(self.rg, self.reducer.best_tsne)
+    def tsne_scatter_plot_rg(self, save=False):
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.tsne_scatter_plot_rg(self.rg, self.reducer.best_tsne, plot_dir, self.reducer.bestP, self.reducer.bestK, save)
 
     def dimenfix_scatter_plot(self):
         visualization.dimenfix_scatter_plot(self.transformed_data, self.rg)

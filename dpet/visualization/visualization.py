@@ -12,7 +12,7 @@ from matplotlib.lines import Line2D
 from dpet.visualization.coord import calculate_asphericity, calculate_prolateness, contact_probability_map, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
 from dpet.featurization.featurizer import FeaturizationFactory
 
-def tsne_ramachandran_plot_density(concat_features, bestK, best_kmeans):
+def tsne_ramachandran_plot_density(plot_dir, concat_features, bestP, bestK, best_kmeans, save=False):
     rama_bins = 50
     rama_linspace = np.linspace(-180, 180, rama_bins)
     
@@ -40,12 +40,15 @@ def tsne_ramachandran_plot_density(concat_features, bestK, best_kmeans):
         ax.set_title(f'Ramachandran Plot for cluster {cluster_id}')
         ax.set_xlabel('Phi (ϕ) Angle (degrees)')
         ax.set_ylabel('Psi (ψ) Angle (degrees)')
+
+    if save:
+        plt.savefig(plot_dir  +'/tsnep'+str(int(bestP))+'_kmeans'+str(int(bestK))+'_ramachandran.png', dpi=800)
     
     plt.tight_layout()
     return fig
 
 
-def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg, bestK, bestP, best_kmeans, besttsne):
+def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg, bestK, bestP, best_kmeans, besttsne, save=False):
     bestclust = best_kmeans.labels_
     fig , (ax1, ax2, ax3, ax4) = plt.subplots(1,4, figsize=(14 ,4)) 
 
@@ -77,10 +80,11 @@ def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg, bestK, bestP, best_km
     ax3.set_title('Scatter plot (Rg labels)')
     ax4.set_title('Density Plot ')
     
-    plt.savefig(tsne_dir  +'/tsnep'+str(int(bestP))+'_kmeans'+str(int(bestK))+'.png', dpi=800)
+    if save:
+        plt.savefig(tsne_dir  +'/tsnep'+str(int(bestP))+'_kmeans'+str(int(bestK))+'_scatter.png', dpi=800)
     return fig
 
-def tsne_scatter_plot_2(rg_numbers, besttsne):
+def tsne_scatter_plot_rg(rg_numbers, besttsne, tsne_dir, bestP, bestK, save=False):
     fig, ax = plt.subplots(figsize=(8, 6))
     scatter = ax.scatter(besttsne[:, 0], besttsne[:, 1], c=rg_numbers, cmap='viridis', alpha=0.5)
     cbar = fig.colorbar(scatter, ax=ax)
@@ -88,6 +92,8 @@ def tsne_scatter_plot_2(rg_numbers, besttsne):
     ax.set_xlabel('t-SNE Component 1')
     ax.set_ylabel('t-SNE Component 2')
     ax.set_title('Scatter plot with Rg Labels')
+    if save:
+        plt.savefig(tsne_dir  +'/tsnep'+str(int(bestP))+'_kmeans'+str(int(bestK))+'_scatter_rg.png', dpi=800)
     return fig
 
 
