@@ -11,7 +11,7 @@ from dpet.featurization.featurizer import FeaturizationFactory
 import numpy as np
 from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
 
-DIM_REDUCTION_DIR = "dim_reduction"
+PLOT_DIR = "plots"
 
 class EnsembleAnalysis:
     def __init__(self, ens_codes, data_dir: str):
@@ -22,8 +22,8 @@ class EnsembleAnalysis:
         self.featurized_data = {}
         self.all_labels = []
         self.ens_codes = ens_codes
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        os.makedirs(dim_reduction_dir, exist_ok=True)
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        os.makedirs(plot_dir, exist_ok=True)
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -246,8 +246,7 @@ class EnsembleAnalysis:
 
 
     def fit_dimensionality_reduction(self, method: str, fit_on: list=None, *args, **kwargs):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        self.reducer = DimensionalityReductionFactory.get_reducer(method, dim_reduction_dir, *args, **kwargs)
+        self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
         if method == "pca":
             fit_on_data = self.get_concat_features(fit_on=fit_on)
@@ -282,8 +281,8 @@ class EnsembleAnalysis:
 
     def tsne_scatter_plot(self):
         if self.reduce_dim_method == "tsne":
-            dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-            visualization.tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.ens_codes, self.rg, 
+            plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+            visualization.tsne_scatter_plot(plot_dir, self.all_labels, self.ens_codes, self.rg, 
                                             self.reducer.bestK, self.reducer.bestP, self.reducer.best_kmeans, 
                                             self.reducer.best_tsne)
         else:
@@ -311,12 +310,12 @@ class EnsembleAnalysis:
             print("Analysis is only valid for PCA dimensionality reduction.")
 
     def pca_plot_2d_landscapes(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        visualization.pca_plot_2d_landscapes(self.ens_codes, self.reduce_dim_data, dim_reduction_dir, self.featurization)
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.pca_plot_2d_landscapes(self.ens_codes, self.reduce_dim_data, plot_dir, self.featurization)
 
     def pca_plot_1d_histograms(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        visualization.pca_plot_1d_histograms(self.ens_codes, self.transformed_data, self.reduce_dim_data, dim_reduction_dir, self.featurization)
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.pca_plot_1d_histograms(self.ens_codes, self.transformed_data, self.reduce_dim_data, plot_dir, self.featurization)
 
     def pca_correlation_plot(self, num_residues, sel_dims):
         if self.featurization == "ca_dist":
@@ -325,8 +324,8 @@ class EnsembleAnalysis:
             print("Analysis is only valid for ca_dist feature extraction.")
     
     def pca_rg_correlation(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        visualization.pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, dim_reduction_dir)
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, plot_dir)
         
     def trajectories_plot_total_sasa(self):
         visualization.trajectories_plot_total_sasa(self.trajectories)
