@@ -12,12 +12,7 @@ from matplotlib.lines import Line2D
 from dpet.visualization.coord import calculate_asphericity, calculate_prolateness, contact_probability_map, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
 from dpet.featurization.featurizer import FeaturizationFactory
 
-def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
-    s = np.loadtxt(tsne_kmeans_dir  +'/silhouette.txt')
-    [bestP,bestK] = s[np.argmax(s[:,4]), 0], s[np.argmax(s[:,4]), 1]
-    print([bestP,bestK])
-    besttsne = np.loadtxt(tsne_kmeans_dir  + '/tsnep'+str(int(bestP)))
-    best_kmeans = KMeans(n_clusters=int(bestK), n_init='auto').fit(besttsne)
+def tsne_ramachandran_plot(concat_feature_phi_psi, bestK, best_kmeans):
     fig,axes = plt.subplots(1, 2, figsize = (10,5))
 
     for cluster_id, ax in zip(range(int(bestK)),axes.ravel()):
@@ -39,13 +34,8 @@ def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     plt.tight_layout()
     plt.show()
 
-def tsne_ramachandran_plot_density(tsne_dir, concat_features):
-    s = np.loadtxt(tsne_dir  +'/silhouette.txt')
-    [bestP,bestK] = s[np.argmax(s[:,4]), 0], s[np.argmax(s[:,4]), 1]
-    print([bestP,bestK])
-    besttsne = np.loadtxt(tsne_dir  + '/tsnep'+str(int(bestP)))
-    best_kmeans = KMeans(n_clusters=int(bestK), n_init='auto').fit(besttsne)
-    from matplotlib import colors
+def tsne_ramachandran_plot_density(concat_features, bestK, best_kmeans):
+    
     rama_bins = 50
     rama_linspace = np.linspace(-180,180, rama_bins)
     fig,axes = plt.subplots(1, 2, figsize = (10,5))
@@ -70,14 +60,9 @@ def tsne_ramachandran_plot_density(tsne_dir, concat_features):
     plt.tight_layout()
     plt.show()
 
-def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg):
+def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg, bestK, bestP, best_kmeans, besttsne):
+    bestclust = best_kmeans.labels_
     fig , (ax1, ax2, ax3, ax4) = plt.subplots(1,4, figsize=(14 ,4)) 
-    s = np.loadtxt(tsne_dir  +'/silhouette.txt')
-    [bestP,bestK] = s[np.argmax(s[:,4]), 0], s[np.argmax(s[:,4]), 1]
-    besttsne = np.loadtxt(tsne_dir  + '/tsnep'+str(int(bestP)))
-    bestclust = np.loadtxt(tsne_dir  +'/kmeans_'+str(int(bestK))+'clusters_tsnep'+str(int(bestP))+'.dat')
-    print(bestP, bestK)
-   
 
     # scatter original  labels
     label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in ens_codes}
@@ -109,12 +94,8 @@ def tsne_scatter_plot(tsne_dir, all_labels, ens_codes, rg):
     
     plt.savefig(tsne_dir  +'/tsnep'+str(int(bestP))+'_kmeans'+str(int(bestK))+'.png', dpi=800)
 
-def tsne_scatter_plot_2(tsne_dir, rg_numbers):
-    s = np.loadtxt(tsne_dir  +'/silhouette.txt')
-    [bestP,bestK] = s[np.argmax(s[:,4]), 0], s[np.argmax(s[:,4]), 1]
-    besttsne = np.loadtxt(tsne_dir  + '/tsnep'+str(int(bestP)))
-    print(bestP, bestK)
-
+def tsne_scatter_plot_2(rg_numbers, besttsne):
+    
     row_numbers = np.arange(len(besttsne))
     fig1 = px.scatter(x=besttsne[:, 0], y=besttsne[:, 1], color=rg_numbers, labels={'color': 'Rg Labels'},
                     hover_data={'Row': row_numbers})

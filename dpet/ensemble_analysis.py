@@ -249,41 +249,35 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
-    def cluster(self, range_n_clusters):
-        self.sil_scores = self.reducer.cluster(range_n_clusters=range_n_clusters)
-
-    def execute_pipeline(self, featurization_params, reduce_dim_params, range_n_clusters=None, database=None):
+    def execute_pipeline(self, featurization_params, reduce_dim_params, database=None):
         self.download_from_database(database)
         self.generate_trajectories()
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
-        if range_n_clusters:
-            self.cluster(range_n_clusters)
 
     ##################### Integrated plot function #####################
 
     def tsne_ramachandran_plot(self):
         if self.reduce_dim_method == "tsne":
-            dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-            visualization.tsne_ramachandran_plot(dim_reduction_dir, self.concat_features)
+            visualization.tsne_ramachandran_plot(self.concat_features, self.reducer.bestK, self.reducer.best_kmeans)
         else:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
     def tsne_ramachandran_plot_density(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        visualization.tsne_ramachandran_plot_density(dim_reduction_dir, self.concat_features)
+        visualization.tsne_ramachandran_plot_density(self.concat_features, self.reducer.bestK, self.reducer.best_kmeans)
 
     def tsne_scatter_plot(self):
         if self.reduce_dim_method == "tsne":
             dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-            visualization.tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.ens_codes, self.rg)
+            visualization.tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.ens_codes, self.rg, 
+                                            self.reducer.bestK, self.reducer.bestP, self.reducer.best_kmeans, 
+                                            self.reducer.best_tsne)
         else:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
     def tsne_scatter_plot_2(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        visualization.tsne_scatter_plot_2(dim_reduction_dir, self.rg)
+        visualization.tsne_scatter_plot_2(self.rg, self.reducer.best_tsne)
 
     def dimenfix_scatter_plot(self):
         visualization.dimenfix_scatter_plot(self.transformed_data, self.rg)
@@ -292,10 +286,10 @@ class EnsembleAnalysis:
         visualization.dimenfix_scatter_plot_2(self.transformed_data, self.all_labels)
 
     def dimenfix_cluster_scatter_plot(self):
-        visualization.dimenfix_cluster_scatter_plot(self.sil_scores, self.transformed_data)
+        visualization.dimenfix_cluster_scatter_plot(self.reducer.sil_scores, self.transformed_data)
 
     def dimenfix_cluster_scatter_plot_2(self):
-        visualization.dimenfix_cluster_scatter_plot_2(self.sil_scores, self.transformed_data, self.ens_codes, self.all_labels)
+        visualization.dimenfix_cluster_scatter_plot_2(self.reducer.sil_scores, self.transformed_data, self.ens_codes, self.all_labels)
 
     def pca_cumulative_explained_variance(self):
         if self.reduce_dim_method == "pca":
