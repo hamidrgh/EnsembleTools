@@ -3,6 +3,7 @@ import re
 import shutil
 import zipfile
 from dpet.api_client import APIClient
+from dpet.visualization.reports import generate_tsne_report
 import dpet.visualization.visualization as visualization
 from dpet.utils import extract_tar_gz
 import os
@@ -11,7 +12,7 @@ from dpet.featurization.featurizer import FeaturizationFactory
 import numpy as np
 from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
 
-DIM_REDUCTION_DIR = "dim_reduction"
+PLOT_DIR = "plots"
 
 class EnsembleAnalysis:
     def __init__(self, ens_codes, data_dir: str):
@@ -22,8 +23,8 @@ class EnsembleAnalysis:
         self.featurized_data = {}
         self.all_labels = []
         self.ens_codes = ens_codes
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        os.makedirs(dim_reduction_dir, exist_ok=True)
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        os.makedirs(plot_dir, exist_ok=True)
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -178,6 +179,17 @@ class EnsembleAnalysis:
             else:
                 print(f"File or directory for ensemble {ens_code} doesn't exist.")
                 return
+            
+    def random_sample_trajectories(self, sample_size):
+        self.trajectories = {ensemble_id: self._random_sample(traj, sample_size) for ensemble_id, traj in self.trajectories.items()}
+
+    def _random_sample(self, trajectory, sample_size):
+        total_frames = len(trajectory)
+        random_indices = np.random.choice(total_frames, size=sample_size, replace=False)
+        subsampled_traj = mdtraj.Trajectory(
+            xyz=trajectory.xyz[random_indices],
+            topology=trajectory.topology)
+        return subsampled_traj
 
     def perform_feature_extraction(self, featurization: str, normalize = False, *args, **kwargs):
         self.extract_features(featurization, *args, **kwargs)
@@ -235,8 +247,7 @@ class EnsembleAnalysis:
 
 
     def fit_dimensionality_reduction(self, method: str, fit_on: list=None, *args, **kwargs):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        self.reducer = DimensionalityReductionFactory.get_reducer(method, dim_reduction_dir, *args, **kwargs)
+        self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
         if method == "pca":
             fit_on_data = self.get_concat_features(fit_on=fit_on)
@@ -249,35 +260,33 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
-    def execute_pipeline(self, featurization_params, reduce_dim_params, database=None):
+    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None) -> None:
         self.download_from_database(database)
         self.generate_trajectories()
+        if subsample_size is not None:
+            self.random_sample_trajectories(subsample_size)
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
 
     ##################### Integrated plot function #####################
 
-    def tsne_ramachandran_plot(self):
-        if self.reduce_dim_method == "tsne":
-            visualization.tsne_ramachandran_plot(self.concat_features, self.reducer.bestK, self.reducer.best_kmeans)
-        else:
-            print("Analysis is only valid for t-SNE dimensionality reduction.")
+    def tsne_ramachandran_plot_density(self, save=False):
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.tsne_ramachandran_plot_density(plot_dir, self.concat_features, self.reducer.bestP, self.reducer.bestK, self.reducer.best_kmeans, save)
 
-    def tsne_ramachandran_plot_density(self):
-        visualization.tsne_ramachandran_plot_density(self.concat_features, self.reducer.bestK, self.reducer.best_kmeans)
-
-    def tsne_scatter_plot(self):
+    def tsne_scatter_plot(self, save=False):
         if self.reduce_dim_method == "tsne":
-            dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-            visualization.tsne_scatter_plot(dim_reduction_dir, self.all_labels, self.ens_codes, self.rg, 
+            plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+            visualization.tsne_scatter_plot(plot_dir, self.all_labels, self.ens_codes, self.rg, 
                                             self.reducer.bestK, self.reducer.bestP, self.reducer.best_kmeans, 
-                                            self.reducer.best_tsne)
+                                            self.reducer.best_tsne, save)
         else:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
-    def tsne_scatter_plot_2(self):
-        visualization.tsne_scatter_plot_2(self.rg, self.reducer.best_tsne)
+    def tsne_scatter_plot_rg(self, save=False):
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.tsne_scatter_plot_rg(self.rg, self.reducer.best_tsne, plot_dir, self.reducer.bestP, self.reducer.bestK, save)
 
     def dimenfix_scatter_plot(self):
         visualization.dimenfix_scatter_plot(self.transformed_data, self.rg)
@@ -298,12 +307,12 @@ class EnsembleAnalysis:
             print("Analysis is only valid for PCA dimensionality reduction.")
 
     def pca_plot_2d_landscapes(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        visualization.pca_plot_2d_landscapes(self.ens_codes, self.reduce_dim_data, dim_reduction_dir, self.featurization)
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.pca_plot_2d_landscapes(self.ens_codes, self.reduce_dim_data, plot_dir, self.featurization)
 
     def pca_plot_1d_histograms(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        visualization.pca_plot_1d_histograms(self.ens_codes, self.transformed_data, self.reduce_dim_data, dim_reduction_dir, self.featurization)
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.pca_plot_1d_histograms(self.ens_codes, self.transformed_data, self.reduce_dim_data, plot_dir, self.featurization)
 
     def pca_correlation_plot(self, num_residues, sel_dims):
         if self.featurization == "ca_dist":
@@ -312,8 +321,8 @@ class EnsembleAnalysis:
             print("Analysis is only valid for ca_dist feature extraction.")
     
     def pca_rg_correlation(self):
-        dim_reduction_dir = os.path.join(self.data_dir, DIM_REDUCTION_DIR)
-        visualization.pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, dim_reduction_dir)
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        visualization.pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, plot_dir)
         
     def trajectories_plot_total_sasa(self):
         visualization.trajectories_plot_total_sasa(self.trajectories)
@@ -494,3 +503,12 @@ class EnsembleAnalysis:
     
     def plot_ss_measure_disorder(self, pointer=None):
         visualization.plot_ss_measure_disorder(self.featurized_data, pointer)
+
+
+    ##################### PDF Reports #####################
+
+    def generate_tsne_report(self):
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        generate_tsne_report(plot_dir, self.concat_features, self.reducer.bestK, 
+                             self.reducer.bestP, self.reducer.best_kmeans, self.reducer.best_tsne, 
+                             self.all_labels, self.ens_codes, self.rg)

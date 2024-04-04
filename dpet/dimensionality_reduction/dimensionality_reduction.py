@@ -39,11 +39,10 @@ class PCAReduction(DimensionalityReduction):
         return transformed
 
 class TSNEReduction(DimensionalityReduction):
-    def __init__(self, dir: str=".", perplexity_vals=range(2, 10, 2), metric: str="euclidean", 
+    def __init__(self, perplexity_vals=range(2, 10, 2), metric: str="euclidean", 
                  circular: bool=False, n_components: int=2, learning_rate: float=100.0, range_n_clusters = range(2,10,1)):
         self.perplexity_vals = perplexity_vals
         self.metric = unit_vector_distance if circular else metric
-        self.dir = dir
         self.n_components = n_components
         self.learning_rate = learning_rate
         self.results = []
@@ -153,11 +152,11 @@ class MDSReduction(DimensionalityReduction):
 
 class DimensionalityReductionFactory:
     @staticmethod
-    def get_reducer(method, dir, *args, **kwargs):
+    def get_reducer(method, *args, **kwargs):
         if method == "pca":
             return PCAReduction(*args, **kwargs)
         elif method == "tsne":
-            return TSNEReduction(dir, *args, **kwargs)
+            return TSNEReduction(*args, **kwargs)
         elif method == "dimenfix":
             return DimenFixReduction(*args, **kwargs)
         elif method == "mds":
