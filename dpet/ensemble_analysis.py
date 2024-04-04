@@ -178,6 +178,17 @@ class EnsembleAnalysis:
             else:
                 print(f"File or directory for ensemble {ens_code} doesn't exist.")
                 return
+            
+    def random_sample_trajectories(self, sample_size):
+        self.trajectories = {ensemble_id: self._random_sample(traj, sample_size) for ensemble_id, traj in self.trajectories.items()}
+
+    def _random_sample(self, trajectory, sample_size):
+        total_frames = len(trajectory)
+        random_indices = np.random.choice(total_frames, size=sample_size, replace=False)
+        subsampled_traj = mdtraj.Trajectory(
+            xyz=trajectory.xyz[random_indices],
+            topology=trajectory.topology)
+        return subsampled_traj
 
     def perform_feature_extraction(self, featurization: str, normalize = False, *args, **kwargs):
         self.extract_features(featurization, *args, **kwargs)
@@ -249,9 +260,11 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
-    def execute_pipeline(self, featurization_params, reduce_dim_params, database=None):
+    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None) -> None:
         self.download_from_database(database)
         self.generate_trajectories()
+        if subsample_size is not None:
+            self.random_sample_trajectories(subsample_size)
         self.perform_feature_extraction(**featurization_params)
         self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
