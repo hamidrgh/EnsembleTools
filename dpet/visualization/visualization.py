@@ -9,9 +9,8 @@ import plotly.express as px
 import mdtraj
 from matplotlib.lines import Line2D
 
-<<<<<<< HEAD:refactored/visualization.py
-from coord import *
-from featurizer import FeaturizationFactory
+from dpet.visualization.coord import *
+from dpet.featurization.featurizer import FeaturizationFactory
 
 def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     s = np.loadtxt(tsne_kmeans_dir  +'/silhouette.txt')
@@ -20,13 +19,6 @@ def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     besttsne = np.loadtxt(tsne_kmeans_dir  + '/tsnep'+str(int(bestP)))
     best_kmeans = KMeans(n_clusters=int(bestK), n_init='auto').fit(besttsne)
     fig,axes = plt.subplots(1, int(bestK), figsize = (10,5))
-=======
-from dpet.visualization.coord import calculate_asphericity, calculate_prolateness, contact_probability_map, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
-from dpet.featurization.featurizer import FeaturizationFactory
-
-def tsne_ramachandran_plot(concat_feature_phi_psi, bestK, best_kmeans):
-    fig,axes = plt.subplots(1, 2, figsize = (10,5))
->>>>>>> 0d265ac9bae07858901f8d6322e47a5c83b68c3d:dpet/visualization/visualization.py
 
     for cluster_id, ax in zip(range(int(bestK)),axes.ravel()):
         cluster_frames = np.where(best_kmeans.labels_ == cluster_id)[0]
@@ -715,13 +707,14 @@ def plot_ramachandran_plot(trajectories, two_d_hist= True, linespaces = (-180, 1
         plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
         plt.show()
 
-def plot_ss_measure_disorder(featurized_data: dict, pointer: list = None):
+def plot_ss_measure_disorder( featurized_data: dict, pointer: list = None):
     f = ss_measure_disorder(featurized_data)
     fig, axes = plt.subplots(1,1, figsize=(15,5))
+    keys = list(featurized_data.keys())
+    x = [i+1 for i in range(len(f[keys[0]]))]
     for key, values in f.items():
-        x = [i+1 for i in range(len(values))]
         axes.scatter(x, values, label= key)
-
+    
     axes.set_xticks([i for i in x if  i==1 or i%5 == 0])
     axes.set_xlabel("Residue Index")
     axes.set_ylabel("Site-specific measure of disorder")
