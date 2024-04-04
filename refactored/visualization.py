@@ -9,7 +9,7 @@ import plotly.express as px
 import mdtraj
 from matplotlib.lines import Line2D
 
-from coord import calculate_asphericity, calculate_prolateness, contact_probability_map, create_consecutive_indices_matrix, get_contact_map, get_distance_matrix
+from coord import *
 from featurizer import FeaturizationFactory
 
 def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
@@ -18,7 +18,7 @@ def tsne_ramachandran_plot(tsne_kmeans_dir, concat_feature_phi_psi):
     print([bestP,bestK])
     besttsne = np.loadtxt(tsne_kmeans_dir  + '/tsnep'+str(int(bestP)))
     best_kmeans = KMeans(n_clusters=int(bestK), n_init='auto').fit(besttsne)
-    fig,axes = plt.subplots(1, 2, figsize = (10,5))
+    fig,axes = plt.subplots(1, int(bestK), figsize = (10,5))
 
     for cluster_id, ax in zip(range(int(bestK)),axes.ravel()):
         cluster_frames = np.where(best_kmeans.labels_ == cluster_id)[0]
@@ -48,21 +48,23 @@ def tsne_ramachandran_plot_density(tsne_dir, concat_features):
     from matplotlib import colors
     rama_bins = 50
     rama_linspace = np.linspace(-180,180, rama_bins)
-    fig,axes = plt.subplots(1, 2, figsize = (10,5))
+    fig,axes = plt.subplots(1, int(bestK), figsize = (10,5))
 
     for cluster_id, ax in zip(range(int(bestK)),axes.flatten()):
         cluster_frames = np.where(best_kmeans.labels_ == cluster_id)[0]
-        print(cluster_frames)
-        
-        phi_psi_cluster_id = np.degrees(concat_features[cluster_frames]).flatten()
-        phi_flat = phi_psi_cluster_id[0::2]
 
-        psi_flat = phi_psi_cluster_id[1::2]
-        hist = ax.hist2d(phi_flat, psi_flat, cmap="viridis", bins=(rama_linspace, rama_linspace),  norm=colors.LogNorm(),density=True  )
-        cbar = fig.colorbar(hist[-1], ax=ax)
+        phi, psi = np.split(np.degrees(concat_features[cluster_frames]) , 2 , axis=1)
+        phi_flat = phi.flatten()
+        psi_flat = psi.flatten()
 
-        cbar.set_label("Density")
-        
+        hist = ax.hist2d(
+        phi_flat,
+        psi_flat,
+        cmap="viridis",
+        bins=(rama_linspace, rama_linspace), 
+        norm=colors.LogNorm(),
+        density=True)
+
         ax.set_title(f'Ramachandran Plot for cluster {cluster_id}')
         ax.set_xlabel('Phi (ϕ) Angle (degrees)')
         ax.set_ylabel('Psi (ψ) Angle (degrees)')
@@ -415,7 +417,7 @@ def plot_relative_helix_content(trajectories):
     ax.set_xlabel('Residue Index')
     ax.set_ylabel('Relative Content of H (Helix)')
     ax.set_title('Relative Content of H in Each Residue in the ensembles')
-    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.legend()
     plt.show()
 
 def get_rg_data_dict(trajectories):
@@ -718,3 +720,22 @@ def plot_ramachandran_plot(trajectories, two_d_hist= True, linespaces = (-180, 1
         ax.set_ylabel('Psi (ψ) Angle (degrees)')
         plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
         plt.show()
+
+def plot_ss_measure_disorder(featurized_data: dict, pointer: list = None):
+    f = ss_measure_disorder(featurized_data)
+    fig, axes = plt.subplots(1,1, figsize=(15,5))
+    for key, values in f.items():
+        x = [i+1 for i in range(len(values))]
+        axes.scatter(x, values, label= key)
+
+    axes.set_xticks([i for i in x if  i==1 or i%5 == 0])
+    axes.set_xlabel("Residue Index")
+    axes.set_ylabel("Site-specific measure of disorder")
+    axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    if pointer is not None:
+        for res in pointer:
+            axes.axvline(x= res, c= 'blue', linestyle= '--', alpha= 0.3, linewidth= 1)
+        
+    
+    plt.show()
+        

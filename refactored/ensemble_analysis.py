@@ -497,3 +497,6 @@ class EnsembleAnalysis:
         You can customize the bins for 2D histogram
         """
         visualization.plot_ramachandran_plot(self.trajectories, two_d_hist, linespaces)
+    
+    def plot_ss_measure_disorder(self, pointer=None):
+        visualization.plot_ss_measure_disorder(self.featurized_data, pointer)

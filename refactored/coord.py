@@ -110,3 +110,57 @@ def contact_probability_map(traj, threshold = 0.8):
                     matrix_contact_prob[ens][i][j] = 0
     matrix_prob_avg = np.mean(matrix_contact_prob, axis=0)
     return matrix_prob_avg
+
+def dict_phi_psi_normal_cases(dict_phi_psi):
+    dict_phi_psi_normal_case={}
+    for key in dict_phi_psi.keys():
+        array_phi=dict_phi_psi[key][0][:,:-1]
+        array_psi=dict_phi_psi[key][1][:,1:]
+        dict_phi_psi_normal_case[key]=[array_phi,array_psi]
+    return dict_phi_psi_normal_case
+
+def split_dictionary_phipsiangles(dictionary):
+    dict_phi_psi={}
+    for key, value in dictionary.items():
+        num_columns=len(value[0])
+        split_index=num_columns//2
+        phi_list=value[:,:split_index]
+        psi_list=value[:,split_index:]
+        dict_phi_psi[key]=[phi_list,psi_list]
+    return dict_phi_psi
+
+def ss_measure_disorder(featurized_data:dict):
+    
+    """This function accepts the dictionary of phi-psi arrays
+    which is saved in featurized_data attribute and as an output provide
+    lexibility parameter for each residue in the ensemble
+    Note: this function only works on phi/psi feature """
+
+    f = {}
+    R_square_dict = {}
+
+    for key in dict_phi_psi_normal_cases(split_dictionary_phipsiangles(featurized_data)).keys():
+        Rsquare_phi = []
+        Rsquare_psi = []
+
+        phi_array = dict_phi_psi_normal_cases(split_dictionary_phipsiangles(featurized_data))[key][0]
+        psi_array = dict_phi_psi_normal_cases(split_dictionary_phipsiangles(featurized_data))[key][1]
+        if isinstance(phi_array, np.ndarray) and phi_array.ndim == 2:
+            for i in range(phi_array.shape[1]):
+                Rsquare_phi.append(round(np.square(np.sum(np.fromiter(((1 / phi_array.shape[0]) * np.cos(phi_array[c][i]) for c in range(phi_array.shape[0])), dtype=float))) + \
+                        np.square(np.sum(np.fromiter(((1 / phi_array.shape[0]) * np.sin(phi_array[c][i]) for c in range(phi_array.shape[0])), dtype=float))),5))
+
+        if isinstance(psi_array, np.ndarray) and psi_array.ndim == 2:
+                for j in range(psi_array.shape[1]):
+                    Rsquare_psi.append(round(np.square(np.sum(np.fromiter(((1 / psi_array.shape[0]) * np.cos(psi_array[c][j]) for c in range(psi_array.shape[0])), dtype=float))) + \
+                          np.square(np.sum(np.fromiter(((1 / psi_array.shape[0]) * np.sin(psi_array[c][j]) for c in range(psi_array.shape[0])), dtype=float))),5))
+
+
+        R_square_dict[key] = [Rsquare_phi, Rsquare_psi]
+
+    for k in R_square_dict.keys():
+        f_i=[]
+        for z in range(len(R_square_dict[k][0])):
+            f_i.append(round(1 - (1/2 * np.sqrt(R_square_dict[k][0][z])) - (1/2 * np.sqrt(R_square_dict[k][1][z])),5))
+            f[k]=f_i
+    return f
