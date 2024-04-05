@@ -194,14 +194,19 @@ def dimenfix_cluster_scatter_plot_2(sil_scores, data, ens_codes, all_labels):
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     labels = point_colors
 
+    # Create the figure and axis objects
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+    
     # Plot the points with different colors for each cluster
-    plt.figure(dpi=100)
-    plt.scatter(data[:, 0], data[:, 1], c=labels, s=7)
-    # plt.title('K-means Clustering')
+    scatter = ax.scatter(data[:, 0], data[:, 1], c=labels, s=7)
+    ax.set_title('K-means Clustering')
+    
+    # Create legend
     legend_labels = list(label_colors.keys())
     legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-    plt.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'upper left', bbox_to_anchor=(1, 1))
-    plt.show()
+    ax.legend(legend_handles, legend_labels, title='Original Labels', loc='upper left', bbox_to_anchor=(1, 1))
+
+    return fig
 
 def pca_cumulative_explained_variance(pca_model):
     print("- Percentage of variance explained by each of the selected components:")

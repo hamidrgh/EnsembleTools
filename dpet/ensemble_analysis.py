@@ -515,4 +515,4 @@ class EnsembleAnalysis:
         
     def generate_dimenfix_report(self):
         plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-        generate_dimenfix_report(plot_dir, self.transformed_data, self.rg, self.all_labels, self.reducer.sil_scores)
+        generate_dimenfix_report(plot_dir, self.transformed_data, self.rg, self.all_labels, self.reducer.sil_scores, self.ens_codes)
