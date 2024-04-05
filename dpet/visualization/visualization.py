@@ -168,14 +168,21 @@ def s_max(sil_scores):
 def dimenfix_cluster_scatter_plot(sil_scores, data):
     n_clusters = s_max(sil_scores)
 
-    # Apply K-means clustering
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     labels = kmeans.fit_predict(data)
 
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
     # Plot the points with different colors for each cluster
-    plt.scatter(data[:, 0], data[:, 1], s=3 ,c=labels, cmap='viridis')
-    plt.title('K-means Clustering')
-    plt.show()
+    scatter = ax.scatter(data[:, 0], data[:, 1], s=3, c=labels, cmap='viridis')
+    ax.set_title('K-means Clustering')
+    
+    # Create colorbar
+    cbar = fig.colorbar(scatter, ax=ax)
+    cbar.set_label('Cluster Labels')
+
+    return fig
+
 
 def dimenfix_cluster_scatter_plot_2(sil_scores, data, ens_codes, all_labels):
     label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in ens_codes}
