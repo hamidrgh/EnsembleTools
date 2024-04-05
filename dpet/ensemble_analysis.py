@@ -298,27 +298,24 @@ class EnsembleAnalysis:
 
     def pca_cumulative_explained_variance(self):
         if self.reduce_dim_method == "pca":
-            visualization.pca_cumulative_explained_variance(self.reduce_dim_model)
+            visualization.pca_cumulative_explained_variance(self)
         else:
             print("Analysis is only valid for PCA dimensionality reduction.")
 
-    def pca_plot_2d_landscapes(self):
-        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-        visualization.pca_plot_2d_landscapes(self.ens_codes, self.reduce_dim_data, plot_dir, self.featurization)
+    def pca_plot_2d_landscapes(self, save=False):
+        visualization.pca_plot_2d_landscapes(self, save)
 
-    def pca_plot_1d_histograms(self):
-        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-        visualization.pca_plot_1d_histograms(self.ens_codes, self.transformed_data, self.reduce_dim_data, plot_dir, self.featurization)
+    def pca_plot_1d_histograms(self, save=False):
+        visualization.pca_plot_1d_histograms(self, save)
 
     def pca_correlation_plot(self, num_residues, sel_dims):
         if self.featurization == "ca_dist":
-            visualization.pca_correlation_plot(num_residues, sel_dims, self.feature_names, self.reduce_dim_model)
+            visualization.pca_correlation_plot(num_residues, sel_dims, self)
         else:
             print("Analysis is only valid for ca_dist feature extraction.")
     
-    def pca_rg_correlation(self):
-        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-        visualization.pca_rg_correlation(self.ens_codes, self.trajectories, self.reduce_dim_data, plot_dir)
+    def pca_rg_correlation(self, save=False):
+        visualization.pca_rg_correlation(self, save)
         
     def trajectories_plot_total_sasa(self):
         visualization.trajectories_plot_total_sasa(self.trajectories)

@@ -223,19 +223,19 @@ def dimenfix_cluster_scatter_plot_2(analysis, save=False):
         plt.savefig(plot_dir  +'/dimenfix_cluster_scatter_2.png', dpi=800)
     return fig
 
-def pca_cumulative_explained_variance(pca_model):
+def pca_cumulative_explained_variance(analysis):
     print("- Percentage of variance explained by each of the selected components:")
-    plt.plot(np.cumsum(pca_model.explained_variance_ratio_)*100)
+    plt.plot(np.cumsum(analysis.reduce_dim_model.explained_variance_ratio_)*100)
     plt.xlabel("PCA dimension")
     plt.ylabel("Cumulative explained variance %")
     plt.show()
-    print("- First three:", pca_model.explained_variance_ratio_[0:3].sum()*100)
+    print("- First three:", analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum()*100)
 
 def set_labels(ax, reduce_dim_method, dim_x, dim_y):
     ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
     ax.set_ylabel(f"{reduce_dim_method} dim {dim_y+1}")
 
-def pca_plot_2d_landscapes(ens_codes, reduce_dim_data, reduce_dim_dir, featurization):
+def pca_plot_2d_landscapes(analysis, save=False):
     # 2d scatters.
     dim_x = 0
     dim_y = 1
@@ -245,20 +245,20 @@ def pca_plot_2d_landscapes(ens_codes, reduce_dim_data, reduce_dim_dir, featuriza
                     "fontsize": 8}
 
     # Plot all ensembles at the same time.
-    fig, ax = plt.subplots(len(ens_codes)+1, figsize=(4, 4*len(ens_codes)), dpi=120)
+    fig, ax = plt.subplots(len(analysis.ens_codes)+1, figsize=(4, 4*len(analysis.ens_codes)), dpi=120)
     ax[0].set_title("all")
-    for code_i in ens_codes:
-        ax[0].scatter(reduce_dim_data[code_i][:,dim_x],
-                    reduce_dim_data[code_i][:,dim_y],
+    for code_i in analysis.ens_codes:
+        ax[0].scatter(analysis.reduce_dim_data[code_i][:,dim_x],
+                    analysis.reduce_dim_data[code_i][:,dim_y],
                     label=code_i, marker=marker)
     ax[0].legend(**legend_kwargs)
     set_labels(ax[0], "pca", dim_x, dim_y)
 
     # Concatenate all reduced dimensionality data from the dictionary
-    all_data = np.concatenate(list(reduce_dim_data.values()))
+    all_data = np.concatenate(list(analysis.reduce_dim_data.values()))
 
     # Plot each ensembles.
-    for i, code_i in enumerate(ens_codes):
+    for i, code_i in enumerate(analysis.ens_codes):
         ax[i+1].set_title(code_i)
         # Plot all data in gray
         ax[i+1].scatter(all_data[:, dim_x],
@@ -266,38 +266,41 @@ def pca_plot_2d_landscapes(ens_codes, reduce_dim_data, reduce_dim_dir, featuriza
                         label="all", color="gray", alpha=0.25,
                         marker=marker)
         # Plot ensemble data in color
-        ax[i+1].scatter(reduce_dim_data[code_i][:,dim_x],
-                        reduce_dim_data[code_i][:,dim_y],
+        ax[i+1].scatter(analysis.reduce_dim_data[code_i][:,dim_x],
+                        analysis.reduce_dim_data[code_i][:,dim_y],
                         label=code_i, c=f"C{i}",
                         marker=marker)
         ax[i+1].legend(**legend_kwargs)
         set_labels(ax[i+1], "pca", dim_x, dim_y)
 
     plt.tight_layout()
-    plt.savefig(os.path.join(reduce_dim_dir, 'PCA' + featurization + ens_codes[0]))
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir, 'PCA' + analysis.featurization + analysis.ens_codes[0]))
     plt.show()
+    return fig
 
-def pca_plot_1d_histograms(ens_codes, concat_reduce_dim_data, reduce_dim_data, reduce_dim_dir, featurization):
+def pca_plot_1d_histograms(analysis, save=False):
     # 1d histograms. Looking at the scatter plot above can be misleading
     # to the eye if we want to assess the density of points. Better use
     # an histogram for a precise evaluation.
     n_bins = 30
 
     dpi = 120
-    fig, ax = plt.subplots(len(ens_codes), 1, figsize=(4, 2*len(ens_codes)), dpi=dpi)
+    fig, ax = plt.subplots(len(analysis.ens_codes), 1, figsize=(4, 2*len(analysis.ens_codes)), dpi=dpi)
     k = 0
-    bins = np.linspace(concat_reduce_dim_data[:,k].min(),
-                    concat_reduce_dim_data[:,k].max(),
+    bins = np.linspace(analysis.transformed_data[:,k].min(),
+                    analysis.transformed_data[:,k].max(),
                     n_bins)
 
-    for i, code_i in enumerate(ens_codes):
-        ax[i].hist(reduce_dim_data[code_i][:,k],
+    for i, code_i in enumerate(analysis.ens_codes):
+        ax[i].hist(analysis.reduce_dim_data[code_i][:,k],
                 label=code_i,
                 bins=bins,
                 density=True,
                 color=f"C{i}",
                 histtype="step")
-        ax[i].hist(concat_reduce_dim_data[:,k],
+        ax[i].hist(analysis.transformed_data[:,k],
                 label="all",
                 bins=bins,
                 density=True,
@@ -312,10 +315,13 @@ def pca_plot_1d_histograms(ens_codes, concat_reduce_dim_data, reduce_dim_data, r
         ax[i].set_ylabel("Density")
 
     plt.tight_layout()
-    plt.savefig(os.path.join(reduce_dim_dir, 'PCA_hist' + featurization + ens_codes[0]))
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
     plt.show()
+    return fig
 
-def pca_correlation_plot(num_residues, sel_dims, feature_names, reduce_dim_model):
+def pca_correlation_plot(num_residues, sel_dims, analysis):
     cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
     norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted
                                           # when analyzing other systems via PCA!
@@ -325,13 +331,13 @@ def pca_correlation_plot(num_residues, sel_dims, feature_names, reduce_dim_model
     fig, ax = plt.subplots(1, 3, dpi=dpi, figsize=(15*fig_r, 4*fig_r))
 
     for k, sel_dim in enumerate(sel_dims):
-        feature_ids_sorted_by_weight = np.flip(np.argsort(abs(reduce_dim_model.components_[sel_dim,:])))
+        feature_ids_sorted_by_weight = np.flip(np.argsort(abs(analysis.reduce_dim_model.components_[sel_dim,:])))
         matrix = np.zeros((num_residues, num_residues))
         for i in feature_ids_sorted_by_weight:
-            r1, r2 = feature_names[i].split("-")
+            r1, r2 = analysis.feature_names[i].split("-")
             # Note: this should be patched for proteins with resSeq values not starting from 1!
-            matrix[int(r1[3:])-1, int(r2[3:])-1] = reduce_dim_model.components_[sel_dim,i]
-            matrix[int(r2[3:])-1, int(r1[3:])-1] = reduce_dim_model.components_[sel_dim,i]
+            matrix[int(r1[3:])-1, int(r2[3:])-1] = analysis.reduce_dim_model.components_[sel_dim,i]
+            matrix[int(r2[3:])-1, int(r1[3:])-1] = analysis.reduce_dim_model.components_[sel_dim,i]
         im = ax[k].imshow(matrix, cmap=cmap, norm=norm)  # RdBu, PiYG
         ax[k].set_xlabel("Residue j")
         ax[k].set_ylabel("Residue i")
@@ -343,14 +349,14 @@ def pca_correlation_plot(num_residues, sel_dims, feature_names, reduce_dim_model
     plt.tight_layout()
     plt.show()
 
-def pca_rg_correlation(ens_codes, trajectories, reduce_dim_data, reduce_dim_dir):
+def pca_rg_correlation(analysis, save):
     dpi = 120
-    fig, ax = plt.subplots(len(ens_codes), 1, figsize=(3, 3*len(ens_codes)), dpi=dpi)
+    fig, ax = plt.subplots(len(analysis.ens_codes), 1, figsize=(3, 3*len(analysis.ens_codes)), dpi=dpi)
     pca_dim = 0
 
-    for i, code_i in enumerate(ens_codes):
-        rg_i = mdtraj.compute_rg(trajectories[code_i])
-        ax[i].scatter(reduce_dim_data[code_i][:,pca_dim],
+    for i, code_i in enumerate(analysis.ens_codes):
+        rg_i = mdtraj.compute_rg(analysis.trajectories[code_i])
+        ax[i].scatter(analysis.reduce_dim_data[code_i][:,pca_dim],
                 rg_i, label=code_i,
                 color=f"C{i}"
         )
@@ -359,8 +365,11 @@ def pca_rg_correlation(ens_codes, trajectories, reduce_dim_data, reduce_dim_dir)
         ax[i].set_ylabel("Rg [nm]")
 
     plt.tight_layout()
-    plt.savefig(reduce_dim_dir + 'PCA_RG' + ens_codes[0])
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir,'PCA_RG' + analysis.ens_codes[0]))
     plt.show()
+    return fig
 
 def trajectories_plot_total_sasa(trajectories):
     for ens in trajectories:
