@@ -3,7 +3,7 @@ import re
 import shutil
 import zipfile
 from dpet.api_client import APIClient
-from dpet.visualization.reports import generate_dimenfix_report, generate_tsne_report
+from dpet.visualization.reports import generate_custom_report, generate_dimenfix_report, generate_tsne_report
 import dpet.visualization.visualization as visualization
 from dpet.utils import extract_tar_gz
 import os
@@ -25,6 +25,7 @@ class EnsembleAnalysis:
         self.ens_codes = ens_codes
         plot_dir = os.path.join(self.data_dir, PLOT_DIR)
         os.makedirs(plot_dir, exist_ok=True)
+        self.figures = {}
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -283,17 +284,17 @@ class EnsembleAnalysis:
     def tsne_scatter_plot_rg(self, save=False):
         visualization.tsne_scatter_plot_rg(self, save)
 
-    def dimenfix_scatter_plot(self):
-        visualization.dimenfix_scatter_plot_rg(self)
+    def dimenfix_scatter_plot(self, save=False):
+        visualization.dimenfix_scatter_plot_rg(self, save)
 
-    def dimenfix_scatter_plot_2(self):
-        visualization.dimenfix_scatter_plot_ens(self)
+    def dimenfix_scatter_plot_2(self, save=False):
+        visualization.dimenfix_scatter_plot_ens(self, save)
 
-    def dimenfix_cluster_scatter_plot(self):
-        visualization.dimenfix_cluster_scatter_plot(self)
+    def dimenfix_cluster_scatter_plot(self, save=False):
+        visualization.dimenfix_cluster_scatter_plot(self, save)
 
-    def dimenfix_cluster_scatter_plot_2(self):
-        visualization.dimenfix_cluster_scatter_plot_2(self)
+    def dimenfix_cluster_scatter_plot_2(self, save=False):
+        visualization.dimenfix_cluster_scatter_plot_2(self, save)
 
     def pca_cumulative_explained_variance(self):
         if self.reduce_dim_method == "pca":
@@ -507,3 +508,6 @@ class EnsembleAnalysis:
         
     def generate_dimenfix_report(self):
         generate_dimenfix_report(self)
+
+    def generate_custom_report(self):
+        generate_custom_report(self)

@@ -1,11 +1,9 @@
 import os
 import random
-from matplotlib import cm, colors, legend, pyplot as plt
+from matplotlib import cm, colors, pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
 import seaborn as sns
-import plotly.graph_objects as go 
-import plotly.express as px
 import mdtraj
 from matplotlib.lines import Line2D
 
@@ -46,6 +44,10 @@ def tsne_ramachandran_plot_density(analysis, save=False):
         ax.set_title(f'Ramachandran Plot for cluster {cluster_id}')
         ax.set_xlabel('Phi (ϕ) Angle (degrees)')
         ax.set_ylabel('Psi (ψ) Angle (degrees)')
+    
+    key = "tsne_ramachandran_plot_density"
+    if key not in analysis.figures:
+            analysis.figures[key] = fig
 
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
@@ -86,6 +88,10 @@ def tsne_scatter_plot(analysis, save=False):
     ax2.set_title('Scatter plot (clustering labels)')
     ax3.set_title('Scatter plot (Rg labels)')
     ax4.set_title('Density Plot ')
+
+    key = "tsne_scatter_plot"
+    if key not in analysis.figures:
+            analysis.figures[key] = fig
     
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
@@ -100,21 +106,34 @@ def tsne_scatter_plot_rg(analysis, save=False):
     ax.set_xlabel('t-SNE Component 1')
     ax.set_ylabel('t-SNE Component 2')
     ax.set_title('Scatter plot with Rg Labels')
+
+    key = "tsne_scatter_plot_rg"
+    if key not in analysis.figures:
+            analysis.figures[key] = fig
+
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter_rg.png', dpi=800)
     return fig
 
-def dimenfix_scatter_plot_rg(analysis):
+def dimenfix_scatter_plot_rg(analysis, save=False):
     fig, ax = plt.subplots(figsize=(10, 6))
     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=analysis.rg, cmap='viridis', s=100)
     fig.colorbar(scatter, ax=ax, label='Rg Numbers')
     ax.set_xlabel('Dimension 1')
     ax.set_ylabel('Dimension 2')
     ax.set_title('Scatter Plot')
+
+    key = "dimenfix_scatter_plot_rg"
+    if key not in analysis.figures:
+            analysis.figures[key] = fig
+
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(plot_dir  +'/dimenfix_scatter_rg.png', dpi=800)
     return fig
 
-def dimenfix_scatter_plot_ens(analysis):
+def dimenfix_scatter_plot_ens(analysis, save=False):
     # Map unique labels to unique integer values
     label_to_int = {label: i for i, label in enumerate(np.unique(analysis.all_labels))}
     
@@ -130,6 +149,14 @@ def dimenfix_scatter_plot_ens(analysis):
     ax.set_xlabel('Dimension 1')
     ax.set_ylabel('Dimension 2')
     ax.set_title('Scatter Plot 2')
+
+    key = "dimenfix_scatter_plot_ens"
+    if key not in analysis.figures:
+            analysis.figures[key] = fig
+
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(plot_dir  +'/dimenfix_scatter_ens.png', dpi=800)
     return fig
 
 def s_max(sil_scores):
@@ -140,7 +167,7 @@ def s_max(sil_scores):
             k = i[0]
     return k
 
-def dimenfix_cluster_scatter_plot(analysis):
+def dimenfix_cluster_scatter_plot(analysis, save=False):
     n_clusters = s_max(analysis.reducer.sil_scores)
 
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
@@ -156,10 +183,16 @@ def dimenfix_cluster_scatter_plot(analysis):
     cbar = fig.colorbar(scatter, ax=ax)
     cbar.set_label('Cluster Labels')
 
+    key = "dimenfix_cluster_scatter_plot"
+    if key not in analysis.figures:
+            analysis.figures[key] = fig
+
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(plot_dir  +'/dimenfix_cluster_scatter.png', dpi=800)
     return fig
 
-
-def dimenfix_cluster_scatter_plot_2(analysis):
+def dimenfix_cluster_scatter_plot_2(analysis, save=False):
     label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
     point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
 
@@ -181,6 +214,13 @@ def dimenfix_cluster_scatter_plot_2(analysis):
     legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
     ax.legend(legend_handles, legend_labels, title='Original Labels', loc='upper left', bbox_to_anchor=(1, 1))
 
+    key = "dimenfix_cluster_scatter_plot_2"
+    if key not in analysis.figures:
+            analysis.figures[key] = fig
+
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(plot_dir  +'/dimenfix_cluster_scatter_2.png', dpi=800)
     return fig
 
 def pca_cumulative_explained_variance(pca_model):
@@ -345,8 +385,6 @@ def plot_rg_vs_asphericity(trajectories):
     plt.xlabel("Rg [nm]")
     plt.legend()
     plt.show()
-    
-
 
 def trajectories_plot_density(trajectories):
     for ens in trajectories:

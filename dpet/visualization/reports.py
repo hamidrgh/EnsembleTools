@@ -42,3 +42,10 @@ def generate_dimenfix_report(analysis):
         plt.close(fig)
 
     print(f"Plots saved to {pdf_file_path}")
+
+def generate_custom_report(analysis):
+    pdf_file_path = os.path.join(analysis.data_dir, PLOT_DIR, 'custom_report.pdf')
+    with PdfPages(pdf_file_path) as pdf:
+        for fig in analysis.figures.values():
+            pdf.savefig(fig)
+    print(f"Plots saved to {pdf_file_path}")
