@@ -272,21 +272,16 @@ class EnsembleAnalysis:
     ##################### Integrated plot function #####################
 
     def tsne_ramachandran_plot_density(self, save=False):
-        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-        visualization.tsne_ramachandran_plot_density(plot_dir, self.concat_features, self.reducer.bestP, self.reducer.bestK, self.reducer.best_kmeans, save)
+        visualization.tsne_ramachandran_plot_density(self, save)
 
     def tsne_scatter_plot(self, save=False):
         if self.reduce_dim_method == "tsne":
-            plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-            visualization.tsne_scatter_plot(plot_dir, self.all_labels, self.ens_codes, self.rg, 
-                                            self.reducer.bestK, self.reducer.bestP, self.reducer.best_kmeans, 
-                                            self.reducer.best_tsne, save)
+            visualization.tsne_scatter_plot(self, save)
         else:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
     def tsne_scatter_plot_rg(self, save=False):
-        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-        visualization.tsne_scatter_plot_rg(self.rg, self.reducer.best_tsne, plot_dir, self.reducer.bestP, self.reducer.bestK, save)
+        visualization.tsne_scatter_plot_rg(self, save)
 
     def dimenfix_scatter_plot(self):
         visualization.dimenfix_scatter_plot_rg(self.transformed_data, self.rg)
@@ -508,10 +503,7 @@ class EnsembleAnalysis:
     ##################### PDF Reports #####################
 
     def generate_tsne_report(self):
-        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-        generate_tsne_report(plot_dir, self.concat_features, self.reducer.bestK, 
-                             self.reducer.bestP, self.reducer.best_kmeans, self.reducer.best_tsne, 
-                             self.all_labels, self.ens_codes, self.rg)
+        generate_tsne_report(self)
         
     def generate_dimenfix_report(self):
         plot_dir = os.path.join(self.data_dir, PLOT_DIR)

@@ -1,21 +1,21 @@
+import os
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-from dpet.visualization.visualization import dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot_rg, dimenfix_scatter_plot_ens, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_rg
+from dpet.visualization.visualization import PLOT_DIR, dimenfix_cluster_scatter_plot, dimenfix_cluster_scatter_plot_2, dimenfix_scatter_plot_rg, dimenfix_scatter_plot_ens, tsne_ramachandran_plot_density, tsne_scatter_plot, tsne_scatter_plot_rg
 
-def generate_tsne_report(plot_dir, concat_features, bestK, bestP, best_kmeans, besttsne, all_labels, ens_codes, rg):
-    pdf_file_path = plot_dir + '/tsne.pdf'
+def generate_tsne_report(analysis):
+    pdf_file_path = os.path.join(analysis.data_dir, PLOT_DIR, 'tsne.pdf')
     with PdfPages(pdf_file_path) as pdf:
-        fig = tsne_ramachandran_plot_density(plot_dir, concat_features, bestP, bestK, best_kmeans, False)
-
+        fig = tsne_ramachandran_plot_density(analysis, False)
         pdf.savefig(fig)
         plt.close(fig)
 
-        fig = tsne_scatter_plot(plot_dir, all_labels, ens_codes, rg, bestK, bestP, best_kmeans, besttsne, False)
+        fig = tsne_scatter_plot(analysis, False)
         pdf.savefig(fig)
         plt.close(fig)
 
-        fig = tsne_scatter_plot_rg(rg, besttsne, plot_dir, bestP, bestK, False)
+        fig = tsne_scatter_plot_rg(analysis, False)
 
         pdf.savefig(fig)
         plt.close(fig)
