@@ -284,16 +284,16 @@ class EnsembleAnalysis:
         visualization.tsne_scatter_plot_rg(self, save)
 
     def dimenfix_scatter_plot(self):
-        visualization.dimenfix_scatter_plot_rg(self.transformed_data, self.rg)
+        visualization.dimenfix_scatter_plot_rg(self)
 
     def dimenfix_scatter_plot_2(self):
-        visualization.dimenfix_scatter_plot_ens(self.transformed_data, self.all_labels)
+        visualization.dimenfix_scatter_plot_ens(self)
 
     def dimenfix_cluster_scatter_plot(self):
-        visualization.dimenfix_cluster_scatter_plot(self.reducer.sil_scores, self.transformed_data)
+        visualization.dimenfix_cluster_scatter_plot(self)
 
     def dimenfix_cluster_scatter_plot_2(self):
-        visualization.dimenfix_cluster_scatter_plot_2(self.reducer.sil_scores, self.transformed_data, self.ens_codes, self.all_labels)
+        visualization.dimenfix_cluster_scatter_plot_2(self)
 
     def pca_cumulative_explained_variance(self):
         if self.reduce_dim_method == "pca":
@@ -506,5 +506,4 @@ class EnsembleAnalysis:
         generate_tsne_report(self)
         
     def generate_dimenfix_report(self):
-        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
-        generate_dimenfix_report(plot_dir, self.transformed_data, self.rg, self.all_labels, self.reducer.sil_scores, self.ens_codes)
+        generate_dimenfix_report(self)

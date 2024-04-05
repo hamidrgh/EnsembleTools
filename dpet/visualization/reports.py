@@ -22,22 +22,22 @@ def generate_tsne_report(analysis):
     
     print(f"Plots saved to {pdf_file_path}")
 
-def generate_dimenfix_report(plot_dir, data, rg_numbers, all_labels, sil_scores, ens_codes):
-    pdf_file_path = plot_dir + '/dimenfix.pdf'
+def generate_dimenfix_report(analysis):
+    pdf_file_path = os.path.join(analysis.data_dir, PLOT_DIR, 'dimenfix.pdf')
     with PdfPages(pdf_file_path) as pdf:
-        fig = dimenfix_scatter_plot_rg(data, rg_numbers)
+        fig = dimenfix_scatter_plot_rg(analysis)
         pdf.savefig(fig)
         plt.close(fig)
 
-        fig = dimenfix_scatter_plot_ens(data, all_labels)
+        fig = dimenfix_scatter_plot_ens(analysis)
         pdf.savefig(fig)
         plt.close(fig)
 
-        fig = dimenfix_cluster_scatter_plot(sil_scores, data)
+        fig = dimenfix_cluster_scatter_plot(analysis)
         pdf.savefig(fig)
         plt.close(fig)
 
-        fig = dimenfix_cluster_scatter_plot_2(sil_scores, data, ens_codes, all_labels)
+        fig = dimenfix_cluster_scatter_plot_2(analysis)
         pdf.savefig(fig)
         plt.close(fig)
 
