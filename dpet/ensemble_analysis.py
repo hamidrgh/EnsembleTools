@@ -3,7 +3,7 @@ import re
 import shutil
 import zipfile
 from dpet.api_client import APIClient
-from dpet.visualization.reports import generate_tsne_report
+from dpet.visualization.reports import generate_dimenfix_report, generate_tsne_report
 import dpet.visualization.visualization as visualization
 from dpet.utils import extract_tar_gz
 import os
@@ -289,10 +289,10 @@ class EnsembleAnalysis:
         visualization.tsne_scatter_plot_rg(self.rg, self.reducer.best_tsne, plot_dir, self.reducer.bestP, self.reducer.bestK, save)
 
     def dimenfix_scatter_plot(self):
-        visualization.dimenfix_scatter_plot(self.transformed_data, self.rg)
+        visualization.dimenfix_scatter_plot_rg(self.transformed_data, self.rg)
 
     def dimenfix_scatter_plot_2(self):
-        visualization.dimenfix_scatter_plot_2(self.transformed_data, self.all_labels)
+        visualization.dimenfix_scatter_plot_ens(self.transformed_data, self.all_labels)
 
     def dimenfix_cluster_scatter_plot(self):
         visualization.dimenfix_cluster_scatter_plot(self.reducer.sil_scores, self.transformed_data)
@@ -512,3 +512,7 @@ class EnsembleAnalysis:
         generate_tsne_report(plot_dir, self.concat_features, self.reducer.bestK, 
                              self.reducer.bestP, self.reducer.best_kmeans, self.reducer.best_tsne, 
                              self.all_labels, self.ens_codes, self.rg)
+        
+    def generate_dimenfix_report(self):
+        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        generate_dimenfix_report(plot_dir, self.transformed_data, self.rg, self.all_labels)

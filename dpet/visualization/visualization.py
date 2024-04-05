@@ -99,7 +99,7 @@ def tsne_scatter_plot_rg(rg_numbers, besttsne, tsne_dir, bestP, bestK, save=Fals
         plt.savefig(tsne_dir  +'/tsnep'+str(int(bestP))+'_kmeans'+str(int(bestK))+'_scatter_rg.png', dpi=800)
     return fig
 
-
+'''
 def dimenfix_scatter_plot(data, rg_numbers):
     fig = go.Figure(data=
                     go.Scatter(x=data[:, 0],
@@ -115,6 +115,7 @@ def dimenfix_scatter_plot(data, rg_numbers):
                             )
                     )
     fig.show()
+    return fig
 
 def dimenfix_scatter_plot_2(data, all_labels):
     row = np.arange(len(data))
@@ -126,6 +127,35 @@ def dimenfix_scatter_plot_2(data, all_labels):
                                             )),
                     )
     fig.show()
+    return fig
+'''
+
+def dimenfix_scatter_plot_rg(data, rg_numbers):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    scatter = ax.scatter(data[:, 0], data[:, 1], c=rg_numbers, cmap='viridis', s=100)
+    fig.colorbar(scatter, ax=ax, label='Rg Numbers')
+    ax.set_xlabel('Dimension 1')
+    ax.set_ylabel('Dimension 2')
+    ax.set_title('Scatter Plot')
+    return fig
+
+def dimenfix_scatter_plot_ens(data, all_labels):
+    # Map unique labels to unique integer values
+    label_to_int = {label: i for i, label in enumerate(np.unique(all_labels))}
+    
+    # Convert labels to corresponding integer values
+    int_labels = np.array([label_to_int[label] for label in all_labels])
+    
+    # Create a colormap based on the number of unique labels
+    cmap = plt.cm.get_cmap('viridis', len(label_to_int))
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    scatter = ax.scatter(data[:, 0], data[:, 1], c=int_labels, cmap=cmap, s=100)
+    fig.colorbar(scatter, ax=ax, label='All Labels')
+    ax.set_xlabel('Dimension 1')
+    ax.set_ylabel('Dimension 2')
+    ax.set_title('Scatter Plot 2')
+    return fig
 
 def s_max(sil_scores):
     s = 0
