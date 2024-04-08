@@ -1,6 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import Union
 import mdtraj
 import numpy as np
+
+from dpet.featurization.utils import get_max_sep
+
+ca_selector = "protein and name CA"
 
 class Featurizer(ABC):
     @abstractmethod
@@ -8,19 +13,24 @@ class Featurizer(ABC):
         pass
 
 class CADistFeaturizer(Featurizer):
-    def __init__(self, seq_sep=2, inverse=False):
-        self.seq_sep = seq_sep
+    def __init__(self, min_sep: int = 2, max_sep: Union[None, int, float] = None, inverse=False):
+        self.min_sep = min_sep
+        self.max_sep = max_sep
         self.inverse = inverse
-
+        
     def featurize(self, traj, get_names=False):
-        ca_ids = traj.topology.select("name == CA")
+        # Get all C-alpha indices.
+        ca_ids = traj.topology.select(ca_selector)
         atoms = list(traj.topology.atoms)
+        max_sep = get_max_sep(L=len(atoms), max_sep=self.max_sep)
         # Get all pair of ids.
         pair_ids = []
         names = []
         for i, id_i in enumerate(ca_ids):
             for j, id_j in enumerate(ca_ids):
-                if j - i >= self.seq_sep:
+                if j - i >= self.min_sep:
+                    if j - i > max_sep:
+                        continue
                     pair_ids.append([id_i, id_j])
                     if get_names:
                         names.append(

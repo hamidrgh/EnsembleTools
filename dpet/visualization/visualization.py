@@ -3,12 +3,12 @@ import random
 from matplotlib import cm, colors, pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
-import seaborn as sns
 import mdtraj
 from matplotlib.lines import Line2D
 
 from dpet.visualization.coord import *
 from dpet.featurization.featurizer import FeaturizationFactory
+from scipy.stats import gaussian_kde
 
 PLOT_DIR = "plots"
 
@@ -81,8 +81,13 @@ def tsne_scatter_plot(analysis, save=False):
     fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
 
     # KDE plot
-    sns.kdeplot(x=analysis.reducer.best_tsne[:, 0], y=analysis.reducer.best_tsne[:, 1], ax=ax4, fill=True, cmap='Blues', levels=5)
-
+    #sns.kdeplot(x=analysis.reducer.best_tsne[:, 0], y=analysis.reducer.best_tsne[:, 1], ax=ax4, fill=True, cmap='Blues', levels=5)
+    kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])
+    xi, yi = np.mgrid[min(analysis.reducer.best_tsne[:, 0]):max(analysis.reducer.best_tsne[:, 0]):100j,
+                      min(analysis.reducer.best_tsne[:, 1]):max(analysis.reducer.best_tsne[:, 1]):100j]
+    zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
+    ax4.contour(xi, yi, zi.reshape(xi.shape), levels=5, cmap='Blues')
+    
     # ax1.scatter(grid_positions[0, densest_indices], grid_positions[1, densest_indices], c='red', marker='x', s=50, label='Densest Points')
     ax1.set_title('Scatter plot (original labels)')
     ax2.set_title('Scatter plot (clustering labels)')
@@ -223,13 +228,19 @@ def dimenfix_cluster_scatter_plot_2(analysis, save=False):
         plt.savefig(plot_dir  +'/dimenfix_cluster_scatter_2.png', dpi=800)
     return fig
 
-def pca_cumulative_explained_variance(analysis):
-    print("- Percentage of variance explained by each of the selected components:")
-    plt.plot(np.cumsum(analysis.reduce_dim_model.explained_variance_ratio_)*100)
-    plt.xlabel("PCA dimension")
-    plt.ylabel("Cumulative explained variance %")
-    plt.show()
-    print("- First three:", analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum()*100)
+def pca_cumulative_explained_variance(analysis, save=False):
+    fig, ax = plt.subplots()
+    ax.plot(np.cumsum(analysis.reduce_dim_model.explained_variance_ratio_) * 100)
+    ax.set_xlabel("PCA dimension")
+    ax.set_ylabel("Cumulative explained variance %")
+    ax.set_title("Cumulative Explained Variance by PCA Dimension")
+    ax.grid(True)
+    first_three_variance = analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum() * 100
+    ax.text(0.5, 0.9, f"First three: {first_three_variance:.2f}%", transform=ax.transAxes, ha='center')
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
+    return fig
 
 def set_labels(ax, reduce_dim_method, dim_x, dim_y):
     ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
@@ -277,7 +288,7 @@ def pca_plot_2d_landscapes(analysis, save=False):
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(os.path.join(plot_dir, 'PCA' + analysis.featurization + analysis.ens_codes[0]))
-    plt.show()
+    #plt.show()
     return fig
 
 def pca_plot_1d_histograms(analysis, save=False):
@@ -318,10 +329,10 @@ def pca_plot_1d_histograms(analysis, save=False):
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(os.path.join(plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
-    plt.show()
+    #plt.show()
     return fig
 
-def pca_correlation_plot(num_residues, sel_dims, analysis):
+def pca_correlation_plot(num_residues, sel_dims, analysis, save=False):
     cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
     norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted
                                           # when analyzing other systems via PCA!
@@ -347,9 +358,13 @@ def pca_correlation_plot(num_residues, sel_dims, analysis):
             label="PCA weight"
         )
     plt.tight_layout()
-    plt.show()
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
+    #plt.show()
 
-def pca_rg_correlation(analysis, save):
+
+def pca_rg_correlation(analysis, save=False):
     dpi = 120
     fig, ax = plt.subplots(len(analysis.ens_codes), 1, figsize=(3, 3*len(analysis.ens_codes)), dpi=dpi)
     pca_dim = 0
@@ -368,7 +383,7 @@ def pca_rg_correlation(analysis, save):
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(os.path.join(plot_dir,'PCA_RG' + analysis.ens_codes[0]))
-    plt.show()
+    #plt.show()
     return fig
 
 def trajectories_plot_total_sasa(trajectories):
@@ -395,11 +410,27 @@ def plot_rg_vs_asphericity(trajectories):
     plt.legend()
     plt.show()
 
+'''
 def trajectories_plot_density(trajectories):
     for ens in trajectories:
         asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
         sns.kdeplot(asphericity, label = ens)
     plt.legend()
+    plt.show()
+'''
+
+def trajectories_plot_density(trajectories):
+    fig, ax = plt.subplots()
+    for ens in trajectories:
+        asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        # sns.kdeplot(asphericity, label = ens)
+        kde = gaussian_kde(asphericity)
+        x = np.linspace(min(asphericity), max(asphericity), 100)
+        ax.plot(x, kde(x), label=ens)
+    ax.legend()
+    ax.set_xlabel('Asphericity')
+    ax.set_ylabel('Density')
+    ax.set_title('Kernel Density Estimate of Asphericity for Trajectories')
     plt.show()
 
 def plot_rg_vs_prolateness(trajectories):
@@ -414,11 +445,27 @@ def plot_rg_vs_prolateness(trajectories):
     plt.legend()
     plt.show()
 
+'''
 def trajectories_plot_prolateness(trajectories):
     for ens in trajectories:
         prolatness = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
         sns.kdeplot(prolatness, label = ens)
     plt.legend()
+    plt.show()
+'''
+
+def trajectories_plot_prolateness(trajectories):
+    fig, ax = plt.subplots()
+    for ens in trajectories:
+        prolatness = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        # sns.kdeplot(asphericity, label = ens)
+        kde = gaussian_kde(prolatness)
+        x = np.linspace(min(prolatness), max(prolatness), 100)
+        ax.plot(x, kde(x), label=ens)
+    ax.legend()
+    ax.set_xlabel('Prolateness')
+    ax.set_ylabel('Density')
+    ax.set_title('Kernel Density Estimate of Prolateness for Trajectories')
     plt.show()
 
 def trajectories_plot_dihedrals(trajectories):
