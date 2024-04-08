@@ -181,6 +181,8 @@ class EnsembleAnalysis:
             else:
                 print(f"File or directory for ensemble {ens_code} doesn't exist.")
                 return
+            # Copy in order to be able to sample multiple times
+            self.old_trajectories = self.trajectories.copy()
             
     def random_sample_trajectories(self, sample_size):
         """
@@ -195,7 +197,7 @@ class EnsembleAnalysis:
         sample_size: int
         Number of conformations sampled from the ensemble. 
         """
-        self.trajectories = {ensemble_id: self._random_sample(traj, sample_size) for ensemble_id, traj in self.trajectories.items()}
+        self.trajectories = {ensemble_id: self._random_sample(traj, sample_size) for ensemble_id, traj in self.old_trajectories.items()}
 
     def _random_sample(self, trajectory, sample_size):
         total_frames = len(trajectory)
@@ -220,28 +222,28 @@ class EnsembleAnalysis:
         if featurization is "ca_dist" normalize True will normalize the distances based on the mean and standard deviation.
 
         """
-        self.extract_features(featurization, *args, **kwargs)
-        self.concat_features = self.get_concat_features()
-        self.create_all_labels()
+        self._extract_features(featurization, *args, **kwargs)
+        self.concat_features = self._get_concat_features()
+        self._create_all_labels()
         if normalize and featurization == "ca_dist":
-            self.normalize_data()
+            self._normalize_data()
 
-    def extract_features(self, featurization: str, *args, **kwargs):
+    def _extract_features(self, featurization: str, *args, **kwargs):
         get_names = True
         self.featurization = featurization
         for ens_code, trajectory in self.trajectories.items():
             print(f"Performing feature extraction for Ensemble: {ens_code}.")
             if get_names:
-                features, names = self.featurize(featurization, trajectory, get_names, *args, **kwargs)
+                features, names = self._featurize(featurization, trajectory, get_names, *args, **kwargs)
                 get_names = False
             else:
-                features = self.featurize(featurization, trajectory, get_names, *args, **kwargs)
+                features = self._featurize(featurization, trajectory, get_names, *args, **kwargs)
             self.featurized_data[ens_code] = features
             print("Transformed ensemble shape:", features.shape)
         self.feature_names = names
         print("Feature names:", names)
 
-    def featurize(self, featurization, trajectory, get_names, *args, **kwargs):
+    def _featurize(self, featurization, trajectory, get_names, *args, **kwargs):
         if featurization == "ca_dist":
             return featurize_ca_dist(traj=trajectory, get_names=get_names, *args, **kwargs)
         elif featurization == "phi_psi":
@@ -263,29 +265,30 @@ class EnsembleAnalysis:
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
 
-    def create_all_labels(self):
+    def _create_all_labels(self):
+        self.all_labels = []
         for label, data_points in self.featurized_data.items():
             num_data_points = len(data_points)
             self.all_labels.extend([label] * num_data_points)
 
-    def normalize_data(self):
+    def _normalize_data(self):
         mean = self.concat_features.mean(axis=0)
         std = self.concat_features.std(axis=0)
         self.concat_features = (self.concat_features - mean) / std
         for label, features in self.featurized_data.items():
             self.featurized_data[label] = (features - mean) / std
 
-    def calculate_rg_for_trajectory(self, trajectory):
+    def _calculate_rg_for_trajectory(self, trajectory):
         return [mdtraj.compute_rg(frame) for frame in trajectory]
 
     def rg_calculator(self):
         rg_values_list = []
         for traj in self.trajectories.values():
-            rg_values_list.extend(self.calculate_rg_for_trajectory(traj))
+            rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
             self.rg = [item[0] * 10 for item in rg_values_list]
         return self.rg
 
-    def get_concat_features(self, fit_on:list=None):
+    def _get_concat_features(self, fit_on:list=None):
         if fit_on is None:
             fit_on = self.ens_codes
         
@@ -294,12 +297,11 @@ class EnsembleAnalysis:
         print("Concatenated featurized ensemble shape:", concat_features.shape)
         return concat_features
 
-
     def fit_dimensionality_reduction(self, method: str, fit_on: list=None, *args, **kwargs):
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
         if method in ("pca","kpca"):
-            fit_on_data = self.get_concat_features(fit_on=fit_on)
+            fit_on_data = self._get_concat_features(fit_on=fit_on)
             self.reduce_dim_model = self.reducer.fit(data=fit_on_data)
             self.reduce_dim_data = {}
             for key, data in self.featurized_data.items():
