@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, KernelPCA
 from sklearn.manifold import TSNE
 import numpy as np
 from sklearn.manifold import MDS
@@ -149,6 +149,37 @@ class MDSReduction(DimensionalityReduction):
         embedding = MDS(n_components=self.num_dim)
         feature_transformed = embedding.fit_transform(data)
         return feature_transformed
+    
+class KPCAReduction(DimensionalityReduction):
+    def __init__(self, circular=False, num_dim=10, gamma=None) -> None:
+        self.circular = circular
+        self.num_dim = num_dim
+        self.gamma = gamma
+
+    def fit(self, data):
+        # Use angular features and a custom similarity function.
+        if self.circular:
+            self.gamma = 1/data.shape[1] if self.gamma is None else self.gamma
+            kernel = lambda a1, a2: unit_vector_kernel(a1, a2, gamma=self.gamma)
+            pca_in = data
+        # Use raw features.
+        else:
+            pca_in = data
+
+        self.pca = KernelPCA(
+            n_components=self.num_dim,
+            kernel=kernel,
+            gamma=self.gamma  # Ignored if using circular.
+        )
+        self.pca.fit(pca_in)
+        return self.pca
+    
+    def transform(self, data):
+        reduce_dim_data = self.pca.transform(data)
+        return reduce_dim_data
+    
+    def fit_transform(self, data):
+        return super().fit_transform(data)
 
 class DimensionalityReductionFactory:
     @staticmethod
@@ -161,22 +192,36 @@ class DimensionalityReductionFactory:
             return DimenFixReduction(*args, **kwargs)
         elif method == "mds":
             return MDSReduction(*args, **kwargs)
+        elif method == "kpca":
+            return KPCAReduction(*args, **kwargs)
         else:
             raise NotImplementedError("Unsupported dimensionality reduction method.")
 
-def unit_vectorize(a):
+#----------------------------------------------------------------------
+# Functions for performing dimensionality reduction on circular data. -
+#----------------------------------------------------------------------
+
+def unit_vectorize(a: np.ndarray) -> np.ndarray:
     """Convert an array with (*, N) angles in an array with (*, N, 2) sine and
     cosine values for the N angles."""
-    v = np.concatenate([np.cos(a)[..., None], np.sin(a)[..., None]], axis=-1)
+    v = np.concatenate([np.cos(a)[...,None], np.sin(a)[...,None]], axis=-1)
     return v
 
-def unit_vector_distance(a0, a1):
-    """Compute the sum of distances between two (*, N, 2) arrays storing the
-    sine and cosine values of N angles."""
+def unit_vector_distance(a0: np.ndarray, a1: np.ndarray, sqrt: bool = True):
+    """Compute the sum of distances between two (*, N) arrays storing the
+    values of N angles."""
     v0 = unit_vectorize(a0)
     v1 = unit_vectorize(a1)
-    # Distance between every pair of N angles.
-    dist = np.sqrt(np.square(v0 - v1).sum(axis=-1))
+    # Distance between N pairs of angles.
+    if sqrt:
+        dist = np.sqrt(np.square(v0 - v1).sum(axis=-1))
+    else:
+        dist = np.square(v0 - v1).sum(axis=-1)
     # We sum over the N angles.
     dist = dist.sum(axis=-1)
     return dist
+
+def unit_vector_kernel(a1, a2, gamma):
+    dist = unit_vector_distance(a1, a2, sqrt=False)
+    sim = np.exp(-gamma*dist)
+    return sim

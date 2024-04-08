@@ -6,8 +6,8 @@ from sklearn.cluster import KMeans
 import mdtraj
 from matplotlib.lines import Line2D
 
+from dpet.featurization.angles import featurize_a_angle
 from dpet.visualization.coord import *
-from dpet.featurization.featurizer import FeaturizationFactory
 from scipy.stats import gaussian_kde
 
 PLOT_DIR = "plots"
@@ -795,9 +795,8 @@ def plot_prolateness_dist(trajectories, bins= 50, violin_plot= True, median=Fals
         plt.show()
 
 def plot_alpha_angles_dist(trajectories, bins =50):
-    featurizer = FeaturizationFactory.get_featurizer('a_angle')
     for ens in trajectories:
-        plt.hist(featurizer.featurize(trajectories[ens]).ravel(), bins=bins, histtype="step", density=False, label=ens)
+        plt.hist(featurize_a_angle(trajectories[ens], get_names=False).ravel(), bins=bins, histtype="step", density=False, label=ens)
         
     plt.title("the distribution of dihedral angles between four consecutive Cα beads.")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
