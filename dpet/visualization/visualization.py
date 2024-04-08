@@ -228,13 +228,19 @@ def dimenfix_cluster_scatter_plot_2(analysis, save=False):
         plt.savefig(plot_dir  +'/dimenfix_cluster_scatter_2.png', dpi=800)
     return fig
 
-def pca_cumulative_explained_variance(analysis):
-    print("- Percentage of variance explained by each of the selected components:")
-    plt.plot(np.cumsum(analysis.reduce_dim_model.explained_variance_ratio_)*100)
-    plt.xlabel("PCA dimension")
-    plt.ylabel("Cumulative explained variance %")
-    plt.show()
-    print("- First three:", analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum()*100)
+def pca_cumulative_explained_variance(analysis, save=False):
+    fig, ax = plt.subplots()
+    ax.plot(np.cumsum(analysis.reduce_dim_model.explained_variance_ratio_) * 100)
+    ax.set_xlabel("PCA dimension")
+    ax.set_ylabel("Cumulative explained variance %")
+    ax.set_title("Cumulative Explained Variance by PCA Dimension")
+    ax.grid(True)
+    first_three_variance = analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum() * 100
+    ax.text(0.5, 0.9, f"First three: {first_three_variance:.2f}%", transform=ax.transAxes, ha='center')
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
+    return fig
 
 def set_labels(ax, reduce_dim_method, dim_x, dim_y):
     ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
@@ -282,7 +288,7 @@ def pca_plot_2d_landscapes(analysis, save=False):
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(os.path.join(plot_dir, 'PCA' + analysis.featurization + analysis.ens_codes[0]))
-    plt.show()
+    #plt.show()
     return fig
 
 def pca_plot_1d_histograms(analysis, save=False):
@@ -323,10 +329,10 @@ def pca_plot_1d_histograms(analysis, save=False):
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(os.path.join(plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
-    plt.show()
+    #plt.show()
     return fig
 
-def pca_correlation_plot(num_residues, sel_dims, analysis):
+def pca_correlation_plot(num_residues, sel_dims, analysis, save=False):
     cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
     norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted
                                           # when analyzing other systems via PCA!
@@ -352,9 +358,13 @@ def pca_correlation_plot(num_residues, sel_dims, analysis):
             label="PCA weight"
         )
     plt.tight_layout()
-    plt.show()
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
+    #plt.show()
 
-def pca_rg_correlation(analysis, save):
+
+def pca_rg_correlation(analysis, save=False):
     dpi = 120
     fig, ax = plt.subplots(len(analysis.ens_codes), 1, figsize=(3, 3*len(analysis.ens_codes)), dpi=dpi)
     pca_dim = 0
@@ -373,7 +383,7 @@ def pca_rg_correlation(analysis, save):
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(os.path.join(plot_dir,'PCA_RG' + analysis.ens_codes[0]))
-    plt.show()
+    #plt.show()
     return fig
 
 def trajectories_plot_total_sasa(trajectories):

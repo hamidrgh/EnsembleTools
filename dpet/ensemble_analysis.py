@@ -3,7 +3,7 @@ import re
 import shutil
 import zipfile
 from dpet.api_client import APIClient
-from dpet.visualization.reports import generate_custom_report, generate_dimenfix_report, generate_tsne_report
+from dpet.visualization.reports import generate_custom_report, generate_dimenfix_report, generate_pca_report, generate_tsne_report
 import dpet.visualization.visualization as visualization
 from dpet.utils import extract_tar_gz
 import os
@@ -296,9 +296,9 @@ class EnsembleAnalysis:
     def dimenfix_cluster_scatter_plot_2(self, save=False):
         visualization.dimenfix_cluster_scatter_plot_2(self, save)
 
-    def pca_cumulative_explained_variance(self):
+    def pca_cumulative_explained_variance(self, save=False):
         if self.reduce_dim_method == "pca":
-            visualization.pca_cumulative_explained_variance(self)
+            visualization.pca_cumulative_explained_variance(self, save)
         else:
             print("Analysis is only valid for PCA dimensionality reduction.")
 
@@ -505,6 +505,9 @@ class EnsembleAnalysis:
         
     def generate_dimenfix_report(self):
         generate_dimenfix_report(self)
+
+    def generate_pca_report(self):
+        generate_pca_report(self)
 
     def generate_custom_report(self):
         generate_custom_report(self)
