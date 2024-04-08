@@ -130,14 +130,14 @@ def tsne_scatter_plot_rg(analysis, save=False):
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter_rg.png', dpi=800)
     return fig
-
-def s_max(sil_scores):
-    s = 0
-    for i in sil_scores:
-        if i[1] > s:
-            s = i[1]
-            k = i[0]
-    return k
+# It was not effiecent way and deleted 
+# def s_max(sil_scores):
+#     s = 0
+#     for i in sil_scores:
+#         if i[1] > s:
+#             s = i[1]
+#             k = i[0]
+#     return k
 
 def dimenfix_scatter(analysis, save=False):
     fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(14,4))
@@ -152,8 +152,9 @@ def dimenfix_scatter(analysis, save=False):
     cbar = plt.colorbar(rg_labeled, ax=ax3)
 
     # scatter cluster label
-    n_clusters = s_max(analysis.reducer.sil_scores)
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    
+    
+    kmeans = KMeans(n_clusters= max(analysis.reducer.sil_scores, key=lambda x: x[1])[0], random_state=42)
     labels = kmeans.fit_predict(analysis.transformed_data)
     scatter = ax2.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
 
@@ -166,120 +167,116 @@ def dimenfix_scatter(analysis, save=False):
     legend_labels = list(label_colors.keys())
     legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
     fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-def dimenfix_scatter_plot_rg(analysis, save=False):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=analysis.rg, cmap='viridis', s=10)
-    fig.colorbar(scatter, ax=ax, label='Rg Numbers')
-    ax.set_xlabel('Dimension 1')
-    ax.set_ylabel('Dimension 2')
-    ax.set_title('Scatter Plot')
-
-    key = "dimenfix_scatter_plot_rg"
-    if key not in analysis.figures:
-            analysis.figures[key] = fig
 
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-        plt.savefig(plot_dir  +'/dimenfix_scatter_rg.png', dpi=800)
+        plt.savefig(plot_dir  + '/dimenfix_scatter.png', dpi=800)
+        
     return fig
-
-def dimenfix_scatter_plot_ens(analysis, save=False):
-    # Map unique labels to unique integer values
-    label_to_int = {label: i for i, label in enumerate(np.unique(analysis.all_labels))}
     
-    # Convert labels to corresponding integer values
-    int_labels = np.array([label_to_int[label] for label in analysis.all_labels])
     
-    # Create a colormap based on the number of unique labels
-    cmap = plt.cm.get_cmap('viridis', len(label_to_int))
+
+
+# def dimenfix_scatter_plot_rg(analysis, save=False):
+#     fig, ax = plt.subplots(figsize=(10, 6))
+#     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=analysis.rg, cmap='viridis', s=10)
+#     fig.colorbar(scatter, ax=ax, label='Rg Numbers')
+#     ax.set_xlabel('Dimension 1')
+#     ax.set_ylabel('Dimension 2')
+#     ax.set_title('Scatter Plot')
+
+#     key = "dimenfix_scatter_plot_rg"
+#     if key not in analysis.figures:
+#             analysis.figures[key] = fig
+
+#     if save:
+#         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+#         plt.savefig(plot_dir  +'/dimenfix_scatter_rg.png', dpi=800)
+#     return fig
+
+# def dimenfix_scatter_plot_ens(analysis, save=False):
+#     # Map unique labels to unique integer values
+#     label_to_int = {label: i for i, label in enumerate(np.unique(analysis.all_labels))}
     
-    fig, ax = plt.subplots(figsize=(10, 6))
-    scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=int_labels, cmap=cmap, s=100)
-    fig.colorbar(scatter, ax=ax, label='All Labels')
-    ax.set_xlabel('Dimension 1')
-    ax.set_ylabel('Dimension 2')
-    ax.set_title('Scatter Plot 2')
-
-    key = "dimenfix_scatter_plot_ens"
-    if key not in analysis.figures:
-            analysis.figures[key] = fig
-
-    if save:
-        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-        plt.savefig(plot_dir  +'/dimenfix_scatter_ens.png', dpi=800)
-    return fig
-
-
-
-def dimenfix_cluster_scatter_plot(analysis, save=False):
-    n_clusters = s_max(analysis.reducer.sil_scores)
-
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    labels = kmeans.fit_predict(analysis.transformed_data)
-
-    fig, ax = plt.subplots(figsize=(10, 6))
+#     # Convert labels to corresponding integer values
+#     int_labels = np.array([label_to_int[label] for label in analysis.all_labels])
     
-    # Plot the points with different colors for each cluster
-    scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=3, c=labels, cmap='viridis')
-    ax.set_title('K-means Clustering')
+#     # Create a colormap based on the number of unique labels
+#     cmap = plt.cm.get_cmap('viridis', len(label_to_int))
     
-    # Create colorbar
-    cbar = fig.colorbar(scatter, ax=ax)
-    cbar.set_label('Cluster Labels')
+#     fig, ax = plt.subplots(figsize=(10, 6))
+#     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=int_labels, cmap=cmap, s=100)
+#     fig.colorbar(scatter, ax=ax, label='All Labels')
+#     ax.set_xlabel('Dimension 1')
+#     ax.set_ylabel('Dimension 2')
+#     ax.set_title('Scatter Plot 2')
 
-    key = "dimenfix_cluster_scatter_plot"
-    if key not in analysis.figures:
-            analysis.figures[key] = fig
+#     key = "dimenfix_scatter_plot_ens"
+#     if key not in analysis.figures:
+#             analysis.figures[key] = fig
 
-    if save:
-        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-        plt.savefig(plot_dir  +'/dimenfix_cluster_scatter.png', dpi=800)
-    return fig
+#     if save:
+#         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+#         plt.savefig(plot_dir  +'/dimenfix_scatter_ens.png', dpi=800)
+#     return fig
 
-def dimenfix_cluster_scatter_plot_2(analysis, save=False):
-    label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
-    point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
 
-    n_clusters = s_max(analysis.reducer.sil_scores)
 
-    # Apply K-means clustering
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    labels = point_colors
+# def dimenfix_cluster_scatter_plot(analysis, save=False):
+#     n_clusters = s_max(analysis.reducer.sil_scores)
 
-    # Create the figure and axis objects
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+#     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+#     labels = kmeans.fit_predict(analysis.transformed_data)
+
+#     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Plot the points with different colors for each cluster
-    scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=labels, s=7)
-    ax.set_title('K-means Clustering')
+#     # Plot the points with different colors for each cluster
+#     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=3, c=labels, cmap='viridis')
+#     ax.set_title('K-means Clustering')
     
-    # Create legend
-    legend_labels = list(label_colors.keys())
-    legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-    ax.legend(legend_handles, legend_labels, title='Original Labels', loc='upper left', bbox_to_anchor=(1, 1))
+#     # Create colorbar
+#     cbar = fig.colorbar(scatter, ax=ax)
+#     cbar.set_label('Cluster Labels')
 
-    key = "dimenfix_cluster_scatter_plot_2"
-    if key not in analysis.figures:
-            analysis.figures[key] = fig
+#     key = "dimenfix_cluster_scatter_plot"
+#     if key not in analysis.figures:
+#             analysis.figures[key] = fig
 
-    if save:
-        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-        plt.savefig(plot_dir  +'/dimenfix_cluster_scatter_2.png', dpi=800)
-    return fig
+#     if save:
+#         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+#         plt.savefig(plot_dir  +'/dimenfix_cluster_scatter.png', dpi=800)
+#     return fig
+
+# def dimenfix_cluster_scatter_plot_2(analysis, save=False):
+#     label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
+#     point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
+
+#     n_clusters = s_max(analysis.reducer.sil_scores)
+
+#     # Apply K-means clustering
+#     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+#     labels = point_colors
+
+#     # Create the figure and axis objects
+#     fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+    
+#     # Plot the points with different colors for each cluster
+#     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=labels, s=7)
+#     ax.set_title('K-means Clustering')
+    
+#     # Create legend
+#     legend_labels = list(label_colors.keys())
+#     legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
+#     ax.legend(legend_handles, legend_labels, title='Original Labels', loc='upper left', bbox_to_anchor=(1, 1))
+
+#     key = "dimenfix_cluster_scatter_plot_2"
+#     if key not in analysis.figures:
+#             analysis.figures[key] = fig
+
+#     if save:
+#         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+#         plt.savefig(plot_dir  +'/dimenfix_cluster_scatter_2.png', dpi=800)
+#     return fig
 
 def pca_cumulative_explained_variance(analysis, save=False):
     fig, ax = plt.subplots()

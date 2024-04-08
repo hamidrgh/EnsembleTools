@@ -323,8 +323,7 @@ class EnsembleAnalysis:
     ##################### Integrated plot function #####################
 
 
-    def dimenfix_scatter(self):
-        visualization.dimenfix_scatter(self)
+
     def tsne_ramachandran_plot_density(self, save=False):
         """
         It gets the 2-D histogram ramachandran plots of the
@@ -363,17 +362,20 @@ class EnsembleAnalysis:
     def tsne_scatter_plot_rg(self, save=False):
         visualization.tsne_scatter_plot_rg(self, save)
 
-    def dimenfix_scatter_plot(self, save=False):
-        visualization.dimenfix_scatter_plot_rg(self, save)
+    def dimenfix_scatter(self, save=False):
+        visualization.dimenfix_scatter(self, save)
 
-    def dimenfix_scatter_plot_2(self, save=False):
-        visualization.dimenfix_scatter_plot_ens(self, save)
+    # def dimenfix_scatter_plot(self, save=False):
+    #     visualization.dimenfix_scatter_plot_rg(self, save)
 
-    def dimenfix_cluster_scatter_plot(self, save=False):
-        visualization.dimenfix_cluster_scatter_plot(self, save)
+    # def dimenfix_scatter_plot_2(self, save=False):
+    #     visualization.dimenfix_scatter_plot_ens(self, save)
 
-    def dimenfix_cluster_scatter_plot_2(self, save=False):
-        visualization.dimenfix_cluster_scatter_plot_2(self, save)
+    # def dimenfix_cluster_scatter_plot(self, save=False):
+    #     visualization.dimenfix_cluster_scatter_plot(self, save)
+
+    # def dimenfix_cluster_scatter_plot_2(self, save=False):
+    #     visualization.dimenfix_cluster_scatter_plot_2(self, save)
 
     def pca_cumulative_explained_variance(self, save=False):
         if self.reduce_dim_method == "pca":

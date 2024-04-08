@@ -106,7 +106,7 @@ class TSNEReduction(DimensionalityReduction):
 
 
 class DimenFixReduction(DimensionalityReduction):
-    def __init__(self, range_n_clusters = range(2,10,1)) -> None:
+    def __init__(self, range_n_clusters = range(1,10,1)) -> None:
         self.range_n_clusters = range_n_clusters
 
     def fit(self, data):
@@ -122,8 +122,8 @@ class DimenFixReduction(DimensionalityReduction):
         return self.projection
     
     def cluster(self):
+        self.sil_scores = []
         for n_clusters in self.range_n_clusters:
-            self.sil_scores = []
             clusterer = KMeans(n_clusters=n_clusters, n_init="auto", random_state=10)
             cluster_labels = clusterer.fit_predict(self.projection)
             silhouette_avg = silhouette_score(self.projection, cluster_labels)
