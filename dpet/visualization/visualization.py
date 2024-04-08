@@ -13,6 +13,10 @@ from scipy.stats import gaussian_kde
 PLOT_DIR = "plots"
 
 def tsne_ramachandran_plot_density(analysis, save=False):
+    """
+    It gets the ramachadran 2D histogram for the clusters based on the t-SNE
+    algorithm when the extracted feature is "phi_psi" 
+    """
     
     rama_bins = 50
     rama_linspace = np.linspace(-180, 180, rama_bins)
@@ -58,6 +62,10 @@ def tsne_ramachandran_plot_density(analysis, save=False):
 
 
 def tsne_scatter_plot(analysis, save=False):
+    """
+    generate the output for t-sne 
+    """
+    
     bestclust = analysis.reducer.best_kmeans.labels_
     fig , (ax1, ax2, ax3, ax4) = plt.subplots(1,4, figsize=(14 ,4)) 
 
@@ -103,7 +111,9 @@ def tsne_scatter_plot(analysis, save=False):
         plt.savefig(plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter.png', dpi=800)
     return fig
 
+    
 def tsne_scatter_plot_rg(analysis, save=False):
+    # It plots the same thing as above and could be removed 
     fig, ax = plt.subplots(figsize=(8, 6))
     scatter = ax.scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=analysis.rg, cmap='viridis', alpha=0.5)
     cbar = fig.colorbar(scatter, ax=ax)
@@ -121,9 +131,58 @@ def tsne_scatter_plot_rg(analysis, save=False):
         plt.savefig(plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter_rg.png', dpi=800)
     return fig
 
+def s_max(sil_scores):
+    s = 0
+    for i in sil_scores:
+        if i[1] > s:
+            s = i[1]
+            k = i[0]
+    return k
+
+def dimenfix_scatter(analysis, save=False):
+    fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(14,4))
+
+    # scatter original  labels
+    label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
+    point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
+    scatter_labeled = ax1.scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha = 0.5)
+
+    # scatter Rg labels
+    rg_labeled = ax3.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c= [rg for rg in analysis.rg], s=10, alpha=0.5) 
+    cbar = plt.colorbar(rg_labeled, ax=ax3)
+
+    # scatter cluster label
+    n_clusters = s_max(analysis.reducer.sil_scores)
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    labels = kmeans.fit_predict(analysis.transformed_data)
+    scatter = ax2.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
+
+    ax1.set_title('Scatter plot (original labels)')
+    ax2.set_title('Scatter plot (clustering labels)')
+    ax3.set_title('Scatter plot (Rg labels)')
+
+
+    #manage legends
+    legend_labels = list(label_colors.keys())
+    legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
+    fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
 def dimenfix_scatter_plot_rg(analysis, save=False):
     fig, ax = plt.subplots(figsize=(10, 6))
-    scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=analysis.rg, cmap='viridis', s=100)
+    scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=analysis.rg, cmap='viridis', s=10)
     fig.colorbar(scatter, ax=ax, label='Rg Numbers')
     ax.set_xlabel('Dimension 1')
     ax.set_ylabel('Dimension 2')
@@ -164,13 +223,7 @@ def dimenfix_scatter_plot_ens(analysis, save=False):
         plt.savefig(plot_dir  +'/dimenfix_scatter_ens.png', dpi=800)
     return fig
 
-def s_max(sil_scores):
-    s = 0
-    for i in sil_scores:
-        if i[1] > s:
-            s = i[1]
-            k = i[0]
-    return k
+
 
 def dimenfix_cluster_scatter_plot(analysis, save=False):
     n_clusters = s_max(analysis.reducer.sil_scores)
@@ -407,7 +460,7 @@ def plot_rg_vs_asphericity(trajectories):
         print(f"Pearson coeff for {ens} = {round(p[0][1], 3)}")
     plt.ylabel("Asphericity")
     plt.xlabel("Rg [nm]")
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()
 
 '''
@@ -442,7 +495,7 @@ def plot_rg_vs_prolateness(trajectories):
         print(f"Pearson coeff for {ens} = {round(p[0][1], 3)}")
     plt.ylabel("prolateness")
     plt.xlabel("Rg [nm]")
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()
 
 '''
@@ -506,7 +559,7 @@ def plot_relative_helix_content(trajectories):
     ax.set_xlabel('Residue Index')
     ax.set_ylabel('Relative Content of H (Helix)')
     ax.set_title('Relative Content of H in Each Residue in the ensembles')
-    ax.legend()
+    ax.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
     plt.show()
 
 def get_rg_data_dict(trajectories):
@@ -747,7 +800,7 @@ def plot_alpha_angles_dist(trajectories, bins =50):
         plt.hist(featurizer.featurize(trajectories[ens]).ravel(), bins=bins, histtype="step", density=False, label=ens)
         
     plt.title("the distribution of dihedral angles between four consecutive Cα beads.")
-    plt.legend()
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()
 
 def plot_contact_prob(trajectories,title,threshold = 0.8,dpi = 96):

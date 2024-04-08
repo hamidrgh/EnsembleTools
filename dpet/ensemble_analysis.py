@@ -182,6 +182,18 @@ class EnsembleAnalysis:
                 return
             
     def random_sample_trajectories(self, sample_size):
+        """
+        Sample a defined random number of conformations from the ensemble 
+        trajectroy. 
+
+        Note: If you want to change the sample size after running the cell, you need to load 
+        the trajectories again. 
+
+        Parameters
+        ----------
+        sample_size: int
+        Number of conformations sampled from the ensemble. 
+        """
         self.trajectories = {ensemble_id: self._random_sample(traj, sample_size) for ensemble_id, traj in self.trajectories.items()}
 
     def _random_sample(self, trajectory, sample_size):
@@ -193,6 +205,20 @@ class EnsembleAnalysis:
         return subsampled_traj
 
     def perform_feature_extraction(self, featurization: str, normalize = False, *args, **kwargs):
+        """
+        Extract the selected feature. The options are "phi_psi", "ca_dist" and "a_angle".
+
+        Note: If you want to change the extracted feature after running this method you need to restart the kernel. 
+        
+        Parameters
+        ----------
+        featurization: str 
+        Choose between "phi_psi", "ca_dist" and "a_angle"
+
+        normalize: Bool
+        if featurization is "ca_dist" normalize True will normalize the distances based on the mean and standard deviation.
+
+        """
         self.extract_features(featurization, *args, **kwargs)
         self.concat_features = self.get_concat_features()
         self.create_all_labels()
@@ -272,10 +298,39 @@ class EnsembleAnalysis:
 
     ##################### Integrated plot function #####################
 
+
+    def dimenfix_scatter(self):
+        visualization.dimenfix_scatter(self)
     def tsne_ramachandran_plot_density(self, save=False):
+        """
+        It gets the 2-D histogram ramachandran plots of the
+        clusters from t-SNE analysis. \n
+        The results is only meaningful when the extracted feature is "phi_psi".
+
+        Parameters
+        -----------
+        save: bool
+        If True the plot will save 
+        """
+        # if featurization_option != "phi_psi": (This control step should be added)
+            # it should raise an error
         visualization.tsne_ramachandran_plot_density(self, save)
 
     def tsne_scatter_plot(self, save=False):
+        """
+        It gets the output results of t-SNE. 
+        Three scatter plot will be generated based on original, clustering and Rg labels. 
+        One KDE density plot will also be generated to shod the most populated areas in 
+        the reduced dimension. 
+
+        
+
+        Parameters
+        -----------
+        save: Bool \n
+        if True the plot will be saved. 
+        """
+
         if self.reduce_dim_method == "tsne":
             visualization.tsne_scatter_plot(self, save)
         else:
@@ -475,6 +530,21 @@ class EnsembleAnalysis:
         visualization.plot_alpha_angles_dist(self.trajectories, bins)
 
     def plot_contact_prob(self,title,threshold = 0.8,dpi = 96):
+        """
+        It plots the contact probability map based on the threshold. 
+        The default value for threshold is 0.8[nm], 
+
+        Parameters
+        ----------
+        title: str 
+        You need to specify a title for the plot
+
+        threshold: float
+        Determing the threshold fo calculating the contact frequencies. default value is 0.8[nm]
+
+        dpi: int
+        For changing the quality and dimension of the output figure
+        """
         visualization.plot_contact_prob(self.trajectories,title,threshold,dpi)
 
     def plot_ramachandran_plot(self, two_d_hist=True, linespaces= (-180, 180, 80)):
