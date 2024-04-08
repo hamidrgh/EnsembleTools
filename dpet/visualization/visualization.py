@@ -3,12 +3,12 @@ import random
 from matplotlib import cm, colors, pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
-import seaborn as sns
 import mdtraj
 from matplotlib.lines import Line2D
 
 from dpet.visualization.coord import *
 from dpet.featurization.featurizer import FeaturizationFactory
+from scipy.stats import gaussian_kde
 
 PLOT_DIR = "plots"
 
@@ -81,8 +81,13 @@ def tsne_scatter_plot(analysis, save=False):
     fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
 
     # KDE plot
-    sns.kdeplot(x=analysis.reducer.best_tsne[:, 0], y=analysis.reducer.best_tsne[:, 1], ax=ax4, fill=True, cmap='Blues', levels=5)
-
+    #sns.kdeplot(x=analysis.reducer.best_tsne[:, 0], y=analysis.reducer.best_tsne[:, 1], ax=ax4, fill=True, cmap='Blues', levels=5)
+    kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])
+    xi, yi = np.mgrid[min(analysis.reducer.best_tsne[:, 0]):max(analysis.reducer.best_tsne[:, 0]):100j,
+                      min(analysis.reducer.best_tsne[:, 1]):max(analysis.reducer.best_tsne[:, 1]):100j]
+    zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
+    ax4.contour(xi, yi, zi.reshape(xi.shape), levels=5, cmap='Blues')
+    
     # ax1.scatter(grid_positions[0, densest_indices], grid_positions[1, densest_indices], c='red', marker='x', s=50, label='Densest Points')
     ax1.set_title('Scatter plot (original labels)')
     ax2.set_title('Scatter plot (clustering labels)')
@@ -395,11 +400,27 @@ def plot_rg_vs_asphericity(trajectories):
     plt.legend()
     plt.show()
 
+'''
 def trajectories_plot_density(trajectories):
     for ens in trajectories:
         asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
         sns.kdeplot(asphericity, label = ens)
     plt.legend()
+    plt.show()
+'''
+
+def trajectories_plot_density(trajectories):
+    fig, ax = plt.subplots()
+    for ens in trajectories:
+        asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        # sns.kdeplot(asphericity, label = ens)
+        kde = gaussian_kde(asphericity)
+        x = np.linspace(min(asphericity), max(asphericity), 100)
+        ax.plot(x, kde(x), label=ens)
+    ax.legend()
+    ax.set_xlabel('Asphericity')
+    ax.set_ylabel('Density')
+    ax.set_title('Kernel Density Estimate of Asphericity for Trajectories')
     plt.show()
 
 def plot_rg_vs_prolateness(trajectories):
@@ -414,11 +435,27 @@ def plot_rg_vs_prolateness(trajectories):
     plt.legend()
     plt.show()
 
+'''
 def trajectories_plot_prolateness(trajectories):
     for ens in trajectories:
         prolatness = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
         sns.kdeplot(prolatness, label = ens)
     plt.legend()
+    plt.show()
+'''
+
+def trajectories_plot_prolateness(trajectories):
+    fig, ax = plt.subplots()
+    for ens in trajectories:
+        prolatness = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
+        # sns.kdeplot(asphericity, label = ens)
+        kde = gaussian_kde(prolatness)
+        x = np.linspace(min(prolatness), max(prolatness), 100)
+        ax.plot(x, kde(x), label=ens)
+    ax.legend()
+    ax.set_xlabel('Prolateness')
+    ax.set_ylabel('Density')
+    ax.set_title('Kernel Density Estimate of Prolateness for Trajectories')
     plt.show()
 
 def trajectories_plot_dihedrals(trajectories):
