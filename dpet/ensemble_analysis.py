@@ -494,8 +494,46 @@ class EnsembleAnalysis:
         """
         visualization.plot_ramachandran_plot(self.trajectories, two_d_hist, linespaces)
     
-    def plot_ss_measure_disorder(self, pointer=None):
-        visualization.plot_ss_measure_disorder(self.featurized_data, pointer)
+    def plot_ss_measure_disorder(self, pointer=None, figsize=(15,5)):
+        """
+        This function generates site specific flexibility parameter plot. For further information
+        you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. 
+        In summary this score is sensitive to local flexibility based on the circular variance of the
+        Ramachandran angles φ and ψ for each residue in the ensemble.
+
+        This score ranges from 0 for identical dihederal angles for all conformers at the residue i to 1 
+        for a uniform distribution of dihederal angles at the residue i. 
+
+        Parameters
+        ----------
+        pointer: list 
+        You can add the desired residues in a list and then you have a vertical dashed line to point those residues
+
+        figsize:tuple
+        You can change the size oof the figure here using a tuple. 
+        """
+        self.extract_features("phi_psi") # extract phi_psi features to calculate this score
+        feature_dict = self.featurized_data # provide feature dictionary for plot function
+        visualization.plot_ss_measure_disorder(feature_dict, pointer, figsize)
+
+    def plot_ss_order_parameter(self, pointer=None, figsize=(15,5)):
+
+        """
+        This function generates site specific order parameter plot. For further information
+        you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. 
+        In summary this score abstracts from local chain flexibility. The parameter is still site-specific, as orientation 
+        correlations in IDRs and IDPs decrease with increasing sequence distance. 
+
+        Parameters
+        ----------
+        pointer: list 
+        You can add the desired residues in a list and then you have a vertical dashed line to point those residues
+
+        figsize:tuple
+        You can change the size oof the figure here using a tuple. 
+        """
+
+        visualization.plot_ss_order_parameter(self.trajectories, pointer, figsize)
 
 
     ##################### PDF Reports #####################

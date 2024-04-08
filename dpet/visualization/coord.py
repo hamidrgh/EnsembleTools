@@ -164,3 +164,34 @@ def ss_measure_disorder(featurized_data:dict):
             f_i.append(round(1 - (1/2 * np.sqrt(R_square_dict[k][0][z])) - (1/2 * np.sqrt(R_square_dict[k][1][z])),5))
             f[k]=f_i
     return f
+
+
+def site_specific_order_parameter(ca_xyz_dict: dict) -> dict: 
+    """
+    Computes site-specific order parameters for a set of protein conformations.
+    Parameters:
+        ca_xyz_dict (dict): A dictionary where keys represent unique identifiers for proteins,
+        and values are 3D arrays containing the coordinates of alpha-carbon (CA) atoms for different conformations of the protein.
+    Returns:
+        dict: A dictionary where keys are the same protein identifiers provided in `ca_xyz_dict`,
+        and values are one-dimensional arrays containing the site-specific order parameters computed for each residue of the protein.
+    """
+    computed_data = {}
+    for key, ca_xyz in ca_xyz_dict.items():
+        starting_matrix = np.zeros((ca_xyz.shape[0], ca_xyz.shape[1]-1, ca_xyz.shape[1]-1))
+        for conformation in range(ca_xyz.shape[0]):
+            for i in range(ca_xyz.shape[1]-1):
+                vector_i_i_plus1 = ca_xyz[conformation][i+1] - ca_xyz[conformation][i]
+                vector_i_i_plus1 /= np.linalg.norm(vector_i_i_plus1)
+                for j in range(ca_xyz.shape[1]-1):
+                    vector_j_j_plus1 = ca_xyz[conformation][j+1] - ca_xyz[conformation][j]
+                    vector_j_j_plus1 /= np.linalg.norm(vector_j_j_plus1)
+                    cos_i_j = np.dot(vector_i_i_plus1, vector_j_j_plus1)
+                    starting_matrix[conformation][i][j] = cos_i_j
+        mean_cos_tetha = np.mean(starting_matrix, axis=0)
+        square_diff = (starting_matrix - mean_cos_tetha) ** 2
+        variance_cos_tetha = np.mean(square_diff, axis=0)
+        K_ij = np.array([[1 - np.sqrt(2 * variance_cos_tetha[i][j]) for j in range(variance_cos_tetha.shape[1])] for i in range(variance_cos_tetha.shape[0])])
+        o_i = np.mean(K_ij, axis=1)
+        computed_data[key] = o_i
+    return computed_data

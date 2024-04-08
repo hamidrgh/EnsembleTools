@@ -763,9 +763,9 @@ def plot_ramachandran_plot(trajectories, two_d_hist= True, linespaces = (-180, 1
         plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
         plt.show()
 
-def plot_ss_measure_disorder( featurized_data: dict, pointer: list = None):
+def plot_ss_measure_disorder( featurized_data: dict, pointer: list = None, figsize=(15,5)):
     f = ss_measure_disorder(featurized_data)
-    fig, axes = plt.subplots(1,1, figsize=(15,5))
+    fig, axes = plt.subplots(1,1, figsize=figsize)
     keys = list(featurized_data.keys())
     x = [i+1 for i in range(len(f[keys[0]]))]
     for key, values in f.items():
@@ -778,7 +778,26 @@ def plot_ss_measure_disorder( featurized_data: dict, pointer: list = None):
     if pointer is not None:
         for res in pointer:
             axes.axvline(x= res, c= 'blue', linestyle= '--', alpha= 0.3, linewidth= 1)
-        
-    
     plt.show()
         
+def plot_ss_order_parameter(trajectories, pointer:list= None , figsize=(15,5) ): 
+    dict_ca_xyz = {}
+    for ens in trajectories:
+        ca_index= trajectories[ens].topology.select('name == CA')
+        dict_ca_xyz[ens] = trajectories[ens].xyz[:,ca_index,:]
+
+    dict_order_parameter = site_specific_order_parameter(dict_ca_xyz)
+    fig, axes = plt.subplots(1,1, figsize=figsize)
+    keys = list(dict_order_parameter.keys())
+    x = [i+1 for i in range(len(dict_order_parameter[keys[0]]))]
+    for key, values in dict_order_parameter.items():
+        axes.scatter(x, values, label= key, alpha= 0.5)
+    axes.set_xticks([i for i in x if  i==1 or i%5 == 0])
+    axes.set_xlabel("Residue Index")
+    axes.set_ylabel("Site-specific order parameter")
+    axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    if pointer is not None:
+        for res in pointer:
+            axes.axvline(x=res, c='blue', linestyle='--', alpha=0.3, linewidth=1)
+        
+    plt.show()
