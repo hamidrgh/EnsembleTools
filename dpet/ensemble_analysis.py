@@ -272,7 +272,7 @@ class EnsembleAnalysis:
     def fit_dimensionality_reduction(self, method: str, fit_on: list=None, *args, **kwargs):
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
-        if method == "pca":
+        if method in ("pca","kpca"):
             fit_on_data = self.get_concat_features(fit_on=fit_on)
             self.reduce_dim_model = self.reducer.fit(data=fit_on_data)
             self.reduce_dim_data = {}
