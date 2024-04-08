@@ -3,12 +3,13 @@ import re
 import shutil
 import zipfile
 from dpet.api_client import APIClient
+from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi, featurize_tr_angle
+from dpet.featurization.distances import featurize_ca_dist
 from dpet.visualization.reports import generate_custom_report, generate_dimenfix_report, generate_pca_report, generate_tsne_report
 import dpet.visualization.visualization as visualization
 from dpet.utils import extract_tar_gz
 import os
 import mdtraj
-from dpet.featurization.featurizer import FeaturizationFactory
 import numpy as np
 from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
 
@@ -200,20 +201,41 @@ class EnsembleAnalysis:
             self.normalize_data()
 
     def extract_features(self, featurization: str, *args, **kwargs):
-        featurizer = FeaturizationFactory.get_featurizer(featurization, *args, **kwargs)
         get_names = True
         self.featurization = featurization
         for ens_code, trajectory in self.trajectories.items():
             print(f"Performing feature extraction for Ensemble: {ens_code}.")
             if get_names:
-                features, names = featurizer.featurize(trajectory, get_names=get_names)
+                features, names = self.featurize(featurization, trajectory, get_names, *args, **kwargs)
                 get_names = False
             else:
-                features = featurizer.featurize(trajectory, get_names=get_names)
+                features = self.featurize(featurization, trajectory, get_names, *args, **kwargs)
             self.featurized_data[ens_code] = features
             print("Transformed ensemble shape:", features.shape)
         self.feature_names = names
         print("Feature names:", names)
+
+    def featurize(self, featurization, trajectory, get_names, *args, **kwargs):
+        if featurization == "ca_dist":
+            return featurize_ca_dist(traj=trajectory, get_names=get_names, *args, **kwargs)
+        elif featurization == "phi_psi":
+            return featurize_phi_psi(traj=trajectory, get_names=get_names, *args, **kwargs)
+        elif featurization == "a_angle":
+            return featurize_a_angle(traj=trajectory, get_names=get_names, *args, **kwargs)
+        elif featurization == "tr_omega":
+            return featurize_tr_angle(
+                traj=trajectory,
+                type="omega",
+                get_names=get_names,
+                *args, **kwargs)
+        elif featurization == "tr_phi":
+            return featurize_tr_angle(
+                traj=trajectory,
+                type="phi",
+                get_names=get_names,
+                *args, **kwargs)
+        else:
+            raise NotImplementedError("Unsupported feature extraction method.")
 
     def create_all_labels(self):
         for label, data_points in self.featurized_data.items():
