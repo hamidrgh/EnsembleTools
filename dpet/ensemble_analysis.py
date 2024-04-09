@@ -322,7 +322,9 @@ class EnsembleAnalysis:
         self.perform_feature_extraction(**featurization_params)
         self.fit_dimensionality_reduction(**reduce_dim_params)
 
-    ##################### Integrated plot function #####################
+    #----------------------------------------------------------------------
+    #------------------- Integrated plot functions ------------------------
+    #----------------------------------------------------------------------
 
     def tsne_ramachandran_plot_density(self, save:bool=False):
         """
@@ -631,7 +633,9 @@ class EnsembleAnalysis:
 
         visualization.plot_ss_order_parameter(self.trajectories, pointer, figsize)
 
-    ##################### PDF Reports #####################
+    #----------------------------------------------------------------------
+    #------------- Functions for generating PDF reports -------------------
+    #----------------------------------------------------------------------
 
     def generate_tsne_report(self):
         generate_tsne_report(self)
