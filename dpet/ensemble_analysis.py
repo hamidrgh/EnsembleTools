@@ -27,6 +27,7 @@ class EnsembleAnalysis:
         plot_dir = os.path.join(self.data_dir, PLOT_DIR)
         os.makedirs(plot_dir, exist_ok=True)
         self.figures = {}
+        self.rg_features = None
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -208,8 +209,6 @@ class EnsembleAnalysis:
         """
         Extract the selected feature. The options are "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi".
 
-        Note: If you want to change the extracted feature after running this method you need to restart the kernel. 
-        
         Parameters
         ----------
         featurization: str 
@@ -286,13 +285,18 @@ class EnsembleAnalysis:
 
     def _calculate_rg_for_trajectory(self, trajectory:mdtraj.Trajectory):
         return [mdtraj.compute_rg(frame) for frame in trajectory]
-
-    def rg_calculator(self):
+    
+    @property
+    def rg(self):
+        # If the need to recalculate rg comes remove the if statement
+        if self.rg_features is not None:
+            return self.rg_features
+        print("Calculating rg...")
         rg_values_list = []
         for traj in self.trajectories.values():
             rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
-            self.rg = [item[0] * 10 for item in rg_values_list]
-        return self.rg
+            self.rg_features = [item[0] * 10 for item in rg_values_list]
+        return self.rg_features
 
     def _get_concat_features(self, fit_on: list[str]=None):
         if fit_on is None:
@@ -323,12 +327,9 @@ class EnsembleAnalysis:
         if subsample_size is not None:
             self.random_sample_trajectories(subsample_size)
         self.perform_feature_extraction(**featurization_params)
-        self.rg_calculator()
         self.fit_dimensionality_reduction(**reduce_dim_params)
 
     ##################### Integrated plot function #####################
-
-
 
     def tsne_ramachandran_plot_density(self, save:bool=False):
         """
@@ -614,7 +615,7 @@ class EnsembleAnalysis:
         figsize:tuple
         You can change the size oof the figure here using a tuple. 
         """
-        self.extract_features("phi_psi") # extract phi_psi features to calculate this score
+        self.perform_feature_extraction("phi_psi") # extract phi_psi features to calculate this score
         feature_dict = self.featurized_data # provide feature dictionary for plot function
         visualization.plot_ss_measure_disorder(feature_dict, pointer, figsize)
 
