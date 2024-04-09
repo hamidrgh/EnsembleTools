@@ -9,38 +9,43 @@ from sklearn.metrics import silhouette_score
 
 class DimensionalityReduction(ABC):
     @abstractmethod
-    def fit(self, data):
-        pass
+    def fit(self, data:np.ndarray):
+        raise NotImplementedError("Method 'fit' must be implemented in subclasses.")
 
     @abstractmethod
-    def transform(self, data):
-        pass
+    def transform(self, data:np.ndarray):
+        raise NotImplementedError("Method 'transform' must be implemented in subclasses.")
     
     @abstractmethod
-    def fit_transform(self, data):
-        pass
+    def fit_transform(self, data:np.ndarray):
+        raise NotImplementedError("Method 'fit_transform' must be implemented in subclasses.")
 
 class PCAReduction(DimensionalityReduction):
-    def __init__(self, num_dim=10):
+    def __init__(self, num_dim:int=10):
         self.num_dim = num_dim
 
-    def fit(self, data):
+    def fit(self, data:np.ndarray):
         self.pca = PCA(n_components=self.num_dim)
         self.pca.fit(data)
         return self.pca
     
-    def transform(self, data):
+    def transform(self, data:np.ndarray):
         reduce_dim_data = self.pca.transform(data)
         return reduce_dim_data
     
-    def fit_transform(self, data):
+    def fit_transform(self, data:np.ndarray):
         self.pca = PCA(n_components=self.num_dim)
         transformed = self.pca.fit_transform(data)
         return transformed
 
 class TSNEReduction(DimensionalityReduction):
-    def __init__(self, perplexity_vals=range(2, 10, 2), metric: str="euclidean", 
-                 circular: bool=False, n_components: int=2, learning_rate: float=100.0, range_n_clusters = range(2,10,1)):
+    def __init__(
+            self, perplexity_vals:list[float]=range(2, 10, 2), 
+            metric:str="euclidean", 
+            circular:bool=False, 
+            n_components:int=2, 
+            learning_rate:float=100.0, 
+            range_n_clusters:list[int] = range(2,10,1)):
         self.perplexity_vals = perplexity_vals
         self.metric = unit_vector_distance if circular else metric
         self.n_components = n_components
@@ -48,13 +53,13 @@ class TSNEReduction(DimensionalityReduction):
         self.results = []
         self.range_n_clusters = range_n_clusters
 
-    def fit(self, data):
+    def fit(self, data:np.ndarray):
         return super().fit(data)
     
-    def transform(self, data):
+    def transform(self, data:np.ndarray):
         return super().transform(data)
 
-    def fit_transform(self, data):
+    def fit_transform(self, data:np.ndarray):
         self.data = data
         print("tsne is running...")
         for perplexity in self.perplexity_vals:
@@ -76,7 +81,7 @@ class TSNEReduction(DimensionalityReduction):
         self.bestP, self.bestK, self.best_tsne, self.best_kmeans = self.get_best_results()
         return self.best_tsne
 
-    def cluster(self, tsne, perplexity):
+    def cluster(self, tsne:np.ndarray, perplexity:float):
         for n_clusters in self.range_n_clusters:
             kmeans = KMeans(n_clusters=n_clusters, n_init='auto').fit(tsne)
             silhouette_ld = silhouette_score(tsne, kmeans.labels_)
@@ -104,18 +109,17 @@ class TSNEReduction(DimensionalityReduction):
         print("Best Number of Clusters:", best_n_clusters)
         return best_perplexity, best_n_clusters, best_tsne, best_kmeans
 
-
 class DimenFixReduction(DimensionalityReduction):
-    def __init__(self, range_n_clusters = range(1,10,1)) -> None:
+    def __init__(self, range_n_clusters:list[int] = range(1,10,1)) -> None:
         self.range_n_clusters = range_n_clusters
 
-    def fit(self, data):
+    def fit(self, data:np.ndarray):
         return super().fit(data)
     
-    def transform(self, data):
+    def transform(self, data:np.ndarray):
         return super().transform(data)
     
-    def fit_transform(self, data):
+    def fit_transform(self, data:np.ndarray):
         nfs = NeoForceScheme()
         self.projection = nfs.fit_transform(data)
         self.cluster()
@@ -136,22 +140,22 @@ class DimenFixReduction(DimensionalityReduction):
             )
 
 class MDSReduction(DimensionalityReduction):
-    def __init__(self, num_dim):
+    def __init__(self, num_dim:int):
         self.num_dim = num_dim
 
-    def fit(self, data):
+    def fit(self, data:np.ndarray):
         return super().fit(data)
     
-    def transform(self, data):
+    def transform(self, data:np.ndarray):
         return super().transform(data)
     
-    def fit_transform(self, data):    
+    def fit_transform(self, data:np.ndarray):    
         embedding = MDS(n_components=self.num_dim)
         feature_transformed = embedding.fit_transform(data)
         return feature_transformed
     
 class KPCAReduction(DimensionalityReduction):
-    def __init__(self, circular=False, num_dim=10, gamma=None) -> None:
+    def __init__(self, circular:bool=False, num_dim:int=10, gamma:float=None) -> None:
         self.circular = circular
         self.num_dim = num_dim
         self.gamma = gamma

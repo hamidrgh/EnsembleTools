@@ -13,8 +13,6 @@ import mdtraj
 import numpy as np
 from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
 
-PLOT_DIR = "plots"
-
 class EnsembleAnalysis:
     def __init__(self, ens_codes:list[str], data_dir:str):
         self.data_dir = Path(data_dir)
@@ -24,10 +22,9 @@ class EnsembleAnalysis:
         self.featurized_data = {}
         self.all_labels = []
         self.ens_codes = ens_codes
-        plot_dir = os.path.join(self.data_dir, PLOT_DIR)
+        plot_dir = os.path.join(self.data_dir, visualization.PLOT_DIR)
         os.makedirs(plot_dir, exist_ok=True)
         self.figures = {}
-        self.rg_features = None
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -140,8 +137,8 @@ class EnsembleAnalysis:
 
         """
         Loading trajectory files on to mdtraj object.
-        if only pdb files are existed, the function makes dcd and 
-        topology files for the fast loading next times.
+        if only pdb files exist, the function makes dcd and 
+        topology files for fast loading next time.
         """
         for ens_code in self.ens_codes:
             pdb_filename = f'{ens_code}.pdb'
@@ -197,7 +194,7 @@ class EnsembleAnalysis:
         """
         self.trajectories = {ensemble_id: self._random_sample(traj, sample_size) for ensemble_id, traj in self.old_trajectories.items()}
 
-    def _random_sample(self, trajectory, sample_size):
+    def _random_sample(self, trajectory:mdtraj.Trajectory, sample_size:int):
         total_frames = len(trajectory)
         random_indices = np.random.choice(total_frames, size=sample_size, replace=False)
         subsampled_traj = mdtraj.Trajectory(
@@ -288,15 +285,11 @@ class EnsembleAnalysis:
     
     @property
     def rg(self):
-        # If the need to recalculate rg comes remove the if statement
-        if self.rg_features is not None:
-            return self.rg_features
         print("Calculating rg...")
         rg_values_list = []
         for traj in self.trajectories.values():
             rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
-            self.rg_features = [item[0] * 10 for item in rg_values_list]
-        return self.rg_features
+        return [item[0] * 10 for item in rg_values_list]
 
     def _get_concat_features(self, fit_on: list[str]=None):
         if fit_on is None:
