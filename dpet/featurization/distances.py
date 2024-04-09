@@ -64,25 +64,8 @@ def _featurize_dist(
     else:
         return ca_dist
 
-def seq_sep_deprecation(func):
-    """
-    NOTE: development only, to be removed when seq_sep has been substituted in
-          all the code.
-    """
-    def inner(seq_sep=None, min_sep=2, *args, **kwargs):
-        if seq_sep is not None:
-            print(
-                f"WARNING: the 'seq_sep' argument in '{func.__name__}' is"
-                " deprecated by Giacomo, use min_sep instead! We should remove"
-                " seq_sep.")
-            min_sep = seq_sep
-        return func(min_sep=min_sep, *args, **kwargs)
-    return inner
-
-@seq_sep_deprecation
 def featurize_ca_dist(
         traj: mdtraj.Trajectory,
-        seq_sep: int = None,  # Remove.
         min_sep: int = 2,
         max_sep: int = None,
         inverse: bool = False,
@@ -93,10 +76,8 @@ def featurize_ca_dist(
                            inverse=inverse,
                            get_names=get_names)
 
-@seq_sep_deprecation
 def featurize_com_dist(
         traj: mdtraj.Trajectory,
-        seq_sep: int = None,  # Remove.
         min_sep: int = 2,
         max_sep: int = None,
         inverse: bool = False,
