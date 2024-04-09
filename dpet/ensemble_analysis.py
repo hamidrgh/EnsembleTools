@@ -16,7 +16,7 @@ from dpet.dimensionality_reduction.dimensionality_reduction import Dimensionalit
 PLOT_DIR = "plots"
 
 class EnsembleAnalysis:
-    def __init__(self, ens_codes, data_dir: str):
+    def __init__(self, ens_codes:list[str], data_dir:str):
         self.data_dir = Path(data_dir)
         self.api_client = APIClient()
         self.trajectories = {}
@@ -184,13 +184,10 @@ class EnsembleAnalysis:
             # Copy in order to be able to sample multiple times
             self.old_trajectories = self.trajectories.copy()
             
-    def random_sample_trajectories(self, sample_size):
+    def random_sample_trajectories(self, sample_size: int):
         """
         Sample a defined random number of conformations from the ensemble 
         trajectroy. 
-
-        Note: If you want to change the sample size after running the cell, you need to load 
-        the trajectories again. 
 
         Parameters
         ----------
@@ -207,9 +204,9 @@ class EnsembleAnalysis:
             topology=trajectory.topology)
         return subsampled_traj
 
-    def perform_feature_extraction(self, featurization: str, normalize = False, *args, **kwargs):
+    def perform_feature_extraction(self, featurization: str, normalize: bool = False, *args, **kwargs):
         """
-        Extract the selected feature. The options are "phi_psi", "ca_dist" and "a_angle".
+        Extract the selected feature. The options are "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi".
 
         Note: If you want to change the extracted feature after running this method you need to restart the kernel. 
         
@@ -243,13 +240,22 @@ class EnsembleAnalysis:
         self.feature_names = names
         print("Feature names:", names)
 
-    def _featurize(self, featurization, trajectory, get_names, *args, **kwargs):
+    def _featurize(self, featurization: str, trajectory: mdtraj.Trajectory, get_names: bool, *args, **kwargs):
         if featurization == "ca_dist":
-            return featurize_ca_dist(traj=trajectory, get_names=get_names, *args, **kwargs)
+            return featurize_ca_dist(
+                traj=trajectory, 
+                get_names=get_names, 
+                *args, **kwargs)
         elif featurization == "phi_psi":
-            return featurize_phi_psi(traj=trajectory, get_names=get_names, *args, **kwargs)
+            return featurize_phi_psi(
+                traj=trajectory, 
+                get_names=get_names, 
+                *args, **kwargs)
         elif featurization == "a_angle":
-            return featurize_a_angle(traj=trajectory, get_names=get_names, *args, **kwargs)
+            return featurize_a_angle(
+                traj=trajectory, 
+                get_names=get_names, 
+                *args, **kwargs)
         elif featurization == "tr_omega":
             return featurize_tr_angle(
                 traj=trajectory,
@@ -278,7 +284,7 @@ class EnsembleAnalysis:
         for label, features in self.featurized_data.items():
             self.featurized_data[label] = (features - mean) / std
 
-    def _calculate_rg_for_trajectory(self, trajectory):
+    def _calculate_rg_for_trajectory(self, trajectory:mdtraj.Trajectory):
         return [mdtraj.compute_rg(frame) for frame in trajectory]
 
     def rg_calculator(self):
@@ -288,7 +294,7 @@ class EnsembleAnalysis:
             self.rg = [item[0] * 10 for item in rg_values_list]
         return self.rg
 
-    def _get_concat_features(self, fit_on:list=None):
+    def _get_concat_features(self, fit_on: list[str]=None):
         if fit_on is None:
             fit_on = self.ens_codes
         
@@ -297,7 +303,7 @@ class EnsembleAnalysis:
         print("Concatenated featurized ensemble shape:", concat_features.shape)
         return concat_features
 
-    def fit_dimensionality_reduction(self, method: str, fit_on: list=None, *args, **kwargs):
+    def fit_dimensionality_reduction(self, method: str, fit_on:list[str]=None, *args, **kwargs):
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
         if method in ("pca","kpca"):
@@ -324,7 +330,7 @@ class EnsembleAnalysis:
 
 
 
-    def tsne_ramachandran_plot_density(self, save=False):
+    def tsne_ramachandran_plot_density(self, save:bool=False):
         """
         It gets the 2-D histogram ramachandran plots of the
         clusters from t-SNE analysis. \n
@@ -339,7 +345,7 @@ class EnsembleAnalysis:
             # it should raise an error
         visualization.tsne_ramachandran_plot_density(self, save)
 
-    def tsne_scatter_plot(self, save=False):
+    def tsne_scatter_plot(self, save:bool=False):
         """
         It gets the output results of t-SNE. 
         Three scatter plot will be generated based on original, clustering and Rg labels. 
@@ -359,10 +365,10 @@ class EnsembleAnalysis:
         else:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
-    def tsne_scatter_plot_rg(self, save=False):
+    def tsne_scatter_plot_rg(self, save:bool=False):
         visualization.tsne_scatter_plot_rg(self, save)
 
-    def dimenfix_scatter(self, save=False):
+    def dimenfix_scatter(self, save:bool=False):
         visualization.dimenfix_scatter(self, save)
 
     # def dimenfix_scatter_plot(self, save=False):
@@ -377,25 +383,25 @@ class EnsembleAnalysis:
     # def dimenfix_cluster_scatter_plot_2(self, save=False):
     #     visualization.dimenfix_cluster_scatter_plot_2(self, save)
 
-    def pca_cumulative_explained_variance(self, save=False):
+    def pca_cumulative_explained_variance(self, save:bool=False):
         if self.reduce_dim_method == "pca":
             visualization.pca_cumulative_explained_variance(self, save)
         else:
             print("Analysis is only valid for PCA dimensionality reduction.")
 
-    def pca_plot_2d_landscapes(self, save=False):
+    def pca_plot_2d_landscapes(self, save:bool=False):
         visualization.pca_plot_2d_landscapes(self, save)
 
-    def pca_plot_1d_histograms(self, save=False):
+    def pca_plot_1d_histograms(self, save:bool=False):
         visualization.pca_plot_1d_histograms(self, save)
 
-    def pca_correlation_plot(self, num_residues, sel_dims):
+    def pca_correlation_plot(self, num_residues:int, sel_dims:list[int]):
         if self.featurization == "ca_dist":
             visualization.pca_correlation_plot(num_residues, sel_dims, self)
         else:
             print("Analysis is only valid for ca_dist feature extraction.")
     
-    def pca_rg_correlation(self, save=False):
+    def pca_rg_correlation(self, save:bool=False):
         visualization.pca_rg_correlation(self, save)
         
     def trajectories_plot_total_sasa(self):
@@ -431,7 +437,7 @@ class EnsembleAnalysis:
         """
         visualization.plot_relative_helix_content(self.trajectories)
 
-    def trajectories_plot_rg_comparison(self, n_bins=50, bins_range=(1, 4.5), dpi=96):
+    def trajectories_plot_rg_comparison(self, n_bins:int=50, bins_range:tuple=(1, 4.5), dpi:int=96):
         """
         Plot the distribution of the Rg whithin each ensemble
         
@@ -445,12 +451,12 @@ class EnsembleAnalysis:
         visualization.trajectories_plot_rg_comparison(self.trajectories, n_bins, bins_range, dpi)
 
     def plot_average_dmap_comparison(self, 
-                                    ticks_fontsize=14,
-                                    cbar_fontsize=14,
-                                    title_fontsize=14,
-                                    dpi=96,
-                                    max_d=6.8,
-                                    use_ylabel=True):
+                                    ticks_fontsize:int=14,
+                                    cbar_fontsize:int=14,
+                                    title_fontsize:int=14,
+                                    dpi:int=96,
+                                    max_d:float=6.8,
+                                    use_ylabel:bool=True):
         
         """Plot the average distance maps for selected ensembles.
         
@@ -467,19 +473,19 @@ class EnsembleAnalysis:
         visualization.plot_average_dmap_comparison(self.trajectories, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
 
     def plot_cmap_comparison(self,
-                            title,
-                            ticks_fontsize=14,
-                            cbar_fontsize=14,
-                            title_fontsize=14,
-                            dpi=96,
-                            cmap_min=-3.5,
-                            use_ylabel=True):
+                            title:str,
+                            ticks_fontsize:int=14,
+                            cbar_fontsize:int=14,
+                            title_fontsize:int=14,
+                            dpi:int=96,
+                            cmap_min:float=-3.5,
+                            use_ylabel:bool=True):
         visualization.plot_cmap_comparison(self.trajectories, title, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, cmap_min, use_ylabel)
 
-    def plot_distance_distribution_multiple(self, dpi = 96):
+    def plot_distance_distribution_multiple(self, dpi:int=96):
         visualization.plot_distance_distribution_multiple(self.trajectories, dpi)
 
-    def end_to_end_distances_plot(self, atom_selector ="protein and name CA", bins = 50, violin_plot=True, means=False, median=True ):
+    def end_to_end_distances_plot(self, atom_selector:str="protein and name CA", bins:int=50, violin_plot:bool=True, means:bool=False, median:bool=True):
         """
         Plot end-to-end distance distributions. 
 
@@ -501,7 +507,7 @@ class EnsembleAnalysis:
         """
         visualization.end_to_end_distances_plot(self.trajectories, atom_selector, bins, violin_plot, means, median)
 
-    def plot_asphericity_dist(self, bins = 50,violin_plot=True, means=False, median=True ):
+    def plot_asphericity_dist(self, bins:int=50,violin_plot:bool=True, means:bool=False, median:bool=True):
         """
         Plot asphericity distribution in each ensemble.
         Asphericity is calculated based on the gyration tensor.  
@@ -522,7 +528,7 @@ class EnsembleAnalysis:
         """
         visualization.plot_asphericity_dist(self.trajectories ,bins, violin_plot, means, median )
 
-    def plot_prolateness_dist(self, bins=50, violin_plot=True, means=False, median=True):
+    def plot_prolateness_dist(self, bins:int=50, violin_plot:bool=True, means:bool=False, median:bool=True):
         """
         Plot prolateness distribution in each ensemble.
         Prolateness is calculated based on the gyration tensor.  
@@ -543,7 +549,7 @@ class EnsembleAnalysis:
         """
         visualization.plot_prolateness_dist(self.trajectories, bins, violin_plot, means, median)
 
-    def plot_alpha_angles_dist(self, bins=50):
+    def plot_alpha_angles_dist(self, bins:int=50):
 
         """
         It plot the distribution of alpha angles.
@@ -555,7 +561,7 @@ class EnsembleAnalysis:
         """
         visualization.plot_alpha_angles_dist(self.trajectories, bins)
 
-    def plot_contact_prob(self,title,threshold = 0.8,dpi = 96):
+    def plot_contact_prob(self,title:str, threshold:float=0.8, dpi:int=96):
         """
         It plots the contact probability map based on the threshold. 
         The default value for threshold is 0.8[nm], 
@@ -573,7 +579,7 @@ class EnsembleAnalysis:
         """
         visualization.plot_contact_prob(self.trajectories,title,threshold,dpi)
 
-    def plot_ramachandran_plot(self, two_d_hist=True, linespaces= (-180, 180, 80)):
+    def plot_ramachandran_plot(self, two_d_hist:bool=True, linespaces:tuple=(-180, 180, 80)):
         """
         It gets Ramachandran plot. If two_d_hist= True it returns 2D histogram 
         for each ensembles. If two_d_hist=False it returns a simple scatter plot 
@@ -590,7 +596,7 @@ class EnsembleAnalysis:
         """
         visualization.plot_ramachandran_plot(self.trajectories, two_d_hist, linespaces)
     
-    def plot_ss_measure_disorder(self, pointer=None, figsize=(15,5)):
+    def plot_ss_measure_disorder(self, pointer:list=None, figsize:tuple=(15,5)):
         """
         This function generates site specific flexibility parameter plot. For further information
         you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. 
@@ -612,7 +618,7 @@ class EnsembleAnalysis:
         feature_dict = self.featurized_data # provide feature dictionary for plot function
         visualization.plot_ss_measure_disorder(feature_dict, pointer, figsize)
 
-    def plot_ss_order_parameter(self, pointer=None, figsize=(15,5)):
+    def plot_ss_order_parameter(self, pointer:list=None, figsize:tuple=(15,5)):
 
         """
         This function generates site specific order parameter plot. For further information
@@ -630,7 +636,6 @@ class EnsembleAnalysis:
         """
 
         visualization.plot_ss_order_parameter(self.trajectories, pointer, figsize)
-
 
     ##################### PDF Reports #####################
 
