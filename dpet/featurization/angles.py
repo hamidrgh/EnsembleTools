@@ -36,7 +36,7 @@ def featurize_phi_psi(
 
 def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True):
     # Get all C-alpha indices.
-    ca_ids = traj.topology.select("protein and name CB")
+    ca_ids = traj.topology.select("protein and name CA")
     atoms = list(traj.topology.atoms)
     # Get all pair of ids.
     tors_ids = []

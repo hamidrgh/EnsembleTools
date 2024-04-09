@@ -171,7 +171,7 @@ def dimenfix_scatter(analysis, save=False):
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
         plt.savefig(plot_dir  + '/dimenfix_scatter.png', dpi=800)
-        
+
     return fig
     
     
@@ -436,29 +436,40 @@ def pca_rg_correlation(analysis, save=False):
     #plt.show()
     return fig
 
-def trajectories_plot_total_sasa(trajectories):
-    for ens in trajectories:
-        sasa = mdtraj.shrake_rupley(trajectories[ens])
-
-
+def plot_global_sasa(analysis,showmeans=True, showmedians=True ,save=False):
+    fig, ax = plt.subplots(1, 1 )
+    positions = []
+    dist_list = []
+    for ens in analysis.trajectories:
+        positions.append(ens)
+        sasa = mdtraj.shrake_rupley(analysis.trajectories[ens])
         total_sasa = sasa.sum(axis=1)
-        plt.plot(trajectories[ens].time, total_sasa,label = ens )
-    plt.xlabel('frame', size=16)
-    plt.ylabel('Total SASA (nm)^2', size=16)
-    plt.legend()
-    plt.show()
+        dist_list.append(total_sasa)
+    ax.violinplot(dist_list, showmeans=showmeans, showmedians=showmedians  )
 
-def plot_rg_vs_asphericity(trajectories):
-    for ens in trajectories:
-        x = mdtraj.compute_rg(trajectories[ens])
-        y = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
+    plt.xticks(ticks= [y + 1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
+    plt.title('SASA distribution over the ensembles')
+    plt.ylabel('SASA (nm)^2')
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))
+    # plt.legend()
+    # plt.show()
+
+def plot_rg_vs_asphericity(analysis, save=False):
+    for ens in analysis.trajectories:
+        x = mdtraj.compute_rg(analysis.trajectories[ens])
+        y = calculate_asphericity(mdtraj.compute_gyration_tensor(analysis.trajectories[ens]))
         p = np.corrcoef(x , y)
         plt.scatter(x,y,s=4,label = ens)
         print(f"Pearson coeff for {ens} = {round(p[0][1], 3)}")
     plt.ylabel("Asphericity")
     plt.xlabel("Rg [nm]")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.show()
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir,'Rg_vs_Asphericity' + analysis.ens_codes[0]))
+    # plt.show()
 
 '''
 def trajectories_plot_density(trajectories):
@@ -468,7 +479,7 @@ def trajectories_plot_density(trajectories):
     plt.legend()
     plt.show()
 '''
-
+'''
 def trajectories_plot_density(trajectories):
     fig, ax = plt.subplots()
     for ens in trajectories:
@@ -482,18 +493,21 @@ def trajectories_plot_density(trajectories):
     ax.set_ylabel('Density')
     ax.set_title('Kernel Density Estimate of Asphericity for Trajectories')
     plt.show()
-
-def plot_rg_vs_prolateness(trajectories):
-    for ens in trajectories:
-        x = mdtraj.compute_rg(trajectories[ens])
-        y = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
+'''
+def plot_rg_vs_prolateness(analysis, save=False):
+    for ens in analysis.trajectories:
+        x = mdtraj.compute_rg(analysis.trajectories[ens])
+        y = calculate_prolateness(mdtraj.compute_gyration_tensor(analysis.trajectories[ens]))
         p = np.corrcoef(x , y)
         plt.scatter(x,y,s=4,label = ens)
         print(f"Pearson coeff for {ens} = {round(p[0][1], 3)}")
     plt.ylabel("prolateness")
     plt.xlabel("Rg [nm]")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    plt.show()
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir,'Rg_vs_Prolateness' + analysis.ens_codes[0]))
+    # plt.show()
 
 '''
 def trajectories_plot_prolateness(trajectories):
@@ -503,7 +517,7 @@ def trajectories_plot_prolateness(trajectories):
     plt.legend()
     plt.show()
 '''
-
+'''
 def trajectories_plot_prolateness(trajectories):
     fig, ax = plt.subplots()
     for ens in trajectories:
@@ -517,15 +531,19 @@ def trajectories_plot_prolateness(trajectories):
     ax.set_ylabel('Density')
     ax.set_title('Kernel Density Estimate of Prolateness for Trajectories')
     plt.show()
+'''
 
-def trajectories_plot_dihedrals(trajectories):
-    for ens in trajectories:
-        four_cons_indices_ca = create_consecutive_indices_matrix(trajectories[ens].topology.select("protein and name CA") )
-        ens_dh_ca = mdtraj.compute_dihedrals(trajectories[ens], four_cons_indices_ca).ravel()
-        plt.hist(ens_dh_ca, bins=50, histtype="step", density=True, label=ens)
+def plot_alpha_angle_dihederal(analysis, bins=50, atom_selector='protein and name CA', save=False):
+    for ens in analysis.trajectories:
+        four_cons_indices_ca = create_consecutive_indices_matrix(analysis.trajectories[ens].topology.select(atom_selector) )
+        ens_dh_ca = mdtraj.compute_dihedrals(analysis.trajectories[ens], four_cons_indices_ca).ravel()
+        plt.hist(ens_dh_ca, bins=bins, histtype="step", density=True, label=ens)
     plt.title("the distribution of dihedral angles between four consecutive Cα beads.")    
     plt.legend()
-    plt.show
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(os.path.join(plot_dir,'alpha_angle_dihederal' + analysis.ens_codes[0]))
+    # plt.show
 
 def get_protein_dssp_data_dict(trajectories):
     dssp_data_dict = {}
