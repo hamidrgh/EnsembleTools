@@ -68,7 +68,7 @@ class EnsembleAnalysis:
                     extract_tar_gz(tar_gz_file, self.data_dir, pdb_filename)
                     print(f"Extracted file {pdb_filename}.")
                 else:
-                    print("File already exists. Skipping extracting.")
+                    print("File already exists. Skipping extraction.")
             else:
                 print(f"Entry {ens_code} does not match the pattern and will be skipped.")
 
@@ -79,28 +79,32 @@ class EnsembleAnalysis:
         """
         new_ens_codes = []
         for ens_code in self.ens_codes:
-            print(f"Downloading entry {ens_code} from Atlas.")
             zip_filename = f'{ens_code}.zip'
             zip_file = os.path.join(self.data_dir, zip_filename)
 
-            url = f"https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/{ens_code}/{ens_code}_protein.zip"
-            headers = {'accept': '*/*'}
+            if not os.path.exists(zip_file):
+                print(f"Downloading entry {ens_code} from Atlas.")
+                url = f"https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/{ens_code}/{ens_code}_protein.zip"
+                headers = {'accept': '*/*'}
 
-            response = self.api_client.perform_get_request(url, headers=headers)
-            if response:
-                # Download and save the response content to a file
-                self.api_client.download_response_content(response, zip_file)
-                print(f"Downloaded file {zip_filename} from Atlas.")
-                # Unzip.
-                with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-                    zip_ref.extractall(self.data_dir)
-                    print(f"Extracted directory {self.data_dir}.")
+                response = self.api_client.perform_get_request(url, headers=headers)
+                if response:
+                    # Download and save the response content to a file
+                    self.api_client.download_response_content(response, zip_file)
+                    print(f"Downloaded file {zip_filename} from Atlas.")
+            else:
+                print("File already exists. Skipping download.")
+
+            # Unzip.
+            with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                zip_ref.extractall(self.data_dir)
+                print(f"Extracted file {zip_file}.")
 
                 # Remove unused files.
                 for unused_path in self.data_dir.glob("*.tpr"):
                     os.remove(unused_path)
                 os.remove(self.data_dir / "README.txt")
-                os.remove(zip_file)
+                # os.remove(zip_file) # Keep the zip file to avoid downloading again
 
         # Collect xtc files for updating ens_codes
         new_ens_codes = ([f.stem for f in self.data_dir.glob("*.xtc")])
