@@ -256,7 +256,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         featurization: str 
-        Choose between "phi_psi", "ca_dist" and "a_angle"
+        Choose between "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi"
 
         normalize: Bool
         if featurization is "ca_dist" normalize True will normalize the distances based on the mean and standard deviation.
@@ -269,6 +269,7 @@ class EnsembleAnalysis:
             self._normalize_data()
 
     def _extract_features(self, featurization: str, *args, **kwargs):
+        # Get names only for the first ensemble
         get_names = True
         self.featurization = featurization
         for ens_code, trajectory in self.trajectories.items():
@@ -348,6 +349,18 @@ class EnsembleAnalysis:
         return concat_features
 
     def fit_dimensionality_reduction(self, method: str, fit_on:list[str]=None, *args, **kwargs):
+        """
+        Perform dimensionality reduction on the extracted features. The options are "pca", "tsne", "dimenfix", "mds" and "kpca".
+
+        Parameters
+        ----------
+        method: str 
+        Choose between pca", "tsne", "dimenfix", "mds" and "kpca".
+
+        fit_on: list[str]
+        if method is "pca" or "kpca" the fit_on parameter specifies on which ensembles the models should be fit. 
+        The model will then be used to transform all ensembles.
+        """
         if method == "tsne" and self.featurization != "phi_psi":
             raise ValueError("t-SNE reduction is only valid with phi_psi feature extraction.")
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
@@ -363,7 +376,30 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
-    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None) -> None:
+    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None):
+        """
+        Executes the data analysis pipeline end-to-end. The pipeline includes:
+        1. Download from database (optional)
+        2. Generate trajectories
+        3. Sample a random number of conformations from trajectories (optional)
+        4. Perform feature extraction
+        5. Perform dimensionality reduction
+
+        Parameters
+        ----------
+        featurization_params: dict
+            Parameters for feature extraction. The only required parameter is "featurization",
+            which can be "phi_psi", "ca_dist", "a_angle", "tr_omega" or "tr_phi". 
+            Other method-specific parameters are optional.
+        reduce_dim_params: dict
+            Parameters for dimensionality reduction. The only required parameter is "method",
+            which can be "pca", "tsne", "dimenfix", "mds" or "kpca".
+        database: str
+            Optional parameter that specifies the database from which the entries should be downloaded.
+            Options are "ped" and "atlas".
+        subsample_size: int
+            Optional parameter that specifies the trajectory subsample size.
+        """
         self.download_from_database(database)
         self.generate_trajectories()
         if subsample_size is not None:
