@@ -241,6 +241,8 @@ class EnsembleAnalysis:
 
     def _random_sample(self, trajectory:mdtraj.Trajectory, sample_size:int):
         total_frames = len(trajectory)
+        if sample_size > total_frames:
+            raise ValueError("Sample size cannot be larger than the total number of frames in the trajectory.")
         random_indices = np.random.choice(total_frames, size=sample_size, replace=False)
         subsampled_traj = mdtraj.Trajectory(
             xyz=trajectory.xyz[random_indices],
