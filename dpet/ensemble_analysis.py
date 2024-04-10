@@ -76,7 +76,7 @@ class EnsembleAnalysis:
         """ Automate Downloading MD ensembles from
         Atlas. 
         """
-        new_ens_codes = []
+        new_ens_codes_mapping = {}
         for ens_code in self.ens_codes:
             zip_filename = f'{ens_code}.zip'
             zip_file = os.path.join(self.data_dir, zip_filename)
@@ -87,40 +87,44 @@ class EnsembleAnalysis:
                 headers = {'accept': '*/*'}
 
                 response = self.api_client.perform_get_request(url, headers=headers)
-                if response:
-                    # Download and save the response content to a file
-                    self.api_client.download_response_content(response, zip_file)
-                    print(f"Downloaded file {zip_filename} from Atlas.")
+                if not response:
+                    continue
+                # Download and save the response content to a file
+                self.api_client.download_response_content(response, zip_file)
+                print(f"Downloaded file {zip_filename} from Atlas.")
             else:
                 print("File already exists. Skipping download.")
 
-            # Unzip.
             with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                # Map reps to original ensemble code
+                zip_contents = zip_ref.namelist()
+                new_ens_codes = [fname.split('.')[0] for fname in zip_contents if fname.endswith('.xtc')]
+                new_ens_codes_mapping[ens_code] = new_ens_codes
+                # Unzip
                 zip_ref.extractall(self.data_dir)
                 print(f"Extracted file {zip_file}.")
 
-                # Remove unused files.
-                for unused_path in self.data_dir.glob("*.tpr"):
-                    os.remove(unused_path)
-                os.remove(self.data_dir / "README.txt")
-                # os.remove(zip_file) # Keep the zip file to avoid downloading again
-
-        # Collect xtc files for updating ens_codes
-        new_ens_codes = ([f.stem for f in self.data_dir.glob("*.xtc")])
+            # Remove unused files.
+            for unused_path in self.data_dir.glob("*.tpr"):
+                os.remove(unused_path)
+            os.remove(os.path.join(self.data_dir, "README.txt"))
 
         # Copy and rename toplogy files to new ensemble codes
-        for ens_code in self.ens_codes:
-            pdb_file = os.path.join(self.data_dir,f"{ens_code}.pdb")
-            for new_ens_code in new_ens_codes:
-                if new_ens_code.__contains__(ens_code):
-                    new_pdb_file = os.path.join(self.data_dir,f"{new_ens_code}.top.pdb")
-                    shutil.copy(pdb_file, new_pdb_file)
-                    print(f"Copied and renamed {pdb_file} to {new_pdb_file}.")
+        for old_code, new_codes in new_ens_codes_mapping.items():
+            old_pdb_file = os.path.join(self.data_dir,f"{old_code}.pdb")
+            for new_code in new_codes:
+                new_pdb_file = os.path.join(self.data_dir,f"{new_code}.top.pdb")
+                shutil.copy(old_pdb_file, new_pdb_file)
+                print(f"Copied and renamed {old_pdb_file} to {new_pdb_file}.")
             # Delete old topology file
-            os.remove(pdb_file)
+            os.remove(old_pdb_file)
 
-        # Update self.ens_codes
-        self.ens_codes = new_ens_codes
+        # Update self.ens_codes using the mapping
+        updated_ens_codes = []
+        for old_code in self.ens_codes:
+            updated_ens_codes.extend(new_ens_codes_mapping.get(old_code, [old_code]))
+
+        self.ens_codes = updated_ens_codes
         print("Analysing ensembles:", self.ens_codes)
 
     def download_from_database(self, database: str =None):
