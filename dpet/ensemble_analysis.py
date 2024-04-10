@@ -36,7 +36,7 @@ class EnsembleAnalysis:
 
         Note
         ----
-        Ensembles must be provided in the PED ID format, which consists of a string starting with 'PED'
+        The function only downloads ensembles in the PED ID format, which consists of a string starting with 'PED'
         followed by a numeric identifier and 'e' followed by another numeric identifier.
         Example: 'PED00423e001', 'PED00424e001'
         """
@@ -82,7 +82,7 @@ class EnsembleAnalysis:
 
         Note:
         ----
-        Ensembles must be provided as PDB IDs with an optional chain identifier separated by an underscore.
+        The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
         Example: '3a1g_B'
         """
         pdb_pattern = r'^\d\w{3}_[A-Z]$'
@@ -153,12 +153,12 @@ class EnsembleAnalysis:
         Note
         ----
         For PED database:
-            Ensembles must be provided in the PED ID format, which consists of a string starting with 'PED'
+            The function only downloads ensembles in the PED ID format, which consists of a string starting with 'PED'
             followed by a numeric identifier and 'e' followed by another numeric identifier.
             Example: 'PED00423e001', 'PED00424e001'
 
         For atlas database:
-            Ensembles must be provided as PDB IDs with an optional chain identifier separated by an underscore.
+            The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
             Example: '3a1g_B'
         """
         if database == "ped":
