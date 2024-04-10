@@ -109,10 +109,9 @@ class EnsembleAnalysis:
                 os.remove(unused_path)
             os.remove(os.path.join(self.data_dir, "README.txt"))
 
-        # Copy and rename toplogy files to new ensemble codes
-        for old_code, new_codes in new_ens_codes_mapping.items():
-            old_pdb_file = os.path.join(self.data_dir,f"{old_code}.pdb")
-            for new_code in new_codes:
+            # Copy and rename topology file
+            old_pdb_file = os.path.join(self.data_dir,f"{ens_code}.pdb")
+            for new_code in new_ens_codes:
                 new_pdb_file = os.path.join(self.data_dir,f"{new_code}.top.pdb")
                 shutil.copy(old_pdb_file, new_pdb_file)
                 print(f"Copied and renamed {old_pdb_file} to {new_pdb_file}.")
