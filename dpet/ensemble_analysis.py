@@ -305,10 +305,12 @@ class EnsembleAnalysis:
 
     def _calculate_rg_for_trajectory(self, trajectory:mdtraj.Trajectory):
         return [mdtraj.compute_rg(frame) for frame in trajectory]
-    
-    @property
-    def rg(self):
-        print("Calculating rg...")
+
+    def rg_calculator(self):
+        """
+        Calculates Rg for each conformations in the loaded ensembles.
+        The returned values are in Angstrom.  
+        """
         rg_values_list = []
         for traj in self.trajectories.values():
             rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
@@ -387,9 +389,18 @@ class EnsembleAnalysis:
             print("Analysis is only valid for t-SNE dimensionality reduction.")
 
     def tsne_scatter_plot_rg(self, save:bool=False):
+        # It plots a redundant plot which implemented in tsne_scatter_plot and could be removed
         visualization.tsne_scatter_plot_rg(self, save)
 
     def dimenfix_scatter(self, save:bool=False):
+        """
+        It gets the the final result for dimenfix method. 
+
+        Parameters
+        ----------
+        save: bool \n
+        if True it will save the figure
+        """
         visualization.dimenfix_scatter(self, save)
 
     # def dimenfix_scatter_plot(self, save=False):
@@ -405,51 +416,107 @@ class EnsembleAnalysis:
     #     visualization.dimenfix_cluster_scatter_plot_2(self, save)
 
     def pca_cumulative_explained_variance(self, save:bool=False):
+
+        """
+        It gets the cumulative variance and only applicable when the
+        dimensionality reduction method is "pca"
+
+        Parameters
+        ----------
+        save: bool \n
+        if True it will save the figure
+        """
         if self.reduce_dim_method == "pca":
             visualization.pca_cumulative_explained_variance(self, save)
         else:
             print("Analysis is only valid for PCA dimensionality reduction.")
 
     def pca_plot_2d_landscapes(self, save:bool=False):
+
+        """
+        It gets the 2d landscapes plots when the dimensionality reduction method 
+        is "pca" or "kpca"
+
+        Parameters
+        ----------
+        save: bool \n
+        if True it will save the figure
+        """
         visualization.pca_plot_2d_landscapes(self, save)
 
     def pca_plot_1d_histograms(self, save:bool=False):
+        """
+        It gets the 2d landscapes plots when the dimensionality reduction method 
+        is "pca" or "kpca"
+
+        Parameters
+        ----------
+        save: bool \n
+        if True it will save the figure
+        """
         visualization.pca_plot_1d_histograms(self, save)
 
-    def pca_correlation_plot(self, num_residues:int, sel_dims:list[int]):
+    def pca_correlation_plot(self, num_residues:int,sel_dims:list[int]):
         if self.featurization == "ca_dist":
             visualization.pca_correlation_plot(num_residues, sel_dims, self)
         else:
             print("Analysis is only valid for ca_dist feature extraction.")
     
     def pca_rg_correlation(self, save:bool=False):
+        """
+        It demonstrates the correlation between PC dimension 1 and the amount of Rg
+        Typically high correlation can be detected here. 
+
+        Parameters
+        ----------
+        save: bool \n
+        if True it will save the figure
+        """
         visualization.pca_rg_correlation(self, save)
         
-    def trajectories_plot_total_sasa(self):
-        visualization.trajectories_plot_total_sasa(self.trajectories)
+    def plot_global_sasa(self, save=False, showmeans=True ,showmedians=True):
 
-    def plot_rg_vs_asphericity(self):
+        """
+        It plots the distribution of SASA for each conformation 
+        within the ensembles 
+
+        Parameters
+        ----------
+        save: bool \n
+        if True it will save the figure
+
+        showmean: bool \n
+        if True it will show the mean 
+
+        showmedian: bool \n 
+        if True it will show the median
+        """
+        visualization.plot_global_sasa(self, save, showmeans, showmedians)
+
+    def plot_rg_vs_asphericity(self, save=False):
         """
         It plots the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate 
         the correlation between Rg and Asphericity. 
         """
-        visualization.plot_rg_vs_asphericity(self.trajectories)
-
+        visualization.plot_rg_vs_asphericity(self, save)
+    '''
     def trajectories_plot_density(self):
         visualization.trajectories_plot_density(self.trajectories)
+    '''
 
-    def plot_rg_vs_prolateness(self):
+    def plot_rg_vs_prolateness(self, save=False):
         """
         It plots the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
         the correlation between Rg and Prolateness. 
         """
-        visualization.plot_rg_vs_prolateness(self.trajectories)
-
+        visualization.plot_rg_vs_prolateness(self, save)
+    '''
     def trajectories_plot_prolateness(self):
         visualization.trajectories_plot_prolateness(self.trajectories)
+    '''
     
-    def trajectories_plot_dihedrals(self):
-        visualization.trajectories_plot_dihedrals(self.trajectories)
+    def plot_alpha_angle_dihedral(self, bins=50, atom_selector='protein and name CA'):
+        visualization.plot_alpha_angle_dihederal(self, bins, atom_selector)
 
     def plot_relative_helix_content(self):
 
