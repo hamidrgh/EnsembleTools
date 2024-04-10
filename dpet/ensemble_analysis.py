@@ -31,8 +31,14 @@ class EnsembleAnalysis:
             self.api_client.close_session()
     
     def download_from_ped(self):
-        """Automate Downloading ensembles
-        using PED API 
+        """
+        Automate Downloading ensembles using PED API 
+
+        Note
+        ----
+        Ensembles must be provided in the PED ID format, which consists of a string starting with 'PED'
+        followed by a numeric identifier and 'e' followed by another numeric identifier.
+        Example: 'PED00423e001', 'PED00424e001'
         """
         ped_pattern = r'^(PED\d{5})(e\d{3})$'
 
@@ -72,8 +78,12 @@ class EnsembleAnalysis:
                 print(f"File {pdb_filename} already exists. Skipping extraction.")
     
     def download_from_atlas(self):
-        """ Automate Downloading MD ensembles from
-        Atlas. 
+        """ Automate Downloading MD ensembles from Atlas. 
+
+        Note:
+        ----
+        Ensembles must be provided as PDB IDs with an optional chain identifier separated by an underscore.
+        Example: '3a1g_B'
         """
         pdb_pattern = r'^\d\w{3}_[A-Z]$'
         new_ens_codes_mapping = {}
@@ -170,6 +180,10 @@ class EnsembleAnalysis:
             - If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.
             - If only a .pdb file exists, generate trajectory and topology files from the .pdb file.
             - If a directory [ens_code] exists containing .pdb files, generate trajectory and topology files from the directory.
+
+        Note
+        ----
+        Using 'download_from_database' transforms the downloaded data into the appropriate format.
         """
         for ens_code in self.ens_codes:
             pdb_filename = f'{ens_code}.pdb'
@@ -216,7 +230,7 @@ class EnsembleAnalysis:
     def random_sample_trajectories(self, sample_size: int):
         """
         Sample a defined random number of conformations from the ensemble 
-        trajectroy. 
+        trajectory. 
 
         Parameters
         ----------
