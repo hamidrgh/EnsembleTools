@@ -35,43 +35,42 @@ class EnsembleAnalysis:
         using PED API 
         """
         # Define the pattern
-        pattern = r'^(PED\d+)(e\d+)$'
+        pattern = r'^(PED\d{5})(e\d{3})$'
 
         # Filter the ens_codes list using regex
         for ens_code in self.ens_codes:
             match = re.match(pattern, ens_code)
-            if match:
-                print(f"Downloading entry {ens_code} from PED.")
-                ped_id = match.group(1)
-                ensemble_id = match.group(2)
-                tar_gz_filename = f'{ens_code}.tar.gz'
-                tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
-
-                pdb_filename = f'{ens_code}.pdb'
-                pdb_file = os.path.join(self.data_dir, pdb_filename)
-
-                if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
-                    url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
-                    print(url)
-                    headers = {'accept': '*/*'}
-
-                    response = self.api_client.perform_get_request(url, headers=headers)
-                    if response:
-                        # Download and save the response content to a file
-                        self.api_client.download_response_content(response, tar_gz_file)
-                        print(f"Downloaded file {tar_gz_filename} from PED.")
-                else:
-                    print("File already exists. Skipping download.")
-
-                # Extract the .tar.gz file
-                if not os.path.exists(pdb_file):
-                    extract_tar_gz(tar_gz_file, self.data_dir, pdb_filename)
-                    print(f"Extracted file {pdb_filename}.")
-                else:
-                    print("File already exists. Skipping extraction.")
-            else:
+            if not match:
                 print(f"Entry {ens_code} does not match the pattern and will be skipped.")
+                continue
+            
+            ped_id = match.group(1)
+            ensemble_id = match.group(2)
+            tar_gz_filename = f'{ens_code}.tar.gz'
+            tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
 
+            pdb_filename = f'{ens_code}.pdb'
+            pdb_file = os.path.join(self.data_dir, pdb_filename)
+
+            if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
+                url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
+                print(f"Downloading entry {ens_code} from PED.")
+                headers = {'accept': '*/*'}
+
+                response = self.api_client.perform_get_request(url, headers=headers)
+                if response:
+                    # Download and save the response content to a file
+                    self.api_client.download_response_content(response, tar_gz_file)
+                    print(f"Downloaded file {tar_gz_filename} from PED.")
+            else:
+                print(f"Ensemble {ens_code} already downloaded. Skipping.")
+
+            # Extract the .tar.gz file
+            if not os.path.exists(pdb_file):
+                extract_tar_gz(tar_gz_file, self.data_dir, pdb_filename)
+                print(f"Extracted file {pdb_filename}.")
+            else:
+                print(f"File {pdb_filename} already exists. Skipping extraction.")
     
     def download_from_atlas(self):
         """ Automate Downloading MD ensembles from
@@ -125,12 +124,24 @@ class EnsembleAnalysis:
         print("Analysing ensembles:", self.ens_codes)
 
     def download_from_database(self, database: str =None):
-        """ Download ensembles from databases
+        """ 
+        Download ensembles from databases.
 
-        Parameter
-        ---------
-        databse : str
-        Choose the database you want to download from ('ped'/'atlas')
+        Parameters
+        ----------
+        database : str
+            Choose the database you want to download from ('ped'/'atlas').
+
+        Note
+        ----
+        For PED database:
+            Ensembles must be provided in the PED ID format, which consists of a string starting with 'PED'
+            followed by a numeric identifier and 'e' followed by another numeric identifier.
+            Example: 'PED00423e001', 'PED00424e001'
+
+        For atlas database:
+            Ensembles must be provided as PDB IDs with an optional chain identifier separated by an underscore.
+            Example: '3a1g_B'
         """
         if database == "ped":
             self.download_from_ped()
@@ -138,11 +149,19 @@ class EnsembleAnalysis:
             self.download_from_atlas()
 
     def generate_trajectories(self):
-
         """
-        Loading trajectory files on to mdtraj object.
-        if only pdb files exist, the function makes dcd and 
-        topology files for fast loading next time.
+        Load trajectory files into mdtraj objects.
+        
+        Supported file formats:
+        1. [ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)
+        2. [ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)
+        3. [ens_code].pdb
+        4. Directory [ens_code] containing several .pdb files
+        
+        For each ensemble code (ens_code):
+            - If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.
+            - If only a .pdb file exists, generate trajectory and topology files from the .pdb file.
+            - If a directory [ens_code] exists containing .pdb files, generate trajectory and topology files from the directory.
         """
         for ens_code in self.ens_codes:
             pdb_filename = f'{ens_code}.pdb'
