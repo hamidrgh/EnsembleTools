@@ -34,14 +34,13 @@ class EnsembleAnalysis:
         """Automate Downloading ensembles
         using PED API 
         """
-        # Define the pattern
-        pattern = r'^(PED\d{5})(e\d{3})$'
+        ped_pattern = r'^(PED\d{5})(e\d{3})$'
 
         # Filter the ens_codes list using regex
         for ens_code in self.ens_codes:
-            match = re.match(pattern, ens_code)
+            match = re.match(ped_pattern, ens_code)
             if not match:
-                print(f"Entry {ens_code} does not match the pattern and will be skipped.")
+                print(f"Entry {ens_code} does not match the PED ID pattern and will be skipped.")
                 continue
             
             ped_id = match.group(1)
@@ -76,8 +75,14 @@ class EnsembleAnalysis:
         """ Automate Downloading MD ensembles from
         Atlas. 
         """
+        pdb_pattern = r'^\d\w{3}_[A-Z]$'
         new_ens_codes_mapping = {}
         for ens_code in self.ens_codes:
+
+            if not re.match(pdb_pattern, ens_code):
+                print(f"Entry {ens_code} does not match the PDB ID pattern and will be skipped.")
+                continue
+
             zip_filename = f'{ens_code}.zip'
             zip_file = os.path.join(self.data_dir, zip_filename)
 
