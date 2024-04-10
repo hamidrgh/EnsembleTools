@@ -140,7 +140,7 @@ class DimenFixReduction(DimensionalityReduction):
             )
 
 class MDSReduction(DimensionalityReduction):
-    def __init__(self, num_dim:int):
+    def __init__(self, num_dim:int=2):
         self.num_dim = num_dim
 
     def fit(self, data:np.ndarray):

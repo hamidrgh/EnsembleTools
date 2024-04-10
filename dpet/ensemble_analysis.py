@@ -305,6 +305,8 @@ class EnsembleAnalysis:
         return concat_features
 
     def fit_dimensionality_reduction(self, method: str, fit_on:list[str]=None, *args, **kwargs):
+        if method == "tsne" and self.featurization != "phi_psi":
+            raise ValueError("t-SNE reduction is only valid with phi_psi feature extraction.")
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
         if method in ("pca","kpca"):
@@ -641,14 +643,13 @@ class EnsembleAnalysis:
     #------------- Functions for generating PDF reports -------------------
     #----------------------------------------------------------------------
 
-    def generate_tsne_report(self):
-        generate_tsne_report(self)
-        
-    def generate_dimenfix_report(self):
-        generate_dimenfix_report(self)
-
-    def generate_pca_report(self):
-        generate_pca_report(self)
-
     def generate_custom_report(self):
         generate_custom_report(self)
+
+    def generate_report(self):
+        if self.reduce_dim_method == "tsne":
+            generate_tsne_report(self)
+        if self.reduce_dim_method == "dimenfix":
+            generate_dimenfix_report(self)
+        if self.reduce_dim_method == "pca":
+            generate_pca_report(self)
