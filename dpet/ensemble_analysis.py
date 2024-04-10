@@ -31,17 +31,22 @@ class EnsembleAnalysis:
             self.api_client.close_session()
     
     def download_from_ped(self):
-        """Automate Downloading ensembles
-        using PED API 
         """
-        # Define the pattern
-        pattern = r'^(PED\d{5})(e\d{3})$'
+        Automate Downloading ensembles using PED API 
+
+        Note
+        ----
+        The function only downloads ensembles in the PED ID format, which consists of a string starting with 'PED'
+        followed by a numeric identifier and 'e' followed by another numeric identifier.
+        Example: 'PED00423e001', 'PED00424e001'
+        """
+        ped_pattern = r'^(PED\d{5})(e\d{3})$'
 
         # Filter the ens_codes list using regex
         for ens_code in self.ens_codes:
-            match = re.match(pattern, ens_code)
+            match = re.match(ped_pattern, ens_code)
             if not match:
-                print(f"Entry {ens_code} does not match the pattern and will be skipped.")
+                print(f"Entry {ens_code} does not match the PED ID pattern and will be skipped.")
                 continue
             
             ped_id = match.group(1)
@@ -73,11 +78,21 @@ class EnsembleAnalysis:
                 print(f"File {pdb_filename} already exists. Skipping extraction.")
     
     def download_from_atlas(self):
-        """ Automate Downloading MD ensembles from
-        Atlas. 
+        """ Automate Downloading MD ensembles from Atlas. 
+
+        Note:
+        ----
+        The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
+        Example: '3a1g_B'
         """
-        new_ens_codes = []
+        pdb_pattern = r'^\d\w{3}_[A-Z]$'
+        new_ens_codes_mapping = {}
         for ens_code in self.ens_codes:
+
+            if not re.match(pdb_pattern, ens_code):
+                print(f"Entry {ens_code} does not match the PDB ID pattern and will be skipped.")
+                continue
+
             zip_filename = f'{ens_code}.zip'
             zip_file = os.path.join(self.data_dir, zip_filename)
 
@@ -87,40 +102,43 @@ class EnsembleAnalysis:
                 headers = {'accept': '*/*'}
 
                 response = self.api_client.perform_get_request(url, headers=headers)
-                if response:
-                    # Download and save the response content to a file
-                    self.api_client.download_response_content(response, zip_file)
-                    print(f"Downloaded file {zip_filename} from Atlas.")
+                if not response:
+                    continue
+                # Download and save the response content to a file
+                self.api_client.download_response_content(response, zip_file)
+                print(f"Downloaded file {zip_filename} from Atlas.")
             else:
                 print("File already exists. Skipping download.")
 
-            # Unzip.
             with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                # Map reps to original ensemble code
+                zip_contents = zip_ref.namelist()
+                new_ens_codes = [fname.split('.')[0] for fname in zip_contents if fname.endswith('.xtc')]
+                new_ens_codes_mapping[ens_code] = new_ens_codes
+                # Unzip
                 zip_ref.extractall(self.data_dir)
                 print(f"Extracted file {zip_file}.")
 
-                # Remove unused files.
-                for unused_path in self.data_dir.glob("*.tpr"):
-                    os.remove(unused_path)
-                os.remove(self.data_dir / "README.txt")
-                # os.remove(zip_file) # Keep the zip file to avoid downloading again
+            # Remove unused files.
+            for unused_path in self.data_dir.glob("*.tpr"):
+                os.remove(unused_path)
+            os.remove(os.path.join(self.data_dir, "README.txt"))
 
-        # Collect xtc files for updating ens_codes
-        new_ens_codes = ([f.stem for f in self.data_dir.glob("*.xtc")])
-
-        # Copy and rename toplogy files to new ensemble codes
-        for ens_code in self.ens_codes:
-            pdb_file = os.path.join(self.data_dir,f"{ens_code}.pdb")
-            for new_ens_code in new_ens_codes:
-                if new_ens_code.__contains__(ens_code):
-                    new_pdb_file = os.path.join(self.data_dir,f"{new_ens_code}.top.pdb")
-                    shutil.copy(pdb_file, new_pdb_file)
-                    print(f"Copied and renamed {pdb_file} to {new_pdb_file}.")
+            # Copy and rename topology file
+            old_pdb_file = os.path.join(self.data_dir,f"{ens_code}.pdb")
+            for new_code in new_ens_codes:
+                new_pdb_file = os.path.join(self.data_dir,f"{new_code}.top.pdb")
+                shutil.copy(old_pdb_file, new_pdb_file)
+                print(f"Copied and renamed {old_pdb_file} to {new_pdb_file}.")
             # Delete old topology file
-            os.remove(pdb_file)
+            os.remove(old_pdb_file)
 
-        # Update self.ens_codes
-        self.ens_codes = new_ens_codes
+        # Update self.ens_codes using the mapping
+        updated_ens_codes = []
+        for old_code in self.ens_codes:
+            updated_ens_codes.extend(new_ens_codes_mapping.get(old_code, [old_code]))
+
+        self.ens_codes = updated_ens_codes
         print("Analysing ensembles:", self.ens_codes)
 
     def download_from_database(self, database: str =None):
@@ -135,12 +153,12 @@ class EnsembleAnalysis:
         Note
         ----
         For PED database:
-            Ensembles must be provided in the PED ID format, which consists of a string starting with 'PED'
+            The function only downloads ensembles in the PED ID format, which consists of a string starting with 'PED'
             followed by a numeric identifier and 'e' followed by another numeric identifier.
             Example: 'PED00423e001', 'PED00424e001'
 
         For atlas database:
-            Ensembles must be provided as PDB IDs with an optional chain identifier separated by an underscore.
+            The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
             Example: '3a1g_B'
         """
         if database == "ped":
@@ -162,6 +180,10 @@ class EnsembleAnalysis:
             - If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.
             - If only a .pdb file exists, generate trajectory and topology files from the .pdb file.
             - If a directory [ens_code] exists containing .pdb files, generate trajectory and topology files from the directory.
+
+        Note
+        ----
+        Using 'download_from_database' transforms the downloaded data into the appropriate format.
         """
         for ens_code in self.ens_codes:
             pdb_filename = f'{ens_code}.pdb'
@@ -208,7 +230,7 @@ class EnsembleAnalysis:
     def random_sample_trajectories(self, sample_size: int):
         """
         Sample a defined random number of conformations from the ensemble 
-        trajectroy. 
+        trajectory. 
 
         Parameters
         ----------
@@ -219,6 +241,8 @@ class EnsembleAnalysis:
 
     def _random_sample(self, trajectory:mdtraj.Trajectory, sample_size:int):
         total_frames = len(trajectory)
+        if sample_size > total_frames:
+            raise ValueError("Sample size cannot be larger than the total number of frames in the trajectory.")
         random_indices = np.random.choice(total_frames, size=sample_size, replace=False)
         subsampled_traj = mdtraj.Trajectory(
             xyz=trajectory.xyz[random_indices],
@@ -232,7 +256,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         featurization: str 
-        Choose between "phi_psi", "ca_dist" and "a_angle"
+        Choose between "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi"
 
         normalize: Bool
         if featurization is "ca_dist" normalize True will normalize the distances based on the mean and standard deviation.
@@ -245,6 +269,7 @@ class EnsembleAnalysis:
             self._normalize_data()
 
     def _extract_features(self, featurization: str, *args, **kwargs):
+        # Get names only for the first ensemble
         get_names = True
         self.featurization = featurization
         for ens_code, trajectory in self.trajectories.items():
@@ -326,6 +351,18 @@ class EnsembleAnalysis:
         return concat_features
 
     def fit_dimensionality_reduction(self, method: str, fit_on:list[str]=None, *args, **kwargs):
+        """
+        Perform dimensionality reduction on the extracted features. The options are "pca", "tsne", "dimenfix", "mds" and "kpca".
+
+        Parameters
+        ----------
+        method: str 
+        Choose between pca", "tsne", "dimenfix", "mds" and "kpca".
+
+        fit_on: list[str]
+        if method is "pca" or "kpca" the fit_on parameter specifies on which ensembles the models should be fit. 
+        The model will then be used to transform all ensembles.
+        """
         if method == "tsne" and self.featurization != "phi_psi":
             raise ValueError("t-SNE reduction is only valid with phi_psi feature extraction.")
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
@@ -341,7 +378,30 @@ class EnsembleAnalysis:
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
 
-    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None) -> None:
+    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None):
+        """
+        Executes the data analysis pipeline end-to-end. The pipeline includes:
+        1. Download from database (optional)
+        2. Generate trajectories
+        3. Sample a random number of conformations from trajectories (optional)
+        4. Perform feature extraction
+        5. Perform dimensionality reduction
+
+        Parameters
+        ----------
+        featurization_params: dict
+            Parameters for feature extraction. The only required parameter is "featurization",
+            which can be "phi_psi", "ca_dist", "a_angle", "tr_omega" or "tr_phi". 
+            Other method-specific parameters are optional.
+        reduce_dim_params: dict
+            Parameters for dimensionality reduction. The only required parameter is "method",
+            which can be "pca", "tsne", "dimenfix", "mds" or "kpca".
+        database: str
+            Optional parameter that specifies the database from which the entries should be downloaded.
+            Options are "ped" and "atlas".
+        subsample_size: int
+            Optional parameter that specifies the trajectory subsample size.
+        """
         self.download_from_database(database)
         self.generate_trajectories()
         if subsample_size is not None:
