@@ -423,10 +423,9 @@ class EnsembleAnalysis:
         save: bool
         If True the plot will save 
         """
-        # if featurization_option != "phi_psi": (This control step should be added)
-            # it should raise an error
         if self.reduce_dim_method != "tsne" or self.featurization != "phi_psi":
-            raise ValueError("This analysis is only valid for t-SNE reduction with phi_psi feature extraction.")
+            print("This analysis is only valid for t-SNE reduction with phi_psi feature extraction.")
+            return
         visualization.tsne_ramachandran_plot_density(self, save)
 
     def tsne_scatter_plot(self, save:bool=False):
