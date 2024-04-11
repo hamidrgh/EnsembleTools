@@ -3,6 +3,8 @@ import numpy as np
 import mdtraj
 from dpet.featurization.utils import get_triu_indices
 
+ca_selector = "protein and name C"
+ca_selector_cg = "protein"
 
 #------------------------------------------
 # Commonly used protein structure angles. -
@@ -34,9 +36,10 @@ def featurize_phi_psi(
         return phi_psi
 
 
-def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True):
+def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True, coarse_grained = False):
     # Get all C-alpha indices.
-    ca_ids = traj.topology.select("protein and name CA")
+    selector = ca_selector_cg if coarse_grained else ca_selector
+    ca_ids = traj.topology.select(selector)
     atoms = list(traj.topology.atoms)
     # Get all pair of ids.
     tors_ids = []

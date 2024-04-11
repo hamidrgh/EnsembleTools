@@ -312,6 +312,7 @@ class EnsembleAnalysis:
             return featurize_a_angle(
                 traj=trajectory, 
                 get_names=get_names, 
+                coarse_grained=coarse_grained,
                 *args, **kwargs)
         elif featurization == "tr_omega":
             return featurize_tr_angle(
