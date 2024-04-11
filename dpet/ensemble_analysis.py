@@ -331,7 +331,8 @@ class EnsembleAnalysis:
     def _calculate_rg_for_trajectory(self, trajectory:mdtraj.Trajectory):
         return [mdtraj.compute_rg(frame) for frame in trajectory]
 
-    def rg_calculator(self):
+    @property
+    def rg(self):
         """
         Calculates Rg for each conformations in the loaded ensembles.
         The returned values are in Angstrom.  
@@ -363,8 +364,6 @@ class EnsembleAnalysis:
         if method is "pca" or "kpca" the fit_on parameter specifies on which ensembles the models should be fit. 
         The model will then be used to transform all ensembles.
         """
-        if method == "tsne" and self.featurization != "phi_psi":
-            raise ValueError("t-SNE reduction is only valid with phi_psi feature extraction.")
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
         if method in ("pca","kpca"):
@@ -426,6 +425,8 @@ class EnsembleAnalysis:
         """
         # if featurization_option != "phi_psi": (This control step should be added)
             # it should raise an error
+        if self.reduce_dim_method != "tsne" or self.featurization != "phi_psi":
+            raise ValueError("This analysis is only valid for t-SNE reduction with phi_psi feature extraction.")
         visualization.tsne_ramachandran_plot_density(self, save)
 
     def tsne_scatter_plot(self, save:bool=False):

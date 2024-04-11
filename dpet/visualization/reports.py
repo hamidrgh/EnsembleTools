@@ -7,9 +7,10 @@ from dpet.visualization.visualization import PLOT_DIR, pca_cumulative_explained_
 def generate_tsne_report(analysis):
     pdf_file_path = os.path.join(analysis.data_dir, PLOT_DIR, 'tsne.pdf')
     with PdfPages(pdf_file_path) as pdf:
-        fig = tsne_ramachandran_plot_density(analysis, False)
-        pdf.savefig(fig)
-        plt.close(fig)
+        if analysis.featurization == "phi_psi":
+            fig = tsne_ramachandran_plot_density(analysis, False)
+            pdf.savefig(fig)
+            plt.close(fig)
 
         fig = tsne_scatter_plot(analysis, False)
         pdf.savefig(fig)
