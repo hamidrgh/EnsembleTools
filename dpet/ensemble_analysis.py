@@ -281,6 +281,8 @@ class EnsembleAnalysis:
             self._normalize_data()
 
     def _extract_features(self, featurization: str, *args, **kwargs):
+        if featurization in ("phi_psi", "tr_omega") and self.coarse_grained:
+            raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         # Get names only for the first ensemble
         get_names = True
         self.featurization = featurization
@@ -301,6 +303,7 @@ class EnsembleAnalysis:
             return featurize_ca_dist(
                 traj=trajectory, 
                 get_names=get_names, 
+                coarse_grained=self.coarse_grained, 
                 *args, **kwargs)
         elif featurization == "phi_psi":
             return featurize_phi_psi(

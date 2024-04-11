@@ -9,7 +9,8 @@ from dpet.featurization.utils import get_max_sep
 # Calculate (N, L, L) distance maps. Mostly used for visualization. -
 #--------------------------------------------------------------------
 
-ca_selector = "protein and name CA"
+ca_selector = "protein and name C"
+ca_selector_cg = "protein"
 
 def _calc_dmap(traj: mdtraj.Trajectory):
     ca_ids = traj.topology.select(ca_selector)
@@ -36,10 +37,13 @@ def _featurize_dist(
         min_sep: int = 2,
         max_sep: Union[None, int, float] = None,
         inverse: bool = False,
-        get_names: bool = True
+        get_names: bool = True,
+        coarse_grained: bool = False
     ):
     # Get all C-alpha indices.
-    ca_ids = traj.topology.select(ca_selector)
+    selector = ca_selector_cg if coarse_grained else ca_selector
+    print("selector:",selector)
+    ca_ids = traj.topology.select(selector)
     atoms = list(traj.topology.atoms)
     max_sep = get_max_sep(L=len(atoms), max_sep=max_sep)
     # Get all pair of ids.
@@ -69,22 +73,26 @@ def featurize_ca_dist(
         min_sep: int = 2,
         max_sep: int = None,
         inverse: bool = False,
-        get_names: bool = True):
+        get_names: bool = True,
+        coarse_grained: bool = False):
     return _featurize_dist(traj=traj,
                            min_sep=min_sep,
                            max_sep=max_sep,
                            inverse=inverse,
-                           get_names=get_names)
+                           get_names=get_names,
+                           coarse_grained = coarse_grained)
 
 def featurize_com_dist(
         traj: mdtraj.Trajectory,
         min_sep: int = 2,
         max_sep: int = None,
         inverse: bool = False,
-        get_names: bool = True):
+        get_names: bool = True,
+        coarse_grained: bool = False):
     traj = slice_traj_to_com(traj)
     return _featurize_dist(traj=traj,
                            min_sep=min_sep,
                            max_sep=max_sep,
                            inverse=inverse,
-                           get_names=get_names)
+                           get_names=get_names,
+                           coarse_grained=coarse_grained)
