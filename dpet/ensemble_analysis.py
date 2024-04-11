@@ -620,7 +620,7 @@ class EnsembleAnalysis:
         The maximum amount for distance the default value is 6.8
         use_ylabel: bool
         """
-        visualization.plot_average_dmap_comparison(self.trajectories, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
+        visualization.plot_average_dmap_comparison(self.trajectories, self.coarse_grained, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
 
     def plot_cmap_comparison(self,
                             title:str,
@@ -709,7 +709,7 @@ class EnsembleAnalysis:
         bins : int
         The number of bins for bar plot 
         """
-        visualization.plot_alpha_angles_dist(self.trajectories, bins)
+        visualization.plot_alpha_angles_dist(self.trajectories, self.coarse_grained, bins)
 
     def plot_contact_prob(self,title:str, threshold:float=0.8, dpi:int=96):
         """
@@ -785,7 +785,7 @@ class EnsembleAnalysis:
         You can change the size oof the figure here using a tuple. 
         """
 
-        visualization.plot_ss_order_parameter(self.trajectories, pointer, figsize)
+        visualization.plot_ss_order_parameter(self.trajectories, self.coarse_grained, pointer, figsize)
 
     #----------------------------------------------------------------------
     #------------- Functions for generating PDF reports -------------------

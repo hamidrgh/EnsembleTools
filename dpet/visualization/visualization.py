@@ -11,6 +11,8 @@ from dpet.visualization.coord import *
 from scipy.stats import gaussian_kde
 
 PLOT_DIR = "plots"
+ca_selector = "protein and name C"
+ca_selector_cg = "protein"
 
 def tsne_ramachandran_plot_density(analysis, save=False):
     """
@@ -576,8 +578,9 @@ def trajectories_plot_prolateness(trajectories):
     plt.show()
 '''
 
-def plot_alpha_angle_dihederal(analysis, bins=50, atom_selector='protein and name CA', save=False):
+def plot_alpha_angle_dihederal(analysis, bins=50, save=False):
     for ens in analysis.trajectories:
+        atom_selector = ca_selector_cg if analysis.coarse_grained[ens] else ca_selector
         four_cons_indices_ca = create_consecutive_indices_matrix(analysis.trajectories[ens].topology.select(atom_selector) )
         ens_dh_ca = mdtraj.compute_dihedrals(analysis.trajectories[ens], four_cons_indices_ca).ravel()
         plt.hist(ens_dh_ca, bins=bins, histtype="step", density=True, label=ens)
@@ -654,29 +657,33 @@ def trajectories_plot_rg_comparison(trajectories, n_bins=50, bins_range=(1, 4.5)
     plt.tight_layout()
     plt.show()
 
-def get_distance_matrix_ens_dict(trajectories):
+def get_distance_matrix_ens_dict(trajectories, coarse_grained):
     distance_matrix_ens_dict = {}
     for ens in trajectories:
-        xyz_ens = trajectories[ens].xyz[:,trajectories[ens].topology.select("protein and name CA")]
+        selector = ca_selector_cg if coarse_grained[ens] else ca_selector
+        xyz_ens = trajectories[ens].xyz[:,trajectories[ens].topology.select(selector)]
         distance_matrix_ens_dict[ens] = get_distance_matrix(xyz_ens)
     return distance_matrix_ens_dict
 
-def get_contact_ens_dict(trajectories):
+def get_contact_ens_dict(trajectories, coarse_grained):
     distance_matrix_ens_dict = {}
     contact_ens_dict = {}
     for ens in trajectories:
-        xyz_ens = trajectories[ens].xyz[:,trajectories[ens].topology.select("protein and name CA")]
+        selector = ca_selector_cg if coarse_grained[ens] else ca_selector
+        xyz_ens = trajectories[ens].xyz[:,trajectories[ens].topology.select(selector)]
         distance_matrix_ens_dict[ens] = get_distance_matrix(xyz_ens)
         contact_ens_dict[ens] = get_contact_map(distance_matrix_ens_dict[ens])
     return contact_ens_dict
 
-def plot_average_dmap_comparison(trajectories, ticks_fontsize=14,
+def plot_average_dmap_comparison(trajectories, 
+                                 coarse_grained, 
+                                 ticks_fontsize=14,
                                  cbar_fontsize=14,
                                  title_fontsize=14,
                                  dpi=96,
                                  max_d=6.8,
                                  use_ylabel=True):
-    ens_dict = get_distance_matrix_ens_dict(trajectories)
+    ens_dict = get_distance_matrix_ens_dict(trajectories, coarse_grained)
     num_proteins = len(ens_dict)
     cols = 2  # Number of columns for subplots
     rows = (num_proteins + cols - 1) // cols
@@ -852,9 +859,9 @@ def plot_prolateness_dist(trajectories, bins= 50, violin_plot= True, median=Fals
         plt.legend()
         plt.show()
 
-def plot_alpha_angles_dist(trajectories, bins =50):
+def plot_alpha_angles_dist(trajectories, coarse_grained, bins =50):
     for ens in trajectories:
-        plt.hist(featurize_a_angle(trajectories[ens], get_names=False).ravel(), bins=bins, histtype="step", density=False, label=ens)
+        plt.hist(featurize_a_angle(trajectories[ens], get_names=False, coarse_grained=coarse_grained[ens]).ravel(), bins=bins, histtype="step", density=False, label=ens)
         
     plt.title("the distribution of dihedral angles between four consecutive Cα beads.")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -937,10 +944,11 @@ def plot_ss_measure_disorder( featurized_data: dict, pointer: list = None, figsi
             axes.axvline(x= res, c= 'blue', linestyle= '--', alpha= 0.3, linewidth= 1)
     plt.show()
         
-def plot_ss_order_parameter(trajectories, pointer:list= None , figsize=(15,5) ): 
+def plot_ss_order_parameter(trajectories, coarse_grained, pointer:list= None , figsize=(15,5) ): 
     dict_ca_xyz = {}
     for ens in trajectories:
-        ca_index= trajectories[ens].topology.select('name == CA')
+        selector = ca_selector_cg if coarse_grained[ens] else ca_selector
+        ca_index= trajectories[ens].topology.select(selector)
         dict_ca_xyz[ens] = trajectories[ens].xyz[:,ca_index,:]
 
     dict_order_parameter = site_specific_order_parameter(dict_ca_xyz)
