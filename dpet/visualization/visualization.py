@@ -784,6 +784,7 @@ def plot_asphericity_dist(trajectories, bins = 50, violin_plot = True, means = T
         plt.show()
     else:
         for ens in trajectories:
+            asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
             plt.hist(asphericity, label=ens, bins=bins, edgecolor = 'black', density=True)
         plt.title("Asphericity distribution")        
         plt.legend()
@@ -842,7 +843,8 @@ def plot_contact_prob(trajectories,title,threshold = 0.8,dpi = 96):
         fig.delaxes(axes.flatten()[i])
     
     plt.tight_layout()
-    plt.suptitle(title, fontsize=14)
+    fig.suptitle(title, fontsize=14)
+    fig.subplots_adjust(top=0.91)
     plt.show()
 
 def plot_ramachandran_plot(trajectories, two_d_hist= True, linespaces = (-180, 180, 80)):

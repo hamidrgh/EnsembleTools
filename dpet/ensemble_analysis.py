@@ -692,7 +692,7 @@ class EnsembleAnalysis:
         figsize:tuple
         You can change the size oof the figure here using a tuple. 
         """
-        self.extract_features("phi_psi") # extract phi_psi features to calculate this score
+        self._extract_features("phi_psi") # extract phi_psi features to calculate this score
         feature_dict = self.featurized_data # provide feature dictionary for plot function
         visualization.plot_ss_measure_disorder(feature_dict, pointer, figsize)
 

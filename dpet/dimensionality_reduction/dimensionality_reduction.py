@@ -106,7 +106,7 @@ class TSNEReduction(DimensionalityReduction):
 
 
 class DimenFixReduction(DimensionalityReduction):
-    def __init__(self, range_n_clusters = range(1,10,1)) -> None:
+    def __init__(self, range_n_clusters = range(2,10,1)) -> None:
         self.range_n_clusters = range_n_clusters
 
     def fit(self, data):
