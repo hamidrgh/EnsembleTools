@@ -635,7 +635,7 @@ class EnsembleAnalysis:
     def plot_distance_distribution_multiple(self, dpi:int=96):
         visualization.plot_distance_distribution_multiple(self.trajectories, dpi)
 
-    def end_to_end_distances_plot(self, atom_selector:str="protein and name CA", bins:int=50, violin_plot:bool=True, means:bool=False, median:bool=True):
+    def end_to_end_distances_plot(self, bins:int=50, violin_plot:bool=True, means:bool=False, median:bool=True):
         """
         Plot end-to-end distance distributions. 
 
@@ -655,7 +655,7 @@ class EnsembleAnalysis:
         median: bool
         If True median is showing in the box plot
         """
-        visualization.end_to_end_distances_plot(self.trajectories, atom_selector, bins, violin_plot, means, median)
+        visualization.end_to_end_distances_plot(self.trajectories, self.coarse_grained, bins, violin_plot, means, median)
 
     def plot_asphericity_dist(self, bins:int=50,violin_plot:bool=True, means:bool=False, median:bool=True):
         """

@@ -637,6 +637,10 @@ def trajectories_plot_rg_comparison(trajectories, n_bins=50, bins_range=(1, 4.5)
     bins = np.linspace(bins_range[0], bins_range[1], n_bins + 1)
     fig, ax = plt.subplots(1, n_systems, figsize=(3 * n_systems, 3), dpi=dpi)
     
+    # Ensure ax is always a list
+    if not isinstance(ax, np.ndarray):
+        ax = [ax]
+
     for i, (name_i, rg_i) in enumerate(rg_data_dict.items()):
         ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
         ax[i].set_title(name_i)
@@ -693,7 +697,7 @@ def plot_average_dmap_comparison(trajectories,
     for i, (protein_name, ens_data) in enumerate(ens_dict.items()):
         row = i // cols
         col = i % cols
-        ax = axes[row, col] if num_proteins > 1 else axes[0]
+        ax = axes[row, col]# if num_proteins > 1 else axes[0]
         
         avg_dmap = np.mean(ens_data, axis=0)
         tril_ids = np.tril_indices(avg_dmap.shape[0], 0)
@@ -798,12 +802,13 @@ def plot_distance_distribution_multiple(trajectories, dpi=96):
     plt.tight_layout()
     plt.show()
 
-def end_to_end_distances_plot(trajectories, atom_selector ="protein and name CA", bins = 50, violin_plot = True, means = True, median = True):
-    ca_indices = trajectories[next(iter(trajectories))].topology.select(atom_selector)
+def end_to_end_distances_plot(trajectories, coarse_grained, bins = 50, violin_plot = True, means = True, median = True):
     dist_list = []
     positions = []
     if violin_plot:
         for ens in trajectories:
+            atom_selector = ca_selector_cg if coarse_grained[ens] else ca_selector
+            ca_indices = trajectories[next(iter(trajectories))].topology.select(atom_selector)
             positions.append(ens)
             dist_list.append(mdtraj.compute_distances(trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel())
         plt.violinplot(dist_list, showmeans= means, showmedians= median)
@@ -877,7 +882,7 @@ def plot_contact_prob(trajectories,title,threshold = 0.8,dpi = 96):
     for i, (protein_name, traj) in enumerate(trajectories.items()):
         row = i // cols
         col = i % cols
-        ax = axes[row, col] if num_proteins > 1 else axes
+        ax = axes[row, col] if num_proteins > 1 else axes[0]
 
         matrtix_p_map = contact_probability_map(traj , threshold=threshold)
         im = ax.imshow(matrtix_p_map, cmap=cmap )
