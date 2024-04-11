@@ -585,6 +585,9 @@ class EnsembleAnalysis:
         """
         Plot the relative helix content in each ensemble for each residue. 
         """
+        if any(cg for cg in self.coarse_grained.values()):
+            print("This analysis is not possible with coarse-grained models.")
+            return
         visualization.plot_relative_helix_content(self.trajectories)
 
     def trajectories_plot_rg_comparison(self, n_bins:int=50, bins_range:tuple=(1, 4.5), dpi:int=96):
