@@ -25,6 +25,7 @@ class EnsembleAnalysis:
         plot_dir = os.path.join(self.data_dir, visualization.PLOT_DIR)
         os.makedirs(plot_dir, exist_ok=True)
         self.figures = {}
+        self.coarse_grained = {}
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -230,14 +231,10 @@ class EnsembleAnalysis:
             self.check_coarse_grained()
             
     def check_coarse_grained(self):
-        self.coarse_grained = False
-        for traj in self.trajectories.values():
+        for ens_code, traj in self.trajectories.items():
             topology = traj.topology
-
             atoms = topology.atoms
-            if all(atom.element.symbol == 'C' for atom in atoms):
-                self.coarse_grained = True
-                break
+            self.coarse_grained[ens_code] = all(atom.element.symbol == 'C' for atom in atoms)
 
     def random_sample_trajectories(self, sample_size: int):
         """
@@ -281,29 +278,30 @@ class EnsembleAnalysis:
             self._normalize_data()
 
     def _extract_features(self, featurization: str, *args, **kwargs):
-        if featurization in ("phi_psi", "tr_omega") and self.coarse_grained:
+        if featurization in ("phi_psi", "tr_omega") and any(cg for cg in self.coarse_grained.values()):
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         # Get names only for the first ensemble
         get_names = True
         self.featurization = featurization
         for ens_code, trajectory in self.trajectories.items():
             print(f"Performing feature extraction for Ensemble: {ens_code}.")
+            cg = self.coarse_grained[ens_code]
             if get_names:
-                features, names = self._featurize(featurization, trajectory, get_names, *args, **kwargs)
+                features, names = self._featurize(featurization, trajectory, get_names, cg, *args, **kwargs)
                 get_names = False
             else:
-                features = self._featurize(featurization, trajectory, get_names, *args, **kwargs)
+                features = self._featurize(featurization, trajectory, get_names, cg, *args, **kwargs)
             self.featurized_data[ens_code] = features
             print("Transformed ensemble shape:", features.shape)
         self.feature_names = names
         print("Feature names:", names)
 
-    def _featurize(self, featurization: str, trajectory: mdtraj.Trajectory, get_names: bool, *args, **kwargs):
+    def _featurize(self, featurization: str, trajectory: mdtraj.Trajectory, get_names: bool, coarse_grained:bool = False, *args, **kwargs):
         if featurization == "ca_dist":
             return featurize_ca_dist(
                 traj=trajectory, 
-                get_names=get_names, 
-                coarse_grained=self.coarse_grained, 
+                get_names=get_names,
+                coarse_grained=coarse_grained,
                 *args, **kwargs)
         elif featurization == "phi_psi":
             return featurize_phi_psi(
