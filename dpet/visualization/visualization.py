@@ -17,6 +17,10 @@ def tsne_ramachandran_plot_density(analysis, save=False):
     It gets the ramachadran 2D histogram for the clusters based on the t-SNE
     algorithm when the extracted feature is "phi_psi" 
     """
+
+    if analysis.reduce_dim_method != "tsne" or analysis.featurization != "phi_psi":
+            print("This analysis is only valid for t-SNE reduction with phi_psi feature extraction.")
+            return
     
     rama_bins = 50
     rama_linspace = np.linspace(-180, 180, rama_bins)
@@ -65,6 +69,10 @@ def tsne_scatter_plot(analysis, save=False):
     """
     generate the output for t-sne 
     """
+
+    if analysis.reduce_dim_method != "tsne":
+            print("Analysis is only valid for t-SNE dimensionality reduction.")
+            return
     
     bestclust = analysis.reducer.best_kmeans.labels_
     fig , (ax1, ax2, ax3, ax4) = plt.subplots(1,4, figsize=(14 ,4)) 
@@ -113,6 +121,11 @@ def tsne_scatter_plot(analysis, save=False):
 
     
 def tsne_scatter_plot_rg(analysis, save=False):
+
+    if analysis.reduce_dim_method != "tsne":
+            print("Analysis is only valid for t-SNE dimensionality reduction.")
+            return
+    
     # It plots the same thing as above and could be removed 
     fig, ax = plt.subplots(figsize=(8, 6))
     scatter = ax.scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=analysis.rg, cmap='viridis', alpha=0.5)
@@ -140,6 +153,11 @@ def tsne_scatter_plot_rg(analysis, save=False):
 #     return k
 
 def dimenfix_scatter(analysis, save=False):
+
+    if analysis.reduce_dim_method != "dimenfix":
+            print("Analysis is only valid for dimenfix dimensionality reduction.")
+            return
+    
     fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(14,4))
 
     # scatter original  labels
@@ -279,6 +297,11 @@ def dimenfix_scatter(analysis, save=False):
 #     return fig
 
 def pca_cumulative_explained_variance(analysis, save=False):
+
+    if analysis.reduce_dim_method != "pca":
+            print("Analysis is only valid for pca dimensionality reduction.")
+            return
+    
     fig, ax = plt.subplots()
     ax.plot(np.cumsum(analysis.reduce_dim_model.explained_variance_ratio_) * 100)
     ax.set_xlabel("PCA dimension")
@@ -297,6 +320,11 @@ def set_labels(ax, reduce_dim_method, dim_x, dim_y):
     ax.set_ylabel(f"{reduce_dim_method} dim {dim_y+1}")
 
 def pca_plot_2d_landscapes(analysis, save=False):
+
+    if analysis.reduce_dim_method != "pca":
+            print("Analysis is only valid for pca dimensionality reduction.")
+            return
+
     # 2d scatters.
     dim_x = 0
     dim_y = 1
@@ -345,6 +373,11 @@ def pca_plot_1d_histograms(analysis, save=False):
     # 1d histograms. Looking at the scatter plot above can be misleading
     # to the eye if we want to assess the density of points. Better use
     # an histogram for a precise evaluation.
+
+    if analysis.reduce_dim_method != "pca":
+            print("Analysis is only valid for pca dimensionality reduction.")
+            return
+    
     n_bins = 30
 
     dpi = 120
@@ -383,6 +416,11 @@ def pca_plot_1d_histograms(analysis, save=False):
     return fig
 
 def pca_correlation_plot(num_residues, sel_dims, analysis, save=False):
+
+    if analysis.reduce_dim_method != "pca" or analysis.featurization != "ca_dist":
+            print("Analysis is only valid for pca dimensionality reduction with ca_dist feature extraction.")
+            return
+    
     cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
     norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted
                                           # when analyzing other systems via PCA!
@@ -415,6 +453,11 @@ def pca_correlation_plot(num_residues, sel_dims, analysis, save=False):
 
 
 def pca_rg_correlation(analysis, save=False):
+
+    if analysis.reduce_dim_method != "pca":
+            print("Analysis is only valid for pca dimensionality reduction.")
+            return
+    
     dpi = 120
     fig, ax = plt.subplots(len(analysis.ens_codes), 1, figsize=(3, 3*len(analysis.ens_codes)), dpi=dpi)
     pca_dim = 0

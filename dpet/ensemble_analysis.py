@@ -435,9 +435,7 @@ class EnsembleAnalysis:
         save: bool
         If True the plot will save 
         """
-        if self.reduce_dim_method != "tsne" or self.featurization != "phi_psi":
-            print("This analysis is only valid for t-SNE reduction with phi_psi feature extraction.")
-            return
+        
         visualization.tsne_ramachandran_plot_density(self, save)
 
     def tsne_scatter_plot(self, save:bool=False):
@@ -454,11 +452,7 @@ class EnsembleAnalysis:
         save: Bool \n
         if True the plot will be saved. 
         """
-
-        if self.reduce_dim_method == "tsne":
-            visualization.tsne_scatter_plot(self, save)
-        else:
-            print("Analysis is only valid for t-SNE dimensionality reduction.")
+        visualization.tsne_scatter_plot(self, save)
 
     def tsne_scatter_plot_rg(self, save:bool=False):
         # It plots a redundant plot which implemented in tsne_scatter_plot and could be removed
@@ -498,11 +492,8 @@ class EnsembleAnalysis:
         save: bool \n
         if True it will save the figure
         """
-        if self.reduce_dim_method == "pca":
-            visualization.pca_cumulative_explained_variance(self, save)
-        else:
-            print("Analysis is only valid for PCA dimensionality reduction.")
-
+        visualization.pca_cumulative_explained_variance(self, save)
+    
     def pca_plot_2d_landscapes(self, save:bool=False):
 
         """
@@ -529,10 +520,7 @@ class EnsembleAnalysis:
         visualization.pca_plot_1d_histograms(self, save)
 
     def pca_correlation_plot(self, num_residues:int,sel_dims:list[int]):
-        if self.featurization == "ca_dist":
-            visualization.pca_correlation_plot(num_residues, sel_dims, self)
-        else:
-            print("Analysis is only valid for ca_dist feature extraction.")
+        visualization.pca_correlation_plot(num_residues, sel_dims, self)
     
     def pca_rg_correlation(self, save:bool=False):
         """
