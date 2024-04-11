@@ -226,7 +226,19 @@ class EnsembleAnalysis:
                 return
             # Copy in order to be able to sample multiple times
             self.old_trajectories = self.trajectories.copy()
+            # Check if at least one loaded trajectory is a coarse-grained model
+            self.check_coarse_grained()
             
+    def check_coarse_grained(self):
+        self.coarse_grained = False
+        for traj in self.trajectories.values():
+            topology = traj.topology
+
+            atoms = topology.atoms
+            if all(atom.element.symbol == 'C' for atom in atoms):
+                self.coarse_grained = True
+                break
+
     def random_sample_trajectories(self, sample_size: int):
         """
         Sample a defined random number of conformations from the ensemble 
