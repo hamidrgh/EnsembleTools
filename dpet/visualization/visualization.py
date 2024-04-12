@@ -322,7 +322,7 @@ def set_labels(ax, reduce_dim_method, dim_x, dim_y):
 
 def pca_plot_2d_landscapes(analysis, save=False):
 
-    if analysis.reduce_dim_method != "pca":
+    if analysis.reduce_dim_method not in ("pca","kpca"):
             print("Analysis is only valid for pca dimensionality reduction.")
             return
 
