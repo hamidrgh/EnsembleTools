@@ -1,8 +1,10 @@
 from pathlib import Path
 import re
 import shutil
+from typing import Dict
 import zipfile
 from dpet.api_client import APIClient
+from dpet.ensemble import Ensemble
 from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi, featurize_tr_angle
 from dpet.featurization.distances import featurize_ca_dist
 from dpet.visualization.reports import generate_custom_report, generate_dimenfix_report, generate_pca_report, generate_tsne_report
@@ -17,15 +19,13 @@ class EnsembleAnalysis:
     def __init__(self, ens_codes:list[str], data_dir:str):
         self.data_dir = Path(data_dir)
         self.api_client = APIClient()
-        self.trajectories = {}
         self.feature_names = []
-        self.featurized_data = {}
         self.all_labels = []
         self.ens_codes = ens_codes
         plot_dir = os.path.join(self.data_dir, visualization.PLOT_DIR)
         os.makedirs(plot_dir, exist_ok=True)
         self.figures = {}
-        self.coarse_grained = {}
+        self.ensembles: Dict[str, Ensemble] = {}
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -187,55 +187,11 @@ class EnsembleAnalysis:
         Using 'download_from_database' transforms the downloaded data into the appropriate format.
         """
         for ens_code in self.ens_codes:
-            pdb_filename = f'{ens_code}.pdb'
-            pdb_file = os.path.join(self.data_dir, pdb_filename)
-            traj_dcd = os.path.join(self.data_dir, f'{ens_code}.dcd')
-            traj_xtc = os.path.join(self.data_dir, f'{ens_code}.xtc')
-            traj_top = os.path.join(self.data_dir, f'{ens_code}.top.pdb')
+            ensemble = Ensemble(ens_code, self.data_dir)
+            ensemble.load_trajectory()
+            ensemble.check_coarse_grained()
+            self.ensembles[ens_code] = ensemble
             
-            ens_dir = os.path.join(self.data_dir, ens_code)
-
-            if os.path.exists(traj_dcd) and os.path.exists(traj_top):
-                print(f'Trajectory already exists for ensemble {ens_code}. Loading trajectory.')
-                trajectory = mdtraj.load(traj_dcd, top=traj_top)
-                self.trajectories[ens_code] = trajectory
-            elif os.path.exists(traj_xtc) and os.path.exists(traj_top):
-                print(f'Trajectory already exists for ensemble {ens_code}. Loading trajectory.')
-                trajectory = mdtraj.load(traj_xtc, top=traj_top)
-                self.trajectories[ens_code] = trajectory
-            elif os.path.exists(pdb_file):
-                print(f'Generating trajectory from PDB file: {pdb_file}.')
-                trajectory = mdtraj.load(pdb_file)
-                print(f'Saving trajectory.')
-                trajectory.save(traj_dcd)
-                trajectory[0].save(traj_top)
-                self.trajectories[ens_code] = trajectory
-            elif os.path.exists(ens_dir):
-                files_in_dir = [f for f in os.listdir(ens_dir) if f.endswith('.pdb')]
-                if files_in_dir:
-                    full_paths = [os.path.join(ens_dir, file) for file in files_in_dir]
-                    print(f'Generating trajectory from directory: {ens_dir}.')
-                    trajectory = mdtraj.load(full_paths)
-                    print(f'Saving trajectory.')
-                    trajectory.save(traj_dcd)
-                    trajectory[0].save(traj_top)
-                    self.trajectories[ens_code] = trajectory
-                else:
-                    print(f"No DCD files found in directory: {ens_dir}")
-            else:
-                print(f"File or directory for ensemble {ens_code} doesn't exist.")
-                return
-            # Copy in order to be able to sample multiple times
-            self.old_trajectories = self.trajectories.copy()
-            # Check if at least one loaded trajectory is a coarse-grained model
-            self.check_coarse_grained()
-            
-    def check_coarse_grained(self):
-        for ens_code, traj in self.trajectories.items():
-            topology = traj.topology
-            atoms = topology.atoms
-            self.coarse_grained[ens_code] = all(atom.element.symbol == 'C' for atom in atoms)
-
     def random_sample_trajectories(self, sample_size: int):
         """
         Sample a defined random number of conformations from the ensemble 
@@ -246,17 +202,8 @@ class EnsembleAnalysis:
         sample_size: int
         Number of conformations sampled from the ensemble. 
         """
-        self.trajectories = {ensemble_id: self._random_sample(traj, sample_size) for ensemble_id, traj in self.old_trajectories.items()}
-
-    def _random_sample(self, trajectory:mdtraj.Trajectory, sample_size:int):
-        total_frames = len(trajectory)
-        if sample_size > total_frames:
-            raise ValueError("Sample size cannot be larger than the total number of frames in the trajectory.")
-        random_indices = np.random.choice(total_frames, size=sample_size, replace=False)
-        subsampled_traj = mdtraj.Trajectory(
-            xyz=trajectory.xyz[random_indices],
-            topology=trajectory.topology)
-        return subsampled_traj
+        for ensemble in self.ensembles.values():
+            ensemble.random_sample_trajectory(sample_size)
 
     def perform_feature_extraction(self, featurization: str, normalize: bool = False, *args, **kwargs):
         """
@@ -278,69 +225,27 @@ class EnsembleAnalysis:
             self._normalize_data()
 
     def _extract_features(self, featurization: str, *args, **kwargs):
-        if featurization in ("phi_psi", "tr_omega", "tr_phi") and any(cg for cg in self.coarse_grained.values()):
+        if featurization in ("phi_psi", "tr_omega", "tr_phi") and any(ensemble.coarse_grained for ensemble in self.ensembles.values()):
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         # Get names only for the first ensemble
-        get_names = True
         self.featurization = featurization
-        for ens_code, trajectory in self.trajectories.items():
-            print(f"Performing feature extraction for Ensemble: {ens_code}.")
-            cg = self.coarse_grained[ens_code]
-            if get_names:
-                features, names = self._featurize(featurization, trajectory, get_names, cg, *args, **kwargs)
-                get_names = False
-            else:
-                features = self._featurize(featurization, trajectory, get_names, cg, *args, **kwargs)
-            self.featurized_data[ens_code] = features
-            print("Transformed ensemble shape:", features.shape)
-        self.feature_names = names
-        print("Feature names:", names)
-
-    def _featurize(self, featurization: str, trajectory: mdtraj.Trajectory, get_names: bool, coarse_grained:bool = False, *args, **kwargs):
-        if featurization == "ca_dist":
-            return featurize_ca_dist(
-                traj=trajectory, 
-                get_names=get_names,
-                coarse_grained=coarse_grained,
-                *args, **kwargs)
-        elif featurization == "phi_psi":
-            return featurize_phi_psi(
-                traj=trajectory, 
-                get_names=get_names, 
-                *args, **kwargs)
-        elif featurization == "a_angle":
-            return featurize_a_angle(
-                traj=trajectory, 
-                get_names=get_names, 
-                coarse_grained=coarse_grained,
-                *args, **kwargs)
-        elif featurization == "tr_omega":
-            return featurize_tr_angle(
-                traj=trajectory,
-                type="omega",
-                get_names=get_names,
-                *args, **kwargs)
-        elif featurization == "tr_phi":
-            return featurize_tr_angle(
-                traj=trajectory,
-                type="phi",
-                get_names=get_names,
-                *args, **kwargs)
-        else:
-            raise NotImplementedError("Unsupported feature extraction method.")
+        for ensemble in self.ensembles.values():
+            ensemble.extract_features(featurization, *args, **kwargs)
+        self.feature_names = list(self.ensembles.values())[0].names
+        print("Feature names:", self.feature_names)
 
     def _create_all_labels(self):
         self.all_labels = []
-        for label, data_points in self.featurized_data.items():
-            num_data_points = len(data_points)
-            self.all_labels.extend([label] * num_data_points)
+        for ens_id, ensemble in self.ensembles.items():
+            num_data_points = len(ensemble.features)
+            self.all_labels.extend([ens_id] * num_data_points)
 
     def _normalize_data(self):
         mean = self.concat_features.mean(axis=0)
         std = self.concat_features.std(axis=0)
         self.concat_features = (self.concat_features - mean) / std
-        for label, features in self.featurized_data.items():
-            self.featurized_data[label] = (features - mean) / std
+        for ensemble in self.ensembles.values():
+            ensemble.normalize_features(mean, std)
 
     def _calculate_rg_for_trajectory(self, trajectory:mdtraj.Trajectory):
         return [mdtraj.compute_rg(frame) for frame in trajectory]
@@ -352,7 +257,8 @@ class EnsembleAnalysis:
         The returned values are in Angstrom.  
         """
         rg_values_list = []
-        for traj in self.trajectories.values():
+        for ensemble in self.ensembles.values():
+            traj = ensemble.trajectory
             rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
         return [item[0] * 10 for item in rg_values_list]
 
@@ -360,7 +266,7 @@ class EnsembleAnalysis:
         if fit_on is None:
             fit_on = self.ens_codes
         
-        concat_features = [features for ens_id, features in self.featurized_data.items() if ens_id in fit_on]
+        concat_features = [ensemble.features for ens_code, ensemble in self.ensembles.items() if ens_code in fit_on]
         concat_features = np.concatenate(concat_features, axis=0)
         print("Concatenated featurized ensemble shape:", concat_features.shape)
         return concat_features
@@ -384,9 +290,9 @@ class EnsembleAnalysis:
             fit_on_data = self._get_concat_features(fit_on=fit_on)
             self.reduce_dim_model = self.reducer.fit(data=fit_on_data)
             self.reduce_dim_data = {}
-            for key, data in self.featurized_data.items():
-                self.reduce_dim_data[key] = self.reducer.transform(data)
-                print("Reduced dimensionality ensemble shape:", self.reduce_dim_data[key].shape)
+            for ensemble in self.ensembles.values():
+                ensemble.reduce_dim_data = self.reducer.transform(ensemble.features)
+                print("Reduced dimensionality ensemble shape:", ensemble.reduce_dim_data.shape)
             self.transformed_data = self.reducer.transform(data=self.concat_features)
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
@@ -585,10 +491,10 @@ class EnsembleAnalysis:
         """
         Plot the relative helix content in each ensemble for each residue. 
         """
-        if any(cg for cg in self.coarse_grained.values()):
+        if any(ensemble.coarse_grained for ensemble in self.ensembles.values()):
             print("This analysis is not possible with coarse-grained models.")
             return
-        visualization.plot_relative_helix_content(self.trajectories)
+        visualization.plot_relative_helix_content(self.ensembles)
 
     def trajectories_plot_rg_comparison(self, n_bins:int=50, bins_range:tuple=(1, 4.5), dpi:int=96):
         """
@@ -601,7 +507,7 @@ class EnsembleAnalysis:
         change the Rg scale in x-axis 
         dpi : int
         """
-        visualization.trajectories_plot_rg_comparison(self.trajectories, n_bins, bins_range, dpi)
+        visualization.trajectories_plot_rg_comparison(self.ensembles, n_bins, bins_range, dpi)
 
     def plot_average_dmap_comparison(self, 
                                     ticks_fontsize:int=14,
@@ -623,7 +529,7 @@ class EnsembleAnalysis:
         The maximum amount for distance the default value is 6.8
         use_ylabel: bool
         """
-        visualization.plot_average_dmap_comparison(self.trajectories, self.coarse_grained, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
+        visualization.plot_average_dmap_comparison(self.ensembles, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
 
     def plot_cmap_comparison(self,
                             title:str,
@@ -658,7 +564,7 @@ class EnsembleAnalysis:
         median: bool
         If True median is showing in the box plot
         """
-        visualization.end_to_end_distances_plot(self.trajectories, self.coarse_grained, bins, violin_plot, means, median)
+        visualization.end_to_end_distances_plot(self.ensembles, bins, violin_plot, means, median)
 
     def plot_asphericity_dist(self, bins:int=50,violin_plot:bool=True, means:bool=False, median:bool=True):
         """
@@ -679,7 +585,7 @@ class EnsembleAnalysis:
         median: bool
         If True median is showing in the box plot
         """
-        visualization.plot_asphericity_dist(self.trajectories ,bins, violin_plot, means, median )
+        visualization.plot_asphericity_dist(self.ensembles ,bins, violin_plot, means, median )
 
     def plot_prolateness_dist(self, bins:int=50, violin_plot:bool=True, means:bool=False, median:bool=True):
         """
@@ -700,7 +606,7 @@ class EnsembleAnalysis:
         median: bool
         If True median is showing in the box plot
         """
-        visualization.plot_prolateness_dist(self.trajectories, bins, violin_plot, means, median)
+        visualization.plot_prolateness_dist(self.ensembles, bins, violin_plot, means, median)
 
     def plot_alpha_angles_dist(self, bins:int=50):
 
@@ -712,7 +618,7 @@ class EnsembleAnalysis:
         bins : int
         The number of bins for bar plot 
         """
-        visualization.plot_alpha_angles_dist(self.trajectories, self.coarse_grained, bins)
+        visualization.plot_alpha_angles_dist(self.ensembles, bins)
 
     def plot_contact_prob(self,title:str, threshold:float=0.8, dpi:int=96):
         """
@@ -730,10 +636,10 @@ class EnsembleAnalysis:
         dpi: int
         For changing the quality and dimension of the output figure
         """
-        if any(cg for cg in self.coarse_grained.values()):
+        if any(ensemble.coarse_grained for ensemble in self.ensembles.values()):
             print("This analysis is not possible with coarse-grained models.")
             return
-        visualization.plot_contact_prob(self.trajectories,title,threshold,dpi)
+        visualization.plot_contact_prob(self.ensembles,title,threshold,dpi)
 
     def plot_ramachandran_plot(self, two_d_hist:bool=True, linespaces:tuple=(-180, 180, 80)):
         """
@@ -771,8 +677,8 @@ class EnsembleAnalysis:
         You can change the size oof the figure here using a tuple. 
         """
         self.perform_feature_extraction("phi_psi") # extract phi_psi features to calculate this score
-        feature_dict = self.featurized_data # provide feature dictionary for plot function
-        visualization.plot_ss_measure_disorder(feature_dict, pointer, figsize)
+        #feature_dict = self.featurized_data # provide feature dictionary for plot function
+        visualization.plot_ss_measure_disorder(self.ensembles, pointer, figsize)
 
     def plot_ss_order_parameter(self, pointer:list=None, figsize:tuple=(15,5)):
 
@@ -791,7 +697,7 @@ class EnsembleAnalysis:
         You can change the size oof the figure here using a tuple. 
         """
 
-        visualization.plot_ss_order_parameter(self.trajectories, self.coarse_grained, pointer, figsize)
+        visualization.plot_ss_order_parameter(self.ensembles, pointer, figsize)
 
     #----------------------------------------------------------------------
     #------------- Functions for generating PDF reports -------------------
