@@ -917,3 +917,26 @@ def plot_ss_order_parameter(trajectories, pointer:list= None , figsize=(15,5) ):
             axes.axvline(x=res, c='blue', linestyle='--', alpha=0.3, linewidth=1)
         
     plt.show()
+
+def plot_local_sasa(analysis, figsize=(15,5)): 
+    
+    fig, ax = plt.subplots(1,1,figsize=figsize)
+    colors = ['b', 'g', 'r', 'c', 'm']
+    for i, ens in enumerate(analysis.trajectories):
+
+        res_based_sasa = mdtraj.shrake_rupley(analysis.trajectories[ens], mode='residue')
+        sasa_mean = np.mean(res_based_sasa, axis=0)
+        sasa_std = np.std(res_based_sasa, axis=0)        
+
+        ax.plot(np.arange(1, len(sasa_mean)+1), sasa_mean, '-o', color=colors[i % len(colors)], label= ens)
+        ax.fill_between(np.arange(1,len(sasa_mean)+1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])
+
+    ax.set_xticks([i for i in np.arange(1,len(sasa_mean)+1) if  i==1 or i%5 == 0])
+    ax.set_xlabel('Residue Index')
+    ax.set_ylabel('Mean SASA')
+    ax.set_title('Mean SASA for Each Residue in Ensembles')
+    ax.legend()
+    ax.grid(True)
+
+    plt.tight_layout()
+    plt.show()

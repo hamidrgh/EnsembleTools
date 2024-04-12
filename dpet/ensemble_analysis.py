@@ -715,6 +715,9 @@ class EnsembleAnalysis:
 
         visualization.plot_ss_order_parameter(self.trajectories, pointer, figsize)
 
+    def plot_local_sasa(self, figsize=(15,5)):
+        visualization.plot_local_sasa(self, figsize)
+
 
     ##################### PDF Reports #####################
 
