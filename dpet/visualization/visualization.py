@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 import mdtraj
 from matplotlib.lines import Line2D
-
+from dpet.featurization.distances import *
 from dpet.featurization.angles import featurize_a_angle
 from dpet.visualization.coord import *
 from scipy.stats import gaussian_kde
@@ -640,10 +640,9 @@ def plot_average_dmap_comparison(trajectories, ticks_fontsize=14,
     fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
     axes = axes.reshape((rows, cols))  # Reshape axes to ensure it's 2D
     
-    for i, (protein_name, ens_data) in enumerate(ens_dict.items()):
-        row = i // cols
-        col = i % cols
-        ax = axes[row, col] if num_proteins > 1 else axes[0]
+    for ax, (protein_name, ens_data) in zip(fig.axes, (ens_dict.items())):
+       
+        ax = ax
         
         avg_dmap = np.mean(ens_data, axis=0)
         tril_ids = np.tril_indices(avg_dmap.shape[0], 0)
@@ -818,33 +817,30 @@ def plot_alpha_angles_dist(trajectories, bins =50):
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.show()
 
-def plot_contact_prob(trajectories,title,threshold = 0.8,dpi = 96):
+def plot_contact_prob(trajectories,threshold = 0.8,dpi = 96):
+
 
     num_proteins = len(trajectories)
+    
     cols = 2
     rows = (num_proteins + cols - 1) // cols
     fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
     cmap = cm.get_cmap("Blues")
-    for i, (protein_name, traj) in enumerate(trajectories.items()):
-        row = i // cols
-        col = i % cols
-        ax = axes[row, col] if num_proteins > 1 else axes
-
+    axes = axes.reshape((rows, cols))  # Reshape axes to ensure it's 2D
+    for (protein_name, traj) , ax in zip((trajectories.items()), fig.axes):
+        
         matrtix_p_map = contact_probability_map(traj , threshold=threshold)
         im = ax.imshow(matrtix_p_map, cmap=cmap )
         ax.set_title(f"Contact Probability Map: {protein_name}", fontsize=14)
-
-
         cbar = fig.colorbar(im, ax=ax)
         cbar.set_label('Frequency', fontsize=14)
         cbar.ax.tick_params(labelsize=14)
 
+        # Remove any empty subplots
     for i in range(num_proteins, rows * cols):
         fig.delaxes(axes.flatten()[i])
-    
+
     plt.tight_layout()
-    fig.suptitle(title, fontsize=14)
-    fig.subplots_adjust(top=0.91)
     plt.show()
 
 def plot_ramachandran_plot(trajectories, two_d_hist= True, linespaces = (-180, 180, 80)):
@@ -918,7 +914,7 @@ def plot_ss_order_parameter(trajectories, pointer:list= None , figsize=(15,5) ):
         
     plt.show()
 
-def plot_local_sasa(analysis, figsize=(15,5)): 
+def plot_local_sasa(analysis, figsize=(15,5), pointer:list= None): 
     
     fig, ax = plt.subplots(1,1,figsize=figsize)
     colors = ['b', 'g', 'r', 'c', 'm']
@@ -940,3 +936,31 @@ def plot_local_sasa(analysis, figsize=(15,5)):
 
     plt.tight_layout()
     plt.show()
+
+def plot_dist_ca_com(analysis, min_sep=2,max_sep=None ,get_names=True,inverse=False ,figsize=(6,2.5)):
+
+    for ens in analysis.trajectories:
+        traj = analysis.trajectories[ens]
+        feat, names = featurize_com_dist(traj=traj, min_sep=min_sep,max_sep=max_sep,inverse=inverse ,get_names=get_names)  # Compute (N, *) feature arrays.
+        print(f"# Ensemble: {ens}")
+        print("features:", feat.shape)
+
+        com_dmap = calc_ca_dmap(traj=traj)
+        com_dmap_mean = com_dmap.mean(axis=0)
+        ca_dmap = calc_ca_dmap(traj=traj)
+        ca_dmap_mean = ca_dmap.mean(axis=0)
+
+        print("distance matrix:", com_dmap_mean.shape)
+        fig, ax = plt.subplots(1, 2, figsize=figsize)
+        fig.suptitle(ens)
+        im0 = ax[0].imshow(ca_dmap_mean)
+        ax[0].set_title("CA")
+        im1 = ax[1].imshow(com_dmap_mean)
+        ax[1].set_title("COM")
+        cbar = fig.colorbar(im0, ax=ax[0], shrink=0.8)
+        cbar.set_label("distance [nm]")
+        cbar = fig.colorbar(im1, ax=ax[1], shrink=0.8)
+        cbar.set_label("distance [nm]")
+
+        plt.tight_layout()
+        plt.show()

@@ -639,7 +639,7 @@ class EnsembleAnalysis:
         """
         visualization.plot_alpha_angles_dist(self.trajectories, bins)
 
-    def plot_contact_prob(self,title,threshold = 0.8,dpi = 96):
+    def plot_contact_prob(self,threshold = 0.8,dpi = 96):
         """
         It plots the contact probability map based on the threshold. 
         The default value for threshold is 0.8[nm], 
@@ -655,7 +655,7 @@ class EnsembleAnalysis:
         dpi: int
         For changing the quality and dimension of the output figure
         """
-        visualization.plot_contact_prob(self.trajectories,title,threshold,dpi)
+        visualization.plot_contact_prob(self.trajectories,threshold,dpi)
 
     def plot_ramachandran_plot(self, two_d_hist=True, linespaces= (-180, 180, 80)):
         """
@@ -716,7 +716,21 @@ class EnsembleAnalysis:
         visualization.plot_ss_order_parameter(self.trajectories, pointer, figsize)
 
     def plot_local_sasa(self, figsize=(15,5)):
+
+        """
+        This function plots the average amount of SASA for each residue through the ensemble
+
+        Parameters
+        ----------
+        figsize: tuple \n
+        You can change the size of plot here. 
+        """
         visualization.plot_local_sasa(self, figsize)
+
+
+    def plot_dist_ca_com(self, min_sep=2, get_names=True, figsize=(6,2.5)):
+
+        visualization.plot_dist_ca_com(self, min_sep, get_names, figsize)
 
 
     ##################### PDF Reports #####################
