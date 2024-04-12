@@ -387,6 +387,10 @@ def pca_plot_1d_histograms(analysis, save=False):
     bins = np.linspace(analysis.transformed_data[:,k].min(),
                     analysis.transformed_data[:,k].max(),
                     n_bins)
+    
+    # Ensure ax is always a list
+    if not isinstance(ax, np.ndarray):
+        ax = [ax]
 
     for i, (ens_code, ensemble) in enumerate(analysis.ensembles.items()):
         ax[i].hist(ensemble.reduce_dim_data[:,k],
@@ -462,6 +466,10 @@ def pca_rg_correlation(analysis, save=False):
     dpi = 120
     fig, ax = plt.subplots(len(analysis.ens_codes), 1, figsize=(3, 3*len(analysis.ens_codes)), dpi=dpi)
     pca_dim = 0
+
+    # Ensure ax is always a list
+    if not isinstance(ax, np.ndarray):
+        ax = [ax]
 
     for i, (ens_code, ensemble) in enumerate(analysis.ensembles.items()):
         rg_i = mdtraj.compute_rg(ensemble.trajectory)
