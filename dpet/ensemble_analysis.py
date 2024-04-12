@@ -263,9 +263,10 @@ class EnsembleAnalysis:
         return [item[0] * 10 for item in rg_values_list]
 
     def _get_concat_features(self, fit_on: list[str]=None):
+        if fit_on and any(f not in self.ens_codes for f in fit_on):
+            raise ValueError("Cannot fit on ensembles that were not provided as input.")
         if fit_on is None:
             fit_on = self.ens_codes
-        
         concat_features = [ensemble.features for ens_code, ensemble in self.ensembles.items() if ens_code in fit_on]
         concat_features = np.concatenate(concat_features, axis=0)
         print("Concatenated featurized ensemble shape:", concat_features.shape)
