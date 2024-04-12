@@ -730,6 +730,9 @@ class EnsembleAnalysis:
         dpi: int
         For changing the quality and dimension of the output figure
         """
+        if any(cg for cg in self.coarse_grained.values()):
+            print("This analysis is not possible with coarse-grained models.")
+            return
         visualization.plot_contact_prob(self.trajectories,title,threshold,dpi)
 
     def plot_ramachandran_plot(self, two_d_hist:bool=True, linespaces:tuple=(-180, 180, 80)):
