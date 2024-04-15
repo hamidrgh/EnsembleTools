@@ -747,12 +747,12 @@ def plot_distance_distribution_multiple(trajectories, dpi=96):
     plt.tight_layout()
     plt.show()
 
-def end_to_end_distances_plot(trajectories, atom_selector ="protein and name CA", bins = 50, violin_plot = True, means = True, median = True):
-    ca_indices = trajectories[next(iter(trajectories))].topology.select(atom_selector)
+def end_to_end_distances_plot(trajectories, atom_selector ="name CA", bins = 50, violin_plot = True, means = True, median = True):
     dist_list = []
     positions = []
     if violin_plot:
         for ens in trajectories:
+            ca_indices = trajectories[ens].topology.select(atom_selector)
             positions.append(ens)
             dist_list.append(mdtraj.compute_distances(trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel())
         plt.violinplot(dist_list, showmeans= means, showmedians= median)
@@ -762,6 +762,7 @@ def end_to_end_distances_plot(trajectories, atom_selector ="protein and name CA"
         plt.show()  
     else:
         for ens in trajectories:
+            ca_indices = trajectories[ens].topology.select(atom_selector)
             plt.hist(mdtraj.compute_distances(trajectories[ens],[[ca_indices[0], ca_indices[-1]]]).ravel()
                   , label=ens, bins=bins, edgecolor = 'black', density=True)
         plt.title("End-to-End distances distribution")

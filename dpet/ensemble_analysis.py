@@ -563,7 +563,7 @@ class EnsembleAnalysis:
     def plot_distance_distribution_multiple(self, dpi = 96):
         visualization.plot_distance_distribution_multiple(self.trajectories, dpi)
 
-    def end_to_end_distances_plot(self, atom_selector ="protein and name CA", bins = 50, violin_plot=True, means=False, median=True ):
+    def end_to_end_distances_plot(self, atom_selector ="name CA", bins = 50, violin_plot=True, means=False, median=True ):
         """
         Plot end-to-end distance distributions. 
 
@@ -728,9 +728,9 @@ class EnsembleAnalysis:
         visualization.plot_local_sasa(self, figsize)
 
 
-    def plot_dist_ca_com(self, min_sep=2, get_names=True, figsize=(6,2.5)):
+    def plot_dist_ca_com(self, min_sep=2,max_sep=None, get_names=True, figsize=(6,2.5)):
 
-        visualization.plot_dist_ca_com(self, min_sep, get_names, figsize)
+        visualization.plot_dist_ca_com(self, min_sep, max_sep,get_names, figsize)
 
 
     ##################### PDF Reports #####################

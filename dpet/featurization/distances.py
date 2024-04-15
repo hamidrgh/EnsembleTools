@@ -9,7 +9,7 @@ from dpet.featurization.utils import get_max_sep
 # Calculate (N, L, L) distance maps. Mostly used for visualization. -
 #--------------------------------------------------------------------
 
-ca_selector = "protein and name CA"
+ca_selector = "name CA" # "protein and name CA" is not working  for ensembles contain phopshorylation residues
 
 def _calc_dmap(traj: mdtraj.Trajectory):
     ca_ids = traj.topology.select(ca_selector)
