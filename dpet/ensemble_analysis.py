@@ -5,8 +5,6 @@ from typing import Dict
 import zipfile
 from dpet.api_client import APIClient
 from dpet.ensemble import Ensemble
-from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi, featurize_tr_angle
-from dpet.featurization.distances import featurize_ca_dist
 from dpet.visualization.reports import generate_custom_report, generate_dimenfix_report, generate_pca_report, generate_tsne_report
 import dpet.visualization.visualization as visualization
 from dpet.utils import extract_tar_gz
@@ -189,6 +187,7 @@ class EnsembleAnalysis:
         for ens_code in self.ens_codes:
             ensemble = Ensemble(ens_code, self.data_dir)
             ensemble.load_trajectory()
+            ensemble.select_chain()
             ensemble.check_coarse_grained()
             self.ensembles[ens_code] = ensemble
             

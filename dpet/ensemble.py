@@ -103,3 +103,26 @@ class Ensemble():
         
     def normalize_features(self, mean, std):
         self.features = (self.features - mean) / std
+
+    def select_chain(self):
+        topology = self.trajectory.topology
+
+        if topology.n_chains == 1:
+            return
+
+        # Get all unique chain IDs from the topology
+        chain_ids = set(chain.index for chain in topology.chains)
+
+        # Print available chain IDs
+        print("Ensemble has multiple chains. Available chain IDs:", chain_ids)
+
+        # Prompt user to select a chain ID
+        selected_chain = input("Enter the chain ID you want to select: ")
+
+        # Validate user input
+        if int(selected_chain) not in chain_ids:
+            print("Invalid chain ID. Please select from the available options.")
+            return
+
+        chain_A_indices = topology.select(f"chainid {selected_chain}")
+        self.trajectory = self.trajectory.atom_slice(chain_A_indices)
