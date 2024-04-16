@@ -166,7 +166,7 @@ def dimenfix_scatter(analysis, save=False):
     #manage legends
     legend_labels = list(label_colors.keys())
     legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-    fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
+    fig.legend(legend_handles, legend_labels, title='Original Labels', loc = 'lower left')
 
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
@@ -191,7 +191,7 @@ def umap_scatter(analysis, save=False):
 
     legend_labels = list(label_colors.keys())
     legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-    fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
+    fig.legend(legend_handles, legend_labels, title='Original Labels', loc = 'lower left')
 
     if save:
         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
