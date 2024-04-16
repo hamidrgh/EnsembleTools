@@ -377,6 +377,9 @@ class EnsembleAnalysis:
         if True it will save the figure
         """
         visualization.dimenfix_scatter(self, save)
+    
+    def umap_scatter(self, save=False):
+        visualization.umap_scatter(self,save)
 
     # def dimenfix_scatter_plot(self, save=False):
     #     visualization.dimenfix_scatter_plot_rg(self, save)

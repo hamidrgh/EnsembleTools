@@ -173,6 +173,31 @@ def dimenfix_scatter(analysis, save=False):
         plt.savefig(plot_dir  + '/dimenfix_scatter.png', dpi=800)
 
     return fig
+
+def umap_scatter(analysis, save=False): 
+    fig, (ax1, ax3) = plt.subplots(1,2, figsize=(14,4))
+
+    label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
+    point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
+    scatter_labeled = ax1.scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha = 0.5)
+
+    rg_labeled = ax3.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c= [rg for rg in analysis.rg], s=10, alpha=0.5) 
+    cbar = plt.colorbar(rg_labeled, ax=ax3)
+
+  
+
+    ax1.set_title('Scatter plot (original labels)')
+    ax3.set_title('Scatter plot (Rg labels)')
+
+    legend_labels = list(label_colors.keys())
+    legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
+    fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
+
+    if save:
+        plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+        plt.savefig(plot_dir  + '/umap_scatter.png', dpi=800)
+
+    return fig
     
     
 
@@ -965,3 +990,4 @@ def plot_dist_ca_com(analysis, min_sep=2,max_sep=None ,get_names=True,inverse=Fa
 
         plt.tight_layout()
         plt.show()
+
