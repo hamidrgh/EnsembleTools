@@ -170,10 +170,10 @@ class EnsembleAnalysis:
         Load trajectory files into mdtraj objects.
         
         Supported file formats:
-        1. [ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)
-        2. [ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)
-        3. [ens_code].pdb
-        4. Directory [ens_code] containing several .pdb files
+            1. [ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)
+            2. [ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)
+            3. [ens_code].pdb
+            4. Directory [ens_code] containing several .pdb files
         
         For each ensemble code (ens_code):
             - If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.
@@ -199,7 +199,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         sample_size: int
-        Number of conformations sampled from the ensemble. 
+            Number of conformations sampled from the ensemble. 
         """
         for ensemble in self.ensembles.values():
             ensemble.random_sample_trajectory(sample_size)
@@ -211,10 +211,10 @@ class EnsembleAnalysis:
         Parameters
         ----------
         featurization: str 
-        Choose between "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi"
+            Choose between "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi"
 
         normalize: Bool
-        if featurization is "ca_dist" normalize True will normalize the distances based on the mean and standard deviation.
+            if featurization is "ca_dist" normalize True will normalize the distances based on the mean and standard deviation.
 
         """
         self._extract_features(featurization, *args, **kwargs)
@@ -278,11 +278,11 @@ class EnsembleAnalysis:
         Parameters
         ----------
         method: str 
-        Choose between pca", "tsne", "dimenfix", "mds" and "kpca".
+            Choose between pca", "tsne", "dimenfix", "mds" and "kpca".
 
         fit_on: list[str]
-        if method is "pca" or "kpca" the fit_on parameter specifies on which ensembles the models should be fit. 
-        The model will then be used to transform all ensembles.
+            if method is "pca" or "kpca" the fit_on parameter specifies on which ensembles the models should be fit. 
+            The model will then be used to transform all ensembles.
         """
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
@@ -341,7 +341,7 @@ class EnsembleAnalysis:
         Parameters
         -----------
         save: bool
-        If True the plot will save 
+            If True the plot will save 
         """
         
         visualization.tsne_ramachandran_plot_density(self, save)
@@ -351,14 +351,12 @@ class EnsembleAnalysis:
         It gets the output results of t-SNE. 
         Three scatter plot will be generated based on original, clustering and Rg labels. 
         One KDE density plot will also be generated to shod the most populated areas in 
-        the reduced dimension. 
-
-        
+        the reduced dimension.   
 
         Parameters
         -----------
         save: Bool \n
-        if True the plot will be saved. 
+            if True the plot will be saved. 
         """
         visualization.tsne_scatter_plot(self, save)
 
@@ -373,7 +371,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         save: bool \n
-        if True it will save the figure
+            if True it will save the figure
         """
         visualization.dimenfix_scatter(self, save)
 
@@ -397,8 +395,8 @@ class EnsembleAnalysis:
 
         Parameters
         ----------
-        save: bool \n
-        if True it will save the figure
+        save: bool
+            if True it will save the figure
         """
         visualization.pca_cumulative_explained_variance(self, save)
     
@@ -410,8 +408,8 @@ class EnsembleAnalysis:
 
         Parameters
         ----------
-        save: bool \n
-        if True it will save the figure
+        save: bool
+            if True it will save the figure
         """
         visualization.pca_plot_2d_landscapes(self, save)
 
@@ -423,7 +421,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         save: bool \n
-        if True it will save the figure
+            if True it will save the figure
         """
         visualization.pca_plot_1d_histograms(self, save)
 
@@ -438,7 +436,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         save: bool \n
-        if True it will save the figure
+            if True it will save the figure
         """
         visualization.pca_rg_correlation(self, save)
         
@@ -450,14 +448,14 @@ class EnsembleAnalysis:
 
         Parameters
         ----------
-        save: bool \n
-        if True it will save the figure
+        save: bool
+            if True it will save the figure
 
-        showmean: bool \n
-        if True it will show the mean 
+        showmean: bool
+            if True it will show the mean 
 
-        showmedian: bool \n 
-        if True it will show the median
+        showmedian: bool
+            if True it will show the median
         """
         visualization.plot_global_sasa(self, save, showmeans, showmedians)
 
@@ -526,7 +524,7 @@ class EnsembleAnalysis:
         title_fontsize: int
         dpi: int
         max_d: float
-        The maximum amount for distance the default value is 6.8
+            The maximum amount for distance the default value is 6.8
         use_ylabel: bool
         """
         visualization.plot_average_dmap_comparison(self.ensembles, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
@@ -551,18 +549,19 @@ class EnsembleAnalysis:
         Parameters
         ----------
         atom_selector: str 
-        The type of atom considered for calculating end-to-end distance
+            The type of atom considered for calculating end-to-end distance
 
         bins: int
-        The number of bins for bar plot 
+            The number of bins for bar plot 
+
         violin_plot: bool 
-        If True box plot is visualized
+            If True box plot is visualized
 
         means: bool
-        If True mean is showing in the box plot 
+            If True mean is showing in the box plot 
 
         median: bool
-        If True median is showing in the box plot
+            If True median is showing in the box plot
         """
         visualization.end_to_end_distances_plot(self.ensembles, bins, violin_plot, means, median)
 
@@ -575,15 +574,15 @@ class EnsembleAnalysis:
         ----------
 
         bins: int
-        The number of bins for bar plot 
+            The number of bins for bar plot 
         violint_plot: bool 
-        If True box plot is visualized
+            If True box plot is visualized
 
         means: bool
-        If True mean is showing in the box plot 
+            If True mean is showing in the box plot 
 
         median: bool
-        If True median is showing in the box plot
+            If True median is showing in the box plot
         """
         visualization.plot_asphericity_dist(self.ensembles ,bins, violin_plot, means, median )
 
@@ -596,15 +595,15 @@ class EnsembleAnalysis:
         ----------
 
         bins: int
-        The number of bins for bar plot 
+            The number of bins for bar plot 
         violint_plot: bool 
-        If True box plot is visualized
+            If True box plot is visualized
 
         means: bool
-        If True mean is showing in the box plot 
+            If True mean is showing in the box plot 
 
         median: bool
-        If True median is showing in the box plot
+            If True median is showing in the box plot
         """
         visualization.plot_prolateness_dist(self.ensembles, bins, violin_plot, means, median)
 
@@ -616,7 +615,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         bins : int
-        The number of bins for bar plot 
+            The number of bins for bar plot 
         """
         visualization.plot_alpha_angles_dist(self.ensembles, bins)
 
@@ -628,13 +627,13 @@ class EnsembleAnalysis:
         Parameters
         ----------
         title: str 
-        You need to specify a title for the plot
+            You need to specify a title for the plot
 
         threshold: float
-        Determing the threshold fo calculating the contact frequencies. default value is 0.8[nm]
+            Determing the threshold fo calculating the contact frequencies. default value is 0.8[nm]
 
         dpi: int
-        For changing the quality and dimension of the output figure
+            For changing the quality and dimension of the output figure
         """
         if any(ensemble.coarse_grained for ensemble in self.ensembles.values()):
             print("This analysis is not possible with coarse-grained models.")
@@ -651,10 +650,10 @@ class EnsembleAnalysis:
         ----------
 
         two_d_hist: bool
-        If True it returns 2D histogram for each ensemble. 
+            If True it returns 2D histogram for each ensemble. 
 
         linespaces: tuple
-        You can customize the bins for 2D histogram
+            You can customize the bins for 2D histogram
         """
         visualization.plot_ramachandran_plot(self.trajectories, two_d_hist, linespaces)
     
@@ -671,10 +670,10 @@ class EnsembleAnalysis:
         Parameters
         ----------
         pointer: list 
-        You can add the desired residues in a list and then you have a vertical dashed line to point those residues
+            You can add the desired residues in a list and then you have a vertical dashed line to point those residues
 
         figsize:tuple
-        You can change the size oof the figure here using a tuple. 
+            You can change the size oof the figure here using a tuple. 
         """
         self.perform_feature_extraction("phi_psi") # extract phi_psi features to calculate this score
         #feature_dict = self.featurized_data # provide feature dictionary for plot function
@@ -691,10 +690,10 @@ class EnsembleAnalysis:
         Parameters
         ----------
         pointer: list 
-        You can add the desired residues in a list and then you have a vertical dashed line to point those residues
+            You can add the desired residues in a list and then you have a vertical dashed line to point those residues
 
         figsize:tuple
-        You can change the size oof the figure here using a tuple. 
+            You can change the size oof the figure here using a tuple. 
         """
 
         visualization.plot_ss_order_parameter(self.ensembles, pointer, figsize)
@@ -704,9 +703,19 @@ class EnsembleAnalysis:
     #----------------------------------------------------------------------
 
     def generate_custom_report(self):
+        
+        """
+        Generates pdf report with all plots that were explicitly called during the session.
+        """
+
         generate_custom_report(self)
 
     def generate_report(self):
+
+        """
+        Generates pdf report with all plots relevant to the conducted analysis.
+        """
+
         if self.reduce_dim_method == "tsne":
             generate_tsne_report(self)
         if self.reduce_dim_method == "dimenfix":

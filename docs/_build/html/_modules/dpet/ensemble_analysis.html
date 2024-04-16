@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dpet.ensemble_analysis &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Disordered Protein Ensemble Tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">EnsembleTools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Disordered Protein Ensemble Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dpet.ensemble_analysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for dpet.ensemble_analysis</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">from</span> <span class="nn">dpet.api_client</span> <span class="kn">import</span> <span class="n">APIClient</span>
+<span class="kn">from</span> <span class="nn">dpet.ensemble</span> <span class="kn">import</span> <span class="n">Ensemble</span>
+<span class="kn">from</span> <span class="nn">dpet.visualization.reports</span> <span class="kn">import</span> <span class="n">generate_custom_report</span><span class="p">,</span> <span class="n">generate_dimenfix_report</span><span class="p">,</span> <span class="n">generate_pca_report</span><span class="p">,</span> <span class="n">generate_tsne_report</span>
+<span class="kn">import</span> <span class="nn">dpet.visualization.visualization</span> <span class="k">as</span> <span class="nn">visualization</span>
+<span class="kn">from</span> <span class="nn">dpet.utils</span> <span class="kn">import</span> <span class="n">extract_tar_gz</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">mdtraj</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dpet.dimensionality_reduction.dimensionality_reduction</span> <span class="kn">import</span> <span class="n">DimensionalityReductionFactory</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis">[docs]</a>
+<span class="k">class</span> <span class="nc">EnsembleAnalysis</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ens_codes</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data_dir</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span> <span class="o">=</span> <span class="n">ens_codes</span>
+        <span class="n">plot_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">visualization</span><span class="o">.</span><span class="n">PLOT_DIR</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">plot_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figures</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Ensemble</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;api_client&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">close_session</span><span class="p">()</span>
+    
+<div class="viewcode-block" id="EnsembleAnalysis.download_from_ped">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.download_from_ped">[docs]</a>
+    <span class="k">def</span> <span class="nf">download_from_ped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Automate Downloading ensembles using PED API </span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        The function only downloads ensembles in the PED ID format, which consists of a string starting with &#39;PED&#39;</span>
+<span class="sd">        followed by a numeric identifier and &#39;e&#39; followed by another numeric identifier.</span>
+<span class="sd">        Example: &#39;PED00423e001&#39;, &#39;PED00424e001&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ped_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^(PED\d</span><span class="si">{5}</span><span class="s1">)(e\d</span><span class="si">{3}</span><span class="s1">)$&#39;</span>
+
+        <span class="c1"># Filter the ens_codes list using regex</span>
+        <span class="k">for</span> <span class="n">ens_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">ped_pattern</span><span class="p">,</span> <span class="n">ens_code</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> does not match the PED ID pattern and will be skipped.&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            
+            <span class="n">ped_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ensemble_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">tar_gz_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s1">.tar.gz&#39;</span>
+            <span class="n">tar_gz_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">tar_gz_filename</span><span class="p">)</span>
+
+            <span class="n">pdb_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s1">.pdb&#39;</span>
+            <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">pdb_filename</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tar_gz_file</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://deposition.proteinensemble.org/api/v1/entries/</span><span class="si">{</span><span class="n">ped_id</span><span class="si">}</span><span class="s1">/ensembles/</span><span class="si">{</span><span class="n">ensemble_id</span><span class="si">}</span><span class="s1">/ensemble-pdb&#39;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading entry </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> from PED.&quot;</span><span class="p">)</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;*/*&#39;</span><span class="p">}</span>
+
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">perform_get_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
+                    <span class="c1"># Download and save the response content to a file</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">download_response_content</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">tar_gz_file</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded file </span><span class="si">{</span><span class="n">tar_gz_filename</span><span class="si">}</span><span class="s2"> from PED.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ensemble </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> already downloaded. Skipping.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Extract the .tar.gz file</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
+                <span class="n">extract_tar_gz</span><span class="p">(</span><span class="n">tar_gz_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">pdb_filename</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted file </span><span class="si">{</span><span class="n">pdb_filename</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">pdb_filename</span><span class="si">}</span><span class="s2"> already exists. Skipping extraction.&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="EnsembleAnalysis.download_from_atlas">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.download_from_atlas">[docs]</a>
+    <span class="k">def</span> <span class="nf">download_from_atlas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Automate Downloading MD ensembles from Atlas. </span>
+
+<span class="sd">        Note:</span>
+<span class="sd">        ----</span>
+<span class="sd">        The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.</span>
+<span class="sd">        Example: &#39;3a1g_B&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pdb_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\d\w</span><span class="si">{3}</span><span class="s1">_[A-Z]$&#39;</span>
+        <span class="n">new_ens_codes_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ens_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pdb_pattern</span><span class="p">,</span> <span class="n">ens_code</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> does not match the PDB ID pattern and will be skipped.&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">zip_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s1">.zip&#39;</span>
+            <span class="n">zip_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">zip_filename</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">zip_file</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading entry </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> from Atlas.&quot;</span><span class="p">)</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2">_protein.zip&quot;</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;*/*&#39;</span><span class="p">}</span>
+
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">perform_get_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="c1"># Download and save the response content to a file</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">download_response_content</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">zip_file</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded file </span><span class="si">{</span><span class="n">zip_filename</span><span class="si">}</span><span class="s2"> from Atlas.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File already exists. Skipping download.&quot;</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+                <span class="c1"># Map reps to original ensemble code</span>
+                <span class="n">zip_contents</span> <span class="o">=</span> <span class="n">zip_ref</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span>
+                <span class="n">new_ens_codes</span> <span class="o">=</span> <span class="p">[</span><span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">zip_contents</span> <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xtc&#39;</span><span class="p">)]</span>
+                <span class="n">new_ens_codes_mapping</span><span class="p">[</span><span class="n">ens_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_ens_codes</span>
+                <span class="c1"># Unzip</span>
+                <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted file </span><span class="si">{</span><span class="n">zip_file</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Remove unused files.</span>
+            <span class="k">for</span> <span class="n">unused_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.tpr&quot;</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">unused_path</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;README.txt&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Copy and rename topology file</span>
+            <span class="n">old_pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2">.pdb&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">new_code</span> <span class="ow">in</span> <span class="n">new_ens_codes</span><span class="p">:</span>
+                <span class="n">new_pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_code</span><span class="si">}</span><span class="s2">.top.pdb&quot;</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">old_pdb_file</span><span class="p">,</span> <span class="n">new_pdb_file</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copied and renamed </span><span class="si">{</span><span class="n">old_pdb_file</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_pdb_file</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="c1"># Delete old topology file</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">old_pdb_file</span><span class="p">)</span>
+
+        <span class="c1"># Update self.ens_codes using the mapping</span>
+        <span class="n">updated_ens_codes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">old_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
+            <span class="n">updated_ens_codes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_ens_codes_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">old_code</span><span class="p">,</span> <span class="p">[</span><span class="n">old_code</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span> <span class="o">=</span> <span class="n">updated_ens_codes</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analysing ensembles:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.download_from_database">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.download_from_database">[docs]</a>
+    <span class="k">def</span> <span class="nf">download_from_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Download ensembles from databases.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        database : str</span>
+<span class="sd">            Choose the database you want to download from (&#39;ped&#39;/&#39;atlas&#39;).</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        For PED database:</span>
+<span class="sd">            The function only downloads ensembles in the PED ID format, which consists of a string starting with &#39;PED&#39;</span>
+<span class="sd">            followed by a numeric identifier and &#39;e&#39; followed by another numeric identifier.</span>
+<span class="sd">            Example: &#39;PED00423e001&#39;, &#39;PED00424e001&#39;</span>
+
+<span class="sd">        For atlas database:</span>
+<span class="sd">            The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.</span>
+<span class="sd">            Example: &#39;3a1g_B&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;ped&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_from_ped</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;atlas&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_from_atlas</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.generate_trajectories">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.generate_trajectories">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load trajectory files into mdtraj objects.</span>
+<span class="sd">        </span>
+<span class="sd">        Supported file formats:</span>
+<span class="sd">            1. [ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)</span>
+<span class="sd">            2. [ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)</span>
+<span class="sd">            3. [ens_code].pdb</span>
+<span class="sd">            4. Directory [ens_code] containing several .pdb files</span>
+<span class="sd">        </span>
+<span class="sd">        For each ensemble code (ens_code):</span>
+<span class="sd">            - If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.</span>
+<span class="sd">            - If only a .pdb file exists, generate trajectory and topology files from the .pdb file.</span>
+<span class="sd">            - If a directory [ens_code] exists containing .pdb files, generate trajectory and topology files from the directory.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Using &#39;download_from_database&#39; transforms the downloaded data into the appropriate format.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ens_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
+            <span class="n">ensemble</span> <span class="o">=</span> <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">load_trajectory</span><span class="p">()</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">select_chain</span><span class="p">()</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">check_coarse_grained</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">[</span><span class="n">ens_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">ensemble</span></div>
+
+            
+<div class="viewcode-block" id="EnsembleAnalysis.random_sample_trajectories">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories">[docs]</a>
+    <span class="k">def</span> <span class="nf">random_sample_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sample a defined random number of conformations from the ensemble </span>
+<span class="sd">        trajectory. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sample_size: int</span>
+<span class="sd">            Number of conformations sampled from the ensemble. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">random_sample_trajectory</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.perform_feature_extraction">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.perform_feature_extraction">[docs]</a>
+    <span class="k">def</span> <span class="nf">perform_feature_extraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract the selected feature. The options are &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot; and &quot;tr_phi&quot;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        featurization: str </span>
+<span class="sd">            Choose between &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot; and &quot;tr_phi&quot;</span>
+
+<span class="sd">        normalize: Bool</span>
+<span class="sd">            if featurization is &quot;ca_dist&quot; normalize True will normalize the distances based on the mean and standard deviation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_all_labels</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_data</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
+        <span class="c1"># Get names only for the first ensemble</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">featurization</span> <span class="o">=</span> <span class="n">featurization</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature names:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_all_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ens_id</span><span class="p">,</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">num_data_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">ens_id</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_data_points</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">normalize_features</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_rg_for_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajectory</span><span class="p">:</span><span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_rg</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">trajectory</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates Rg for each conformations in the loaded ensembles.</span>
+<span class="sd">        The returned values are in Angstrom.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rg_values_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">traj</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">trajectory</span>
+            <span class="n">rg_values_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_calculate_rg_for_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rg_values_list</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_concat_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fit_on</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fit_on</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot fit on ensembles that were not provided as input.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fit_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fit_on</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span>
+        <span class="n">concat_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span> <span class="k">for</span> <span class="n">ens_code</span><span class="p">,</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">ens_code</span> <span class="ow">in</span> <span class="n">fit_on</span><span class="p">]</span>
+        <span class="n">concat_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Concatenated featurized ensemble shape:&quot;</span><span class="p">,</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">concat_features</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis.fit_dimensionality_reduction">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.fit_dimensionality_reduction">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit_dimensionality_reduction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform dimensionality reduction on the extracted features. The options are &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; and &quot;kpca&quot;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method: str </span>
+<span class="sd">            Choose between pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; and &quot;kpca&quot;.</span>
+
+<span class="sd">        fit_on: list[str]</span>
+<span class="sd">            if method is &quot;pca&quot; or &quot;kpca&quot; the fit_on parameter specifies on which ensembles the models should be fit. </span>
+<span class="sd">            The model will then be used to transform all ensembles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span> <span class="o">=</span> <span class="n">DimensionalityReductionFactory</span><span class="o">.</span><span class="n">get_reducer</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span><span class="s2">&quot;kpca&quot;</span><span class="p">):</span>
+            <span class="n">fit_on_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">(</span><span class="n">fit_on</span><span class="o">=</span><span class="n">fit_on</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">fit_on_data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_data</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">ensemble</span><span class="o">.</span><span class="n">reduce_dim_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reduced dimensionality ensemble shape:&quot;</span><span class="p">,</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">reduce_dim_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.execute_pipeline">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">[docs]</a>
+    <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the data analysis pipeline end-to-end. The pipeline includes:</span>
+<span class="sd">        1. Download from database (optional)</span>
+<span class="sd">        2. Generate trajectories</span>
+<span class="sd">        3. Sample a random number of conformations from trajectories (optional)</span>
+<span class="sd">        4. Perform feature extraction</span>
+<span class="sd">        5. Perform dimensionality reduction</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        featurization_params: dict</span>
+<span class="sd">            Parameters for feature extraction. The only required parameter is &quot;featurization&quot;,</span>
+<span class="sd">            which can be &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot; or &quot;tr_phi&quot;. </span>
+<span class="sd">            Other method-specific parameters are optional.</span>
+<span class="sd">        reduce_dim_params: dict</span>
+<span class="sd">            Parameters for dimensionality reduction. The only required parameter is &quot;method&quot;,</span>
+<span class="sd">            which can be &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; or &quot;kpca&quot;.</span>
+<span class="sd">        database: str</span>
+<span class="sd">            Optional parameter that specifies the database from which the entries should be downloaded.</span>
+<span class="sd">            Options are &quot;ped&quot; and &quot;atlas&quot;.</span>
+<span class="sd">        subsample_size: int</span>
+<span class="sd">            Optional parameter that specifies the trajectory subsample size.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_from_database</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_trajectories</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">subsample_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">random_sample_trajectories</span><span class="p">(</span><span class="n">subsample_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perform_feature_extraction</span><span class="p">(</span><span class="o">**</span><span class="n">featurization_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_dimensionality_reduction</span><span class="p">(</span><span class="o">**</span><span class="n">reduce_dim_params</span><span class="p">)</span></div>
+
+
+    <span class="c1">#----------------------------------------------------------------------</span>
+    <span class="c1">#------------------- Integrated plot functions ------------------------</span>
+    <span class="c1">#----------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis.tsne_ramachandran_plot_density">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.tsne_ramachandran_plot_density">[docs]</a>
+    <span class="k">def</span> <span class="nf">tsne_ramachandran_plot_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It gets the 2-D histogram ramachandran plots of the</span>
+<span class="sd">        clusters from t-SNE analysis. \n</span>
+<span class="sd">        The results is only meaningful when the extracted feature is &quot;phi_psi&quot;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        save: bool</span>
+<span class="sd">            If True the plot will save </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">visualization</span><span class="o">.</span><span class="n">tsne_ramachandran_plot_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.tsne_scatter_plot">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.tsne_scatter_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">tsne_scatter_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It gets the output results of t-SNE. </span>
+<span class="sd">        Three scatter plot will be generated based on original, clustering and Rg labels. </span>
+<span class="sd">        One KDE density plot will also be generated to shod the most populated areas in </span>
+<span class="sd">        the reduced dimension.   </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        save: Bool \n</span>
+<span class="sd">            if True the plot will be saved. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">tsne_scatter_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.tsne_scatter_plot_rg">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.tsne_scatter_plot_rg">[docs]</a>
+    <span class="k">def</span> <span class="nf">tsne_scatter_plot_rg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># It plots a redundant plot which implemented in tsne_scatter_plot and could be removed</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">tsne_scatter_plot_rg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.dimenfix_scatter">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.dimenfix_scatter">[docs]</a>
+    <span class="k">def</span> <span class="nf">dimenfix_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It gets the the final result for dimenfix method. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        save: bool \n</span>
+<span class="sd">            if True it will save the figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">dimenfix_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+
+    <span class="c1"># def dimenfix_scatter_plot(self, save=False):</span>
+    <span class="c1">#     visualization.dimenfix_scatter_plot_rg(self, save)</span>
+
+    <span class="c1"># def dimenfix_scatter_plot_2(self, save=False):</span>
+    <span class="c1">#     visualization.dimenfix_scatter_plot_ens(self, save)</span>
+
+    <span class="c1"># def dimenfix_cluster_scatter_plot(self, save=False):</span>
+    <span class="c1">#     visualization.dimenfix_cluster_scatter_plot(self, save)</span>
+
+    <span class="c1"># def dimenfix_cluster_scatter_plot_2(self, save=False):</span>
+    <span class="c1">#     visualization.dimenfix_cluster_scatter_plot_2(self, save)</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis.pca_cumulative_explained_variance">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.pca_cumulative_explained_variance">[docs]</a>
+    <span class="k">def</span> <span class="nf">pca_cumulative_explained_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It gets the cumulative variance and only applicable when the</span>
+<span class="sd">        dimensionality reduction method is &quot;pca&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        save: bool</span>
+<span class="sd">            if True it will save the figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">pca_cumulative_explained_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="EnsembleAnalysis.pca_plot_2d_landscapes">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.pca_plot_2d_landscapes">[docs]</a>
+    <span class="k">def</span> <span class="nf">pca_plot_2d_landscapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It gets the 2d landscapes plots when the dimensionality reduction method </span>
+<span class="sd">        is &quot;pca&quot; or &quot;kpca&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        save: bool</span>
+<span class="sd">            if True it will save the figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">pca_plot_2d_landscapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.pca_plot_1d_histograms">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.pca_plot_1d_histograms">[docs]</a>
+    <span class="k">def</span> <span class="nf">pca_plot_1d_histograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It gets the 2d landscapes plots when the dimensionality reduction method </span>
+<span class="sd">        is &quot;pca&quot; or &quot;kpca&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        save: bool \n</span>
+<span class="sd">            if True it will save the figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">pca_plot_1d_histograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.pca_correlation_plot">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.pca_correlation_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">pca_correlation_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_residues</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span><span class="n">sel_dims</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">pca_correlation_plot</span><span class="p">(</span><span class="n">num_residues</span><span class="p">,</span> <span class="n">sel_dims</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="EnsembleAnalysis.pca_rg_correlation">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.pca_rg_correlation">[docs]</a>
+    <span class="k">def</span> <span class="nf">pca_rg_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It demonstrates the correlation between PC dimension 1 and the amount of Rg</span>
+<span class="sd">        Typically high correlation can be detected here. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        save: bool \n</span>
+<span class="sd">            if True it will save the figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">pca_rg_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="EnsembleAnalysis.plot_global_sasa">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_global_sasa">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_global_sasa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showmeans</span><span class="o">=</span><span class="kc">True</span> <span class="p">,</span><span class="n">showmedians</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It plots the distribution of SASA for each conformation </span>
+<span class="sd">        within the ensembles </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        save: bool</span>
+<span class="sd">            if True it will save the figure</span>
+
+<span class="sd">        showmean: bool</span>
+<span class="sd">            if True it will show the mean </span>
+
+<span class="sd">        showmedian: bool</span>
+<span class="sd">            if True it will show the median</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_global_sasa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">,</span> <span class="n">showmeans</span><span class="p">,</span> <span class="n">showmedians</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_rg_vs_asphericity">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_asphericity">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_rg_vs_asphericity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It plots the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate </span>
+<span class="sd">        the correlation between Rg and Asphericity. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_rg_vs_asphericity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    def trajectories_plot_density(self):</span>
+<span class="sd">        visualization.trajectories_plot_density(self.trajectories)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_rg_vs_prolateness">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_prolateness">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_rg_vs_prolateness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It plots the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate </span>
+<span class="sd">        the correlation between Rg and Prolateness. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_rg_vs_prolateness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    def trajectories_plot_prolateness(self):</span>
+<span class="sd">        visualization.trajectories_plot_prolateness(self.trajectories)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+<div class="viewcode-block" id="EnsembleAnalysis.plot_alpha_angle_dihedral">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_alpha_angle_dihedral">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_alpha_angle_dihedral</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">atom_selector</span><span class="o">=</span><span class="s1">&#39;protein and name CA&#39;</span><span class="p">):</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_alpha_angle_dihederal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">atom_selector</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_relative_helix_content">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_relative_helix_content">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_relative_helix_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the relative helix content in each ensemble for each residue. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This analysis is not possible with coarse-grained models.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_relative_helix_content</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.trajectories_plot_rg_comparison">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.trajectories_plot_rg_comparison">[docs]</a>
+    <span class="k">def</span> <span class="nf">trajectories_plot_rg_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">bins_range</span><span class="p">:</span><span class="nb">tuple</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">),</span> <span class="n">dpi</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">96</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the distribution of the Rg whithin each ensemble</span>
+<span class="sd">        </span>
+<span class="sd">        Parameter </span>
+<span class="sd">        ---------</span>
+<span class="sd">        n_bins : int </span>
+<span class="sd">        bins_range : tuple</span>
+<span class="sd">        change the Rg scale in x-axis </span>
+<span class="sd">        dpi : int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">trajectories_plot_rg_comparison</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">bins_range</span><span class="p">,</span> <span class="n">dpi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_average_dmap_comparison">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_average_dmap_comparison">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_average_dmap_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                                    <span class="n">ticks_fontsize</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                                    <span class="n">cbar_fontsize</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                                    <span class="n">title_fontsize</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                                    <span class="n">dpi</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
+                                    <span class="n">max_d</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">6.8</span><span class="p">,</span>
+                                    <span class="n">use_ylabel</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the average distance maps for selected ensembles.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ticks_fontsize: int</span>
+<span class="sd">        cbar_fontsize: int</span>
+<span class="sd">        title_fontsize: int</span>
+<span class="sd">        dpi: int</span>
+<span class="sd">        max_d: float</span>
+<span class="sd">            The maximum amount for distance the default value is 6.8</span>
+<span class="sd">        use_ylabel: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_average_dmap_comparison</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">ticks_fontsize</span><span class="p">,</span> <span class="n">cbar_fontsize</span><span class="p">,</span> <span class="n">title_fontsize</span><span class="p">,</span> <span class="n">dpi</span><span class="p">,</span> <span class="n">max_d</span><span class="p">,</span> <span class="n">use_ylabel</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_cmap_comparison">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_cmap_comparison">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_cmap_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                            <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+                            <span class="n">ticks_fontsize</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                            <span class="n">cbar_fontsize</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                            <span class="n">title_fontsize</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                            <span class="n">dpi</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
+                            <span class="n">cmap_min</span><span class="p">:</span><span class="nb">float</span><span class="o">=-</span><span class="mf">3.5</span><span class="p">,</span>
+                            <span class="n">use_ylabel</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_cmap_comparison</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">ticks_fontsize</span><span class="p">,</span> <span class="n">cbar_fontsize</span><span class="p">,</span> <span class="n">title_fontsize</span><span class="p">,</span> <span class="n">dpi</span><span class="p">,</span> <span class="n">cmap_min</span><span class="p">,</span> <span class="n">use_ylabel</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_distance_distribution_multiple">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_distance_distribution_multiple">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_distance_distribution_multiple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">96</span><span class="p">):</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_distance_distribution_multiple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">,</span> <span class="n">dpi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.end_to_end_distances_plot">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.end_to_end_distances_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">end_to_end_distances_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">violin_plot</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">median</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot end-to-end distance distributions. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atom_selector: str </span>
+<span class="sd">            The type of atom considered for calculating end-to-end distance</span>
+
+<span class="sd">        bins: int</span>
+<span class="sd">            The number of bins for bar plot </span>
+
+<span class="sd">        violin_plot: bool </span>
+<span class="sd">            If True box plot is visualized</span>
+
+<span class="sd">        means: bool</span>
+<span class="sd">            If True mean is showing in the box plot </span>
+
+<span class="sd">        median: bool</span>
+<span class="sd">            If True median is showing in the box plot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">violin_plot</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">median</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_asphericity_dist">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_asphericity_dist">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_asphericity_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">violin_plot</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">median</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot asphericity distribution in each ensemble.</span>
+<span class="sd">        Asphericity is calculated based on the gyration tensor.  </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        bins: int</span>
+<span class="sd">            The number of bins for bar plot </span>
+<span class="sd">        violint_plot: bool </span>
+<span class="sd">            If True box plot is visualized</span>
+
+<span class="sd">        means: bool</span>
+<span class="sd">            If True mean is showing in the box plot </span>
+
+<span class="sd">        median: bool</span>
+<span class="sd">            If True median is showing in the box plot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_asphericity_dist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span> <span class="p">,</span><span class="n">bins</span><span class="p">,</span> <span class="n">violin_plot</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">median</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_prolateness_dist">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_prolateness_dist">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_prolateness_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">violin_plot</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">means</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">median</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot prolateness distribution in each ensemble.</span>
+<span class="sd">        Prolateness is calculated based on the gyration tensor.  </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        bins: int</span>
+<span class="sd">            The number of bins for bar plot </span>
+<span class="sd">        violint_plot: bool </span>
+<span class="sd">            If True box plot is visualized</span>
+
+<span class="sd">        means: bool</span>
+<span class="sd">            If True mean is showing in the box plot </span>
+
+<span class="sd">        median: bool</span>
+<span class="sd">            If True median is showing in the box plot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_prolateness_dist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">violin_plot</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">median</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_alpha_angles_dist">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_alpha_angles_dist">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_alpha_angles_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It plot the distribution of alpha angles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bins : int</span>
+<span class="sd">            The number of bins for bar plot </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_alpha_angles_dist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_contact_prob">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_contact_prob">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_contact_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">96</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It plots the contact probability map based on the threshold. </span>
+<span class="sd">        The default value for threshold is 0.8[nm], </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        title: str </span>
+<span class="sd">            You need to specify a title for the plot</span>
+
+<span class="sd">        threshold: float</span>
+<span class="sd">            Determing the threshold fo calculating the contact frequencies. default value is 0.8[nm]</span>
+
+<span class="sd">        dpi: int</span>
+<span class="sd">            For changing the quality and dimension of the output figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This analysis is not possible with coarse-grained models.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_contact_prob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span><span class="n">title</span><span class="p">,</span><span class="n">threshold</span><span class="p">,</span><span class="n">dpi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_ramachandran_plot">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_ramachandran_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_ramachandran_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">two_d_hist</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linespaces</span><span class="p">:</span><span class="nb">tuple</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">80</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        It gets Ramachandran plot. If two_d_hist= True it returns 2D histogram </span>
+<span class="sd">        for each ensembles. If two_d_hist=False it returns a simple scatter plot </span>
+<span class="sd">        for ell ensembles in one plot.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        two_d_hist: bool</span>
+<span class="sd">            If True it returns 2D histogram for each ensemble. </span>
+
+<span class="sd">        linespaces: tuple</span>
+<span class="sd">            You can customize the bins for 2D histogram</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_ramachandran_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">,</span> <span class="n">two_d_hist</span><span class="p">,</span> <span class="n">linespaces</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="EnsembleAnalysis.plot_ss_measure_disorder">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_ss_measure_disorder">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_ss_measure_disorder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointer</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="p">:</span><span class="nb">tuple</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function generates site specific flexibility parameter plot. For further information</span>
+<span class="sd">        you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. </span>
+<span class="sd">        In summary this score is sensitive to local flexibility based on the circular variance of the</span>
+<span class="sd">        Ramachandran angles φ and ψ for each residue in the ensemble.</span>
+
+<span class="sd">        This score ranges from 0 for identical dihederal angles for all conformers at the residue i to 1 </span>
+<span class="sd">        for a uniform distribution of dihederal angles at the residue i. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pointer: list </span>
+<span class="sd">            You can add the desired residues in a list and then you have a vertical dashed line to point those residues</span>
+
+<span class="sd">        figsize:tuple</span>
+<span class="sd">            You can change the size oof the figure here using a tuple. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perform_feature_extraction</span><span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">)</span> <span class="c1"># extract phi_psi features to calculate this score</span>
+        <span class="c1">#feature_dict = self.featurized_data # provide feature dictionary for plot function</span>
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_ss_measure_disorder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">pointer</span><span class="p">,</span> <span class="n">figsize</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.plot_ss_order_parameter">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_ss_order_parameter">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_ss_order_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointer</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="p">:</span><span class="nb">tuple</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">)):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function generates site specific order parameter plot. For further information</span>
+<span class="sd">        you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. </span>
+<span class="sd">        In summary this score abstracts from local chain flexibility. The parameter is still site-specific, as orientation </span>
+<span class="sd">        correlations in IDRs and IDPs decrease with increasing sequence distance. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pointer: list </span>
+<span class="sd">            You can add the desired residues in a list and then you have a vertical dashed line to point those residues</span>
+
+<span class="sd">        figsize:tuple</span>
+<span class="sd">            You can change the size oof the figure here using a tuple. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">visualization</span><span class="o">.</span><span class="n">plot_ss_order_parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">pointer</span><span class="p">,</span> <span class="n">figsize</span><span class="p">)</span></div>
+
+
+    <span class="c1">#----------------------------------------------------------------------</span>
+    <span class="c1">#------------- Functions for generating PDF reports -------------------</span>
+    <span class="c1">#----------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis.generate_custom_report">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.generate_custom_report">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_custom_report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates pdf report with all plots that were explicitly called during the session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">generate_custom_report</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.generate_report">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.generate_report">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates pdf report with all plots relevant to the conducted analysis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">==</span> <span class="s2">&quot;tsne&quot;</span><span class="p">:</span>
+            <span class="n">generate_tsne_report</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">==</span> <span class="s2">&quot;dimenfix&quot;</span><span class="p">:</span>
+            <span class="n">generate_dimenfix_report</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">==</span> <span class="s2">&quot;pca&quot;</span><span class="p">:</span>
+            <span class="n">generate_pca_report</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson, Nikola Ivanović.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

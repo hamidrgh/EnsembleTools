@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dpet package &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="EnsembleTools" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Disordered Protein Ensemble Tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">EnsembleTools</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">dpet package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-dpet.ensemble_analysis">dpet.ensemble_analysis module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dpet.ensemble_analysis.EnsembleAnalysis"><code class="docutils literal notranslate"><span class="pre">EnsembleAnalysis</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-dpet">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Disordered Protein Ensemble Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">EnsembleTools</a></li>
+      <li class="breadcrumb-item active">dpet package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dpet.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dpet-package">
+<h1>dpet package<a class="headerlink" href="#dpet-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-dpet.ensemble_analysis">
+<span id="dpet-ensemble-analysis-module"></span><h2>dpet.ensemble_analysis module<a class="headerlink" href="#module-dpet.ensemble_analysis" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.ensemble_analysis.</span></span><span class="sig-name descname"><span class="pre">EnsembleAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ens_codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.dimenfix_scatter">
+<span class="sig-name descname"><span class="pre">dimenfix_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.dimenfix_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.dimenfix_scatter" title="Link to this definition"></a></dt>
+<dd><p>It gets the the final result for dimenfix method.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<p>save: bool</p>
+<blockquote>
+<div><p>if True it will save the figure</p>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.download_from_atlas">
+<span class="sig-name descname"><span class="pre">download_from_atlas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.download_from_atlas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.download_from_atlas" title="Link to this definition"></a></dt>
+<dd><p>Automate Downloading MD ensembles from Atlas.</p>
+<section id="note">
+<h3>Note:<a class="headerlink" href="#note" title="Link to this heading"></a></h3>
+<p>The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
+Example: ‘3a1g_B’</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.download_from_database">
+<span class="sig-name descname"><span class="pre">download_from_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.download_from_database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.download_from_database" title="Link to this definition"></a></dt>
+<dd><p>Download ensembles from databases.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>database<span class="classifier">str</span></dt><dd><p>Choose the database you want to download from (‘ped’/’atlas’).</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Note<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>For PED database:</dt><dd><p>The function only downloads ensembles in the PED ID format, which consists of a string starting with ‘PED’
+followed by a numeric identifier and ‘e’ followed by another numeric identifier.
+Example: ‘PED00423e001’, ‘PED00424e001’</p>
+</dd>
+<dt>For atlas database:</dt><dd><p>The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
+Example: ‘3a1g_B’</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.download_from_ped">
+<span class="sig-name descname"><span class="pre">download_from_ped</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.download_from_ped"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.download_from_ped" title="Link to this definition"></a></dt>
+<dd><p>Automate Downloading ensembles using PED API</p>
+<section id="id3">
+<h3>Note<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>The function only downloads ensembles in the PED ID format, which consists of a string starting with ‘PED’
+followed by a numeric identifier and ‘e’ followed by another numeric identifier.
+Example: ‘PED00423e001’, ‘PED00424e001’</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.end_to_end_distances_plot">
+<span class="sig-name descname"><span class="pre">end_to_end_distances_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.end_to_end_distances_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.end_to_end_distances_plot" title="Link to this definition"></a></dt>
+<dd><p>Plot end-to-end distance distributions.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>atom_selector: str </dt><dd><p>The type of atom considered for calculating end-to-end distance</p>
+</dd>
+<dt>bins: int</dt><dd><p>The number of bins for bar plot</p>
+</dd>
+<dt>violin_plot: bool </dt><dd><p>If True box plot is visualized</p>
+</dd>
+<dt>means: bool</dt><dd><p>If True mean is showing in the box plot</p>
+</dd>
+<dt>median: bool</dt><dd><p>If True median is showing in the box plot</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">
+<span class="sig-name descname"><span class="pre">execute_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dim_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.execute_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline" title="Link to this definition"></a></dt>
+<dd><p>Executes the data analysis pipeline end-to-end. The pipeline includes:
+1. Download from database (optional)
+2. Generate trajectories
+3. Sample a random number of conformations from trajectories (optional)
+4. Perform feature extraction
+5. Perform dimensionality reduction</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>featurization_params: dict</dt><dd><p>Parameters for feature extraction. The only required parameter is “featurization”,
+which can be “phi_psi”, “ca_dist”, “a_angle”, “tr_omega” or “tr_phi”. 
+Other method-specific parameters are optional.</p>
+</dd>
+<dt>reduce_dim_params: dict</dt><dd><p>Parameters for dimensionality reduction. The only required parameter is “method”,
+which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
+</dd>
+<dt>database: str</dt><dd><p>Optional parameter that specifies the database from which the entries should be downloaded.
+Options are “ped” and “atlas”.</p>
+</dd>
+<dt>subsample_size: int</dt><dd><p>Optional parameter that specifies the trajectory subsample size.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.fit_dimensionality_reduction">
+<span class="sig-name descname"><span class="pre">fit_dimensionality_reduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.fit_dimensionality_reduction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.fit_dimensionality_reduction" title="Link to this definition"></a></dt>
+<dd><p>Perform dimensionality reduction on the extracted features. The options are “pca”, “tsne”, “dimenfix”, “mds” and “kpca”.</p>
+<section id="id6">
+<h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>method: str </dt><dd><p>Choose between pca”, “tsne”, “dimenfix”, “mds” and “kpca”.</p>
+</dd>
+<dt>fit_on: list[str]</dt><dd><p>if method is “pca” or “kpca” the fit_on parameter specifies on which ensembles the models should be fit. 
+The model will then be used to transform all ensembles.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.generate_custom_report">
+<span class="sig-name descname"><span class="pre">generate_custom_report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.generate_custom_report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.generate_custom_report" title="Link to this definition"></a></dt>
+<dd><p>Generates pdf report with all plots that were explicitly called during the session.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.generate_report">
+<span class="sig-name descname"><span class="pre">generate_report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.generate_report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.generate_report" title="Link to this definition"></a></dt>
+<dd><p>Generates pdf report with all plots relevant to the conducted analysis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.generate_trajectories">
+<span class="sig-name descname"><span class="pre">generate_trajectories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.generate_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.generate_trajectories" title="Link to this definition"></a></dt>
+<dd><p>Load trajectory files into mdtraj objects.</p>
+<dl class="simple">
+<dt>Supported file formats:</dt><dd><ol class="arabic simple">
+<li><p>[ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)</p></li>
+<li><p>[ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)</p></li>
+<li><p>[ens_code].pdb</p></li>
+<li><p>Directory [ens_code] containing several .pdb files</p></li>
+</ol>
+</dd>
+<dt>For each ensemble code (ens_code):</dt><dd><ul class="simple">
+<li><p>If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.</p></li>
+<li><p>If only a .pdb file exists, generate trajectory and topology files from the .pdb file.</p></li>
+<li><p>If a directory [ens_code] exists containing .pdb files, generate trajectory and topology files from the directory.</p></li>
+</ul>
+</dd>
+</dl>
+<section id="id7">
+<h3>Note<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>Using ‘download_from_database’ transforms the downloaded data into the appropriate format.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.pca_correlation_plot">
+<span class="sig-name descname"><span class="pre">pca_correlation_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_residues</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.pca_correlation_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.pca_correlation_plot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.pca_cumulative_explained_variance">
+<span class="sig-name descname"><span class="pre">pca_cumulative_explained_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.pca_cumulative_explained_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.pca_cumulative_explained_variance" title="Link to this definition"></a></dt>
+<dd><p>It gets the cumulative variance and only applicable when the
+dimensionality reduction method is “pca”</p>
+<section id="id8">
+<h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save: bool</dt><dd><p>if True it will save the figure</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.pca_plot_1d_histograms">
+<span class="sig-name descname"><span class="pre">pca_plot_1d_histograms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.pca_plot_1d_histograms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.pca_plot_1d_histograms" title="Link to this definition"></a></dt>
+<dd><p>It gets the 2d landscapes plots when the dimensionality reduction method 
+is “pca” or “kpca”</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>save: bool</p>
+<blockquote>
+<div><p>if True it will save the figure</p>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.pca_plot_2d_landscapes">
+<span class="sig-name descname"><span class="pre">pca_plot_2d_landscapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.pca_plot_2d_landscapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.pca_plot_2d_landscapes" title="Link to this definition"></a></dt>
+<dd><p>It gets the 2d landscapes plots when the dimensionality reduction method 
+is “pca” or “kpca”</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save: bool</dt><dd><p>if True it will save the figure</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.pca_rg_correlation">
+<span class="sig-name descname"><span class="pre">pca_rg_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.pca_rg_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.pca_rg_correlation" title="Link to this definition"></a></dt>
+<dd><p>It demonstrates the correlation between PC dimension 1 and the amount of Rg
+Typically high correlation can be detected here.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<p>save: bool</p>
+<blockquote>
+<div><p>if True it will save the figure</p>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.perform_feature_extraction">
+<span class="sig-name descname"><span class="pre">perform_feature_extraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.perform_feature_extraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.perform_feature_extraction" title="Link to this definition"></a></dt>
+<dd><p>Extract the selected feature. The options are “phi_psi”, “ca_dist”, “a_angle”, “tr_omega” and “tr_phi”.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>featurization: str </dt><dd><p>Choose between “phi_psi”, “ca_dist”, “a_angle”, “tr_omega” and “tr_phi”</p>
+</dd>
+<dt>normalize: Bool</dt><dd><p>if featurization is “ca_dist” normalize True will normalize the distances based on the mean and standard deviation.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_alpha_angle_dihedral">
+<span class="sig-name descname"><span class="pre">plot_alpha_angle_dihedral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'protein</span> <span class="pre">and</span> <span class="pre">name</span> <span class="pre">CA'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_alpha_angle_dihedral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_alpha_angle_dihedral" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_alpha_angles_dist">
+<span class="sig-name descname"><span class="pre">plot_alpha_angles_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_alpha_angles_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_alpha_angles_dist" title="Link to this definition"></a></dt>
+<dd><p>It plot the distribution of alpha angles.</p>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bins<span class="classifier">int</span></dt><dd><p>The number of bins for bar plot</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_asphericity_dist">
+<span class="sig-name descname"><span class="pre">plot_asphericity_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_asphericity_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_asphericity_dist" title="Link to this definition"></a></dt>
+<dd><p>Plot asphericity distribution in each ensemble.
+Asphericity is calculated based on the gyration tensor.</p>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bins: int</dt><dd><p>The number of bins for bar plot</p>
+</dd>
+<dt>violint_plot: bool </dt><dd><p>If True box plot is visualized</p>
+</dd>
+<dt>means: bool</dt><dd><p>If True mean is showing in the box plot</p>
+</dd>
+<dt>median: bool</dt><dd><p>If True median is showing in the box plot</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_average_dmap_comparison">
+<span class="sig-name descname"><span class="pre">plot_average_dmap_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ticks_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_average_dmap_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_average_dmap_comparison" title="Link to this definition"></a></dt>
+<dd><p>Plot the average distance maps for selected ensembles.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<p>ticks_fontsize: int
+cbar_fontsize: int
+title_fontsize: int
+dpi: int
+max_d: float</p>
+<blockquote>
+<div><p>The maximum amount for distance the default value is 6.8</p>
+</div></blockquote>
+<p>use_ylabel: bool</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_cmap_comparison">
+<span class="sig-name descname"><span class="pre">plot_cmap_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticks_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-3.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_cmap_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_cmap_comparison" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_contact_prob">
+<span class="sig-name descname"><span class="pre">plot_contact_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_contact_prob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_contact_prob" title="Link to this definition"></a></dt>
+<dd><p>It plots the contact probability map based on the threshold. 
+The default value for threshold is 0.8[nm],</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>title: str </dt><dd><p>You need to specify a title for the plot</p>
+</dd>
+<dt>threshold: float</dt><dd><p>Determing the threshold fo calculating the contact frequencies. default value is 0.8[nm]</p>
+</dd>
+<dt>dpi: int</dt><dd><p>For changing the quality and dimension of the output figure</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_distance_distribution_multiple">
+<span class="sig-name descname"><span class="pre">plot_distance_distribution_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_distance_distribution_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_distance_distribution_multiple" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_global_sasa">
+<span class="sig-name descname"><span class="pre">plot_global_sasa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showmeans</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showmedians</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_global_sasa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_global_sasa" title="Link to this definition"></a></dt>
+<dd><p>It plots the distribution of SASA for each conformation 
+within the ensembles</p>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save: bool</dt><dd><p>if True it will save the figure</p>
+</dd>
+<dt>showmean: bool</dt><dd><p>if True it will show the mean</p>
+</dd>
+<dt>showmedian: bool</dt><dd><p>if True it will show the median</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_prolateness_dist">
+<span class="sig-name descname"><span class="pre">plot_prolateness_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_prolateness_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_prolateness_dist" title="Link to this definition"></a></dt>
+<dd><p>Plot prolateness distribution in each ensemble.
+Prolateness is calculated based on the gyration tensor.</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bins: int</dt><dd><p>The number of bins for bar plot</p>
+</dd>
+<dt>violint_plot: bool </dt><dd><p>If True box plot is visualized</p>
+</dd>
+<dt>means: bool</dt><dd><p>If True mean is showing in the box plot</p>
+</dd>
+<dt>median: bool</dt><dd><p>If True median is showing in the box plot</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_ramachandran_plot">
+<span class="sig-name descname"><span class="pre">plot_ramachandran_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">two_d_hist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linespaces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(-180,</span> <span class="pre">180,</span> <span class="pre">80)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_ramachandran_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_ramachandran_plot" title="Link to this definition"></a></dt>
+<dd><p>It gets Ramachandran plot. If two_d_hist= True it returns 2D histogram 
+for each ensembles. If two_d_hist=False it returns a simple scatter plot 
+for ell ensembles in one plot.</p>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>two_d_hist: bool</dt><dd><p>If True it returns 2D histogram for each ensemble.</p>
+</dd>
+<dt>linespaces: tuple</dt><dd><p>You can customize the bins for 2D histogram</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_relative_helix_content">
+<span class="sig-name descname"><span class="pre">plot_relative_helix_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_relative_helix_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_relative_helix_content" title="Link to this definition"></a></dt>
+<dd><p>Plot the relative helix content in each ensemble for each residue.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_asphericity">
+<span class="sig-name descname"><span class="pre">plot_rg_vs_asphericity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_rg_vs_asphericity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_asphericity" title="Link to this definition"></a></dt>
+<dd><p>It plots the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate 
+the correlation between Rg and Asphericity.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_prolateness">
+<span class="sig-name descname"><span class="pre">plot_rg_vs_prolateness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_rg_vs_prolateness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_prolateness" title="Link to this definition"></a></dt>
+<dd><p>It plots the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
+the correlation between Rg and Prolateness.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_ss_measure_disorder">
+<span class="sig-name descname"><span class="pre">plot_ss_measure_disorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pointer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(15,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_ss_measure_disorder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_ss_measure_disorder" title="Link to this definition"></a></dt>
+<dd><p>This function generates site specific flexibility parameter plot. For further information
+you can check this paper by G.Jeschke <a class="reference external" href="https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906">https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906</a>. 
+In summary this score is sensitive to local flexibility based on the circular variance of the
+Ramachandran angles φ and ψ for each residue in the ensemble.</p>
+<p>This score ranges from 0 for identical dihederal angles for all conformers at the residue i to 1 
+for a uniform distribution of dihederal angles at the residue i.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pointer: list </dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues</p>
+</dd>
+<dt>figsize:tuple</dt><dd><p>You can change the size oof the figure here using a tuple.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.plot_ss_order_parameter">
+<span class="sig-name descname"><span class="pre">plot_ss_order_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pointer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(15,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_ss_order_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_ss_order_parameter" title="Link to this definition"></a></dt>
+<dd><p>This function generates site specific order parameter plot. For further information
+you can check this paper by G.Jeschke <a class="reference external" href="https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906">https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906</a>. 
+In summary this score abstracts from local chain flexibility. The parameter is still site-specific, as orientation 
+correlations in IDRs and IDPs decrease with increasing sequence distance.</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pointer: list </dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues</p>
+</dd>
+<dt>figsize:tuple</dt><dd><p>You can change the size oof the figure here using a tuple.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories">
+<span class="sig-name descname"><span class="pre">random_sample_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.random_sample_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories" title="Link to this definition"></a></dt>
+<dd><p>Sample a defined random number of conformations from the ensemble 
+trajectory.</p>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>sample_size: int</dt><dd><p>Number of conformations sampled from the ensemble.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.rg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rg</span></span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.rg" title="Link to this definition"></a></dt>
+<dd><p>Calculates Rg for each conformations in the loaded ensembles.
+The returned values are in Angstrom.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.trajectories_plot_rg_comparison">
+<span class="sig-name descname"><span class="pre">trajectories_plot_rg_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(1,</span> <span class="pre">4.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.trajectories_plot_rg_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.trajectories_plot_rg_comparison" title="Link to this definition"></a></dt>
+<dd><p>Plot the distribution of the Rg whithin each ensemble</p>
+<section id="parameter">
+<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading"></a></h3>
+<p>n_bins : int 
+bins_range : tuple
+change the Rg scale in x-axis 
+dpi : int</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.tsne_ramachandran_plot_density">
+<span class="sig-name descname"><span class="pre">tsne_ramachandran_plot_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.tsne_ramachandran_plot_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.tsne_ramachandran_plot_density" title="Link to this definition"></a></dt>
+<dd><p>It gets the 2-D histogram ramachandran plots of the
+clusters from t-SNE analysis.</p>
+<p>The results is only meaningful when the extracted feature is “phi_psi”.</p>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save: bool</dt><dd><p>If True the plot will save</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.tsne_scatter_plot">
+<span class="sig-name descname"><span class="pre">tsne_scatter_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.tsne_scatter_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.tsne_scatter_plot" title="Link to this definition"></a></dt>
+<dd><p>It gets the output results of t-SNE. 
+Three scatter plot will be generated based on original, clustering and Rg labels. 
+One KDE density plot will also be generated to shod the most populated areas in 
+the reduced dimension.</p>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>save: Bool</p>
+<blockquote>
+<div><p>if True the plot will be saved.</p>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.tsne_scatter_plot_rg">
+<span class="sig-name descname"><span class="pre">tsne_scatter_plot_rg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.tsne_scatter_plot_rg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.tsne_scatter_plot_rg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dpet">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dpet" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="EnsembleTools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson, Nikola Ivanović.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
