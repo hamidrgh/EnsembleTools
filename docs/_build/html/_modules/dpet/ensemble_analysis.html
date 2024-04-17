@@ -157,10 +157,11 @@
 <div class="viewcode-block" id="EnsembleAnalysis.download_from_atlas">
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.download_from_atlas">[docs]</a>
     <span class="k">def</span> <span class="nf">download_from_atlas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Automate Downloading MD ensembles from Atlas. </span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Automate Downloading MD ensembles from Atlas. </span>
 
 <span class="sd">        Note:</span>
-<span class="sd">        ----</span>
+<span class="sd">        -----</span>
 <span class="sd">        The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.</span>
 <span class="sd">        Example: &#39;3a1g_B&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -661,7 +662,8 @@
                                     <span class="n">max_d</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">6.8</span><span class="p">,</span>
                                     <span class="n">use_ylabel</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the average distance maps for selected ensembles.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the average distance maps for selected ensembles.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -673,6 +675,7 @@
 <span class="sd">            The maximum amount for distance the default value is 6.8</span>
 <span class="sd">        use_ylabel: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        
         <span class="n">visualization</span><span class="o">.</span><span class="n">plot_average_dmap_comparison</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">ticks_fontsize</span><span class="p">,</span> <span class="n">cbar_fontsize</span><span class="p">,</span> <span class="n">title_fontsize</span><span class="p">,</span> <span class="n">dpi</span><span class="p">,</span> <span class="n">max_d</span><span class="p">,</span> <span class="n">use_ylabel</span><span class="p">)</span></div>
 
 

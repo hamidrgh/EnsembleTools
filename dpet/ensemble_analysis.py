@@ -77,10 +77,11 @@ class EnsembleAnalysis:
                 print(f"File {pdb_filename} already exists. Skipping extraction.")
     
     def download_from_atlas(self):
-        """ Automate Downloading MD ensembles from Atlas. 
+        """ 
+        Automate Downloading MD ensembles from Atlas. 
 
         Note:
-        ----
+        -----
         The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
         Example: '3a1g_B'
         """
@@ -515,7 +516,8 @@ class EnsembleAnalysis:
                                     max_d:float=6.8,
                                     use_ylabel:bool=True):
         
-        """Plot the average distance maps for selected ensembles.
+        """
+        Plot the average distance maps for selected ensembles.
         
         Parameters
         ----------
@@ -527,6 +529,7 @@ class EnsembleAnalysis:
             The maximum amount for distance the default value is 6.8
         use_ylabel: bool
         """
+        
         visualization.plot_average_dmap_comparison(self.ensembles, ticks_fontsize, cbar_fontsize, title_fontsize, dpi, max_d, use_ylabel)
 
     def plot_cmap_comparison(self,

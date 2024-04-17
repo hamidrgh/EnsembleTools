@@ -11,6 +11,7 @@ Welcome to Disordered Protein Ensemble Tools's documentation!
    :caption: Contents:
 
    modules
+   introduction
 
 Indices and tables
 ==================

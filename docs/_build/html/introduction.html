@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction to Disordered Protein Ensemble Tools &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="dpet package" href="dpet.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Disordered Protein Ensemble Tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">EnsembleTools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to Disordered Protein Ensemble Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#workflow-example">Workflow Example</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Disordered Protein Ensemble Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Introduction to Disordered Protein Ensemble Tools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction-to-disordered-protein-ensemble-tools">
+<span id="intro"></span><h1>Introduction to Disordered Protein Ensemble Tools<a class="headerlink" href="#introduction-to-disordered-protein-ensemble-tools" title="Link to this heading"></a></h1>
+<p>TODO: Write the introduction</p>
+<nav class="contents local" id="table-of-contents">
+<p class="topic-title">Table of Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#workflow-example" id="id1">Workflow Example</a></p></li>
+</ul>
+</nav>
+<section id="workflow-example">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Workflow Example</a><a class="headerlink" href="#workflow-example" title="Link to this heading"></a></h2>
+<p>TODO: Perhaps insert a graphical representation of the pipeline steps in order</p>
+<p>The first step of the pipeline is to instantiate the ‘EnsembleAnalysis’
+class by providing a list of ensemble codes to analyse and the path to
+the data directory.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ens_codes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;PED00423e001&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;PED00424e001&#39;</span>
+<span class="p">]</span>
+<span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;delete&#39;</span>
+
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ens_codes</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>The pipeline expects ensemble data in the ‘data_dir’ directory in one of the following formats:</dt><dd><ol class="arabic simple">
+<li><p>[ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)</p></li>
+<li><p>[ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)</p></li>
+<li><p>[ens_code].pdb</p></li>
+<li><p>Directory [ens_code] containing several .pdb files</p></li>
+</ol>
+</dd>
+</dl>
+<p>Where [ens_code] corresponds to the input ensemble codes.</p>
+<p>Alternatively, it is possible to download the ensemble files and store them in the data directory
+with the following function call, by providing the appropriate database.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">download_from_database</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The next step is to generate MD trajectories from the ensemble files (or load them if trajectory data exists).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">generate_trajectories</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Optionally, a random number of conformations of given size is sampled from the trajectories for further analysis.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">random_sample_trajectories</span><span class="p">(</span><span class="n">sample_size</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, feature extraction is performed on the ensemble trajectories by selecting one of the supported methods.
+In this example, the features are phi and psi angles computed from the trajectories.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">perform_feature_extraction</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s1">&#39;phi_psi&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, one of several dimensionality reduction methods is performed on the previously extracted features by calling the following function.
+In this example, t-SNE dimensionality reduction is performed for perplexities 10, 50 and 100. The data is then clustered using K-means with
+the given number of clusters. The best combination of perplexity and number of clusters is determined by computing the silhouette score and the
+best results are kept. By setting circular to True, unit vector distance is used as t-SNE metric.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">fit_dimensionality_reduction</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;tsne&#39;</span><span class="p">,</span> <span class="n">perplexity_vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">circular</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">range_n_clusters</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Once the data transformation pipeline is completed, plot functions can be called to analyse the results. If save is True, the figure is saved
+in the data directory.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">tsne_scatter_plot</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="images/tsnep10_kmeans2_scatter.png"><img alt="images/tsnep10_kmeans2_scatter.png" src="images/tsnep10_kmeans2_scatter.png" style="width: 600px;" /></a>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dpet.html" class="btn btn-neutral float-left" title="dpet package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson, Nikola Ivanović.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
