@@ -303,11 +303,11 @@ class EnsembleAnalysis:
     def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None):
         """
         Execute the data analysis pipeline end-to-end. The pipeline includes:
-        1. Download from database (optional)
-        2. Generate trajectories
-        3. Sample a random number of conformations from trajectories (optional)
-        4. Perform feature extraction
-        5. Perform dimensionality reduction
+            1. Download from database (optional)
+            2. Generate trajectories
+            3. Sample a random number of conformations from trajectories (optional)
+            4. Perform feature extraction
+            5. Perform dimensionality reduction
 
         Parameters
         ----------

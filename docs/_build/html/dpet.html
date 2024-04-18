@@ -152,12 +152,16 @@ Example: ‘PED00423e001’, ‘PED00424e001’</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">
 <span class="sig-name descname"><span class="pre">execute_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dim_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.execute_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline" title="Link to this definition"></a></dt>
-<dd><p>Execute the data analysis pipeline end-to-end. The pipeline includes:
-1. Download from database (optional)
-2. Generate trajectories
-3. Sample a random number of conformations from trajectories (optional)
-4. Perform feature extraction
-5. Perform dimensionality reduction</p>
+<dd><dl class="simple">
+<dt>Execute the data analysis pipeline end-to-end. The pipeline includes:</dt><dd><ol class="arabic simple">
+<li><p>Download from database (optional)</p></li>
+<li><p>Generate trajectories</p></li>
+<li><p>Sample a random number of conformations from trajectories (optional)</p></li>
+<li><p>Perform feature extraction</p></li>
+<li><p>Perform dimensionality reduction</p></li>
+</ol>
+</dd>
+</dl>
 <section id="id3">
 <h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <dl class="simple">
