@@ -12,6 +12,14 @@ dpet.ensemble\_analysis module
    :undoc-members:
    :show-inheritance:
 
+dpet.visualization module
+------------------------------
+
+.. automodule:: dpet.visualization
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
