@@ -205,20 +205,25 @@ class EnsembleAnalysis:
         for ensemble in self.ensembles.values():
             ensemble.random_sample_trajectory(sample_size)
 
-    def extract_features(self, featurization: str, normalize: bool = False, *args, **kwargs):
+    def extract_features(self, featurization: str, normalize: bool = False, min_sep: int = 2, max_sep: int = None):
         """
-        Extract the selected feature. The options are "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi".
+        Extract the selected feature.
 
         Parameters
         ----------
-        featurization: str 
-            Choose between "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi"
+        featurization : str
+            Choose between "phi_psi", "ca_dist", "a_angle", "tr_omega", and "tr_phi".
 
-        normalize: Bool
-            if featurization is "ca_dist" normalize True will normalize the distances based on the mean and standard deviation.
+        normalize : bool, optional
+            Whether to normalize the data. Only applicable to the "ca_dist" method. Default is False.
 
+        min_sep : int, optional
+            Minimum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is 2.
+
+        max_sep : int, optional
+            Maximum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is None.
         """
-        self._featurize(featurization, *args, **kwargs)
+        self._featurize(featurization=featurization, min_sep=min_sep, max_sep=max_sep)
         self.concat_features = self._get_concat_features()
         self._create_all_labels()
         if normalize and featurization == "ca_dist":
@@ -227,13 +232,12 @@ class EnsembleAnalysis:
     def _exists_coarse_grained(self):
         return any(ensemble.coarse_grained for ensemble in self.ensembles.values())
 
-    def _featurize(self, featurization: str, *args, **kwargs):
+    def _featurize(self, featurization: str, min_sep, max_sep):
         if featurization in ("phi_psi", "tr_omega", "tr_phi") and self._exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
-        # Get names only for the first ensemble
         self.featurization = featurization
         for ensemble in self.ensembles.values():
-            ensemble.extract_features(featurization, *args, **kwargs)
+            ensemble.extract_features(featurization, min_sep, max_sep)
         self.feature_names = list(self.ensembles.values())[0].names
         print("Feature names:", self.feature_names)
 
@@ -319,11 +323,11 @@ class EnsembleAnalysis:
         reduce_dim_params: dict
             Parameters for dimensionality reduction. The only required parameter is "method",
             which can be "pca", "tsne", "dimenfix", "mds" or "kpca".
-        database: str
+        database: str, optional
             Optional parameter that specifies the database from which the entries should be downloaded.
-            Options are "ped" and "atlas".
-        subsample_size: int
-            Optional parameter that specifies the trajectory subsample size.
+            Options are "ped" and "atlas". Default is None.
+        subsample_size: int, optional
+            Optional parameter that specifies the trajectory subsample size. Default is None.
         """
         self.download_from_database(database)
         self.generate_trajectories()
@@ -344,8 +348,8 @@ class EnsembleAnalysis:
 
         Parameters
         -----------
-        save: bool
-            If True the plot will save 
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
         """
         
         visualization.tsne_ramachandran_plot_density(self, save)
@@ -359,8 +363,8 @@ class EnsembleAnalysis:
 
         Parameters
         -----------
-        save: Bool \n
-            if True the plot will be saved. 
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
         """
         visualization.tsne_scatter_plot(self, save)
 
@@ -373,9 +377,9 @@ class EnsembleAnalysis:
         Plot the the complete results for dimenfix method. 
 
         Parameters
-        ----------
-        save: bool \n
-            if True it will save the figure
+        -----------
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
         """
         visualization.dimenfix_scatter(self, save)
 
@@ -398,9 +402,9 @@ class EnsembleAnalysis:
         dimensionality reduction method is "pca"
 
         Parameters
-        ----------
-        save: bool
-            if True it will save the figure
+        -----------
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
         """
         visualization.pca_cumulative_explained_variance(self, save)
     
@@ -411,9 +415,9 @@ class EnsembleAnalysis:
         is "pca" or "kpca"
 
         Parameters
-        ----------
-        save: bool
-            if True it will save the figure
+        -----------
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
         """
         visualization.pca_plot_2d_landscapes(self, save)
 
@@ -423,9 +427,9 @@ class EnsembleAnalysis:
         is "pca" or "kpca"
 
         Parameters
-        ----------
-        save: bool \n
-            if True it will save the figure
+        -----------
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
         """
         visualization.pca_plot_1d_histograms(self, save)
 
@@ -438,9 +442,9 @@ class EnsembleAnalysis:
         Typically high correlation can be detected here. 
 
         Parameters
-        ----------
-        save: bool \n
-            if True it will save the figure
+        -----------
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
         """
         visualization.pca_rg_correlation(self, save)
         
@@ -452,8 +456,8 @@ class EnsembleAnalysis:
 
         Parameters
         ----------
-        save: bool
-            if True it will save the figure
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
 
         showmean: bool
             if True it will show the mean 
@@ -478,6 +482,11 @@ class EnsembleAnalysis:
         """
         Plot the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
         the correlation between Rg and Prolateness. 
+        
+        Parameters
+        -----------
+        save: bool, optional
+            If True the plot will be saved in the data directory. Default is False.
         """
         visualization.plot_rg_vs_prolateness(self, save)
     '''

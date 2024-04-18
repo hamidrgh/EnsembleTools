@@ -298,33 +298,40 @@
 
 <div class="viewcode-block" id="EnsembleAnalysis.extract_features">
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.extract_features">[docs]</a>
-    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extract the selected feature. The options are &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot; and &quot;tr_phi&quot;.</span>
+<span class="sd">        Extract the selected feature.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        featurization: str </span>
-<span class="sd">            Choose between &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot; and &quot;tr_phi&quot;</span>
+<span class="sd">        featurization : str</span>
+<span class="sd">            Choose between &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot;, and &quot;tr_phi&quot;.</span>
 
-<span class="sd">        normalize: Bool</span>
-<span class="sd">            if featurization is &quot;ca_dist&quot; normalize True will normalize the distances based on the mean and standard deviation.</span>
+<span class="sd">        normalize : bool, optional</span>
+<span class="sd">            Whether to normalize the data. Only applicable to the &quot;ca_dist&quot; method. Default is False.</span>
 
+<span class="sd">        min_sep : int, optional</span>
+<span class="sd">            Minimum separation distance for &quot;ca_dist&quot;, &quot;tr_omega&quot;, and &quot;tr_phi&quot; methods. Default is 2.</span>
+
+<span class="sd">        max_sep : int, optional</span>
+<span class="sd">            Maximum separation distance for &quot;ca_dist&quot;, &quot;tr_omega&quot;, and &quot;tr_phi&quot; methods. Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_featurize</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_featurize</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="o">=</span><span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_all_labels</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_data</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+    <span class="k">def</span> <span class="nf">_exists_coarse_grained</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exists_coarse_grained</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
-        <span class="c1"># Get names only for the first ensemble</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">featurization</span> <span class="o">=</span> <span class="n">featurization</span>
         <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">ensemble</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature names:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
 
@@ -415,11 +422,11 @@
 <span class="sd">        reduce_dim_params: dict</span>
 <span class="sd">            Parameters for dimensionality reduction. The only required parameter is &quot;method&quot;,</span>
 <span class="sd">            which can be &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; or &quot;kpca&quot;.</span>
-<span class="sd">        database: str</span>
+<span class="sd">        database: str, optional</span>
 <span class="sd">            Optional parameter that specifies the database from which the entries should be downloaded.</span>
-<span class="sd">            Options are &quot;ped&quot; and &quot;atlas&quot;.</span>
-<span class="sd">        subsample_size: int</span>
-<span class="sd">            Optional parameter that specifies the trajectory subsample size.</span>
+<span class="sd">            Options are &quot;ped&quot; and &quot;atlas&quot;. Default is None.</span>
+<span class="sd">        subsample_size: int, optional</span>
+<span class="sd">            Optional parameter that specifies the trajectory subsample size. Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">download_from_database</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">generate_trajectories</span><span class="p">()</span>
@@ -443,8 +450,8 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
-<span class="sd">        save: bool</span>
-<span class="sd">            If True the plot will save </span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="n">visualization</span><span class="o">.</span><span class="n">tsne_ramachandran_plot_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
@@ -461,8 +468,8 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
-<span class="sd">        save: Bool \n</span>
-<span class="sd">            if True the plot will be saved. </span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">tsne_scatter_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
 
@@ -481,9 +488,9 @@
 <span class="sd">        Plot the the complete results for dimenfix method. </span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        save: bool \n</span>
-<span class="sd">            if True it will save the figure</span>
+<span class="sd">        -----------</span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">dimenfix_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
 
@@ -509,9 +516,9 @@
 <span class="sd">        dimensionality reduction method is &quot;pca&quot;</span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        save: bool</span>
-<span class="sd">            if True it will save the figure</span>
+<span class="sd">        -----------</span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">pca_cumulative_explained_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
 
@@ -525,9 +532,9 @@
 <span class="sd">        is &quot;pca&quot; or &quot;kpca&quot;</span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        save: bool</span>
-<span class="sd">            if True it will save the figure</span>
+<span class="sd">        -----------</span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">pca_plot_2d_landscapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
 
@@ -540,9 +547,9 @@
 <span class="sd">        is &quot;pca&quot; or &quot;kpca&quot;</span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        save: bool \n</span>
-<span class="sd">            if True it will save the figure</span>
+<span class="sd">        -----------</span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">pca_plot_1d_histograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
 
@@ -561,9 +568,9 @@
 <span class="sd">        Typically high correlation can be detected here. </span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        save: bool \n</span>
-<span class="sd">            if True it will save the figure</span>
+<span class="sd">        -----------</span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">pca_rg_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
 
@@ -578,8 +585,8 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        save: bool</span>
-<span class="sd">            if True it will save the figure</span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 
 <span class="sd">        showmean: bool</span>
 <span class="sd">            if True it will show the mean </span>
@@ -610,6 +617,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate </span>
 <span class="sd">        the correlation between Rg and Prolateness. </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        save: bool, optional</span>
+<span class="sd">            If True the plot will be saved in the data directory. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">plot_rg_vs_prolateness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
 
@@ -631,7 +643,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot the relative helix content in each ensemble for each residue. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exists_coarse_grained</span><span class="p">():</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This analysis is not possible with coarse-grained models.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">plot_relative_helix_content</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span></div>
@@ -806,7 +818,7 @@
 <span class="sd">        dpi: int</span>
 <span class="sd">            For changing the quality and dimension of the output figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exists_coarse_grained</span><span class="p">():</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This analysis is not possible with coarse-grained models.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">plot_contact_prob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span><span class="n">title</span><span class="p">,</span><span class="n">threshold</span><span class="p">,</span><span class="n">dpi</span><span class="p">)</span></div>

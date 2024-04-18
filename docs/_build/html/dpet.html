@@ -103,10 +103,10 @@
 <dd><p>Plot the the complete results for dimenfix method.</p>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
-<p>save: bool</p>
-<blockquote>
-<div><p>if True it will save the figure</p>
-</div></blockquote>
+<dl class="simple">
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 
@@ -198,10 +198,10 @@ Other method-specific parameters are optional.</p>
 <dt>reduce_dim_params: dict</dt><dd><p>Parameters for dimensionality reduction. The only required parameter is “method”,
 which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 </dd>
-<dt>database: str</dt><dd><p>Optional parameter that specifies the database from which the entries should be downloaded.
-Options are “ped” and “atlas”.</p>
+<dt>database: str, optional</dt><dd><p>Optional parameter that specifies the database from which the entries should be downloaded.
+Options are “ped” and “atlas”. Default is None.</p>
 </dd>
-<dt>subsample_size: int</dt><dd><p>Optional parameter that specifies the trajectory subsample size.</p>
+<dt>subsample_size: int, optional</dt><dd><p>Optional parameter that specifies the trajectory subsample size. Default is None.</p>
 </dd>
 </dl>
 </section>
@@ -209,14 +209,18 @@ Options are “ped” and “atlas”.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.extract_features">
-<span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.extract_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.extract_features" title="Link to this definition"></a></dt>
-<dd><p>Extract the selected feature. The options are “phi_psi”, “ca_dist”, “a_angle”, “tr_omega” and “tr_phi”.</p>
+<span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.extract_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.extract_features" title="Link to this definition"></a></dt>
+<dd><p>Extract the selected feature.</p>
 <section id="id6">
 <h3>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>featurization: str </dt><dd><p>Choose between “phi_psi”, “ca_dist”, “a_angle”, “tr_omega” and “tr_phi”</p>
+<dt>featurization<span class="classifier">str</span></dt><dd><p>Choose between “phi_psi”, “ca_dist”, “a_angle”, “tr_omega”, and “tr_phi”.</p>
 </dd>
-<dt>normalize: Bool</dt><dd><p>if featurization is “ca_dist” normalize True will normalize the distances based on the mean and standard deviation.</p>
+<dt>normalize<span class="classifier">bool, optional</span></dt><dd><p>Whether to normalize the data. Only applicable to the “ca_dist” method. Default is False.</p>
+</dd>
+<dt>min_sep<span class="classifier">int, optional</span></dt><dd><p>Minimum separation distance for “ca_dist”, “tr_omega”, and “tr_phi” methods. Default is 2.</p>
+</dd>
+<dt>max_sep<span class="classifier">int, optional</span></dt><dd><p>Maximum separation distance for “ca_dist”, “tr_omega”, and “tr_phi” methods. Default is None.</p>
 </dd>
 </dl>
 </section>
@@ -272,7 +276,7 @@ dimensionality reduction method is “pca”</p>
 <section id="id8">
 <h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>save: bool</dt><dd><p>if True it will save the figure</p>
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -285,10 +289,10 @@ dimensionality reduction method is “pca”</p>
 is “pca” or “kpca”</p>
 <section id="id9">
 <h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
-<p>save: bool</p>
-<blockquote>
-<div><p>if True it will save the figure</p>
-</div></blockquote>
+<dl class="simple">
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 
@@ -300,7 +304,7 @@ is “pca” or “kpca”</p>
 <section id="id10">
 <h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>save: bool</dt><dd><p>if True it will save the figure</p>
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -313,10 +317,10 @@ is “pca” or “kpca”</p>
 Typically high correlation can be detected here.</p>
 <section id="id11">
 <h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
-<p>save: bool</p>
-<blockquote>
-<div><p>if True it will save the figure</p>
-</div></blockquote>
+<dl class="simple">
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 
@@ -412,7 +416,7 @@ within the ensembles.</p>
 <section id="id16">
 <h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>save: bool</dt><dd><p>if True it will save the figure</p>
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
 <dt>showmean: bool</dt><dd><p>if True it will show the mean</p>
 </dd>
@@ -477,6 +481,13 @@ the correlation between Rg and Asphericity.</p>
 <span class="sig-name descname"><span class="pre">plot_rg_vs_prolateness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.plot_rg_vs_prolateness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_prolateness" title="Link to this definition"></a></dt>
 <dd><p>Plot the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
 the correlation between Rg and Prolateness.</p>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
@@ -488,8 +499,8 @@ In summary this score is sensitive to local flexibility based on the circular va
 Ramachandran angles φ and ψ for each residue in the ensemble.</p>
 <p>This score ranges from 0 for identical dihederal angles for all conformers at the residue i to 1 
 for a uniform distribution of dihederal angles at the residue i.</p>
-<section id="id19">
-<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>pointer: list </dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues</p>
 </dd>
@@ -506,8 +517,8 @@ for a uniform distribution of dihederal angles at the residue i.</p>
 you can check this paper by G.Jeschke <a class="reference external" href="https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906">https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906</a>. 
 In summary this score abstracts from local chain flexibility. The parameter is still site-specific, as orientation 
 correlations in IDRs and IDPs decrease with increasing sequence distance.</p>
-<section id="id20">
-<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>pointer: list </dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues</p>
 </dd>
@@ -522,8 +533,8 @@ correlations in IDRs and IDPs decrease with increasing sequence distance.</p>
 <span class="sig-name descname"><span class="pre">random_sample_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.random_sample_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories" title="Link to this definition"></a></dt>
 <dd><p>Sample a defined random number of conformations from the ensemble 
 trajectory.</p>
-<section id="id21">
-<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>sample_size: int</dt><dd><p>Number of conformations sampled from the ensemble.</p>
 </dd>
@@ -535,8 +546,8 @@ trajectory.</p>
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">
 <span class="sig-name descname"><span class="pre">reduce_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.reduce_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features" title="Link to this definition"></a></dt>
 <dd><p>Perform dimensionality reduction on the extracted features. The options are “pca”, “tsne”, “dimenfix”, “mds” and “kpca”.</p>
-<section id="id22">
-<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>method: str </dt><dd><p>Choose between pca”, “tsne”, “dimenfix”, “mds” and “kpca”.</p>
 </dd>
@@ -573,10 +584,10 @@ dpi : int</p>
 <dd><p>Plot the 2-D histogram ramachandran plots of the
 clusters from t-SNE analysis.</p>
 <p>The results is only meaningful when the extracted feature is “phi_psi”.</p>
-<section id="id23">
-<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>save: bool</dt><dd><p>If True the plot will save</p>
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -589,12 +600,12 @@ clusters from t-SNE analysis.</p>
 Three scatter plot will be generated based on original, clustering and Rg labels. 
 One KDE density plot will also be generated to shod the most populated areas in 
 the reduced dimension.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
-<p>save: Bool</p>
-<blockquote>
-<div><p>if True the plot will be saved.</p>
-</div></blockquote>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 

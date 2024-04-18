@@ -63,41 +63,42 @@ class Ensemble():
             xyz=self.original_trajectory.xyz[random_indices],
             topology=self.original_trajectory.topology)
         
-    def extract_features(self, featurization, *args, **kwargs):
+    def extract_features(self, featurization, min_sep, max_sep):
         print(f"Performing feature extraction for Ensemble: {self.ens_code}.")
-        self.features, self.names = self._featurize(featurization, *args, **kwargs)
+        self.features, self.names = self._featurize(featurization, min_sep, max_sep)
         print("Transformed ensemble shape:", self.features.shape)
 
-    def _featurize(self, featurization: str, *args, **kwargs):
+    def _featurize(self, featurization: str, min_sep, max_sep):
         if featurization == "ca_dist":
             return featurize_ca_dist(
                 traj=self.trajectory, 
                 get_names=True,
                 atom_selector=self.atom_selector,
-                *args, **kwargs)
+                min_sep=min_sep,
+                max_sep=max_sep)
         elif featurization == "phi_psi":
             return featurize_phi_psi(
                 traj=self.trajectory, 
-                get_names=True, 
-                *args, **kwargs)
+                get_names=True)
         elif featurization == "a_angle":
             return featurize_a_angle(
                 traj=self.trajectory, 
                 get_names=True, 
-                atom_selector=self.atom_selector,
-                *args, **kwargs)
+                atom_selector=self.atom_selector)
         elif featurization == "tr_omega":
             return featurize_tr_angle(
                 traj=self.trajectory,
                 type="omega",
                 get_names=True,
-                *args, **kwargs)
+                min_sep=min_sep,
+                max_sep=max_sep)
         elif featurization == "tr_phi":
             return featurize_tr_angle(
                 traj=self.trajectory,
                 type="phi",
                 get_names=True,
-                *args, **kwargs)
+                min_sep=min_sep,
+                max_sep=max_sep)
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
         
@@ -113,13 +114,10 @@ class Ensemble():
         # Get all unique chain IDs from the topology
         chain_ids = set(chain.index for chain in topology.chains)
 
-        # Print available chain IDs
-        print("Ensemble has multiple chains. Available chain IDs:", chain_ids)
+        print("Ensemble has multiple chains. Enter the chain ID you want to select. Available chain IDs:", chain_ids)
 
-        # Prompt user to select a chain ID
         selected_chain = input("Enter the chain ID you want to select: ")
 
-        # Validate user input
         if int(selected_chain) not in chain_ids:
             print("Invalid chain ID. Please select from the available options.")
             return
