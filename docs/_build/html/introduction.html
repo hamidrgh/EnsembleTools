@@ -135,9 +135,10 @@ best results are kept. By setting circular to True, unit vector distance is used
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">fit_dimensionality_reduction</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;tsne&#39;</span><span class="p">,</span> <span class="n">perplexity_vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">circular</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">range_n_clusters</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Once the data transformation pipeline is completed, plot functions can be called to analyse the results. If save is True, the figure is saved
-in the data directory.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">tsne_scatter_plot</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<p>Once the data transformation pipeline is completed, the Visualization class is instantiated to analyse the results.
+In the example below, the figure is saved in the data directory.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span> <span class="o">=</span> <span class="n">Visualization</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+<span class="n">visualization</span><span class="o">.</span><span class="n">tsne_scatter_plot</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="images/tsnep10_kmeans2_scatter.png"><img alt="images/tsnep10_kmeans2_scatter.png" src="images/tsnep10_kmeans2_scatter.png" style="width: 600px;" /></a>

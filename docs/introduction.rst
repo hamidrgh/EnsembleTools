@@ -70,12 +70,13 @@ best results are kept. By setting circular to True, unit vector distance is used
 
     analysis.fit_dimensionality_reduction(method='tsne', perplexity_vals = [10, 50, 100], circular=True, range_n_clusters=range(2,10,1))
 
-Once the data transformation pipeline is completed, plot functions can be called to analyse the results. If save is True, the figure is saved
-in the data directory.
+Once the data transformation pipeline is completed, the Visualization class is instantiated to analyse the results. 
+In the example below, the figure is saved in the data directory.
 
 .. code-block:: python
 
-    analysis.tsne_scatter_plot(save=True)
+    visualization = Visualization(analysis)
+    visualization.tsne_scatter_plot(save=True)
 
 .. image:: images/tsnep10_kmeans2_scatter.png
    :width: 600
