@@ -9,7 +9,7 @@ from matplotlib.lines import Line2D
 
 from dpet.ensemble_analysis import EnsembleAnalysis
 from dpet.featurization.angles import featurize_a_angle
-from dpet.visualization.coord import *
+from dpet.data.coord import *
 from scipy.stats import gaussian_kde
 
 PLOT_DIR = "plots"
