@@ -44,6 +44,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">EnsembleTools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
 </ul>
 
         </div>
@@ -295,9 +296,9 @@
             <span class="n">ensemble</span><span class="o">.</span><span class="n">random_sample_trajectory</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="EnsembleAnalysis.perform_feature_extraction">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.perform_feature_extraction">[docs]</a>
-    <span class="k">def</span> <span class="nf">perform_feature_extraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnsembleAnalysis.extract_features">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.extract_features">[docs]</a>
+    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the selected feature. The options are &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot; and &quot;tr_phi&quot;.</span>
 
@@ -310,14 +311,14 @@
 <span class="sd">            if featurization is &quot;ca_dist&quot; normalize True will normalize the distances based on the mean and standard deviation.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_featurize</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_all_labels</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_data</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
         <span class="c1"># Get names only for the first ensemble</span>
@@ -365,9 +366,9 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Concatenated featurized ensemble shape:&quot;</span><span class="p">,</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">concat_features</span>
 
-<div class="viewcode-block" id="EnsembleAnalysis.fit_dimensionality_reduction">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.fit_dimensionality_reduction">[docs]</a>
-    <span class="k">def</span> <span class="nf">fit_dimensionality_reduction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="EnsembleAnalysis.reduce_features">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">[docs]</a>
+    <span class="k">def</span> <span class="nf">reduce_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform dimensionality reduction on the extracted features. The options are &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; and &quot;kpca&quot;.</span>
 
@@ -398,7 +399,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">[docs]</a>
     <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Executes the data analysis pipeline end-to-end. The pipeline includes:</span>
+<span class="sd">        Execute the data analysis pipeline end-to-end. The pipeline includes:</span>
 <span class="sd">        1. Download from database (optional)</span>
 <span class="sd">        2. Generate trajectories</span>
 <span class="sd">        3. Sample a random number of conformations from trajectories (optional)</span>
@@ -424,8 +425,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">generate_trajectories</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">subsample_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">random_sample_trajectories</span><span class="p">(</span><span class="n">subsample_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">perform_feature_extraction</span><span class="p">(</span><span class="o">**</span><span class="n">featurization_params</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fit_dimensionality_reduction</span><span class="p">(</span><span class="o">**</span><span class="n">reduce_dim_params</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="o">**</span><span class="n">featurization_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduce_features</span><span class="p">(</span><span class="o">**</span><span class="n">reduce_dim_params</span><span class="p">)</span></div>
 
 
     <span class="c1">#----------------------------------------------------------------------</span>
@@ -436,7 +437,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.tsne_ramachandran_plot_density">[docs]</a>
     <span class="k">def</span> <span class="nf">tsne_ramachandran_plot_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It gets the 2-D histogram ramachandran plots of the</span>
+<span class="sd">        Plot the 2-D histogram ramachandran plots of the</span>
 <span class="sd">        clusters from t-SNE analysis. \n</span>
 <span class="sd">        The results is only meaningful when the extracted feature is &quot;phi_psi&quot;.</span>
 
@@ -453,7 +454,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.tsne_scatter_plot">[docs]</a>
     <span class="k">def</span> <span class="nf">tsne_scatter_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It gets the output results of t-SNE. </span>
+<span class="sd">        Plot the results of t-SNE analysis. </span>
 <span class="sd">        Three scatter plot will be generated based on original, clustering and Rg labels. </span>
 <span class="sd">        One KDE density plot will also be generated to shod the most populated areas in </span>
 <span class="sd">        the reduced dimension.   </span>
@@ -477,7 +478,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.dimenfix_scatter">[docs]</a>
     <span class="k">def</span> <span class="nf">dimenfix_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It gets the the final result for dimenfix method. </span>
+<span class="sd">        Plot the the complete results for dimenfix method. </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -504,7 +505,7 @@
     <span class="k">def</span> <span class="nf">pca_cumulative_explained_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It gets the cumulative variance and only applicable when the</span>
+<span class="sd">        Plot the cumulative variance. Only applicable when the</span>
 <span class="sd">        dimensionality reduction method is &quot;pca&quot;</span>
 
 <span class="sd">        Parameters</span>
@@ -520,7 +521,7 @@
     <span class="k">def</span> <span class="nf">pca_plot_2d_landscapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It gets the 2d landscapes plots when the dimensionality reduction method </span>
+<span class="sd">        Plot 2D landscapes when the dimensionality reduction method </span>
 <span class="sd">        is &quot;pca&quot; or &quot;kpca&quot;</span>
 
 <span class="sd">        Parameters</span>
@@ -535,7 +536,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.pca_plot_1d_histograms">[docs]</a>
     <span class="k">def</span> <span class="nf">pca_plot_1d_histograms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It gets the 2d landscapes plots when the dimensionality reduction method </span>
+<span class="sd">        Plot 1D histogram when the dimensionality reduction method </span>
 <span class="sd">        is &quot;pca&quot; or &quot;kpca&quot;</span>
 
 <span class="sd">        Parameters</span>
@@ -556,7 +557,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.pca_rg_correlation">[docs]</a>
     <span class="k">def</span> <span class="nf">pca_rg_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It demonstrates the correlation between PC dimension 1 and the amount of Rg</span>
+<span class="sd">        Examine and plot the correlation between PC dimension 1 and the amount of Rg</span>
 <span class="sd">        Typically high correlation can be detected here. </span>
 
 <span class="sd">        Parameters</span>
@@ -572,8 +573,8 @@
     <span class="k">def</span> <span class="nf">plot_global_sasa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showmeans</span><span class="o">=</span><span class="kc">True</span> <span class="p">,</span><span class="n">showmedians</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It plots the distribution of SASA for each conformation </span>
-<span class="sd">        within the ensembles </span>
+<span class="sd">        Plot the distribution of SASA for each conformation </span>
+<span class="sd">        within the ensembles.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -593,7 +594,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_asphericity">[docs]</a>
     <span class="k">def</span> <span class="nf">plot_rg_vs_asphericity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It plots the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate </span>
+<span class="sd">        Plot the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate </span>
 <span class="sd">        the correlation between Rg and Asphericity. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">plot_rg_vs_asphericity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
@@ -607,7 +608,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_rg_vs_prolateness">[docs]</a>
     <span class="k">def</span> <span class="nf">plot_rg_vs_prolateness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It plots the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate </span>
+<span class="sd">        Plot the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate </span>
 <span class="sd">        the correlation between Rg and Prolateness. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">visualization</span><span class="o">.</span><span class="n">plot_rg_vs_prolateness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="p">)</span></div>
@@ -777,7 +778,7 @@
     <span class="k">def</span> <span class="nf">plot_alpha_angles_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It plot the distribution of alpha angles.</span>
+<span class="sd">        Plot the distribution of alpha angles.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -791,7 +792,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_contact_prob">[docs]</a>
     <span class="k">def</span> <span class="nf">plot_contact_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">96</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It plots the contact probability map based on the threshold. </span>
+<span class="sd">        Plot the contact probability map based on the threshold. </span>
 <span class="sd">        The default value for threshold is 0.8[nm], </span>
 
 <span class="sd">        Parameters</span>
@@ -815,7 +816,7 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_ramachandran_plot">[docs]</a>
     <span class="k">def</span> <span class="nf">plot_ramachandran_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">two_d_hist</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linespaces</span><span class="p">:</span><span class="nb">tuple</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">80</span><span class="p">)):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        It gets Ramachandran plot. If two_d_hist= True it returns 2D histogram </span>
+<span class="sd">        Ramachandran plot. If two_d_hist= True it returns 2D histogram </span>
 <span class="sd">        for each ensembles. If two_d_hist=False it returns a simple scatter plot </span>
 <span class="sd">        for ell ensembles in one plot.</span>
 
@@ -835,8 +836,8 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.plot_ss_measure_disorder">[docs]</a>
     <span class="k">def</span> <span class="nf">plot_ss_measure_disorder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointer</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="p">:</span><span class="nb">tuple</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">)):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function generates site specific flexibility parameter plot. For further information</span>
-<span class="sd">        you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. </span>
+<span class="sd">        Generate site specific flexibility parameter plot. Further information is available in</span>
+<span class="sd">        this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. </span>
 <span class="sd">        In summary this score is sensitive to local flexibility based on the circular variance of the</span>
 <span class="sd">        Ramachandran angles φ and ψ for each residue in the ensemble.</span>
 
@@ -861,7 +862,7 @@
     <span class="k">def</span> <span class="nf">plot_ss_order_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pointer</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="p">:</span><span class="nb">tuple</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">)):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function generates site specific order parameter plot. For further information</span>
+<span class="sd">        Generate site specific order parameter plot. For further information</span>
 <span class="sd">        you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. </span>
 <span class="sd">        In summary this score abstracts from local chain flexibility. The parameter is still site-specific, as orientation </span>
 <span class="sd">        correlations in IDRs and IDPs decrease with increasing sequence distance. </span>
@@ -887,7 +888,7 @@
     <span class="k">def</span> <span class="nf">generate_custom_report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generates pdf report with all plots that were explicitly called during the session.</span>
+<span class="sd">        Generate pdf report with all plots that were explicitly called during the session.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">generate_custom_report</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
@@ -898,7 +899,7 @@
     <span class="k">def</span> <span class="nf">generate_report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generates pdf report with all plots relevant to the conducted analysis.</span>
+<span class="sd">        Generate pdf report with all plots relevant to the conducted analysis.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">==</span> <span class="s2">&quot;tsne&quot;</span><span class="p">:</span>

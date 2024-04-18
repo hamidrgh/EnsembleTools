@@ -205,7 +205,7 @@ class EnsembleAnalysis:
         for ensemble in self.ensembles.values():
             ensemble.random_sample_trajectory(sample_size)
 
-    def perform_feature_extraction(self, featurization: str, normalize: bool = False, *args, **kwargs):
+    def extract_features(self, featurization: str, normalize: bool = False, *args, **kwargs):
         """
         Extract the selected feature. The options are "phi_psi", "ca_dist", "a_angle", "tr_omega" and "tr_phi".
 
@@ -218,13 +218,13 @@ class EnsembleAnalysis:
             if featurization is "ca_dist" normalize True will normalize the distances based on the mean and standard deviation.
 
         """
-        self._extract_features(featurization, *args, **kwargs)
+        self._featurize(featurization, *args, **kwargs)
         self.concat_features = self._get_concat_features()
         self._create_all_labels()
         if normalize and featurization == "ca_dist":
             self._normalize_data()
 
-    def _extract_features(self, featurization: str, *args, **kwargs):
+    def _featurize(self, featurization: str, *args, **kwargs):
         if featurization in ("phi_psi", "tr_omega", "tr_phi") and any(ensemble.coarse_grained for ensemble in self.ensembles.values()):
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         # Get names only for the first ensemble
@@ -272,7 +272,7 @@ class EnsembleAnalysis:
         print("Concatenated featurized ensemble shape:", concat_features.shape)
         return concat_features
 
-    def fit_dimensionality_reduction(self, method: str, fit_on:list[str]=None, *args, **kwargs):
+    def reduce_features(self, method: str, fit_on:list[str]=None, *args, **kwargs):
         """
         Perform dimensionality reduction on the extracted features. The options are "pca", "tsne", "dimenfix", "mds" and "kpca".
 
@@ -300,7 +300,7 @@ class EnsembleAnalysis:
 
     def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None):
         """
-        Executes the data analysis pipeline end-to-end. The pipeline includes:
+        Execute the data analysis pipeline end-to-end. The pipeline includes:
         1. Download from database (optional)
         2. Generate trajectories
         3. Sample a random number of conformations from trajectories (optional)
@@ -326,8 +326,8 @@ class EnsembleAnalysis:
         self.generate_trajectories()
         if subsample_size is not None:
             self.random_sample_trajectories(subsample_size)
-        self.perform_feature_extraction(**featurization_params)
-        self.fit_dimensionality_reduction(**reduce_dim_params)
+        self.extract_features(**featurization_params)
+        self.reduce_features(**reduce_dim_params)
 
     #----------------------------------------------------------------------
     #------------------- Integrated plot functions ------------------------
@@ -335,7 +335,7 @@ class EnsembleAnalysis:
 
     def tsne_ramachandran_plot_density(self, save:bool=False):
         """
-        It gets the 2-D histogram ramachandran plots of the
+        Plot the 2-D histogram ramachandran plots of the
         clusters from t-SNE analysis. \n
         The results is only meaningful when the extracted feature is "phi_psi".
 
@@ -349,7 +349,7 @@ class EnsembleAnalysis:
 
     def tsne_scatter_plot(self, save:bool=False):
         """
-        It gets the output results of t-SNE. 
+        Plot the results of t-SNE analysis. 
         Three scatter plot will be generated based on original, clustering and Rg labels. 
         One KDE density plot will also be generated to shod the most populated areas in 
         the reduced dimension.   
@@ -367,7 +367,7 @@ class EnsembleAnalysis:
 
     def dimenfix_scatter(self, save:bool=False):
         """
-        It gets the the final result for dimenfix method. 
+        Plot the the complete results for dimenfix method. 
 
         Parameters
         ----------
@@ -391,7 +391,7 @@ class EnsembleAnalysis:
     def pca_cumulative_explained_variance(self, save:bool=False):
 
         """
-        It gets the cumulative variance and only applicable when the
+        Plot the cumulative variance. Only applicable when the
         dimensionality reduction method is "pca"
 
         Parameters
@@ -404,7 +404,7 @@ class EnsembleAnalysis:
     def pca_plot_2d_landscapes(self, save:bool=False):
 
         """
-        It gets the 2d landscapes plots when the dimensionality reduction method 
+        Plot 2D landscapes when the dimensionality reduction method 
         is "pca" or "kpca"
 
         Parameters
@@ -416,7 +416,7 @@ class EnsembleAnalysis:
 
     def pca_plot_1d_histograms(self, save:bool=False):
         """
-        It gets the 2d landscapes plots when the dimensionality reduction method 
+        Plot 1D histogram when the dimensionality reduction method 
         is "pca" or "kpca"
 
         Parameters
@@ -431,7 +431,7 @@ class EnsembleAnalysis:
     
     def pca_rg_correlation(self, save:bool=False):
         """
-        It demonstrates the correlation between PC dimension 1 and the amount of Rg
+        Examine and plot the correlation between PC dimension 1 and the amount of Rg
         Typically high correlation can be detected here. 
 
         Parameters
@@ -444,8 +444,8 @@ class EnsembleAnalysis:
     def plot_global_sasa(self, save=False, showmeans=True ,showmedians=True):
 
         """
-        It plots the distribution of SASA for each conformation 
-        within the ensembles 
+        Plot the distribution of SASA for each conformation 
+        within the ensembles.
 
         Parameters
         ----------
@@ -462,7 +462,7 @@ class EnsembleAnalysis:
 
     def plot_rg_vs_asphericity(self, save=False):
         """
-        It plots the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate 
+        Plot the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate 
         the correlation between Rg and Asphericity. 
         """
         visualization.plot_rg_vs_asphericity(self, save)
@@ -473,7 +473,7 @@ class EnsembleAnalysis:
 
     def plot_rg_vs_prolateness(self, save=False):
         """
-        It plots the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
+        Plot the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
         the correlation between Rg and Prolateness. 
         """
         visualization.plot_rg_vs_prolateness(self, save)
@@ -613,7 +613,7 @@ class EnsembleAnalysis:
     def plot_alpha_angles_dist(self, bins:int=50):
 
         """
-        It plot the distribution of alpha angles.
+        Plot the distribution of alpha angles.
 
         Parameters
         ----------
@@ -624,7 +624,7 @@ class EnsembleAnalysis:
 
     def plot_contact_prob(self,title:str, threshold:float=0.8, dpi:int=96):
         """
-        It plots the contact probability map based on the threshold. 
+        Plot the contact probability map based on the threshold. 
         The default value for threshold is 0.8[nm], 
 
         Parameters
@@ -645,7 +645,7 @@ class EnsembleAnalysis:
 
     def plot_ramachandran_plot(self, two_d_hist:bool=True, linespaces:tuple=(-180, 180, 80)):
         """
-        It gets Ramachandran plot. If two_d_hist= True it returns 2D histogram 
+        Ramachandran plot. If two_d_hist= True it returns 2D histogram 
         for each ensembles. If two_d_hist=False it returns a simple scatter plot 
         for ell ensembles in one plot.
 
@@ -662,8 +662,8 @@ class EnsembleAnalysis:
     
     def plot_ss_measure_disorder(self, pointer:list=None, figsize:tuple=(15,5)):
         """
-        This function generates site specific flexibility parameter plot. For further information
-        you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. 
+        Generate site specific flexibility parameter plot. Further information is available in
+        this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. 
         In summary this score is sensitive to local flexibility based on the circular variance of the
         Ramachandran angles φ and ψ for each residue in the ensemble.
 
@@ -685,7 +685,7 @@ class EnsembleAnalysis:
     def plot_ss_order_parameter(self, pointer:list=None, figsize:tuple=(15,5)):
 
         """
-        This function generates site specific order parameter plot. For further information
+        Generate site specific order parameter plot. For further information
         you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. 
         In summary this score abstracts from local chain flexibility. The parameter is still site-specific, as orientation 
         correlations in IDRs and IDPs decrease with increasing sequence distance. 
@@ -708,7 +708,7 @@ class EnsembleAnalysis:
     def generate_custom_report(self):
         
         """
-        Generates pdf report with all plots that were explicitly called during the session.
+        Generate pdf report with all plots that were explicitly called during the session.
         """
 
         generate_custom_report(self)
@@ -716,7 +716,7 @@ class EnsembleAnalysis:
     def generate_report(self):
 
         """
-        Generates pdf report with all plots relevant to the conducted analysis.
+        Generate pdf report with all plots relevant to the conducted analysis.
         """
 
         if self.reduce_dim_method == "tsne":
