@@ -224,8 +224,11 @@ class EnsembleAnalysis:
         if normalize and featurization == "ca_dist":
             self._normalize_data()
 
+    def _exists_coarse_grained(self):
+        return any(ensemble.coarse_grained for ensemble in self.ensembles.values())
+
     def _featurize(self, featurization: str, *args, **kwargs):
-        if featurization in ("phi_psi", "tr_omega", "tr_phi") and any(ensemble.coarse_grained for ensemble in self.ensembles.values()):
+        if featurization in ("phi_psi", "tr_omega", "tr_phi") and self._exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         # Get names only for the first ensemble
         self.featurization = featurization
@@ -490,7 +493,7 @@ class EnsembleAnalysis:
         """
         Plot the relative helix content in each ensemble for each residue. 
         """
-        if any(ensemble.coarse_grained for ensemble in self.ensembles.values()):
+        if self._exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
         visualization.plot_relative_helix_content(self.ensembles)
@@ -638,7 +641,7 @@ class EnsembleAnalysis:
         dpi: int
             For changing the quality and dimension of the output figure
         """
-        if any(ensemble.coarse_grained for ensemble in self.ensembles.values()):
+        if self._exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
         visualization.plot_contact_prob(self.ensembles,title,threshold,dpi)
