@@ -335,7 +335,7 @@ class Visualization:
             plt.savefig(os.path.join(plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
         #return fig
 
-    def set_labels(self, ax, reduce_dim_method, dim_x, dim_y):
+    def _set_labels(self, ax, reduce_dim_method, dim_x, dim_y):
         ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
         ax.set_ylabel(f"{reduce_dim_method} dim {dim_y+1}")
 
@@ -373,7 +373,7 @@ class Visualization:
                         ensemble.reduce_dim_data[:,dim_y],
                         label=ens_code, marker=marker)
         ax[0].legend(**legend_kwargs)
-        self.set_labels(ax[0], "pca", dim_x, dim_y)
+        self._set_labels(ax[0], "pca", dim_x, dim_y)
 
         # Concatenate all reduced dimensionality data from the dictionary
         all_data = analysis.transformed_data
@@ -392,7 +392,7 @@ class Visualization:
                             label=ens_code, c=f"C{i}",
                             marker=marker)
             ax[i+1].legend(**legend_kwargs)
-            self.set_labels(ax[i+1], "pca", dim_x, dim_y)
+            self._set_labels(ax[i+1], "pca", dim_x, dim_y)
 
         plt.tight_layout()
         if save:
@@ -694,7 +694,7 @@ class Visualization:
             plt.savefig(os.path.join(plot_dir,'alpha_angle_dihederal' + analysis.ens_codes[0]))
         # plt.show
 
-    def get_protein_dssp_data_dict(self):
+    def _get_protein_dssp_data_dict(self):
         ensembles = self.analysis.ensembles
         dssp_data_dict = {}
         for ens_code, ensemble in ensembles.items():
@@ -708,7 +708,7 @@ class Visualization:
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
-        protein_dssp_data_dict = self.get_protein_dssp_data_dict()
+        protein_dssp_data_dict = self._get_protein_dssp_data_dict()
         fig, ax = plt.subplots(figsize=(10, 5))
         bottom = np.zeros(next(iter(protein_dssp_data_dict.values())).shape[1])
 
@@ -733,7 +733,7 @@ class Visualization:
         ax.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
         plt.show()
 
-    def get_rg_data_dict(self):
+    def _get_rg_data_dict(self):
         ensembles = self.analysis.ensembles
         rg_dict = {}
         for ens_code, ensemble in ensembles.items():
@@ -753,7 +753,7 @@ class Visualization:
         dpi : int
         """
 
-        rg_data_dict = self.get_rg_data_dict()
+        rg_data_dict = self._get_rg_data_dict()
         h_args = {"histtype": "step", "density": True}
         n_systems = len(rg_data_dict)
         bins = np.linspace(bins_range[0], bins_range[1], n_bins + 1)
@@ -783,7 +783,7 @@ class Visualization:
         plt.tight_layout()
         plt.show()
 
-    def get_distance_matrix_ens_dict(self):
+    def _get_distance_matrix_ens_dict(self):
         ensembles = self.analysis.ensembles
         distance_matrix_ens_dict = {}
         for ens_code, ensemble in ensembles.items():
@@ -793,7 +793,7 @@ class Visualization:
             distance_matrix_ens_dict[ens_code] = get_distance_matrix(xyz_ens)
         return distance_matrix_ens_dict
 
-    def get_contact_ens_dict(self):
+    def _get_contact_ens_dict(self):
         ensembles = self.analysis.ensembles
         distance_matrix_ens_dict = {}
         contact_ens_dict = {}
@@ -825,7 +825,7 @@ class Visualization:
         use_ylabel: bool
         """
 
-        ens_dict = self.get_distance_matrix_ens_dict()
+        ens_dict = self._get_distance_matrix_ens_dict()
         num_proteins = len(ens_dict)
         cols = 2  # Number of columns for subplots
         rows = (num_proteins + cols - 1) // cols
@@ -869,7 +869,7 @@ class Visualization:
                             dpi=96,
                             cmap_min=-3.5,
                             use_ylabel=True):
-        cmap_ens_dict = self.get_contact_ens_dict()
+        cmap_ens_dict = self._get_contact_ens_dict()
         num_proteins = len(cmap_ens_dict)
         cols = 2  # Number of columns for subplots
         rows = (num_proteins + cols - 1) // cols
@@ -908,7 +908,7 @@ class Visualization:
         plt.show()
 
     def plot_distance_distribution_multiple(self, dpi=96):
-        prot_data_dict = self.get_distance_matrix_ens_dict()
+        prot_data_dict = self._get_distance_matrix_ens_dict()
         num_proteins = len(prot_data_dict)
         
         # Set up the subplot grid
