@@ -224,11 +224,14 @@ class EnsembleAnalysis:
         if normalize and featurization == "ca_dist":
             self._normalize_data()
 
-    def _exists_coarse_grained(self):
+    def exists_coarse_grained(self):
+        """
+        Check if at least one of the loaded ensembles is coarse-grained fter loading trajectories.
+        """
         return any(ensemble.coarse_grained for ensemble in self.ensembles.values())
 
     def _featurize(self, featurization: str, min_sep, max_sep):
-        if featurization in ("phi_psi", "tr_omega", "tr_phi") and self._exists_coarse_grained():
+        if featurization in ("phi_psi", "tr_omega", "tr_phi") and self.exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         self.featurization = featurization
         for ensemble in self.ensembles.values():

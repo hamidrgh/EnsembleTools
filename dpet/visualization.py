@@ -705,7 +705,7 @@ class Visualization:
         """
         Plot the relative helix content in each ensemble for each residue. 
         """
-        if self.analysis._exists_coarse_grained():
+        if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
         protein_dssp_data_dict = self.get_protein_dssp_data_dict()
@@ -1104,7 +1104,7 @@ class Visualization:
             For changing the quality and dimension of the output figure
         """
 
-        if self.analysis._exists_coarse_grained():
+        if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
         
