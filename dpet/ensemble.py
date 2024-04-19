@@ -62,6 +62,7 @@ class Ensemble():
         self.trajectory = mdtraj.Trajectory(
             xyz=self.original_trajectory.xyz[random_indices],
             topology=self.original_trajectory.topology)
+        print(f"{sample_size} conformations sampled from {self.ens_code} trajectory.")
         
     def extract_features(self, featurization, min_sep, max_sep):
         print(f"Performing feature extraction for Ensemble: {self.ens_code}.")

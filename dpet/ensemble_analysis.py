@@ -354,7 +354,7 @@ class EnsembleAnalysis:
         Execute the data analysis pipeline end-to-end. The pipeline includes:
             1. Download from database (optional)
             2. Generate trajectories
-            3. Sample a random number of conformations from trajectories (optional)
+            3. Randomly sample a number of conformations from trajectories (optional)
             4. Perform feature extraction
             5. Perform dimensionality reduction
 

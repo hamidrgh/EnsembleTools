@@ -7,8 +7,8 @@ TODO: Write the introduction
 .. contents:: Table of Contents
     :local:
 
-Workflow Example
-----------------
+Basic Workflow Example
+----------------------
 
 TODO: Perhaps insert a graphical representation of the pipeline steps in order
 
@@ -22,7 +22,7 @@ the data directory.
         'PED00423e001',
         'PED00424e001'
     ]
-    data_dir = 'delete'
+    data_dir = 'path/to/data/directory'
 
     analysis = EnsembleAnalysis(ens_codes, data_dir)
 
@@ -59,7 +59,7 @@ In this example, the features are phi and psi angles computed from the trajector
 
 .. code-block:: python
 
-    analysis.perform_feature_extraction(featurization='phi_psi')
+    analysis.extract_features(featurization='phi_psi')
 
 Finally, one of several dimensionality reduction methods is performed on the previously extracted features by calling the following function.
 In this example, t-SNE dimensionality reduction is performed for perplexities 10, 50 and 100. The data is then clustered using K-means with
@@ -68,7 +68,7 @@ best results are kept. By setting circular to True, unit vector distance is used
 
 .. code-block:: python
 
-    analysis.fit_dimensionality_reduction(method='tsne', perplexity_vals = [10, 50, 100], circular=True, range_n_clusters=range(2,10,1))
+    analysis.reduce_features(method='tsne', perplexity_vals = [10, 50, 100], circular=True, range_n_clusters=range(2,10,1))
 
 Once the data transformation pipeline is completed, the Visualization class is instantiated to analyse the results. 
 In the example below, the figure is saved in the data directory.
@@ -79,4 +79,38 @@ In the example below, the figure is saved in the data directory.
     visualization.tsne_scatter_plot(save=True)
 
 .. image:: images/tsnep10_kmeans2_scatter.png
+   :width: 600
+
+End-to-End Example
+------------------
+
+In the example below, the complete data analysis pipeline is executed with one function call.
+The pipeline consists of:
+    1. Downloading trajectories from the Atlas database
+    2. Loading trajectories
+    3. Randomly sampling 200 conformations
+    4. Extracting features
+    5. Performing dimensionality reduction on the features
+
+.. code-block:: python
+
+    ens_codes = [
+        '3a1g_B'
+    ]
+    data_dir = 'path/to/data/directory'
+
+    featurization_params = {'featurization': 'ca_dist'}
+    reduce_dim_params = {'method': 'dimenfix', 'range_n_clusters':[2, 3, 4, 5, 6]}
+
+    analysis = EnsembleAnalysis(ens_codes, data_dir)
+    analysis.execute_pipeline(featurization_params=featurization_params, reduce_dim_params=reduce_dim_params, database='atlas', subsample_size=200)
+
+As in the previous example, the transformed ensemble data can be visualised with supported plot functions.
+
+.. code-block:: python
+
+    visualization = Visualization(analysis)
+    visualization.dimenfix_scatter()
+
+.. image:: images/dimenfix_scatter.png
    :width: 600
