@@ -194,6 +194,10 @@ class Visualization:
         legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
 
+        key = "dimenfix_scatter"
+        if key not in self.figures:
+                self.figures[key] = fig
+
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(plot_dir  + '/dimenfix_scatter.png', dpi=800)
@@ -330,6 +334,9 @@ class Visualization:
         ax.grid(True)
         first_three_variance = analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum() * 100
         ax.text(0.5, 0.9, f"First three: {first_three_variance:.2f}%", transform=ax.transAxes, ha='center')
+        key = "pca_cumulative_explained_variance"
+        if key not in self.figures:
+                self.figures[key] = fig
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(os.path.join(plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
@@ -395,6 +402,9 @@ class Visualization:
             self._set_labels(ax[i+1], "pca", dim_x, dim_y)
 
         plt.tight_layout()
+        key = "pca_plot_2d_landscapes"
+        if key not in self.figures:
+                self.figures[key] = fig
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(os.path.join(plot_dir, 'PCA' + analysis.featurization + analysis.ens_codes[0]))
@@ -454,6 +464,9 @@ class Visualization:
             ax[i].set_ylabel("Density")
 
         plt.tight_layout()
+        key = "pca_plot_1d_histograms"
+        if key not in self.figures:
+                self.figures[key] = fig
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(os.path.join(plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
@@ -493,6 +506,9 @@ class Visualization:
                 label="PCA weight"
             )
         plt.tight_layout()
+        key = "pca_correlation_plot"
+        if key not in self.figures:
+                self.figures[key] = fig
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(os.path.join(plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
@@ -536,6 +552,9 @@ class Visualization:
             ax[i].set_ylabel("Rg [nm]")
 
         plt.tight_layout()
+        key = "pca_rg_correlation"
+        if key not in self.figures:
+                self.figures[key] = fig
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(os.path.join(plot_dir,'PCA_RG' + analysis.ens_codes[0]))
@@ -575,6 +594,9 @@ class Visualization:
         plt.xticks(ticks= [y + 1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
         plt.title('SASA distribution over the ensembles')
         plt.ylabel('SASA (nm)^2')
+        key = "plot_global_sasa"
+        if key not in self.figures:
+                self.figures[key] = fig
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(os.path.join(plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))

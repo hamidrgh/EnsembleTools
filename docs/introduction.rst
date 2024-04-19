@@ -79,7 +79,6 @@ In the example below, the figure is saved in the data directory.
     visualization.tsne_scatter_plot(save=True)
 
 .. image:: images/tsnep10_kmeans2_scatter.png
-   :width: 600
 
 End-to-End Example
 ------------------
@@ -113,4 +112,54 @@ As in the previous example, the transformed ensemble data can be visualised with
     visualization.dimenfix_scatter()
 
 .. image:: images/dimenfix_scatter.png
-   :width: 600
+
+Plot Example
+------------
+
+In this example, analysis is performed on the same ensembles from Atlas, extracting Cα-Cα distances as features and
+transforming them using PCA, which is fit only on replicate n°1 (3a1g_B_prod_R1_fit).
+
+.. code-block:: python
+
+    ens_codes = ['3a1g_B']
+    data_dir = 'path/to/data/directory'
+
+    analysis = EnsembleAnalysis(ens_codes, data_dir)
+    analysis.execute_pipeline(
+        featurization_params={'featurization':'ca_dist'}, 
+        reduce_dim_params={'method':'pca','fit_on':["3a1g_B_prod_R1_fit"]}, 
+        database='atlas', 
+        subsample_size=200)
+
+There is an option to automatically generate a PDF report containing all plots relevant to the conducted analysis.
+The report is saved in the data directory.
+
+.. code-block:: python
+
+    visualization = Visualization(analysis)
+    visualization.generate_report()
+
+Alternatively, different plots can be called explicitly, optionally setting save to True to save the plots as PNGs in the data directory.
+
+.. code-block:: python
+
+    visualization.pca_plot_2d_landscapes(save=True)
+
+.. image:: images/PCA_RG3a1g_B_prod_R1_fit.png
+
+.. code-block:: python
+
+    visualization.pca_plot_1d_histograms(save=True)
+
+.. image:: images/PCA_histca_dist3a1g_B_prod_R1_fit.png
+
+All plots called in one session get stored in a dictionary in the Vizualization class. 
+Calling the following function outputs all of them into a PDF report.
+
+.. code-block:: python
+
+    visualization.generate_custom_report()
+
+Coarse-Grained Models
+---------------------
+Coarse-Grained models are supported, however they are incompatible with some functionalities of the package.
