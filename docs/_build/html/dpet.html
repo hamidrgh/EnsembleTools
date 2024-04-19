@@ -105,7 +105,7 @@
 <span class="sig-name descname"><span class="pre">download_from_atlas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.download_from_atlas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.download_from_atlas" title="Link to this definition"></a></dt>
 <dd><p>Automate Downloading MD ensembles from Atlas.</p>
 <section id="note">
-<h3>Note:<a class="headerlink" href="#note" title="Link to this heading"></a></h3>
+<h3>Note<a class="headerlink" href="#note" title="Link to this heading"></a></h3>
 <p>The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
 Example: ‘3a1g_B’</p>
 </section>
@@ -181,6 +181,12 @@ Options are “ped” and “atlas”. Default is None.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained">
+<span class="sig-name descname"><span class="pre">exists_coarse_grained</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.exists_coarse_grained"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained" title="Link to this definition"></a></dt>
+<dd><p>Check if at least one of the loaded ensembles is coarse-grained fter loading trajectories.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.extract_features">
 <span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.extract_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.extract_features" title="Link to this definition"></a></dt>
 <dd><p>Extract the selected feature.</p>
@@ -241,14 +247,120 @@ trajectory.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">
 <span class="sig-name descname"><span class="pre">reduce_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.reduce_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features" title="Link to this definition"></a></dt>
-<dd><p>Perform dimensionality reduction on the extracted features. The options are “pca”, “tsne”, “dimenfix”, “mds” and “kpca”.</p>
+<dd><p>Perform dimensionality reduction on the extracted features.</p>
 <section id="id7">
 <h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>method: str </dt><dd><p>Choose between pca”, “tsne”, “dimenfix”, “mds” and “kpca”.</p>
+<dt>method<span class="classifier">str</span></dt><dd><p>Choose between “pca”, “tsne”, “dimenfix”, “mds”, and “kpca”.</p>
 </dd>
-<dt>fit_on: list[str]</dt><dd><p>if method is “pca” or “kpca” the fit_on parameter specifies on which ensembles the models should be fit. 
+<dt>fit_on<span class="classifier">list[str], optional</span></dt><dd><p>if method is “pca” or “kpca”, specifies on which ensembles the models should be fit. 
 The model will then be used to transform all ensembles.</p>
+</dd>
+</dl>
+</section>
+<section id="additional-parameters">
+<h3>Additional Parameters<a class="headerlink" href="#additional-parameters" title="Link to this heading"></a></h3>
+<p>The following optional parameters apply based on the selected reduction method:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>pca:</dt><dd><ul>
+<li><dl class="simple">
+<dt>num_dim<span class="classifier">int, optional</span></dt><dd><p>Number of components to keep. Default is 10.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>tsne:</dt><dd><ul>
+<li><dl class="simple">
+<dt>perplexity_vals<span class="classifier">list[float], optional</span></dt><dd><p>List of perplexity values. Default is range(2, 10, 2).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>metric<span class="classifier">str, optional</span></dt><dd><p>Metric to use. Default is “euclidean”.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>circular<span class="classifier">bool, optional</span></dt><dd><p>Whether to use circular metrics. Default is False.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>n_components<span class="classifier">int, optional</span></dt><dd><p>Number of dimensions of the embedded space. Default is 2.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>learning_rate<span class="classifier">float, optional</span></dt><dd><p>Learning rate. Default is 100.0.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>range_n_clusters<span class="classifier">list[int], optional</span></dt><dd><p>Range of cluster values. Default is range(2, 10, 1).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>dimenfix:</dt><dd><ul>
+<li><dl class="simple">
+<dt>range_n_clusters<span class="classifier">list[int], optional</span></dt><dd><p>Range of cluster values. Default is range(1, 10, 1).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>mds:</dt><dd><ul>
+<li><dl class="simple">
+<dt>num_dim<span class="classifier">int, optional</span></dt><dd><p>Number of dimensions. Default is 2.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>kpca:</dt><dd><ul>
+<li><dl class="simple">
+<dt>circular<span class="classifier">bool, optional</span></dt><dd><p>Whether to use circular metrics. Default is False.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>num_dim<span class="classifier">int, optional</span></dt><dd><p>Number of components to keep. Default is 10.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>gamma<span class="classifier">float, optional</span></dt><dd><p>Kernel coefficient. Default is None.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="simple">
+<dt>For more information on each method, see the corresponding documentation:</dt><dd><ul class="simple">
+<li><p>PCA: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html</a></p></li>
+<li><p>t-SNE: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html</a></p></li>
+<li><p>DimenFix: <a class="reference external" href="https://github.com/visml/neo_force_scheme/tree/0.0.3">https://github.com/visml/neo_force_scheme/tree/0.0.3</a></p></li>
+<li><p>MDS: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html">https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html</a></p></li>
+<li><p>Kernel PCA: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html">https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html</a></p></li>
+</ul>
 </dd>
 </dl>
 </section>

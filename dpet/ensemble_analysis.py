@@ -75,8 +75,8 @@ class EnsembleAnalysis:
         """ 
         Automate Downloading MD ensembles from Atlas. 
 
-        Note:
-        -----
+        Note
+        ----
         The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
         Example: '3a1g_B'
         """
@@ -279,17 +279,63 @@ class EnsembleAnalysis:
 
     def reduce_features(self, method: str, fit_on:list[str]=None, *args, **kwargs):
         """
-        Perform dimensionality reduction on the extracted features. The options are "pca", "tsne", "dimenfix", "mds" and "kpca".
+        Perform dimensionality reduction on the extracted features.
 
         Parameters
         ----------
-        method: str 
-            Choose between pca", "tsne", "dimenfix", "mds" and "kpca".
+        method : str
+            Choose between "pca", "tsne", "dimenfix", "mds", and "kpca".
 
-        fit_on: list[str]
-            if method is "pca" or "kpca" the fit_on parameter specifies on which ensembles the models should be fit. 
+        fit_on : list[str], optional
+            if method is "pca" or "kpca", specifies on which ensembles the models should be fit. 
             The model will then be used to transform all ensembles.
+
+        Additional Parameters
+        ---------------------
+        The following optional parameters apply based on the selected reduction method:
+
+        - pca:
+            - num_dim : int, optional
+                Number of components to keep. Default is 10.
+
+        - tsne:
+            - perplexity_vals : list[float], optional
+                List of perplexity values. Default is range(2, 10, 2).
+            - metric : str, optional
+                Metric to use. Default is "euclidean". 
+            - circular : bool, optional
+                Whether to use circular metrics. Default is False.
+            - n_components : int, optional
+                Number of dimensions of the embedded space. Default is 2.
+            - learning_rate : float, optional
+                Learning rate. Default is 100.0.
+            - range_n_clusters : list[int], optional
+                Range of cluster values. Default is range(2, 10, 1).
+
+        - dimenfix:
+            - range_n_clusters : list[int], optional
+                Range of cluster values. Default is range(1, 10, 1).
+
+        - mds:
+            - num_dim : int, optional
+                Number of dimensions. Default is 2.
+
+        - kpca:
+            - circular : bool, optional
+                Whether to use circular metrics. Default is False.
+            - num_dim : int, optional
+                Number of components to keep. Default is 10.
+            - gamma : float, optional
+                Kernel coefficient. Default is None.
+
+        For more information on each method, see the corresponding documentation:
+            - PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
+            - t-SNE: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+            - DimenFix: https://github.com/visml/neo_force_scheme/tree/0.0.3
+            - MDS: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html
+            - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html
         """
+
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
         if method in ("pca","kpca"):

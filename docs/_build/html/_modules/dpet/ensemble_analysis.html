@@ -156,8 +156,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Automate Downloading MD ensembles from Atlas. </span>
 
-<span class="sd">        Note:</span>
-<span class="sd">        -----</span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
 <span class="sd">        The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.</span>
 <span class="sd">        Example: &#39;3a1g_B&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -318,11 +318,17 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_data</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_exists_coarse_grained</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<div class="viewcode-block" id="EnsembleAnalysis.exists_coarse_grained">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained">[docs]</a>
+    <span class="k">def</span> <span class="nf">exists_coarse_grained</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if at least one of the loaded ensembles is coarse-grained fter loading trajectories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
 
     <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exists_coarse_grained</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists_coarse_grained</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">featurization</span> <span class="o">=</span> <span class="n">featurization</span>
         <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -372,17 +378,63 @@
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">[docs]</a>
     <span class="k">def</span> <span class="nf">reduce_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Perform dimensionality reduction on the extracted features. The options are &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; and &quot;kpca&quot;.</span>
+<span class="sd">        Perform dimensionality reduction on the extracted features.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        method: str </span>
-<span class="sd">            Choose between pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; and &quot;kpca&quot;.</span>
+<span class="sd">        method : str</span>
+<span class="sd">            Choose between &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot;, and &quot;kpca&quot;.</span>
 
-<span class="sd">        fit_on: list[str]</span>
-<span class="sd">            if method is &quot;pca&quot; or &quot;kpca&quot; the fit_on parameter specifies on which ensembles the models should be fit. </span>
+<span class="sd">        fit_on : list[str], optional</span>
+<span class="sd">            if method is &quot;pca&quot; or &quot;kpca&quot;, specifies on which ensembles the models should be fit. </span>
 <span class="sd">            The model will then be used to transform all ensembles.</span>
+
+<span class="sd">        Additional Parameters</span>
+<span class="sd">        ---------------------</span>
+<span class="sd">        The following optional parameters apply based on the selected reduction method:</span>
+
+<span class="sd">        - pca:</span>
+<span class="sd">            - num_dim : int, optional</span>
+<span class="sd">                Number of components to keep. Default is 10.</span>
+
+<span class="sd">        - tsne:</span>
+<span class="sd">            - perplexity_vals : list[float], optional</span>
+<span class="sd">                List of perplexity values. Default is range(2, 10, 2).</span>
+<span class="sd">            - metric : str, optional</span>
+<span class="sd">                Metric to use. Default is &quot;euclidean&quot;. </span>
+<span class="sd">            - circular : bool, optional</span>
+<span class="sd">                Whether to use circular metrics. Default is False.</span>
+<span class="sd">            - n_components : int, optional</span>
+<span class="sd">                Number of dimensions of the embedded space. Default is 2.</span>
+<span class="sd">            - learning_rate : float, optional</span>
+<span class="sd">                Learning rate. Default is 100.0.</span>
+<span class="sd">            - range_n_clusters : list[int], optional</span>
+<span class="sd">                Range of cluster values. Default is range(2, 10, 1).</span>
+
+<span class="sd">        - dimenfix:</span>
+<span class="sd">            - range_n_clusters : list[int], optional</span>
+<span class="sd">                Range of cluster values. Default is range(1, 10, 1).</span>
+
+<span class="sd">        - mds:</span>
+<span class="sd">            - num_dim : int, optional</span>
+<span class="sd">                Number of dimensions. Default is 2.</span>
+
+<span class="sd">        - kpca:</span>
+<span class="sd">            - circular : bool, optional</span>
+<span class="sd">                Whether to use circular metrics. Default is False.</span>
+<span class="sd">            - num_dim : int, optional</span>
+<span class="sd">                Number of components to keep. Default is 10.</span>
+<span class="sd">            - gamma : float, optional</span>
+<span class="sd">                Kernel coefficient. Default is None.</span>
+
+<span class="sd">        For more information on each method, see the corresponding documentation:</span>
+<span class="sd">            - PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html</span>
+<span class="sd">            - t-SNE: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html</span>
+<span class="sd">            - DimenFix: https://github.com/visml/neo_force_scheme/tree/0.0.3</span>
+<span class="sd">            - MDS: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html</span>
+<span class="sd">            - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span> <span class="o">=</span> <span class="n">DimensionalityReductionFactory</span><span class="o">.</span><span class="n">get_reducer</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">=</span> <span class="n">method</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span><span class="s2">&quot;kpca&quot;</span><span class="p">):</span>
