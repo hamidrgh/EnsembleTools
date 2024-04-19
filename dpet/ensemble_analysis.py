@@ -4,7 +4,7 @@ import shutil
 from typing import Dict
 import zipfile
 from dpet.data.api_client import APIClient
-from dpet.data.ensemble import Ensemble
+from dpet.ensemble import Ensemble
 from dpet.data.extract_tar_gz import extract_tar_gz
 import os
 import mdtraj
