@@ -617,16 +617,28 @@ def trajectories_plot_rg_comparison(trajectories, n_bins=50, bins_range=(1, 4.5)
     fig, ax = plt.subplots(1, n_systems, figsize=(3 * n_systems, 3), dpi=dpi)
     
     for i, (name_i, rg_i) in enumerate(rg_data_dict.items()):
-        ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
-        ax[i].set_title(name_i)
-        if i == 0:
-            ax[i].set_ylabel("Density")
-        ax[i].set_xlabel("Rg [nm]")
-        mean_rg = np.mean(rg_i)
-        median_rg = np.median(rg_i)
+        if n_systems > 1:
+            ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
+            ax[i].set_title(name_i)
+            if i == 0:
+                ax[i].set_ylabel("Density")
+            ax[i].set_xlabel("Rg [nm]")
+            mean_rg = np.mean(rg_i)
+            median_rg = np.median(rg_i)
 
-        mean_line = ax[i].axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
-        median_line = ax[i].axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
+            mean_line = ax[i].axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
+            median_line = ax[i].axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
+        elif n_systems == 1:
+            ax.hist(rg_i, bins=bins, label=name_i, **h_args)
+            ax.set_title(name_i)
+            if i == 0:
+                ax.set_ylabel("Density")
+            ax.set_xlabel("Rg [nm]")
+            mean_rg = np.mean(rg_i)
+            median_rg = np.median(rg_i)
+
+            mean_line = ax.axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
+            median_line = ax.axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
 
     
     mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
@@ -959,6 +971,10 @@ def plot_local_sasa(analysis, figsize=(15,5), pointer:list= None):
     ax.set_title('Mean SASA for Each Residue in Ensembles')
     ax.legend()
     ax.grid(True)
+    if pointer is not None:
+        for res in pointer:
+            ax.axvline(x=res, c='blue', linestyle='--', alpha=0.3, linewidth=1)
+        
 
     plt.tight_layout()
     plt.show()
