@@ -1112,7 +1112,7 @@ class Visualization:
         ensembles = self.analysis.ensembles
         num_proteins = len(ensembles)
         cols = 2
-        rows = (num_proteins + cols - 1) // cols
+        rows = num_proteins
         fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
         cmap = cm.get_cmap("Blues")
         for i, (ens_code, ensemble) in enumerate(ensembles.items()):
