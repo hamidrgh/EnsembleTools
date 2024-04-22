@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#end-to-end-example">End-to-End Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#plot-example">Plot Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#coarse-grained-models">Coarse-Grained Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ensemble-files-with-multiple-chains">Ensemble Files with Multiple Chains</a></li>
 </ul>
 </li>
 </ul>
@@ -89,6 +90,7 @@
 <li><p><a class="reference internal" href="#end-to-end-example" id="id2">End-to-End Example</a></p></li>
 <li><p><a class="reference internal" href="#plot-example" id="id3">Plot Example</a></p></li>
 <li><p><a class="reference internal" href="#coarse-grained-models" id="id4">Coarse-Grained Models</a></p></li>
+<li><p><a class="reference internal" href="#ensemble-files-with-multiple-chains" id="id5">Ensemble Files with Multiple Chains</a></p></li>
 </ul>
 </nav>
 <section id="basic-workflow-example">
@@ -220,6 +222,11 @@ Calling the following function outputs all of them into a PDF report.</p>
 <section id="coarse-grained-models">
 <h2><a class="toc-backref" href="#id4" role="doc-backlink">Coarse-Grained Models</a><a class="headerlink" href="#coarse-grained-models" title="Link to this heading"></a></h2>
 <p>Coarse-Grained models are supported, however they are incompatible with some functionalities of the package.</p>
+</section>
+<section id="ensemble-files-with-multiple-chains">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Ensemble Files with Multiple Chains</a><a class="headerlink" href="#ensemble-files-with-multiple-chains" title="Link to this heading"></a></h2>
+<p>When dealing with ensemble files that contain multiple chains, the program will prompt the user to select one chain per ensemble for analysis.
+In the context of MDtraj trajectories, chain identifiers are represented as numerical indexes (e.g., 0, 1, 2, etc.) and are assigned sequentially. For example, if working with an ensemble such as PED00014e001, which contains chains labeled as A, C, and D, these chains will be assigned chain indexes 0, 1, and 2, respectively.</p>
 </section>
 </section>
 

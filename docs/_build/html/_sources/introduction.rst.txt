@@ -163,3 +163,8 @@ Calling the following function outputs all of them into a PDF report.
 Coarse-Grained Models
 ---------------------
 Coarse-Grained models are supported, however they are incompatible with some functionalities of the package.
+
+Ensemble Files with Multiple Chains
+-----------------------------------
+When dealing with ensemble files that contain multiple chains, the program will prompt the user to select one chain per ensemble for analysis.
+In the context of MDtraj trajectories, chain identifiers are represented as numerical indexes (e.g., 0, 1, 2, etc.) and are assigned sequentially. For example, if working with an ensemble such as PED00014e001, which contains chains labeled as A, C, and D, these chains will be assigned chain indexes 0, 1, and 2, respectively.
