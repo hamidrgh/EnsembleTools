@@ -645,7 +645,7 @@ class Visualization:
         analysis = self.analysis
 
         for ens_code, ensemble in analysis.ensembles.items():
-            x = analysis.rg
+            x = mdtraj.compute_rg(ensemble.trajectory)
             y = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
             p = np.corrcoef(x , y)
             plt.scatter(x,y,s=4,label = ens_code)
@@ -1205,7 +1205,7 @@ class Visualization:
             You can change the size oof the figure here using a tuple. 
         """
         # TODO: Figure this out
-        self.analysis.perform_feature_extraction("phi_psi") # extract phi_psi features to calculate this score
+        self.analysis.extract_features("phi_psi") # extract phi_psi features to calculate this score
 
         ensembles = self.analysis.ensembles
         f = ss_measure_disorder(ensembles)
