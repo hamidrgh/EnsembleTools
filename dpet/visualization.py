@@ -990,7 +990,7 @@ class Visualization:
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.show()
 
-    def plot_contact_prob(self ,title, threshold = 0.8,dpi = 96):
+    def plot_contact_prob(self , threshold = 0.8,dpi = 96, min_sep=2,max_sep = None):
         
         """
         Plot the contact probability map based on the threshold. 
@@ -1007,11 +1007,51 @@ class Visualization:
         dpi: int
             For changing the quality and dimension of the output figure
         """
-
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
-        
+            self._contact_prob_cg( threshold=threshold, dpi=dpi, min_sep=min_sep, max_sep=max_sep)
+        else:
+            ensembles = self.analysis.ensembles
+            num_proteins = len(ensembles)
+            cols = 2
+            rows = (num_proteins + cols - 1) // cols
+            fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+            cmap = cm.get_cmap("Blues")
+            axes = axes.reshape((rows, cols)) 
+            for (ens_code, ensemble) , ax in zip((ensembles.items()), fig.axes):
+
+                matrtix_p_map = contact_probability_map(ensemble.trajectory  ,threshold=threshold)
+                im = ax.imshow(matrtix_p_map, cmap=cmap )
+                ax.set_title(f"Contact Probability Map: {ens_code}", fontsize=14)
+
+
+                cbar = fig.colorbar(im, ax=ax)
+                cbar.set_label('Frequency', fontsize=14)
+                cbar.ax.tick_params(labelsize=14)
+
+            for i in range(num_proteins, rows * cols):
+                fig.delaxes(axes.flatten()[i])
+            
+            plt.tight_layout()
+            plt.show()
+
+    def _pair_ids(self, min_sep=2,max_sep = None ):
+        analysis = self.analysis
+        pair_ids = []
+        for ens in analysis.ensembles:
+            ca_ids = analysis.ensembles[ens].trajectory.topology.select('name')
+            atoms = list(analysis.ensembles[ens].trajectory.topology.atoms)
+            max_sep = get_max_sep(L=len(atoms), max_sep=max_sep)
+    # Get all pair of ids.
+            for i, id_i in enumerate(ca_ids):
+                for j, id_j in enumerate(ca_ids):
+                    if j - i >= min_sep:
+                        if j - i > max_sep:
+                            continue
+                        pair_ids.append([id_i, id_j])
+        return pair_ids
+
+    def _contact_prob_cg(self ,min_sep=2,max_sep = None ,threshold = 0.8,dpi = 96):
+
         ensembles = self.analysis.ensembles
         num_proteins = len(ensembles)
         cols = 2
@@ -1021,7 +1061,7 @@ class Visualization:
         axes = axes.reshape((rows, cols)) 
         for (ens_code, ensemble) , ax in zip((ensembles.items()), fig.axes):
 
-            matrtix_p_map = contact_probability_map(ensemble.trajectory , threshold=threshold)
+            matrtix_p_map = contact_probability_map(ensemble.trajectory ,scheme='closest', contact=self._pair_ids(min_sep=min_sep, max_sep=max_sep) ,threshold=threshold)
             im = ax.imshow(matrtix_p_map, cmap=cmap )
             ax.set_title(f"Contact Probability Map: {ens_code}", fontsize=14)
 
@@ -1034,8 +1074,10 @@ class Visualization:
             fig.delaxes(axes.flatten()[i])
         
         plt.tight_layout()
-        plt.suptitle(title, fontsize=14)
         plt.show()
+        
+        
+
 
     def plot_ramachandran_plot(self, two_d_hist= True, linespaces = (-180, 180, 80)):
         
@@ -1105,6 +1147,10 @@ class Visualization:
         figsize:tuple
             You can change the size oof the figure here using a tuple. 
         """
+
+        if self.analysis.exists_coarse_grained():
+            print("This analysis is not possible with coarse-grained models.")
+            return
         # TODO: Figure this out
         analysis = self.analysis
         analysis.extract_features("phi_psi") # extract phi_psi features to calculate this score
@@ -1207,6 +1253,9 @@ class Visualization:
         plt.show()
 
     def plot_dist_ca_com(self, min_sep=2,max_sep=None ,get_names=True,inverse=False ,figsize=(6,2.5)):
+        if self.analysis.exists_coarse_grained():
+            print("This analysis is not possible with coarse-grained models.")
+            return
         analysis = self.analysis
         for ens in analysis.ensembles:
             traj = analysis.ensembles[ens].trajectory

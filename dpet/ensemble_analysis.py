@@ -226,7 +226,7 @@ class EnsembleAnalysis:
 
     def exists_coarse_grained(self):
         """
-        Check if at least one of the loaded ensembles is coarse-grained fter loading trajectories.
+        Check if at least one of the loaded ensembles is coarse-grained after loading trajectories.
         """
         return any(ensemble.coarse_grained for ensemble in self.ensembles.values())
 

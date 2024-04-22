@@ -95,9 +95,9 @@ def calculate_prolateness(gyration_tensors):
     
     return prolateness_values
 
-def contact_probability_map(traj, threshold = 0.8):
-    distances = mdtraj.compute_contacts(traj, scheme="ca")[0]
-    res_pair = mdtraj.compute_contacts(traj, scheme="ca")[1]
+def contact_probability_map(traj,scheme='ca', contact='all' ,threshold = 0.8):
+    distances = mdtraj.compute_contacts(traj,contacts=contact ,scheme=scheme)[0]
+    res_pair = mdtraj.compute_contacts(traj,contacts=contact ,scheme=scheme)[1]
     contact_distance = mdtraj.geometry.squareform(distances, res_pair)
     matrix_contact_prob = np.zeros(contact_distance.shape)
     threshold = threshold
