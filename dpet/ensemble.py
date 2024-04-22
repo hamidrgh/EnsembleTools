@@ -64,7 +64,7 @@ class Ensemble():
             topology=self.original_trajectory.topology)
         print(f"{sample_size} conformations sampled from {self.ens_code} trajectory.")
         
-    def extract_features(self, featurization, min_sep, max_sep):
+    def extract_features(self, featurization:str, min_sep:int, max_sep:int):
         print(f"Performing feature extraction for Ensemble: {self.ens_code}.")
         self.features, self.names = self._featurize(featurization, min_sep, max_sep)
         print("Transformed ensemble shape:", self.features.shape)
