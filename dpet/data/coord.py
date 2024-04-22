@@ -119,10 +119,9 @@ def dict_phi_psi_normal_cases(dict_phi_psi):
         dict_phi_psi_normal_case[key]=[array_phi,array_psi]
     return dict_phi_psi_normal_case
 
-def split_dictionary_phipsiangles(ensembles):
+def split_dictionary_phipsiangles(features_dict):
     dict_phi_psi={}
-    for ens_code, ensemble in ensembles.items():
-        features = ensemble.features
+    for ens_code, features in features_dict.items():
         num_columns=len(features[0])
         split_index=num_columns//2
         phi_list=features[:,:split_index]
@@ -130,7 +129,7 @@ def split_dictionary_phipsiangles(ensembles):
         dict_phi_psi[ens_code]=[phi_list,psi_list]
     return dict_phi_psi
 
-def ss_measure_disorder(ensembles:dict):
+def ss_measure_disorder(features_dict:dict):
     
     """This function accepts the dictionary of phi-psi arrays
     which is saved in featurized_data attribute and as an output provide
@@ -140,12 +139,12 @@ def ss_measure_disorder(ensembles:dict):
     f = {}
     R_square_dict = {}
 
-    for key in dict_phi_psi_normal_cases(split_dictionary_phipsiangles(ensembles)).keys():
+    for key in dict_phi_psi_normal_cases(split_dictionary_phipsiangles(features_dict)).keys():
         Rsquare_phi = []
         Rsquare_psi = []
 
-        phi_array = dict_phi_psi_normal_cases(split_dictionary_phipsiangles(ensembles))[key][0]
-        psi_array = dict_phi_psi_normal_cases(split_dictionary_phipsiangles(ensembles))[key][1]
+        phi_array = dict_phi_psi_normal_cases(split_dictionary_phipsiangles(features_dict))[key][0]
+        psi_array = dict_phi_psi_normal_cases(split_dictionary_phipsiangles(features_dict))[key][1]
         if isinstance(phi_array, np.ndarray) and phi_array.ndim == 2:
             for i in range(phi_array.shape[1]):
                 Rsquare_phi.append(round(np.square(np.sum(np.fromiter(((1 / phi_array.shape[0]) * np.cos(phi_array[c][i]) for c in range(phi_array.shape[0])), dtype=float))) + \
