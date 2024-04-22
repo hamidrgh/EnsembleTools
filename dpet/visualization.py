@@ -8,7 +8,7 @@ import mdtraj
 from matplotlib.lines import Line2D
 
 from dpet.ensemble_analysis import EnsembleAnalysis
-from dpet.featurization.angles import featurize_a_angle
+from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi
 from dpet.data.coord import *
 from scipy.stats import gaussian_kde
 
@@ -1202,15 +1202,16 @@ class Visualization:
             You can add the desired residues in a list and then you have a vertical dashed line to point those residues
 
         figsize:tuple
-            You can change the size oof the figure here using a tuple. 
+            You can change the size of the figure here using a tuple. 
         """
-        # TODO: Figure this out
-        self.analysis.extract_features("phi_psi") # extract phi_psi features to calculate this score
+        features_dict = {}
+        for ens in self.analysis.ensembles.values():
+            features = featurize_phi_psi(traj = ens.trajectory, get_names = False)
+            features_dict[ens.ens_code] = features
 
-        ensembles = self.analysis.ensembles
-        f = ss_measure_disorder(ensembles)
+        f = ss_measure_disorder(features_dict)
         fig, axes = plt.subplots(1,1, figsize=figsize)
-        keys = list(ensembles.keys())
+        keys = list(features_dict.keys())
         x = [i+1 for i in range(len(f[keys[0]]))]
         for key, values in f.items():
             axes.scatter(x, values, label= key)
