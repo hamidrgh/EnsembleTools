@@ -37,7 +37,7 @@ def _featurize_dist(
         max_sep: Union[None, int, float] = None,
         inverse: bool = False,
         get_names: bool = True,
-        atom_selector: str = "protein and name CA"
+        atom_selector: str = "name == CA"
     ):
     # Get all C-alpha indices.
     ca_ids = traj.topology.select(atom_selector)
@@ -71,7 +71,7 @@ def featurize_ca_dist(
         max_sep: int = None,
         inverse: bool = False,
         get_names: bool = True,
-        atom_selector: str = "protein and name CA"):
+        atom_selector: str = "name CA"):
     return _featurize_dist(traj=traj,
                            min_sep=min_sep,
                            max_sep=max_sep,
@@ -85,7 +85,7 @@ def featurize_com_dist(
         max_sep: int = None,
         inverse: bool = False,
         get_names: bool = True,
-        atom_selector: str = "protein and name CA"):
+        atom_selector: str = "name == CA"):
     traj = slice_traj_to_com(traj)
     return _featurize_dist(traj=traj,
                            min_sep=min_sep,

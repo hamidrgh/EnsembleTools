@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 import mdtraj
 from matplotlib.lines import Line2D
-
+from dpet.featurization.distances import *
 from dpet.ensemble_analysis import EnsembleAnalysis
 from dpet.featurization.angles import featurize_a_angle
 from dpet.data.coord import *
@@ -89,7 +89,7 @@ class Visualization:
         """
         Plot the results of t-SNE analysis. 
         Three scatter plot will be generated based on original, clustering and Rg labels. 
-        One KDE density plot will also be generated to shod the most populated areas in 
+        One KDE density plot will also be generated to show the most populated areas in 
         the reduced dimension.   
 
         Parameters
@@ -204,109 +204,36 @@ class Visualization:
 
         #return fig
         
-        
+    def umap_scatter(self, save=False): 
 
+        analysis = self.analysis
+        fig, (ax1, ax3) = plt.subplots(1,2, figsize=(14,4))
 
-    # def dimenfix_scatter_plot_rg(analysis, save=False):
-    #     fig, ax = plt.subplots(figsize=(10, 6))
-    #     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=analysis.rg, cmap='viridis', s=10)
-    #     fig.colorbar(scatter, ax=ax, label='Rg Numbers')
-    #     ax.set_xlabel('Dimension 1')
-    #     ax.set_ylabel('Dimension 2')
-    #     ax.set_title('Scatter Plot')
+        label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
+        point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
+        scatter_labeled = ax1.scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha = 0.5)
 
-    #     key = "dimenfix_scatter_plot_rg"
-    #     if key not in self.figures:
-    #             self.figures[key] = fig
+        rg_labeled = ax3.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c= [rg for rg in analysis.rg], s=10, alpha=0.5) 
+        cbar = plt.colorbar(rg_labeled, ax=ax3)
 
-    #     if save:
-    #         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-    #         plt.savefig(plot_dir  +'/dimenfix_scatter_rg.png', dpi=800)
-    #     return fig
+    
 
-    # def dimenfix_scatter_plot_ens(analysis, save=False):
-    #     # Map unique labels to unique integer values
-    #     label_to_int = {label: i for i, label in enumerate(np.unique(analysis.all_labels))}
-        
-    #     # Convert labels to corresponding integer values
-    #     int_labels = np.array([label_to_int[label] for label in analysis.all_labels])
-        
-    #     # Create a colormap based on the number of unique labels
-    #     cmap = plt.cm.get_cmap('viridis', len(label_to_int))
-        
-    #     fig, ax = plt.subplots(figsize=(10, 6))
-    #     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=int_labels, cmap=cmap, s=100)
-    #     fig.colorbar(scatter, ax=ax, label='All Labels')
-    #     ax.set_xlabel('Dimension 1')
-    #     ax.set_ylabel('Dimension 2')
-    #     ax.set_title('Scatter Plot 2')
+        ax1.set_title('Scatter plot (original labels)')
+        ax3.set_title('Scatter plot (Rg labels)')
 
-    #     key = "dimenfix_scatter_plot_ens"
-    #     if key not in self.figures:
-    #             self.figures[key] = fig
+        legend_labels = list(label_colors.keys())
+        legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc = 'lower left')
 
-    #     if save:
-    #         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-    #         plt.savefig(plot_dir  +'/dimenfix_scatter_ens.png', dpi=800)
-    #     return fig
+        key = "umap_scatter"
+        if key not in self.figures:
+                self.figures[key] = fig
 
+        if save:
+            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
+            plt.savefig(plot_dir  + '/umap_scatter.png', dpi=800)
 
-
-    # def dimenfix_cluster_scatter_plot(analysis, save=False):
-    #     n_clusters = s_max(analysis.reducer.sil_scores)
-
-    #     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    #     labels = kmeans.fit_predict(analysis.transformed_data)
-
-    #     fig, ax = plt.subplots(figsize=(10, 6))
-        
-    #     # Plot the points with different colors for each cluster
-    #     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=3, c=labels, cmap='viridis')
-    #     ax.set_title('K-means Clustering')
-        
-    #     # Create colorbar
-    #     cbar = fig.colorbar(scatter, ax=ax)
-    #     cbar.set_label('Cluster Labels')
-
-    #     key = "dimenfix_cluster_scatter_plot"
-    #     if key not in self.figures:
-    #             self.figures[key] = fig
-
-    #     if save:
-    #         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-    #         plt.savefig(plot_dir  +'/dimenfix_cluster_scatter.png', dpi=800)
-    #     return fig
-
-    # def dimenfix_cluster_scatter_plot_2(analysis, save=False):
-    #     label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
-    #     point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
-
-    #     n_clusters = s_max(analysis.reducer.sil_scores)
-
-    #     # Apply K-means clustering
-    #     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    #     labels = point_colors
-
-    #     # Create the figure and axis objects
-    #     fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
-        
-    #     # Plot the points with different colors for each cluster
-    #     scatter = ax.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=labels, s=7)
-    #     ax.set_title('K-means Clustering')
-        
-    #     # Create legend
-    #     legend_labels = list(label_colors.keys())
-    #     legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-    #     ax.legend(legend_handles, legend_labels, title='Original Labels', loc='upper left', bbox_to_anchor=(1, 1))
-
-    #     key = "dimenfix_cluster_scatter_plot_2"
-    #     if key not in self.figures:
-    #             self.figures[key] = fig
-
-    #     if save:
-    #         plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-    #         plt.savefig(plot_dir  +'/dimenfix_cluster_scatter_2.png', dpi=800)
-    #     return fig
+        # return fig
 
     def pca_cumulative_explained_variance(self, save=False):
 
@@ -626,29 +553,7 @@ class Visualization:
             plt.savefig(os.path.join(plot_dir,'Rg_vs_Asphericity' + analysis.ens_codes[0]))
         # plt.show()
 
-    '''
-    def trajectories_plot_density(trajectories):
-        for ens in trajectories:
-            asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
-            sns.kdeplot(asphericity, label = ens)
-        plt.legend()
-        plt.show()
-    '''
-    '''
-    def trajectories_plot_density(trajectories):
-        fig, ax = plt.subplots()
-        for ens in trajectories:
-            asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(trajectories[ens]))
-            # sns.kdeplot(asphericity, label = ens)
-            kde = gaussian_kde(asphericity)
-            x = np.linspace(min(asphericity), max(asphericity), 100)
-            ax.plot(x, kde(x), label=ens)
-        ax.legend()
-        ax.set_xlabel('Asphericity')
-        ax.set_ylabel('Density')
-        ax.set_title('Kernel Density Estimate of Asphericity for Trajectories')
-        plt.show()
-    '''
+  
     def plot_rg_vs_prolateness(self, save=False):
 
         """
@@ -664,7 +569,7 @@ class Visualization:
         analysis = self.analysis
 
         for ens_code, ensemble in analysis.ensembles.items():
-            x = analysis.rg
+            x = mdtraj.compute_rg(ensemble.trajectory)
             y = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
             p = np.corrcoef(x , y)
             plt.scatter(x,y,s=4,label = ens_code)
@@ -677,29 +582,6 @@ class Visualization:
             plt.savefig(os.path.join(plot_dir,'Rg_vs_Prolateness' + analysis.ens_codes[0]))
         # plt.show()
 
-    '''
-    def trajectories_plot_prolateness(trajectories):
-        for ens in trajectories:
-            prolatness = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
-            sns.kdeplot(prolatness, label = ens)
-        plt.legend()
-        plt.show()
-    '''
-    '''
-    def trajectories_plot_prolateness(trajectories):
-        fig, ax = plt.subplots()
-        for ens in trajectories:
-            prolatness = calculate_prolateness(mdtraj.compute_gyration_tensor(trajectories[ens]))
-            # sns.kdeplot(asphericity, label = ens)
-            kde = gaussian_kde(prolatness)
-            x = np.linspace(min(prolatness), max(prolatness), 100)
-            ax.plot(x, kde(x), label=ens)
-        ax.legend()
-        ax.set_xlabel('Prolateness')
-        ax.set_ylabel('Density')
-        ax.set_title('Kernel Density Estimate of Prolateness for Trajectories')
-        plt.show()
-    '''
 
     def plot_alpha_angle_dihederal(self, bins=50, save=False):
         
@@ -1136,10 +1018,8 @@ class Visualization:
         rows = (num_proteins + cols - 1) // cols
         fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
         cmap = cm.get_cmap("Blues")
-        for i, (ens_code, ensemble) in enumerate(ensembles.items()):
-            row = i // cols
-            col = i % cols
-            ax = axes[row, col] if num_proteins > 1 else axes[0]
+        axes = axes.reshape((rows, cols)) 
+        for (ens_code, ensemble) , ax in zip((ensembles.items()), fig.axes):
 
             matrtix_p_map = contact_probability_map(ensemble.trajectory , threshold=threshold)
             im = ax.imshow(matrtix_p_map, cmap=cmap )
@@ -1226,7 +1106,8 @@ class Visualization:
             You can change the size oof the figure here using a tuple. 
         """
         # TODO: Figure this out
-        self.analysis.perform_feature_extraction("phi_psi") # extract phi_psi features to calculate this score
+        analysis = self.analysis
+        analysis.extract_features("phi_psi") # extract phi_psi features to calculate this score
 
         ensembles = self.analysis.ensembles
         f = ss_measure_disorder(ensembles)
@@ -1284,6 +1165,74 @@ class Visualization:
             
         plt.show()
 
+    def plot_local_sasa(self, figsize=(15,5), pointer:list= None): 
+
+        """
+        It plots the average SASA for each residue among all conformations in an ensemble.
+
+        Parameters
+        ----------
+        pointer: list 
+            You can add the desired residues in a list and then you have a vertical dashed line to point those residues
+
+        figsize:tuple
+            You can change the size oof the figure here using a tuple. 
+        """
+
+        analysis = self.analysis
+
+        fig, ax = plt.subplots(1,1,figsize=figsize)
+        colors = ['b', 'g', 'r', 'c', 'm']
+        for i, ens in enumerate(analysis.ensembles):
+
+            res_based_sasa = mdtraj.shrake_rupley(analysis.ensembles[ens].trajectory, mode='residue')
+            sasa_mean = np.mean(res_based_sasa, axis=0)
+            sasa_std = np.std(res_based_sasa, axis=0)        
+
+            ax.plot(np.arange(1, len(sasa_mean)+1), sasa_mean, '-o', color=colors[i % len(colors)], label= ens)
+            ax.fill_between(np.arange(1,len(sasa_mean)+1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])
+
+        ax.set_xticks([i for i in np.arange(1,len(sasa_mean)+1) if  i==1 or i%5 == 0])
+        ax.set_xlabel('Residue Index')
+        ax.set_ylabel('Mean SASA')
+        ax.set_title('Mean SASA for Each Residue in Ensembles')
+        ax.legend()
+        ax.grid(True)
+        if pointer is not None:
+            for res in pointer:
+                ax.axvline(x=res, c='blue', linestyle='--', alpha=0.3, linewidth=1)
+            
+
+        plt.tight_layout()
+        plt.show()
+
+    def plot_dist_ca_com(self, min_sep=2,max_sep=None ,get_names=True,inverse=False ,figsize=(6,2.5)):
+        analysis = self.analysis
+        for ens in analysis.ensembles:
+            traj = analysis.ensembles[ens].trajectory
+            feat, names = featurize_com_dist(traj=traj, min_sep=min_sep,max_sep=max_sep,inverse=inverse ,get_names=get_names)  # Compute (N, *) feature arrays.
+            print(f"# Ensemble: {ens}")
+            print("features:", feat.shape)
+
+            com_dmap = calc_ca_dmap(traj=traj)
+            com_dmap_mean = com_dmap.mean(axis=0)
+            ca_dmap = calc_ca_dmap(traj=traj)
+            ca_dmap_mean = ca_dmap.mean(axis=0)
+
+            print("distance matrix:", com_dmap_mean.shape)
+            fig, ax = plt.subplots(1, 2, figsize=figsize)
+            fig.suptitle(ens)
+            im0 = ax[0].imshow(ca_dmap_mean)
+            ax[0].set_title("CA")
+            im1 = ax[1].imshow(com_dmap_mean)
+            ax[1].set_title("COM")
+            cbar = fig.colorbar(im0, ax=ax[0], shrink=0.8)
+            cbar.set_label("distance [nm]")
+            cbar = fig.colorbar(im1, ax=ax[1], shrink=0.8)
+            cbar.set_label("distance [nm]")
+
+            plt.tight_layout()
+            plt.show()
     #----------------------------------------------------------------------
     #------------- Functions for generating PDF reports -------------------
     #----------------------------------------------------------------------

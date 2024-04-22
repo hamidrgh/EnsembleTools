@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.manifold import MDS
 from neo_force_scheme import NeoForceScheme
 from sklearn.metrics import silhouette_score
+from umap import UMAP
 
 class DimensionalityReduction(ABC):
     @abstractmethod
@@ -154,6 +155,40 @@ class MDSReduction(DimensionalityReduction):
         feature_transformed = embedding.fit_transform(data)
         return feature_transformed
     
+class UMAPReduction(DimensionalityReduction):
+    def __init__(self, num_dim=2, n_neighbors=10, min_dist =0.1 , metric='euclidean', range_n_clusters = range(2,10,1)):
+        self.num_dim = num_dim
+        self.n_neighbors = n_neighbors
+        self.min_dist = min_dist
+        self.metric = metric
+        self.range_n_clusters = range_n_clusters
+        self.sil_scores = []
+    
+    def fit(self, data):
+        return super().fit(data)
+    
+    def transform(self, data):
+        return super().transform(data)
+
+    def fit_transform(self, data):
+        umap_model = UMAP(n_neighbors=self.n_neighbors, min_dist=self.min_dist, n_components=self.num_dim, metric=self.metric)
+        self.embedding = umap_model.fit_transform(data)
+        return self.embedding
+    
+    def cluster(self):
+        
+        for n_clusters in self.range_n_clusters:
+            clusterer = KMeans(n_clusters=n_clusters, n_init="auto", random_state=10)
+            cluster_labels = clusterer.fit_predict(self.embedding)
+            silhouette_avg = silhouette_score(self.embedding, cluster_labels)
+            self.sil_scores.append((n_clusters,silhouette_avg))
+            print(
+                "For n_clusters =",
+                n_clusters,
+                "The average silhouette_score is :",
+                silhouette_avg,
+            )
+    
 class KPCAReduction(DimensionalityReduction):
     def __init__(self, circular:bool=False, num_dim:int=10, gamma:float=None) -> None:
         self.circular = circular
@@ -198,6 +233,8 @@ class DimensionalityReductionFactory:
             return MDSReduction(*args, **kwargs)
         elif method == "kpca":
             return KPCAReduction(*args, **kwargs)
+        elif method == "umap":
+            return UMAPReduction(*args, **kwargs)
         else:
             raise NotImplementedError("Unsupported dimensionality reduction method.")
 

@@ -52,7 +52,7 @@ class Ensemble():
         topology = self.trajectory.topology
         atoms = topology.atoms
         self.coarse_grained = all(atom.element.symbol == 'C' for atom in atoms)
-        self.atom_selector = "protein" if self.coarse_grained else "protein and name CA"
+        self.atom_selector = "protein" if self.coarse_grained else "name == CA"
 
     def random_sample_trajectory(self, sample_size:int):
         total_frames = len(self.original_trajectory)
