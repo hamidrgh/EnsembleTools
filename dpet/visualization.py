@@ -798,7 +798,7 @@ class Visualization:
         ensembles = self.analysis.ensembles
         distance_matrix_ens_dict = {}
         contact_ens_dict = {}
-        for ens_code, ensemble in ensembles:
+        for ens_code, ensemble in ensembles.items():
             xyz_ens = ensemble.trajectory.xyz[:,ensemble.trajectory.topology.select(ensemble.atom_selector)]
             distance_matrix_ens_dict[ens_code] = get_distance_matrix(xyz_ens)
             contact_ens_dict[ens_code] = get_contact_map(distance_matrix_ens_dict[ens_code])
