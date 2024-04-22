@@ -513,26 +513,34 @@ class Visualization:
         # plt.show()
 
     def plot_rg_vs_asphericity(self, save=False):
-        
         """
-        Plot the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate 
-        the correlation between Rg and Asphericity. 
+        Plot the Rg versus Asphericity and get the pearson correlation coefficient to evaluate 
+        the correlation between Rg and Asphericity.
+        
+        Parameters:
+        -----------
+        save : bool, optional
+            If True, the plot will be saved. Default is False.
         """
         
         analysis = self.analysis
         
+        fig, ax = plt.subplots()  # Create a new figure
+        
         for ens_code, ensemble in analysis.ensembles.items():
             x = mdtraj.compute_rg(ensemble.trajectory)
             y = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
-            p = np.corrcoef(x , y)
-            plt.scatter(x,y,s=4,label = ens_code)
+            p = np.corrcoef(x, y)
+            ax.scatter(x, y, s=4, label=ens_code)
             print(f"Pearson coeff for {ens_code} = {round(p[0][1], 3)}")
-        plt.ylabel("Asphericity")
-        plt.xlabel("Rg [nm]")
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        
+        ax.set_ylabel("Asphericity")
+        ax.set_xlabel("Rg [nm]")
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        self.figures['plot_rg_vs_asphericity'] = fig
         if save:
-            plt.savefig(os.path.join(self.plot_dir,'Rg_vs_Asphericity' + analysis.ens_codes[0]))
-        # plt.show()
+            fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Asphericity' + analysis.ens_codes[0]))
+    
 
   
     def plot_rg_vs_prolateness(self, save=False):
