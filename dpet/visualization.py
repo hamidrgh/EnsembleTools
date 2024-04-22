@@ -18,8 +18,8 @@ class Visualization:
 
     def __init__(self, analysis: EnsembleAnalysis):
         self.analysis = analysis
-        plot_dir = os.path.join(self.analysis.data_dir, PLOT_DIR)
-        os.makedirs(plot_dir, exist_ok=True)
+        self.plot_dir = os.path.join(self.analysis.data_dir, PLOT_DIR)
+        os.makedirs(self.plot_dir, exist_ok=True)
         self.figures = {}
 
     def tsne_ramachandran_plot_density(self, save=False):
@@ -73,13 +73,11 @@ class Visualization:
             ax.set_ylabel('Psi (ψ) Angle (degrees)')
         
         key = "tsne_ramachandran_plot_density"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
 
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_ramachandran.png', dpi=800)
-        
+            plt.savefig(self.plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_ramachandran.png', dpi=800)
+            
         plt.tight_layout()
         #return fig
 
@@ -141,12 +139,10 @@ class Visualization:
         ax4.set_title('Density Plot ')
 
         key = "tsne_scatter_plot"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
         
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter.png', dpi=800)
+            plt.savefig(self.plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter.png', dpi=800)
         #return fig
 
     def dimenfix_scatter(self, save=False):
@@ -195,12 +191,10 @@ class Visualization:
         fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
 
         key = "dimenfix_scatter"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
 
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(plot_dir  + '/dimenfix_scatter.png', dpi=800)
+            plt.savefig(self.plot_dir  + '/dimenfix_scatter.png', dpi=800)
 
         #return fig
         
@@ -335,11 +329,9 @@ class Visualization:
         first_three_variance = analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum() * 100
         ax.text(0.5, 0.9, f"First three: {first_three_variance:.2f}%", transform=ax.transAxes, ha='center')
         key = "pca_cumulative_explained_variance"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
         #return fig
 
     def _set_labels(self, ax, reduce_dim_method, dim_x, dim_y):
@@ -403,11 +395,9 @@ class Visualization:
 
         plt.tight_layout()
         key = "pca_plot_2d_landscapes"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir, 'PCA' + analysis.featurization + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir, 'PCA' + analysis.featurization + analysis.ens_codes[0]))
         #plt.show()
         #return fig
 
@@ -465,11 +455,9 @@ class Visualization:
 
         plt.tight_layout()
         key = "pca_plot_1d_histograms"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
         #plt.show()
         #return fig
 
@@ -507,11 +495,9 @@ class Visualization:
             )
         plt.tight_layout()
         key = "pca_correlation_plot"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
         #plt.show()
 
 
@@ -553,11 +539,9 @@ class Visualization:
 
         plt.tight_layout()
         key = "pca_rg_correlation"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir,'PCA_RG' + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir,'PCA_RG' + analysis.ens_codes[0]))
         #plt.show()
         #return fig
 
@@ -595,11 +579,9 @@ class Visualization:
         plt.title('SASA distribution over the ensembles')
         plt.ylabel('SASA (nm)^2')
         key = "plot_global_sasa"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures[key] = fig
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))
         # plt.legend()
         # plt.show()
 
@@ -622,8 +604,7 @@ class Visualization:
         plt.xlabel("Rg [nm]")
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir,'Rg_vs_Asphericity' + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir,'Rg_vs_Asphericity' + analysis.ens_codes[0]))
         # plt.show()
 
     '''
@@ -673,8 +654,7 @@ class Visualization:
         plt.xlabel("Rg [nm]")
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir,'Rg_vs_Prolateness' + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir,'Rg_vs_Prolateness' + analysis.ens_codes[0]))
         # plt.show()
 
     '''
@@ -712,8 +692,7 @@ class Visualization:
         plt.title("the distribution of dihedral angles between four consecutive Cα beads.")    
         plt.legend()
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(os.path.join(plot_dir,'alpha_angle_dihederal' + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir,'alpha_angle_dihederal' + analysis.ens_codes[0]))
         # plt.show
 
     def _get_protein_dssp_data_dict(self):
@@ -1290,42 +1269,49 @@ class Visualization:
 
     def _generate_tsne_report(self):
         analysis = self.analysis
-        pdf_file_path = os.path.join(analysis.data_dir, PLOT_DIR, 'tsne.pdf')
+        pdf_file_path = os.path.join(self.plot_dir, 'tsne.pdf')
         with PdfPages(pdf_file_path) as pdf:
             if analysis.featurization == "phi_psi":
                 self.tsne_ramachandran_plot_density(save=False)
                 pdf.savefig()
+                plt.close()
 
             self.tsne_scatter_plot(save=False)
             pdf.savefig()
+            plt.close()
         
         print(f"Plots saved to {pdf_file_path}")
 
     def _generate_dimenfix_report(self):
         analysis = self.analysis
-        pdf_file_path = os.path.join(analysis.data_dir, PLOT_DIR, 'dimenfix.pdf')
+        pdf_file_path = os.path.join(self.plot_dir, 'dimenfix.pdf')
         with PdfPages(pdf_file_path) as pdf:
             self.dimenfix_scatter()
             pdf.savefig()
+            plt.close()
 
         print(f"Plots saved to {pdf_file_path}")
 
     def _generate_pca_report(self):
         analysis = self.analysis
-        pdf_file_path = os.path.join(analysis.data_dir, PLOT_DIR, 'pca.pdf')
+        pdf_file_path = os.path.join(self.plot_dir, 'pca.pdf')
         with PdfPages(pdf_file_path) as pdf:
         
             self. pca_cumulative_explained_variance()
             pdf.savefig()
+            plt.close()
 
             self.pca_plot_2d_landscapes()
             pdf.savefig()
+            plt.close()
 
             self.pca_plot_1d_histograms()
             pdf.savefig()
+            plt.close()
 
             self.pca_rg_correlation(analysis)
             pdf.savefig()
+            plt.close()
 
         print(f"Plots saved to {pdf_file_path}")
 
@@ -1336,10 +1322,11 @@ class Visualization:
         """
 
         analysis = self.analysis
-        pdf_file_path = os.path.join(analysis.data_dir, PLOT_DIR, 'custom_report.pdf')
+        pdf_file_path = os.path.join(self.plot_dir, 'custom_report.pdf')
         with PdfPages(pdf_file_path) as pdf:
             for fig in self.figures.values():
                 pdf.savefig(fig)
+                plt.close()
         print(f"Plots saved to {pdf_file_path}")
 
     def generate_report(self):
