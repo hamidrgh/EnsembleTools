@@ -867,150 +867,182 @@ class Visualization:
             fig.savefig(os.path.join(self.plot_dir, 'distance_distribution_' + self.analysis.ens_codes[0]))
         
 
-    def end_to_end_distances_plot(self, bins = 50, violin_plot = True, means = True, median = True):
-        
+    def end_to_end_distances_plot(self, bins=50, violin_plot=True, means=True, median=True, save=False):
         """
-        Plot end-to-end distance distributions. 
+        Plot end-to-end distance distributions.
 
         Parameters
         ----------
-        atom_selector: str 
-            The type of atom considered for calculating end-to-end distance
+        bins : int, optional
+            The number of bins for the histogram. Default is 50.
+        violin_plot : bool, optional
+            If True, a violin plot is visualized. Default is True.
+        means : bool, optional
+            If True, means are shown in the violin plot. Default is True.
+        median : bool, optional
+            If True, medians are shown in the violin plot. Default is True.
 
-        bins: int
-            The number of bins for bar plot 
-
-        violin_plot: bool 
-            If True box plot is visualized
-
-        means: bool
-            If True mean is showing in the box plot 
-
-        median: bool
-            If True median is showing in the box plot
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib Figure object containing the plot.
         """
-        
         ensembles = self.analysis.ensembles
         dist_list = []
         positions = []
+        
+        fig, ax = plt.subplots()
+
         if violin_plot:
             for ens_code, ensemble in ensembles.items():
                 ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
                 positions.append(ens_code)
-                dist_list.append(mdtraj.compute_distances(ensemble.trajectory,[[ca_indices[0], ca_indices[-1]]]).ravel())
-            plt.violinplot(dist_list, showmeans= means, showmedians= median)
-            plt.xticks(ticks= [y + 1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
-            plt.ylabel("End-to-End distance [nm]")
-            plt.title("End-to-End distances distribution")
-            plt.show()  
+                dist_list.append(mdtraj.compute_distances(ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]).ravel())
+            ax.violinplot(dist_list, showmeans=means, showmedians=median)
+            ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
+            ax.set_xticklabels(labels=positions, rotation=45.0, ha="center")
+            ax.set_ylabel("End-to-End distance [nm]")
+            ax.set_title("End-to-End distances distribution")
         else:
             for ens_code, ensemble in ensembles.items():
-                plt.hist(mdtraj.compute_distances(ensemble.trajectory,[[ca_indices[0], ca_indices[-1]]]).ravel()
-                    , label=ens_code, bins=bins, edgecolor = 'black', density=True)
-            plt.title("End-to-End distances distribution")
-            plt.legend()
-            plt.show()    
+                ax.hist(mdtraj.compute_distances(ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]).ravel(),
+                        label=ens_code, bins=bins, edgecolor='black', density=True)
+            ax.set_title("End-to-End distances distribution")
+            ax.legend()
 
-    def plot_asphericity_dist(self, bins = 50, violin_plot = True, means = True, median = True ):
-        
+        self.figures['end_to_end_distances_plot'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'e2e_distances_' + self.analysis.ens_codes[0]))
+
+
+    def plot_asphericity_dist(self, bins=50, violin_plot=True, means=True, median=True, save=False):
         """
         Plot asphericity distribution in each ensemble.
-        Asphericity is calculated based on the gyration tensor.  
+        Asphericity is calculated based on the gyration tensor.
 
         Parameters
         ----------
+        bins : int, optional
+            The number of bins for the histogram. Default is 50.
+        violin_plot : bool, optional
+            If True, a violin plot is visualized. Default is True.
+        means : bool, optional
+            If True, means are shown in the violin plot. Default is True.
+        median : bool, optional
+            If True, medians are shown in the violin plot. Default is True.
 
-        bins: int
-            The number of bins for bar plot 
-        violint_plot: bool 
-            If True box plot is visualized
-
-        means: bool
-            If True mean is showing in the box plot 
-
-        median: bool
-            If True median is showing in the box plot
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib Figure object containing the plot.
         """
-        
         ensembles = self.analysis.ensembles
         asph_list = []
         positions = []
+        
+        # Create a new figure object
+        fig, ax = plt.subplots()
+
         if violin_plot:
             for ens_code, ensemble in ensembles.items():
                 asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
                 asph_list.append(asphericity)
                 positions.append(ens_code)
-            plt.violinplot(asph_list, showmeans=means, showmedians= median)
-            plt.xticks(ticks= [y +1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
-            plt.ylabel("Asphericity")
-            plt.title("Asphericity distribution")
-            plt.show()
+            ax.violinplot(asph_list, showmeans=means, showmedians=median)
+            ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
+            ax.set_xticklabels(labels=positions, rotation=45.0, ha="center")
+            ax.set_ylabel("Asphericity")
+            ax.set_title("Asphericity distribution")
         else:
             for ens_code in ensembles.keys():
-                plt.hist(asphericity, label=ens_code, bins=bins, edgecolor = 'black', density=True)
-            plt.title("Asphericity distribution")        
-            plt.legend()
-            plt.show()
+                ax.hist(asphericity, label=ens_code, bins=bins, edgecolor='black', density=True)
+            ax.set_title("Asphericity distribution")
+            ax.legend()
 
-    def plot_prolateness_dist(self, bins= 50, violin_plot= True, median=False, mean=False  ):
-        
+        self.figures['plot_asphericity_dist'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'asphericity_dist_' + self.analysis.ens_codes[0]))
+
+    def plot_prolateness_dist(self, bins=50, violin_plot=True, median=False, mean=False, save=False):
         """
         Plot prolateness distribution in each ensemble.
-        Prolateness is calculated based on the gyration tensor.  
+        Prolateness is calculated based on the gyration tensor.
 
         Parameters
         ----------
+        bins : int, optional
+            The number of bins for the histogram. Default is 50.
+        violin_plot : bool, optional
+            If True, a violin plot is visualized. Default is True.
+        median : bool, optional
+            If True, median is showing in the violin plot. Default is False.
+        mean : bool, optional
+            If True, mean is showing in the violin plot. Default is False.
 
-        bins: int
-            The number of bins for bar plot 
-        violint_plot: bool 
-            If True box plot is visualized
-
-        means: bool
-            If True mean is showing in the box plot 
-
-        median: bool
-            If True median is showing in the box plot
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib Figure object containing the plot.
         """
-        
+
         ensembles = self.analysis.ensembles
         prolat_list = []
         positions = []
+
+        # Create a new figure object
+        fig, ax = plt.subplots()
+
         if violin_plot:
             for ens_code, ensemble in ensembles.items():
                 prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
                 prolat_list.append(prolat)
                 positions.append(ens_code)
-            plt.violinplot(prolat_list, showmeans= mean, showmedians= median)
-            plt.xticks(ticks= [y +1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
-            plt.ylabel("Prolateness")
-            plt.title("Prolateness distribution")
-            plt.show()
+            ax.violinplot(prolat_list, showmeans=mean, showmedians=median)
+            ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
+            ax.set_xticklabels(labels=positions, rotation=45.0, ha="center")
+            ax.set_ylabel("Prolateness")
+            ax.set_title("Prolateness distribution")
         else:
             for ens_code in ensembles.keys():
-                plt.hist(prolat, label=ens_code, bins=bins, edgecolor = 'black', density=True)
-            plt.title("Prolateness distribution")
-            plt.legend()
-            plt.show()
+                ax.hist(prolat, label=ens_code, bins=bins, edgecolor='black', density=True)
+            ax.set_title("Prolateness distribution")
+            ax.legend()
 
-    def plot_alpha_angles_dist(self, bins =50):
+        self.figures['plot_prolateness_dist'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'prolateness_dist_' + self.analysis.ens_codes[0]))
 
+
+    def plot_alpha_angles_dist(self, bins=50, save=False):
         """
         Plot the distribution of alpha angles.
 
         Parameters
         ----------
         bins : int
-            The number of bins for bar plot 
+            The number of bins for the histogram. Default is 50.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib Figure object containing the plot.
         """
 
         ensembles = self.analysis.ensembles
+
+        fig, ax = plt.subplots()
+
         for ens_code, ensemble in ensembles.items():
-            plt.hist(featurize_a_angle(ensemble.trajectory, get_names=False, atom_selector=ensemble.atom_selector).ravel(), bins=bins, histtype="step", density=False, label=ens_code)
-            
-        plt.title("the distribution of dihedral angles between four consecutive Cα beads.")
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        plt.show()
+            ax.hist(featurize_a_angle(ensemble.trajectory, get_names=False, atom_selector=ensemble.atom_selector).ravel(),
+                    bins=bins, histtype="step", density=False, label=ens_code)
+
+        ax.set_title("Distribution of alpha angles")
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+        self.figures['plot_alpha_angles_dist'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'alpha_dist_' + self.analysis.ens_codes[0]))
+
 
     def plot_contact_prob(self ,title, threshold = 0.8, dpi = 96, save=False):
         
