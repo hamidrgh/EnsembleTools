@@ -71,15 +71,13 @@ class Visualization:
             ax.set_title(f'Ramachandran Plot for cluster {cluster_id}')
             ax.set_xlabel('Phi (ϕ) Angle (degrees)')
             ax.set_ylabel('Psi (ψ) Angle (degrees)')
-        
-        key = "tsne_ramachandran_plot_density"
-        self.figures[key] = fig
+
+        plt.tight_layout()
+
+        self.figures["tsne_ramachandran_plot_density"] = fig
 
         if save:
             plt.savefig(self.plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_ramachandran.png', dpi=800)
-            
-        plt.tight_layout()
-        #return fig
 
 
     def tsne_scatter_plot(self, save=False):
@@ -138,12 +136,11 @@ class Visualization:
         ax3.set_title('Scatter plot (Rg labels)')
         ax4.set_title('Density Plot ')
 
-        key = "tsne_scatter_plot"
-        self.figures[key] = fig
+        self.figures["tsne_scatter_plot"] = fig
         
         if save:
             plt.savefig(self.plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter.png', dpi=800)
-        #return fig
+
 
     def dimenfix_scatter(self, save=False):
 
@@ -190,13 +187,11 @@ class Visualization:
         legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
 
-        key = "dimenfix_scatter"
-        self.figures[key] = fig
+        self.figures["dimenfix_scatter"] = fig
 
         if save:
             plt.savefig(self.plot_dir  + '/dimenfix_scatter.png', dpi=800)
 
-        #return fig
         
     def umap_scatter(self, save=False): 
 
@@ -219,15 +214,12 @@ class Visualization:
         legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc = 'lower left')
 
-        key = "umap_scatter"
-        if key not in self.figures:
-                self.figures[key] = fig
+        self.figures["umap_scatter"] = fig
 
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(plot_dir  + '/umap_scatter.png', dpi=800)
 
-        # return fig
 
     def pca_cumulative_explained_variance(self, save=False):
 
@@ -255,11 +247,11 @@ class Visualization:
         ax.grid(True)
         first_three_variance = analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum() * 100
         ax.text(0.5, 0.9, f"First three: {first_three_variance:.2f}%", transform=ax.transAxes, ha='center')
-        key = "pca_cumulative_explained_variance"
-        self.figures[key] = fig
+
+        self.figures["pca_cumulative_explained_variance"] = fig
+
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
-        #return fig
 
     def _set_labels(self, ax, reduce_dim_method, dim_x, dim_y):
         ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
@@ -321,12 +313,11 @@ class Visualization:
             self._set_labels(ax[i+1], "pca", dim_x, dim_y)
 
         plt.tight_layout()
-        key = "pca_plot_2d_landscapes"
-        self.figures[key] = fig
+
+        self.figures["pca_plot_2d_landscapes"] = fig
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA' + analysis.featurization + analysis.ens_codes[0]))
-        #plt.show()
-        #return fig
+            plt.savefig(os.path.join(self.plot_dir, 'PCA_2d_landscapes_' + analysis.featurization + analysis.ens_codes[0]))
+
 
     def pca_plot_1d_histograms(self, save=False):
         
@@ -381,12 +372,10 @@ class Visualization:
             ax[i].set_ylabel("Density")
 
         plt.tight_layout()
-        key = "pca_plot_1d_histograms"
-        self.figures[key] = fig
+        self.figures["pca_plot_1d_histograms"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
-        #plt.show()
-        #return fig
+
 
     def pca_correlation_plot(self, num_residues, sel_dims, save=False):
 
@@ -421,11 +410,9 @@ class Visualization:
                 label="PCA weight"
             )
         plt.tight_layout()
-        key = "pca_correlation_plot"
-        self.figures[key] = fig
+        self.figures["pca_correlation_plot"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
-        #plt.show()
 
 
     def pca_rg_correlation(self, save=False):
@@ -465,12 +452,9 @@ class Visualization:
             ax[i].set_ylabel("Rg [nm]")
 
         plt.tight_layout()
-        key = "pca_rg_correlation"
-        self.figures[key] = fig
+        self.figures["pca_rg_correlation"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir,'PCA_RG' + analysis.ens_codes[0]))
-        #plt.show()
-        #return fig
 
     def plot_global_sasa(self, showmeans=True, showmedians=True ,save=False):
 
@@ -505,12 +489,9 @@ class Visualization:
         plt.xticks(ticks= [y + 1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
         plt.title('SASA distribution over the ensembles')
         plt.ylabel('SASA (nm)^2')
-        key = "plot_global_sasa"
-        self.figures[key] = fig
+        self.figures["plot_global_sasa"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))
-        # plt.legend()
-        # plt.show()
 
     def plot_rg_vs_asphericity(self, save=False):
         """
@@ -537,53 +518,82 @@ class Visualization:
         ax.set_ylabel("Asphericity")
         ax.set_xlabel("Rg [nm]")
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        self.figures['plot_rg_vs_asphericity'] = fig
+        self.figures["plot_rg_vs_asphericity"] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Asphericity' + analysis.ens_codes[0]))
     
-
   
     def plot_rg_vs_prolateness(self, save=False):
-
         """
-        Plot the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
+        Plot the Rg versus Prolateness and gives the Pearson correlation coefficient to evaluate 
         the correlation between Rg and Prolateness. 
-        
+
         Parameters
-        -----------
+        ----------
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
-        """
 
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib Figure object containing the plot.
+        """
         analysis = self.analysis
+        
+        # Create a new figure object
+        fig, ax = plt.subplots()
 
         for ens_code, ensemble in analysis.ensembles.items():
             x = mdtraj.compute_rg(ensemble.trajectory)
             y = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
-            p = np.corrcoef(x , y)
-            plt.scatter(x,y,s=4,label = ens_code)
+            p = np.corrcoef(x, y)
+            ax.scatter(x, y, s=4, label=ens_code)
             print(f"Pearson coeff for {ens_code} = {round(p[0][1], 3)}")
-        plt.ylabel("prolateness")
-        plt.xlabel("Rg [nm]")
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+        ax.set_ylabel("Prolateness")
+        ax.set_xlabel("Rg [nm]")
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+        self.figures["plot_rg_vs_prolateness"] = fig
+
         if save:
-            plt.savefig(os.path.join(self.plot_dir,'Rg_vs_Prolateness' + analysis.ens_codes[0]))
-        # plt.show()
+            fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Prolateness' + analysis.ens_codes[0]))
 
 
-    def plot_alpha_angle_dihederal(self, bins=50, save=False):
-        
+    def plot_alpha_angle_dihedral(self, bins=50, save=False):
+        """
+        Plot the distribution of dihedral angles between four consecutive Cα beads.
+
+        Parameters
+        ----------
+        bins : int, optional
+            Number of bins for the histogram. Default is 50.
+        save : bool, optional
+            If True, the plot will be saved in the data directory. Default is False.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The matplotlib Figure object containing the plot.
+        """
         analysis = self.analysis
+        
+        # Create a new figure object
+        fig, ax = plt.subplots()
 
         for ens_code, ensemble in analysis.ensembles.items():
             four_cons_indices_ca = create_consecutive_indices_matrix(ensemble.trajectory.topology.select(ensemble.atom_selector) )
             ens_dh_ca = mdtraj.compute_dihedrals(ensemble.trajectory, four_cons_indices_ca).ravel()
-            plt.hist(ens_dh_ca, bins=bins, histtype="step", density=True, label=ens_code)
-        plt.title("the distribution of dihedral angles between four consecutive Cα beads.")    
-        plt.legend()
+            ax.hist(ens_dh_ca, bins=bins, histtype="step", density=True, label=ens_code)
+
+        ax.set_title("The distribution of dihedral angles between four consecutive Cα beads.")
+        ax.legend()
+
+        self.figures["plot_alpha_angle_dihedral"] = fig
+
         if save:
-            plt.savefig(os.path.join(self.plot_dir,'alpha_angle_dihederal' + analysis.ens_codes[0]))
-        # plt.show
+            fig.savefig(os.path.join(self.plot_dir, 'alpha_angle_dihedral' + analysis.ens_codes[0]))
+
 
     def _get_protein_dssp_data_dict(self):
         ensembles = self.analysis.ensembles
@@ -592,7 +602,7 @@ class Visualization:
             dssp_data_dict[ens_code] = mdtraj.compute_dssp(ensemble.trajectory)
         return dssp_data_dict
 
-    def plot_relative_helix_content(self):
+    def plot_relative_helix_content(self, save:bool=False):
         """
         Plot the relative helix content in each ensemble for each residue. 
         """
@@ -624,6 +634,10 @@ class Visualization:
         ax.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
         plt.show()
 
+        self.figures["plot_relative_helix_content"] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'relative_helix_' + self.analysis.ens_codes[0]))
+
     def _get_rg_data_dict(self):
         ensembles = self.analysis.ensembles
         rg_dict = {}
@@ -631,7 +645,7 @@ class Visualization:
             rg_dict[ens_code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
 
-    def trajectories_plot_rg_comparison(self, n_bins=50, bins_range=(1, 4.5), dpi=96):
+    def trajectories_plot_rg_comparison(self, n_bins=50, bins_range=(1, 4.5), dpi=96, save=False):
         
         """
         Plot the distribution of the Rg whithin each ensemble
@@ -674,6 +688,11 @@ class Visualization:
         plt.tight_layout()
         plt.show()
 
+        self.figures['trajectories_plot_rg_comparison'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'rg_comparison_' + self.analysis.ens_codes[0]))
+
+
     def _get_distance_matrix_ens_dict(self):
         ensembles = self.analysis.ensembles
         distance_matrix_ens_dict = {}
@@ -700,7 +719,8 @@ class Visualization:
                                     title_fontsize=14,
                                     dpi=96,
                                     max_d=6.8,
-                                    use_ylabel=True):
+                                    use_ylabel=True,
+                                    save=False):
         
         """
         Plot the average distance maps for selected ensembles.
@@ -748,9 +768,14 @@ class Visualization:
         # Remove any empty subplots
         for i in range(num_proteins, rows * cols):
             fig.delaxes(axes.flatten()[i])
-        
+
         plt.tight_layout()
         plt.show()
+
+        self.figures['plot_average_dmap_comparison'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'avg_dmap_' + self.analysis.ens_codes[0]))
+        
 
     def plot_cmap_comparison(self, 
                             title,
@@ -759,7 +784,8 @@ class Visualization:
                             title_fontsize=14,
                             dpi=96,
                             cmap_min=-3.5,
-                            use_ylabel=True):
+                            use_ylabel=True,
+                            save=False):
         cmap_ens_dict = self._get_contact_ens_dict()
         num_proteins = len(cmap_ens_dict)
         cols = 2  # Number of columns for subplots
@@ -798,7 +824,11 @@ class Visualization:
         plt.suptitle(title, fontsize=title_fontsize)
         plt.show()
 
-    def plot_distance_distribution_multiple(self, dpi=96):
+        self.figures['plot_cmap_comparison'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'cmap_' + self.analysis.ens_codes[0]))
+
+    def plot_distance_distribution_multiple(self, dpi=96, save=False):
         prot_data_dict = self._get_distance_matrix_ens_dict()
         num_proteins = len(prot_data_dict)
         
@@ -827,10 +857,15 @@ class Visualization:
         # Remove any empty subplots
         for i in range(num_proteins, rows * cols):
             fig.delaxes(axes.flatten()[i])
-        
+
         # Adjust layout
         plt.tight_layout()
         plt.show()
+
+        self.figures['plot_distance_distribution_multiple'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'distance_distribution_' + self.analysis.ens_codes[0]))
+        
 
     def end_to_end_distances_plot(self, bins = 50, violin_plot = True, means = True, median = True):
         
@@ -977,7 +1012,7 @@ class Visualization:
         plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.show()
 
-    def plot_contact_prob(self ,title, threshold = 0.8,dpi = 96):
+    def plot_contact_prob(self ,title, threshold = 0.8, dpi = 96, save=False):
         
         """
         Plot the contact probability map based on the threshold. 
@@ -1024,7 +1059,11 @@ class Visualization:
         plt.suptitle(title, fontsize=14)
         plt.show()
 
-    def plot_ramachandran_plot(self, two_d_hist= True, linespaces = (-180, 180, 80)):
+        self.figures['plot_contact_prob'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'contact_prob_' + self.analysis.ens_codes[0]))  
+
+    def plot_ramachandran_plot(self, two_d_hist= True, linespaces = (-180, 180, 80), save:bool = False):
         
         """
         Ramachandran plot. If two_d_hist= True it returns 2D histogram 
@@ -1073,7 +1112,11 @@ class Visualization:
             plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
             plt.show()
 
-    def plot_ss_measure_disorder(self: dict, pointer: list = None, figsize=(15,5)):
+        self.figures['plot_ramachandran_plot'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'ramachandran_' + self.analysis.ens_codes[0]))  
+
+    def plot_ss_measure_disorder(self: dict, pointer: list = None, figsize=(15,5), save:bool=False):
         
         """
         Generate site specific flexibility parameter plot. Further information is available in
@@ -1112,8 +1155,12 @@ class Visualization:
             for res in pointer:
                 axes.axvline(x= res, c= 'blue', linestyle= '--', alpha= 0.3, linewidth= 1)
         plt.show()
+
+        self.figures['plot_ss_measure_disorder'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'ss_measure_disorder_' + self.analysis.ens_codes[0]))  
             
-    def plot_ss_order_parameter(self, pointer:list= None , figsize=(15,5) ): 
+    def plot_ss_order_parameter(self, pointer:list= None , figsize=(15,5), save=False): 
         
         """
         Generate site specific order parameter plot. For further information
@@ -1152,7 +1199,11 @@ class Visualization:
             
         plt.show()
 
-    def plot_local_sasa(self, figsize=(15,5), pointer:list= None): 
+        self.figures['plot_ss_order_parameter'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'ss_order_' + self.analysis.ens_codes[0]))  
+
+    def plot_local_sasa(self, figsize=(15,5), pointer:list= None, save=False): 
 
         """
         It plots the average SASA for each residue among all conformations in an ensemble.
@@ -1193,7 +1244,12 @@ class Visualization:
         plt.tight_layout()
         plt.show()
 
-    def plot_dist_ca_com(self, min_sep=2,max_sep=None ,get_names=True,inverse=False ,figsize=(6,2.5)):
+        self.figures['plot_local_sasa'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'local_sasa_' + self.analysis.ens_codes[0]))  
+
+
+    def plot_dist_ca_com(self, min_sep=2,max_sep=None ,get_names=True,inverse=False ,figsize=(6,2.5), save=False):
         analysis = self.analysis
         for ens in analysis.ensembles:
             traj = analysis.ensembles[ens].trajectory
@@ -1220,6 +1276,10 @@ class Visualization:
 
             plt.tight_layout()
             plt.show()
+
+            self.figures['plot_dist_ca_com'] = fig
+            if save:
+                fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + self.analysis.ens_codes[0]))  
     #----------------------------------------------------------------------
     #------------- Functions for generating PDF reports -------------------
     #----------------------------------------------------------------------
