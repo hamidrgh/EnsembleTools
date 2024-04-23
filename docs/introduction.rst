@@ -83,8 +83,7 @@ In the example below, the figure is saved in the data directory.
 End-to-End Example
 ------------------
 
-In the example below, the complete data analysis pipeline is executed with one function call.
-The pipeline consists of:
+In the example below, the complete data analysis pipeline is executed with one function call. The pipeline consists of:
     1. Downloading trajectories from the Atlas database
     2. Loading trajectories
     3. Randomly sampling 200 conformations

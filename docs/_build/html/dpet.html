@@ -384,7 +384,7 @@ The returned values are in Angstrom.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.dimenfix_scatter">
-<span class="sig-name descname"><span class="pre">dimenfix_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.dimenfix_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.dimenfix_scatter" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">dimenfix_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.dimenfix_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.dimenfix_scatter" title="Link to this definition"></a></dt>
 <dd><p>Plot the the complete results for dimenfix method.</p>
 <section id="id8">
 <h3>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
@@ -397,20 +397,20 @@ The returned values are in Angstrom.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.end_to_end_distances_plot">
-<span class="sig-name descname"><span class="pre">end_to_end_distances_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.end_to_end_distances_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.end_to_end_distances_plot" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">end_to_end_distances_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.end_to_end_distances_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.end_to_end_distances_plot" title="Link to this definition"></a></dt>
 <dd><p>Plot end-to-end distance distributions.</p>
 <section id="id9">
 <h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>atom_selector: str </dt><dd><p>The type of atom considered for calculating end-to-end distance</p>
+<dt>bins<span class="classifier">int, optional</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
 </dd>
-<dt>bins: int</dt><dd><p>The number of bins for bar plot</p>
+<dt>violin_plot<span class="classifier">bool, optional</span></dt><dd><p>If True, a violin plot is visualized. Default is True.</p>
 </dd>
-<dt>violin_plot: bool </dt><dd><p>If True box plot is visualized</p>
+<dt>means<span class="classifier">bool, optional</span></dt><dd><p>If True, means are shown in the violin plot. Default is True.</p>
 </dd>
-<dt>means: bool</dt><dd><p>If True mean is showing in the box plot</p>
+<dt>median<span class="classifier">bool, optional</span></dt><dd><p>If True, medians are shown in the violin plot. Default is True.</p>
 </dd>
-<dt>median: bool</dt><dd><p>If True median is showing in the box plot</p>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -430,28 +430,33 @@ The returned values are in Angstrom.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_correlation_plot">
-<span class="sig-name descname"><span class="pre">pca_correlation_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_residues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_correlation_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_correlation_plot" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_cumulative_explained_variance">
-<span class="sig-name descname"><span class="pre">pca_cumulative_explained_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_cumulative_explained_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_cumulative_explained_variance" title="Link to this definition"></a></dt>
-<dd><p>Plot the cumulative variance. Only applicable when the
-dimensionality reduction method is “pca”</p>
+<span class="sig-name descname"><span class="pre">pca_correlation_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_residues</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_correlation_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_correlation_plot" title="Link to this definition"></a></dt>
+<dd><p>Plot the correlation between residues based on PCA weights.</p>
 <section id="id10">
 <h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+<dt>num_residues<span class="classifier">int</span></dt><dd><p>The total number of residues in the system.</p>
+</dd>
+<dt>sel_dims<span class="classifier">List[int]</span></dt><dd><p>A list of indices specifying the PCA dimensions to include in the plot.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This method generates a correlation plot showing the weights of pairwise residue distances
+for selected PCA dimensions. The plot visualizes the correlation between residues based on
+the PCA weights.</p>
+<p>The analysis is only valid on PCA and kernel PCA dimensionality reduction with ‘ca_dist’ feature extraction.</p>
 </section>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_plot_1d_histograms">
-<span class="sig-name descname"><span class="pre">pca_plot_1d_histograms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_plot_1d_histograms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_plot_1d_histograms" title="Link to this definition"></a></dt>
-<dd><p>Plot 1D histogram when the dimensionality reduction method 
-is “pca” or “kpca”</p>
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_cumulative_explained_variance">
+<span class="sig-name descname"><span class="pre">pca_cumulative_explained_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_cumulative_explained_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_cumulative_explained_variance" title="Link to this definition"></a></dt>
+<dd><p>Plot the cumulative variance. Only applicable when the
+dimensionality reduction method is “pca”</p>
 <section id="id11">
 <h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
 <dl class="simple">
@@ -462,9 +467,9 @@ is “pca” or “kpca”</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_plot_2d_landscapes">
-<span class="sig-name descname"><span class="pre">pca_plot_2d_landscapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_plot_2d_landscapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_plot_2d_landscapes" title="Link to this definition"></a></dt>
-<dd><p>Plot 2D landscapes when the dimensionality reduction method 
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_plot_1d_histograms">
+<span class="sig-name descname"><span class="pre">pca_plot_1d_histograms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_plot_1d_histograms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_plot_1d_histograms" title="Link to this definition"></a></dt>
+<dd><p>Plot 1D histogram when the dimensionality reduction method 
 is “pca” or “kpca”</p>
 <section id="id12">
 <h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
@@ -476,10 +481,10 @@ is “pca” or “kpca”</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_rg_correlation">
-<span class="sig-name descname"><span class="pre">pca_rg_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_rg_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_rg_correlation" title="Link to this definition"></a></dt>
-<dd><p>Examine and plot the correlation between PC dimension 1 and the amount of Rg
-Typically high correlation can be detected here.</p>
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_plot_2d_landscapes">
+<span class="sig-name descname"><span class="pre">pca_plot_2d_landscapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_plot_2d_landscapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_plot_2d_landscapes" title="Link to this definition"></a></dt>
+<dd><p>Plot 2D landscapes when the dimensionality reduction method 
+is “pca” or “kpca”</p>
 <section id="id13">
 <h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <dl class="simple">
@@ -490,18 +495,44 @@ Typically high correlation can be detected here.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_alpha_angle_dihederal">
-<span class="sig-name descname"><span class="pre">plot_alpha_angle_dihederal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_alpha_angle_dihederal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_alpha_angle_dihederal" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_alpha_angles_dist">
-<span class="sig-name descname"><span class="pre">plot_alpha_angles_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_alpha_angles_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_alpha_angles_dist" title="Link to this definition"></a></dt>
-<dd><p>Plot the distribution of alpha angles.</p>
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_rg_correlation">
+<span class="sig-name descname"><span class="pre">pca_rg_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_rg_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_rg_correlation" title="Link to this definition"></a></dt>
+<dd><p>Examine and plot the correlation between PC dimension 1 and the amount of Rg
+Typically high correlation can be detected here.</p>
 <section id="id14">
 <h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>bins<span class="classifier">int</span></dt><dd><p>The number of bins for bar plot</p>
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_alpha_angle_dihedral">
+<span class="sig-name descname"><span class="pre">plot_alpha_angle_dihedral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_alpha_angle_dihedral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_alpha_angle_dihedral" title="Link to this definition"></a></dt>
+<dd><p>Plot the distribution of dihedral angles between four consecutive Cα beads.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bins<span class="classifier">int, optional</span></dt><dd><p>Number of bins for the histogram. Default is 50.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_alpha_angles_dist">
+<span class="sig-name descname"><span class="pre">plot_alpha_angles_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_alpha_angles_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_alpha_angles_dist" title="Link to this definition"></a></dt>
+<dd><p>Plot the distribution of alpha angles.</p>
+<section id="id16">
+<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bins<span class="classifier">int</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -509,19 +540,21 @@ Typically high correlation can be detected here.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_asphericity_dist">
-<span class="sig-name descname"><span class="pre">plot_asphericity_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_asphericity_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_asphericity_dist" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_asphericity_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_asphericity_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_asphericity_dist" title="Link to this definition"></a></dt>
 <dd><p>Plot asphericity distribution in each ensemble.
 Asphericity is calculated based on the gyration tensor.</p>
-<section id="id15">
-<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>bins: int</dt><dd><p>The number of bins for bar plot</p>
+<dt>bins<span class="classifier">int, optional</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
 </dd>
-<dt>violint_plot: bool </dt><dd><p>If True box plot is visualized</p>
+<dt>violin_plot<span class="classifier">bool, optional</span></dt><dd><p>If True, a violin plot is visualized. Default is True.</p>
 </dd>
-<dt>means: bool</dt><dd><p>If True mean is showing in the box plot</p>
+<dt>means<span class="classifier">bool, optional</span></dt><dd><p>If True, means are shown in the violin plot. Default is True.</p>
 </dd>
-<dt>median: bool</dt><dd><p>If True median is showing in the box plot</p>
+<dt>median<span class="classifier">bool, optional</span></dt><dd><p>If True, medians are shown in the violin plot. Default is True.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -529,34 +562,75 @@ Asphericity is calculated based on the gyration tensor.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_average_dmap_comparison">
-<span class="sig-name descname"><span class="pre">plot_average_dmap_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ticks_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_average_dmap_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_average_dmap_comparison" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_average_dmap_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ticks_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_average_dmap_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_average_dmap_comparison" title="Link to this definition"></a></dt>
 <dd><p>Plot the average distance maps for selected ensembles.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
-<p>ticks_fontsize: int
-cbar_fontsize: int
-title_fontsize: int
-dpi: int
-max_d: float</p>
-<blockquote>
-<div><p>The maximum amount for distance the default value is 6.8</p>
-</div></blockquote>
-<p>use_ylabel: bool</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ticks_fontsize<span class="classifier">int, optional</span></dt><dd><p>Font size for tick labels on the plot axes. Default is 14.</p>
+</dd>
+<dt>cbar_fontsize<span class="classifier">int, optional</span></dt><dd><p>Font size for labels on the color bar. Default is 14.</p>
+</dd>
+<dt>title_fontsize<span class="classifier">int, optional</span></dt><dd><p>Font size for titles of individual subplots. Default is 14.</p>
+</dd>
+<dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots per inch (resolution) of the output figure. Default is 96.</p>
+</dd>
+<dt>max_d<span class="classifier">float, optional</span></dt><dd><p>The maximum distance value for the color map. Default is 6.8.</p>
+</dd>
+<dt>use_ylabel<span class="classifier">bool, optional</span></dt><dd><p>If True, y-axis labels are displayed on the subplots. Default is True.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Notes<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<p>This method plots the average distance maps for selected ensembles, where each distance map
+represents the average pairwise distances between residues in a protein structure.</p>
 </section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_cmap_comparison">
-<span class="sig-name descname"><span class="pre">plot_cmap_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticks_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-3.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_cmap_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_cmap_comparison" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">plot_cmap_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticks_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-3.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_cmap_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_cmap_comparison" title="Link to this definition"></a></dt>
+<dd><p>Plot the comparison of contact probability maps (Cmaps) for selected ensembles.</p>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>title<span class="classifier">str</span></dt><dd><p>The title of the plot.</p>
+</dd>
+<dt>ticks_fontsize<span class="classifier">int, optional</span></dt><dd><p>Font size for tick labels on the plot axes. Default is 14.</p>
+</dd>
+<dt>cbar_fontsize<span class="classifier">int, optional</span></dt><dd><p>Font size for labels on the color bar. Default is 14.</p>
+</dd>
+<dt>title_fontsize<span class="classifier">int, optional</span></dt><dd><p>Font size for the main title of the plot. Default is 14.</p>
+</dd>
+<dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots per inch (resolution) of the output figure. Default is 96.</p>
+</dd>
+<dt>cmap_min<span class="classifier">float, optional</span></dt><dd><p>The minimum value for the color map scale. Default is -3.5.</p>
+</dd>
+<dt>use_ylabel<span class="classifier">bool, optional</span></dt><dd><p>If True, y-axis labels are displayed on the subplots. Default is True.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id21">
+<h3>Notes<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<p>This method plots the comparison of contact probability maps (Cmaps) for selected ensembles.
+Each Cmap represents the log-transformed contact probabilities between residue pairs in a protein
+structure. The comparison is visualized as a grid of subplots, with each subplot displaying the
+Cmap for a specific ensemble.</p>
+</section>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_contact_prob">
-<span class="sig-name descname"><span class="pre">plot_contact_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">96</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_contact_prob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_contact_prob" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_contact_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_contact_prob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_contact_prob" title="Link to this definition"></a></dt>
 <dd><p>Plot the contact probability map based on the threshold. 
 The default value for threshold is 0.8[nm],</p>
-<section id="id17">
-<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>title: str </dt><dd><p>You need to specify a title for the plot</p>
 </dd>
@@ -564,28 +638,95 @@ The default value for threshold is 0.8[nm],</p>
 </dd>
 <dt>dpi: int</dt><dd><p>For changing the quality and dimension of the output figure</p>
 </dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
+</dd>
 </dl>
 </section>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_dist_ca_com">
+<span class="sig-name descname"><span class="pre">plot_dist_ca_com</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(6,</span> <span class="pre">2.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_dist_ca_com"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_dist_ca_com" title="Link to this definition"></a></dt>
+<dd><p>Plot the distance maps comparing the center of mass (COM) and alpha-carbon (CA) distances within each ensemble.</p>
+<section id="id23">
+<h3>Parameters:<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>min_sep<span class="classifier">int, optional</span></dt><dd><p>Minimum separation distance between atoms to consider. Default is 2.</p>
+</dd>
+<dt>max_sep<span class="classifier">int, optional</span></dt><dd><p>Maximum separation distance between atoms to consider. Default is None, which means no maximum separation.</p>
+</dd>
+<dt>get_names<span class="classifier">bool, optional</span></dt><dd><p>Whether to get the residue names for the features. Default is True.</p>
+</dd>
+<dt>inverse<span class="classifier">bool, optional</span></dt><dd><p>Whether to compute the inverse distances. Default is False.</p>
+</dd>
+<dt>figsize<span class="classifier">tuple, optional</span></dt><dd><p>Figure size in inches (width, height). Default is (6, 2.5).</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, save the plot as an image file. Default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id24">
+<h3>Notes:<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>This method plots the average distance maps for the center of mass (COM) and alpha-carbon (CA) distances
+within each ensemble. It computes the distance matrices for COM and CA atoms and then calculates their
+mean values to generate the distance maps. The plots include color bars indicating the distance range.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_distance_distribution_multiple">
-<span class="sig-name descname"><span class="pre">plot_distance_distribution_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">96</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_distance_distribution_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_distance_distribution_multiple" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">plot_distance_distribution_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_distance_distribution_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_distance_distribution_multiple" title="Link to this definition"></a></dt>
+<dd><p>Plot the distribution of distances for multiple proteins.</p>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots per inch (resolution) of the output figure. Default is 96.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h3>Notes<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<p>This method plots the distribution of distances for multiple proteins based on their distance matrices.
+Each subplot in the resulting grid represents the distance distribution for a specific protein.</p>
+<p>The distance distributions are visualized as histograms, where the x-axis represents the distance
+in nanometers and the y-axis represents the density of distances.</p>
+</section>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_global_sasa">
-<span class="sig-name descname"><span class="pre">plot_global_sasa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">showmeans</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showmedians</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_global_sasa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_global_sasa" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_global_sasa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">showmeans</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showmedians</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_global_sasa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_global_sasa" title="Link to this definition"></a></dt>
 <dd><p>Plot the distribution of SASA for each conformation 
 within the ensembles.</p>
-<section id="id18">
-<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
-<dt>showmean: bool</dt><dd><p>if True it will show the mean</p>
+<dt>showmean: bool, optional</dt><dd><p>if True it will show the mean. Default is True.</p>
 </dd>
-<dt>showmedian: bool</dt><dd><p>if True it will show the median</p>
+<dt>showmedian: bool, optional</dt><dd><p>if True it will show the median. Default is True.</p>
+</dd>
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_local_sasa">
+<span class="sig-name descname"><span class="pre">plot_local_sasa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(15,</span> <span class="pre">5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_local_sasa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_local_sasa" title="Link to this definition"></a></dt>
+<dd><p>It plots the average SASA for each residue among all conformations in an ensemble.</p>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pointer: list, optional</dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues. Default is None.</p>
+</dd>
+<dt>figsize:tuple, optional</dt><dd><p>You can change the size oof the figure here using a tuple. Default is (15,5).</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -593,19 +734,21 @@ within the ensembles.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_prolateness_dist">
-<span class="sig-name descname"><span class="pre">plot_prolateness_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_prolateness_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_prolateness_dist" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_prolateness_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_prolateness_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_prolateness_dist" title="Link to this definition"></a></dt>
 <dd><p>Plot prolateness distribution in each ensemble.
 Prolateness is calculated based on the gyration tensor.</p>
-<section id="id19">
-<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>bins: int</dt><dd><p>The number of bins for bar plot</p>
+<dt>bins<span class="classifier">int, optional</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
 </dd>
-<dt>violint_plot: bool </dt><dd><p>If True box plot is visualized</p>
+<dt>violin_plot<span class="classifier">bool, optional</span></dt><dd><p>If True, a violin plot is visualized. Default is True.</p>
 </dd>
-<dt>means: bool</dt><dd><p>If True mean is showing in the box plot</p>
+<dt>median<span class="classifier">bool, optional</span></dt><dd><p>If True, median is showing in the violin plot. Default is False.</p>
 </dd>
-<dt>median: bool</dt><dd><p>If True median is showing in the box plot</p>
+<dt>mean<span class="classifier">bool, optional</span></dt><dd><p>If True, mean is showing in the violin plot. Default is False.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -613,16 +756,18 @@ Prolateness is calculated based on the gyration tensor.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_ramachandran_plot">
-<span class="sig-name descname"><span class="pre">plot_ramachandran_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">two_d_hist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linespaces</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-180,</span> <span class="pre">180,</span> <span class="pre">80)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_ramachandran_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_ramachandran_plot" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_ramachandran_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">two_d_hist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linespaces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(-180,</span> <span class="pre">180,</span> <span class="pre">80)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_ramachandran_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_ramachandran_plot" title="Link to this definition"></a></dt>
 <dd><p>Ramachandran plot. If two_d_hist= True it returns 2D histogram 
 for each ensembles. If two_d_hist=False it returns a simple scatter plot 
 for ell ensembles in one plot.</p>
-<section id="id20">
-<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>two_d_hist: bool</dt><dd><p>If True it returns 2D histogram for each ensemble.</p>
+<dt>two_d_hist: bool, optional</dt><dd><p>If True it returns 2D histogram for each ensemble. Default is True.</p>
 </dd>
-<dt>linespaces: tuple</dt><dd><p>You can customize the bins for 2D histogram</p>
+<dt>linespaces: tuple, optional</dt><dd><p>You can customize the bins for 2D histogram. Default is (-180, 180, 80).</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -630,24 +775,38 @@ for ell ensembles in one plot.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_relative_helix_content">
-<span class="sig-name descname"><span class="pre">plot_relative_helix_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_relative_helix_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_relative_helix_content" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_relative_helix_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_relative_helix_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_relative_helix_content" title="Link to this definition"></a></dt>
 <dd><p>Plot the relative helix content in each ensemble for each residue.</p>
+<section id="id31">
+<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_rg_vs_asphericity">
-<span class="sig-name descname"><span class="pre">plot_rg_vs_asphericity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_rg_vs_asphericity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_rg_vs_asphericity" title="Link to this definition"></a></dt>
-<dd><p>Plot the Rg versus Asphericity and gives the pearson correlation coefficient to evaluate 
+<span class="sig-name descname"><span class="pre">plot_rg_vs_asphericity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_rg_vs_asphericity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_rg_vs_asphericity" title="Link to this definition"></a></dt>
+<dd><p>Plot the Rg versus Asphericity and get the pearson correlation coefficient to evaluate 
 the correlation between Rg and Asphericity.</p>
+<section id="id32">
+<h3>Parameters:<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_rg_vs_prolateness">
-<span class="sig-name descname"><span class="pre">plot_rg_vs_prolateness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_rg_vs_prolateness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_rg_vs_prolateness" title="Link to this definition"></a></dt>
-<dd><p>Plot the Rg versus Prolateness and gives the pearson correlation coefficient to evaluate 
+<span class="sig-name descname"><span class="pre">plot_rg_vs_prolateness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_rg_vs_prolateness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_rg_vs_prolateness" title="Link to this definition"></a></dt>
+<dd><p>Plot the Rg versus Prolateness and get the Pearson correlation coefficient to evaluate 
 the correlation between Rg and Prolateness.</p>
-<section id="id21">
-<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<section id="id33">
+<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -657,19 +816,21 @@ the correlation between Rg and Prolateness.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_ss_measure_disorder">
-<span class="sig-name descname"><span class="pre">plot_ss_measure_disorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pointer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(15,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_ss_measure_disorder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_ss_measure_disorder" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_ss_measure_disorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pointer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(15,</span> <span class="pre">5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_ss_measure_disorder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_ss_measure_disorder" title="Link to this definition"></a></dt>
 <dd><p>Generate site specific flexibility parameter plot. Further information is available in
 this paper by G.Jeschke <a class="reference external" href="https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906">https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906</a>. 
 In summary this score is sensitive to local flexibility based on the circular variance of the
 Ramachandran angles φ and ψ for each residue in the ensemble.</p>
 <p>This score ranges from 0 for identical dihederal angles for all conformers at the residue i to 1 
 for a uniform distribution of dihederal angles at the residue i.</p>
-<section id="id22">
-<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>pointer: list </dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues</p>
+<dt>pointer: list, optional</dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues. Default is None.</p>
 </dd>
-<dt>figsize:tuple</dt><dd><p>You can change the size oof the figure here using a tuple.</p>
+<dt>figsize:tuple, optional</dt><dd><p>You can change the size of the figure here using a tuple. Default is (15,5).</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -677,17 +838,19 @@ for a uniform distribution of dihederal angles at the residue i.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.plot_ss_order_parameter">
-<span class="sig-name descname"><span class="pre">plot_ss_order_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pointer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(15,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_ss_order_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_ss_order_parameter" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_ss_order_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pointer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(15,</span> <span class="pre">5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.plot_ss_order_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.plot_ss_order_parameter" title="Link to this definition"></a></dt>
 <dd><p>Generate site specific order parameter plot. For further information
 you can check this paper by G.Jeschke <a class="reference external" href="https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906">https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906</a>. 
 In summary this score abstracts from local chain flexibility. The parameter is still site-specific, as orientation 
 correlations in IDRs and IDPs decrease with increasing sequence distance.</p>
-<section id="id23">
-<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<section id="id35">
+<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>pointer: list </dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues</p>
+<dt>pointer: list, optional</dt><dd><p>You can add the desired residues in a list and then you have a vertical dashed line to point those residues. Default is None.</p>
 </dd>
-<dt>figsize:tuple</dt><dd><p>You can change the size oof the figure here using a tuple.</p>
+<dt>figsize:tuple, optional</dt><dd><p>You can change the size oof the figure here using a tuple. Default is (15,5).</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -695,25 +858,38 @@ correlations in IDRs and IDPs decrease with increasing sequence distance.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.trajectories_plot_rg_comparison">
-<span class="sig-name descname"><span class="pre">trajectories_plot_rg_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">4.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">96</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.trajectories_plot_rg_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.trajectories_plot_rg_comparison" title="Link to this definition"></a></dt>
-<dd><p>Plot the distribution of the Rg whithin each ensemble</p>
-<section id="parameter">
-<h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading"></a></h3>
-<p>n_bins : int 
-bins_range : tuple
-change the Rg scale in x-axis 
-dpi : int</p>
+<span class="sig-name descname"><span class="pre">trajectories_plot_rg_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(1,</span> <span class="pre">4.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.trajectories_plot_rg_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.trajectories_plot_rg_comparison" title="Link to this definition"></a></dt>
+<dd><p>Plot the distribution of the radius of gyration (Rg) within each ensemble.</p>
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>n_bins<span class="classifier">int, optional</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
+</dd>
+<dt>bins_range<span class="classifier">tuple[float, float], optional</span></dt><dd><p>The range of Rg values to display on the x-axis. Default is (1, 4.5).</p>
+</dd>
+<dt>dpi<span class="classifier">int, optional</span></dt><dd><p>The DPI (dots per inch) of the output figure. Default is 96.</p>
+</dd>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id37">
+<h3>Notes<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<p>This method plots the distribution of the radius of gyration (Rg) within each ensemble in the analysis.</p>
+<p>The Rg values are binned according to the specified number of bins (<cite>n_bins</cite>) and range (<cite>bins_range</cite>) and 
+displayed as histograms. Additionally, dashed lines representing the mean and median Rg values are overlaid
+on each histogram.</p>
 </section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.tsne_ramachandran_plot_density">
-<span class="sig-name descname"><span class="pre">tsne_ramachandran_plot_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.tsne_ramachandran_plot_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.tsne_ramachandran_plot_density" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">tsne_ramachandran_plot_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.tsne_ramachandran_plot_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.tsne_ramachandran_plot_density" title="Link to this definition"></a></dt>
 <dd><p>Plot the 2-D histogram ramachandran plots of the
 clusters from t-SNE analysis.</p>
 <p>The results is only meaningful when the extracted feature is “phi_psi”.</p>
-<section id="id24">
-<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<section id="id38">
+<h3>Parameters<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -723,17 +899,36 @@ clusters from t-SNE analysis.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.tsne_scatter_plot">
-<span class="sig-name descname"><span class="pre">tsne_scatter_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.tsne_scatter_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.tsne_scatter_plot" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">tsne_scatter_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.tsne_scatter_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.tsne_scatter_plot" title="Link to this definition"></a></dt>
 <dd><p>Plot the results of t-SNE analysis. 
 Three scatter plot will be generated based on original, clustering and Rg labels. 
-One KDE density plot will also be generated to shod the most populated areas in 
+One KDE density plot will also be generated to show the most populated areas in 
 the reduced dimension.</p>
-<section id="id25">
-<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<section id="id39">
+<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
 </dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.umap_scatter">
+<span class="sig-name descname"><span class="pre">umap_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.umap_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.umap_scatter" title="Link to this definition"></a></dt>
+<dd><p>Generate a scatter plot of the transformed data using UMAP.</p>
+<section id="id40">
+<h3>Parameters<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id41">
+<h3>Notes<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<p>This method creates a scatter plot of the transformed data using UMAP, with two subplots:
+- The first subplot shows the scatter plot with points colored by original labels.
+- The second subplot shows the scatter plot with points colored by Rg labels.</p>
 </section>
 </dd></dl>
 
