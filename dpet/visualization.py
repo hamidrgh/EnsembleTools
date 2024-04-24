@@ -681,7 +681,7 @@ class Visualization:
             rg_dict[ens_code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
 
-    def trajectories_plot_rg_comparison(self, n_bins: int = 50, bins_range: Tuple[float, float] = (1, 4.5), dpi: int = 96, save: bool = False):
+    def trajectories_plot_rg_comparison(self, n_bins: int = 50, dpi: int = 96, save: bool = False):
         """
         Plot the distribution of the radius of gyration (Rg) within each ensemble.
 
@@ -689,8 +689,6 @@ class Visualization:
         ----------
         n_bins : int, optional
             The number of bins for the histogram. Default is 50.
-        bins_range : tuple[float, float], optional
-            The range of Rg values to display on the x-axis. Default is (1, 4.5).
         dpi : int, optional
             The DPI (dots per inch) of the output figure. Default is 96.
         save : bool, optional
@@ -708,9 +706,13 @@ class Visualization:
         """
 
         rg_data_dict = self._get_rg_data_dict()
+        concatenated_rg_data = np.concatenate(list(rg_data_dict.values())) 
+        min_value = np.floor(np.min(concatenated_rg_data)) #calculating min and max Rg to automate the range
+        max_value = np.ceil(np.max(concatenated_rg_data))
         h_args = {"histtype": "step", "density": True}
         n_systems = len(rg_data_dict)
-        bins = np.linspace(bins_range[0], bins_range[1], n_bins + 1)
+        
+        bins = np.linspace(min_value, max_value, n_bins + 1)
         fig, ax = plt.subplots(1, n_systems, figsize=(3 * n_systems, 3), dpi=dpi)
         
         # Ensure ax is always a list
@@ -767,7 +769,6 @@ class Visualization:
                                     cbar_fontsize: int = 14,
                                     title_fontsize: int = 14,
                                     dpi: int = 96,
-                                    max_d: float = 6.8,
                                     use_ylabel: bool = True,
                                     save: bool = False):
         """
@@ -783,8 +784,6 @@ class Visualization:
             Font size for titles of individual subplots. Default is 14.
         dpi : int, optional
             Dots per inch (resolution) of the output figure. Default is 96.
-        max_d : float, optional
-            The maximum distance value for the color map. Default is 6.8.
         use_ylabel : bool, optional
             If True, y-axis labels are displayed on the subplots. Default is True.
         save : bool, optional
@@ -810,6 +809,8 @@ class Visualization:
             ax = axes[row, col]# if num_proteins > 1 else axes[0]
             
             avg_dmap = np.mean(ens_data, axis=0)
+            
+           
             tril_ids = np.tril_indices(avg_dmap.shape[0], 0)
             avg_dmap[tril_ids] = np.nan
             
@@ -822,9 +823,8 @@ class Visualization:
             cbar = fig.colorbar(im, ax=ax)
             cbar.set_label(r"Average $d_{ij}$ [nm]", fontsize=cbar_fontsize)
             cbar.ax.tick_params(labelsize=cbar_fontsize)
-            
-            if max_d is not None:
-                im.set_clim(0, max_d)
+
+            im.set_clim(0, np.ceil(np.nanmax(avg_dmap.flatten()))) # find the maximum distance and round it to the next integer to manage the auto range
         
         # Remove any empty subplots
         for i in range(num_proteins, rows * cols):
@@ -1015,6 +1015,7 @@ class Visualization:
             ax.set_title("End-to-End distances distribution")
         else:
             for ens_code, ensemble in ensembles.items():
+                ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
                 ax.hist(mdtraj.compute_distances(ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]).ravel(),
                         label=ens_code, bins=bins, edgecolor='black', density=True)
             ax.set_title("End-to-End distances distribution")
@@ -1062,7 +1063,8 @@ class Visualization:
             ax.set_ylabel("Asphericity")
             ax.set_title("Asphericity distribution")
         else:
-            for ens_code in ensembles.keys():
+            for ens_code, ensemble in ensembles.items():
+                asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
                 ax.hist(asphericity, label=ens_code, bins=bins, edgecolor='black', density=True)
             ax.set_title("Asphericity distribution")
             ax.legend()
@@ -1109,7 +1111,8 @@ class Visualization:
             ax.set_ylabel("Prolateness")
             ax.set_title("Prolateness distribution")
         else:
-            for ens_code in ensembles.keys():
+            for ens_code, ensemble in ensembles.items():
+                prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
                 ax.hist(prolat, label=ens_code, bins=bins, edgecolor='black', density=True)
             ax.set_title("Prolateness distribution")
             ax.legend()
@@ -1148,8 +1151,8 @@ class Visualization:
             fig.savefig(os.path.join(self.plot_dir, 'alpha_dist_' + self.analysis.ens_codes[0]))
 
 
-    def plot_contact_prob(self ,title: str, threshold: float = 0.8, dpi: int = 96, save: bool = False):
-        
+    def plot_contact_prob(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues'):
+        from matplotlib.colors import LogNorm
         """
         Plot the contact probability map based on the threshold. 
         The default value for threshold is 0.8[nm], 
@@ -1167,6 +1170,11 @@ class Visualization:
 
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        
+        norm : bool
+            If True, use log scale range
+
+        cmap_color = select a color for the contact map. Default is "Blues"   
 
         """
         if self.analysis.exists_coarse_grained():
@@ -1177,12 +1185,15 @@ class Visualization:
             cols = 2
             rows = (num_proteins + cols - 1) // cols
             fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
-            cmap = cm.get_cmap("Blues")
+            cmap = cm.get_cmap(cmap_color)
             axes = axes.reshape((rows, cols)) 
             for (ens_code, ensemble) , ax in zip((ensembles.items()), fig.axes):
 
                 matrtix_p_map = contact_probability_map(ensemble.trajectory  ,threshold=threshold)
-                im = ax.imshow(matrtix_p_map, cmap=cmap )
+                if norm:
+                    im = ax.imshow(matrtix_p_map, cmap=cmap, norm=LogNorm() )
+                else:
+                    im = ax.imshow(matrtix_p_map, cmap=cmap )
                 ax.set_title(f"Contact Probability Map: {ens_code}", fontsize=14)
 
 
@@ -1270,7 +1281,7 @@ class Visualization:
         if two_d_hist:
             fig, axes = plt.subplots(1, len(ensembles), figsize=(5*len(ensembles), 5))
             rama_linspace = np.linspace(linespaces[0], linespaces[1], linespaces[2])
-            for ens, ax in zip(ensembles, axes.ravel()):
+            for ens, ax in zip(ensembles, fig.axes):
                 phi_flat = np.degrees(mdtraj.compute_phi(ensembles[ens].trajectory)[1]).ravel()
                 psi_flat = np.degrees(mdtraj.compute_psi(ensembles[ens].trajectory)[1]).ravel()
                 hist = ax.hist2d(
