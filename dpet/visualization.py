@@ -1126,21 +1126,13 @@ class Visualization:
         figsize:tuple
             You can change the size of the figure here using a tuple. 
         """
-<<<<<<< HEAD
-
-        if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
-        # TODO: Figure this out
         analysis = self.analysis
         analysis.extract_features("phi_psi") # extract phi_psi features to calculate this score
-=======
+
         features_dict = {}
         for ens in self.analysis.ensembles.values():
             features = featurize_phi_psi(traj = ens.trajectory, get_names = False)
             features_dict[ens.ens_code] = features
->>>>>>> af5008baee7fc95ec4774d135c9cb9404a3bf2da
-
         f = ss_measure_disorder(features_dict)
         fig, axes = plt.subplots(1,1, figsize=figsize)
         keys = list(features_dict.keys())
