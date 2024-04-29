@@ -1327,10 +1327,10 @@ class Visualization:
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
-        features_dict = {}
-        for ens in self.analysis.ensembles.values():
-            features = featurize_phi_psi(traj = ens.trajectory, get_names = False)
-            features_dict[ens.ens_code] = features
+        features_dict = self.analysis.get_features(featurization='phi_psi')
+        #for ens in self.analysis.ensembles.values():
+        #    features = featurize_phi_psi(traj = ens.trajectory, get_names = False)
+        #    features_dict[ens.ens_code] = features
 
         f = ss_measure_disorder(features_dict)
         fig, axes = plt.subplots(1,1, figsize=figsize)

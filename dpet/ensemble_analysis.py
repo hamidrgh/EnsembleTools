@@ -10,6 +10,8 @@ import os
 import mdtraj
 import numpy as np
 from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
+from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi, featurize_tr_angle
+from dpet.featurization.distances import featurize_ca_dist
 
 class EnsembleAnalysis:
     def __init__(self, ens_codes:list[str], data_dir:str):
@@ -22,10 +24,24 @@ class EnsembleAnalysis:
 
     @property
     def trajectories(self) -> Dict[str, mdtraj.Trajectory]:
+        """
+        Get the trajectories associated with each ensemble.
+
+        Returns:
+            Dict[str, mdtraj.Trajectory]: A dictionary where keys are ensemble IDs
+            and values are the corresponding MDTraj trajectories.
+        """
         return {ens_id: ensemble.trajectory for ens_id, ensemble in self.ensembles.items()}
 
     @property
-    def features(self) -> Dict[str, np.array]:
+    def features(self) -> Dict[str, np.ndarray]:
+        """
+        Get the features associated with each ensemble.
+
+        Returns:
+            Dict[str, np.ndarray]: A dictionary where keys are ensemble IDs
+            and values are the corresponding feature arrays.
+        """
         return {ens_id: ensemble.features for ens_id, ensemble in self.ensembles.items()}
 
     def __del__(self):
@@ -391,3 +407,33 @@ class EnsembleAnalysis:
             self.random_sample_trajectories(subsample_size)
         self.extract_features(**featurization_params)
         self.reduce_features(**reduce_dim_params)
+
+    def get_features(self, featurization: str, min_sep: int = 2, max_sep: int = None) -> Dict[str, np.ndarray]:
+        """
+        Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.
+
+        Parameters:
+        -----------
+        featurization : str
+            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist", "a_angle" and "rg".
+
+        min_sep : int, optional
+            Minimum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is 2.
+
+        max_sep : int, optional
+            Maximum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is None.
+
+        Returns:
+        --------
+        Dict[str, np.ndarray]
+            A dictionary containing the extracted features for each ensemble, where the keys are ensemble IDs and the 
+            values are NumPy arrays containing the features.
+        """
+        if featurization in ("phi_psi", "tr_omega", "tr_phi") and self.exists_coarse_grained():
+            raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
+        
+        features_dict = {}
+        for ens_code, ensemble in self.ensembles.items():
+            features = ensemble._featurize(featurization=featurization, min_sep= min_sep, max_sep=max_sep)
+            features_dict[ens_code] = features
+        return features_dict
