@@ -19,17 +19,18 @@ def get_contact_map(dmap, threshold=0.8, pseudo_count=0.01):
     return cmap
 
 
-def torch_chain_dihedrals(xyz, norm=False):
+def calc_chain_dihedrals(xyz, norm=False):
+    # not sure where this function is used
     r_sel = xyz
     b0 = -(r_sel[:,1:-2,:] - r_sel[:,0:-3,:])
     b1 = r_sel[:,2:-1,:] - r_sel[:,1:-2,:]
     b2 = r_sel[:,3:,:] - r_sel[:,2:-1,:]
-    b0xb1 = torch.cross(b0, b1)
-    b1xb2 = torch.cross(b2, b1)
-    b0xb1_x_b1xb2 = torch.cross(b0xb1, b1xb2)
-    y = torch.sum(b0xb1_x_b1xb2*b1, axis=2)*(1.0/torch.linalg.norm(b1, dim=2))
-    x = torch.sum(b0xb1*b1xb2, axis=2)
-    dh_vals = torch.atan2(y, x)
+    b0xb1 = np.cross(b0, b1)
+    b1xb2 = np.cross(b2, b1)
+    b0xb1_x_b1xb2 = np.cross(b0xb1, b1xb2)
+    y = np.sum(b0xb1_x_b1xb2*b1, axis=2)*(1.0/np.linalg.norm(b1, dim=2))
+    x = np.sum(b0xb1*b1xb2, axis=2)
+    dh_vals = np.atan2(y, x)
     if not norm:
         return dh_vals
     else:

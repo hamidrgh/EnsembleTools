@@ -517,19 +517,21 @@ class Visualization:
         fig, ax = plt.subplots(1, 1 )
         positions = []
         dist_list = []
-        for ens in analysis.trajectories:
+        for ens in analysis.ensembles:
             positions.append(ens)
-            sasa = mdtraj.shrake_rupley(analysis.trajectories[ens])
+            sasa = mdtraj.shrake_rupley(analysis.ensembles[ens].trajectory)
             total_sasa = sasa.sum(axis=1)
             dist_list.append(total_sasa)
         ax.violinplot(dist_list, showmeans=showmeans, showmedians=showmedians  )
 
-        plt.xticks(ticks= [y + 1 for y in range(len(positions))],labels=positions, rotation = 45.0, ha = "center")
-        plt.title('SASA distribution over the ensembles')
-        plt.ylabel('SASA (nm)^2')
+        ax.set_xticks(ticks= [y + 1 for y in range(len(positions))])
+        ax.set_xticklabels(positions, rotation = 45.0, ha = "center")
+        ax.set_title('SASA distribution over the ensembles')
+        ax.set_ylabel('SASA (nm)^2')
         self.figures["plot_global_sasa"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))
+        return ax
 
     def plot_rg_vs_asphericity(self, save: bool = False):
         """
