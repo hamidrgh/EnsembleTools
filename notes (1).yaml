@@ -1,0 +1,94 @@
+################
+# Bugs to fix. #
+################
+
+- type: bug
+  id: 0
+  function:
+    - plot_asphericity_dist --> Corrected
+    - end_to_end_distances_plot --> Corrected 
+    - plot_prolateness_dist --> Corrected
+  error: exception when violin_plot=False
+  importance: high
+
+- type: bug
+  id: 1
+  function: plot_ss_measure_disorder
+  error: name 'features_dict' is not defined --> Corrected
+  importance: high
+
+- type: bug
+  id: 2
+  function: plot_contact_prob
+  error: Visualization.plot_contact_prob() got an unexpected keyword argument 'title' --> Corrected
+  importance: high
+
+
+############################
+# Improve functionalities. #
+############################
+
+- type: functionality improvement
+  id: 3
+  function: all featurization classes and functions
+  fix: let users perform featurization/dimensionality reduction and collect features in numpy array, which they can use the way they want.
+  why: super-useful for experienced users, they will be happy because they will have easy-to-use methods to extract complex features (just like when we make use of mdtraj built-in methods).
+  how: analysis methods should return dictionaries with ensemble codes (keys) and numpy arrays (values). See giacomo's original branch.
+  importance: high
+  candidate: giacomo? Maybe later, when we have a stable version/branch? I want to avoid interfering with ongoing code refactoring.
+
+- type: functionality improvement
+  id: 4
+  function: all plotting methods
+  fix: all methods should return some matplotlib object.
+  why: in this way, users can add/edit their own elements (labels, lines, arrows) to the plot.
+  how: add a return statement to functions and make sure the plot element (axis or entire plot) can be edited. See for example this plotting module https://deeptime-ml.github.io/latest/api/index_plots.html.
+  importance: medium
+  candidate: giacomo? Maybe later, once we have all plotting functions ready?
+
+- type: functionality improvement
+  id: 5
+  function:
+    - plot_average_dmap_comparison, --> Corrected
+    - trajectories_plot_rg_comparison --> Corrected
+    - all other plotting functions that plot data within some system-specific range
+  fix: use auto range
+  importance: high
+  candidate: giacomo?
+
+- type: functionality improvement
+  id: 6
+  function: plot_contact_prob
+  error:
+    - use log scale --> Corrected
+    - let users decide the matplotlib cmap --> Corrected
+  importance: minor
+
+
+#################
+# Improve code. #
+#################
+
+- type: code improvement
+  id: 7
+  function:
+    - plot_contact_prob
+    - plot_cmap_comparison --> I think we can delete this one and keep contact prob map
+  fix: the two functions plot the same thing (contact map), we should keep only one. Use a log_scale:bool argument to allow 0-1 or log scale range. --> Corrected
+  why: avoid confusion for users, simplify code for us
+  importance: medium/high
+  candidate: giacomo
+
+- type: code improvement 
+  id: 8
+  function: torch_chain_dihedrals --> not sure where it should be used
+  fix: remove pytorch dependance by using nupmpy backend. Rename the function to 'calc_chain_dihedrals'
+  why: removes pytorch dependency
+  importance: medium
+  candidate: giacomo
+
+- type: code improvement
+  id: 9
+  function: all visualization functions
+  fix: use consistent names, every function names should start by 'plot' or end by 'plot'. Now we have functions like 'end_to_end_distances_plot' and 'plot_asphericity_dist'. Since all of them are function of the Visualization class, we could simply remove 'plot' from their names, like 'visualization.end_to_end_distances' or 'visualization.asphericity_dist'.
+  importance: minor
