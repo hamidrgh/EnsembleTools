@@ -20,6 +20,14 @@ class EnsembleAnalysis:
         self.ens_codes = ens_codes
         self.ensembles: Dict[str, Ensemble] = {}
 
+    @property
+    def trajectories(self) -> Dict[str, mdtraj.Trajectory]:
+        return {ens_id: ensemble.trajectory for ens_id, ensemble in self.ensembles.items()}
+
+    @property
+    def features(self) -> Dict[str, np.array]:
+        return {ens_id: ensemble.features for ens_id, ensemble in self.ensembles.items()}
+
     def __del__(self):
         if hasattr(self, 'api_client'):
             self.api_client.close_session()
@@ -186,6 +194,7 @@ class EnsembleAnalysis:
             ensemble.select_chain()
             ensemble.check_coarse_grained()
             self.ensembles[ens_code] = ensemble
+        return self.trajectories
             
     def random_sample_trajectories(self, sample_size: int):
         """
@@ -199,6 +208,7 @@ class EnsembleAnalysis:
         """
         for ensemble in self.ensembles.values():
             ensemble.random_sample_trajectory(sample_size)
+        return self.trajectories
 
     def extract_features(self, featurization: str, normalize: bool = False, min_sep: int = 2, max_sep: int = None):
         """
@@ -223,6 +233,7 @@ class EnsembleAnalysis:
         self._create_all_labels()
         if normalize and featurization == "ca_dist":
             self._normalize_data()
+        return self.features
 
     def exists_coarse_grained(self):
         """
@@ -348,6 +359,7 @@ class EnsembleAnalysis:
             self.transformed_data = self.reducer.transform(data=self.concat_features)
         else:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
+        return self.transformed_data
 
     def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None):
         """
