@@ -9,7 +9,7 @@ import mdtraj
 from matplotlib.lines import Line2D
 from dpet.featurization.distances import *
 from dpet.ensemble_analysis import EnsembleAnalysis
-from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi
+from dpet.featurization.angles import featurize_a_angle
 from dpet.data.coord import *
 from scipy.stats import gaussian_kde
 
@@ -80,6 +80,7 @@ class Visualization:
         if save:
             plt.savefig(self.plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_ramachandran.png', dpi=800)
 
+        return axes
 
     def tsne_scatter_plot(self, save:bool=False):
 
@@ -142,6 +143,7 @@ class Visualization:
         if save:
             plt.savefig(self.plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter.png', dpi=800)
 
+        return ax1, ax2, ax3, ax4
 
     def dimenfix_scatter(self, save:bool=False):
 
@@ -192,7 +194,8 @@ class Visualization:
 
         if save:
             plt.savefig(self.plot_dir  + '/dimenfix_scatter.png', dpi=800)
-
+        
+        return ax1, ax2, ax3
         
     def umap_scatter(self, save:bool=False): 
 
@@ -235,6 +238,8 @@ class Visualization:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
             plt.savefig(plot_dir  + '/umap_scatter.png', dpi=800)
 
+        return ax1, ax3
+
 
     def pca_cumulative_explained_variance(self, save:bool=False):
 
@@ -267,6 +272,8 @@ class Visualization:
 
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
+
+        return ax
 
     def _set_labels(self, ax, reduce_dim_method, dim_x, dim_y):
         ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
@@ -333,6 +340,7 @@ class Visualization:
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_2d_landscapes_' + analysis.featurization + analysis.ens_codes[0]))
 
+        return ax
 
     def pca_plot_1d_histograms(self, save:bool=False):
         
@@ -390,6 +398,8 @@ class Visualization:
         self.figures["pca_plot_1d_histograms"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
+        
+        return ax
 
 
     def pca_correlation_plot(self, num_residues: int, sel_dims: List[int], save: bool = False):
@@ -449,6 +459,8 @@ class Visualization:
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
 
+        return ax
+
 
     def pca_rg_correlation(self, save: bool = False):
 
@@ -490,6 +502,8 @@ class Visualization:
         self.figures["pca_rg_correlation"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir,'PCA_RG' + analysis.ens_codes[0]))
+
+        return ax
 
     def plot_global_sasa(self, showmeans: bool = True, showmedians: bool = True ,save: bool =False):
 
@@ -561,6 +575,8 @@ class Visualization:
         self.figures["plot_rg_vs_asphericity"] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Asphericity' + analysis.ens_codes[0]))
+        
+        return ax
     
   
     def plot_rg_vs_prolateness(self, save: bool = False):
@@ -594,6 +610,8 @@ class Visualization:
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Prolateness' + analysis.ens_codes[0]))
+        
+        return ax
 
 
     def plot_alpha_angle_dihedral(self, bins: int = 50, save: bool = False):
@@ -625,6 +643,8 @@ class Visualization:
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'alpha_angle_dihedral' + analysis.ens_codes[0]))
+        
+        return ax
 
 
     def _get_protein_dssp_data_dict(self):
@@ -675,6 +695,8 @@ class Visualization:
         self.figures["plot_relative_helix_content"] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'relative_helix_' + self.analysis.ens_codes[0]))
+        
+        return ax
 
     def _get_rg_data_dict(self):
         ensembles = self.analysis.ensembles
@@ -744,6 +766,8 @@ class Visualization:
         self.figures['trajectories_plot_rg_comparison'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'rg_comparison_' + self.analysis.ens_codes[0]))
+
+        return ax
 
 
     def _get_distance_matrix_ens_dict(self):
@@ -838,7 +862,8 @@ class Visualization:
         self.figures['plot_average_dmap_comparison'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'avg_dmap_' + self.analysis.ens_codes[0]))
-        
+
+        return axes
 
     def plot_cmap_comparison(self, 
                             title: str,
@@ -921,6 +946,8 @@ class Visualization:
         self.figures['plot_cmap_comparison'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'cmap_' + self.analysis.ens_codes[0]))
+        
+        return axes
 
     def plot_distance_distribution_multiple(self, dpi: int = 96, save: bool = False):
         """
@@ -980,6 +1007,8 @@ class Visualization:
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'distance_distribution_' + self.analysis.ens_codes[0]))
         
+        return axes
+        
 
     def end_to_end_distances_plot(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False):
         """
@@ -1026,6 +1055,8 @@ class Visualization:
         self.figures['end_to_end_distances_plot'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'e2e_distances_' + self.analysis.ens_codes[0]))
+
+        return ax
 
 
     def plot_asphericity_dist(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False):
@@ -1075,6 +1106,8 @@ class Visualization:
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'asphericity_dist_' + self.analysis.ens_codes[0]))
 
+        return ax
+
     def plot_prolateness_dist(self, bins: int = 50, violin_plot: bool = True, median: bool = False, mean: bool = False, save: bool =False):
         """
         Plot prolateness distribution in each ensemble.
@@ -1123,6 +1156,8 @@ class Visualization:
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'prolateness_dist_' + self.analysis.ens_codes[0]))
 
+        return ax
+
 
     def plot_alpha_angles_dist(self, bins: int = 50, save: bool = False):
         """
@@ -1151,6 +1186,8 @@ class Visualization:
         self.figures['plot_alpha_angles_dist'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'alpha_dist_' + self.analysis.ens_codes[0]))
+        
+        return ax
 
 
     def plot_contact_prob(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues'):
@@ -1179,35 +1216,43 @@ class Visualization:
         cmap_color = select a color for the contact map. Default is "Blues"   
 
         """
-        if self.analysis.exists_coarse_grained():
-            self._contact_prob_cg( threshold=threshold, dpi=dpi, min_sep=min_sep, max_sep=max_sep)
-        else:
-            ensembles = self.analysis.ensembles
-            num_proteins = len(ensembles)
-            cols = 2
-            rows = (num_proteins + cols - 1) // cols
-            fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
-            cmap = cm.get_cmap(cmap_color)
-            axes = axes.reshape((rows, cols)) 
-            for (ens_code, ensemble) , ax in zip((ensembles.items()), fig.axes):
+        #if self.analysis.exists_coarse_grained():
+        #    self._contact_prob_cg( threshold=threshold, dpi=dpi, min_sep=min_sep, max_sep=max_sep)
+        #else:
+        ensembles = self.analysis.ensembles
+        num_proteins = len(ensembles)
+        cols = 2
+        rows = num_proteins
+        fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+        cmap = cm.get_cmap(cmap_color)
+        axes = axes.reshape((rows, cols)) 
+        for (ens_code, ensemble) , ax in zip((ensembles.items()), fig.axes):
+            if ensemble.coarse_grained:
+                matrtix_p_map = contact_probability_map(ensemble.trajectory, scheme='closest', contact=self._pair_ids(min_sep=min_sep, max_sep=max_sep), threshold=threshold)
+            else:
+                matrtix_p_map = contact_probability_map(ensemble.trajectory, threshold=threshold)
 
-                matrtix_p_map = contact_probability_map(ensemble.trajectory  ,threshold=threshold)
-                if norm:
-                    im = ax.imshow(matrtix_p_map, cmap=cmap, norm=LogNorm() )
-                else:
-                    im = ax.imshow(matrtix_p_map, cmap=cmap )
-                ax.set_title(f"Contact Probability Map: {ens_code}", fontsize=14)
+            if norm:
+                im = ax.imshow(matrtix_p_map, cmap=cmap, norm=LogNorm() )
+            else:
+                im = ax.imshow(matrtix_p_map, cmap=cmap )
+            ax.set_title(f"Contact Probability Map: {ens_code}", fontsize=14)
 
+            cbar = fig.colorbar(im, ax=ax)
+            cbar.set_label('Frequency', fontsize=14)
+            cbar.ax.tick_params(labelsize=14)
 
-                cbar = fig.colorbar(im, ax=ax)
-                cbar.set_label('Frequency', fontsize=14)
-                cbar.ax.tick_params(labelsize=14)
+        for i in range(num_proteins, rows * cols):
+            fig.delaxes(axes.flatten()[i])
+        
+        plt.tight_layout()
+        plt.show()
 
-            for i in range(num_proteins, rows * cols):
-                fig.delaxes(axes.flatten()[i])
-            
-            plt.tight_layout()
-            plt.show()
+        self.figures['plot_contact_prob'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'contact_prob_' + self.analysis.ens_codes[0]))
+        
+        return axes
 
     def _pair_ids(self, min_sep=2,max_sep = None ):
         analysis = self.analysis
@@ -1225,7 +1270,8 @@ class Visualization:
                         pair_ids.append([id_i, id_j])
         return pair_ids
 
-    def _contact_prob_cg(self ,min_sep=2,max_sep = None ,threshold = 0.8,dpi = 96):
+    '''
+    def _contact_prob_cg(self ,min_sep=2,max_sep = None ,threshold = 0.8,dpi = 96, save=False):
 
         ensembles = self.analysis.ensembles
         num_proteins = len(ensembles)
@@ -1250,14 +1296,13 @@ class Visualization:
         
         plt.tight_layout()
         plt.show()
-        
-        
-
 
         self.figures['plot_contact_prob'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'contact_prob_' + self.analysis.ens_codes[0]))  
 
+    '''
+    
     def plot_ramachandran_plot(self, two_d_hist: bool = True, linespaces: Tuple = (-180, 180, 80), save:bool = False):
         
         """
@@ -1283,7 +1328,7 @@ class Visualization:
         if two_d_hist:
             fig, axes = plt.subplots(1, len(ensembles), figsize=(5*len(ensembles), 5))
             rama_linspace = np.linspace(linespaces[0], linespaces[1], linespaces[2])
-            for ens, ax in zip(ensembles, fig.axes):
+            for ens, ax in zip(ensembles, axes):
                 phi_flat = np.degrees(mdtraj.compute_phi(ensembles[ens].trajectory)[1]).ravel()
                 psi_flat = np.degrees(mdtraj.compute_psi(ensembles[ens].trajectory)[1]).ravel()
                 hist = ax.hist2d(
@@ -1301,19 +1346,21 @@ class Visualization:
             plt.tight_layout()
             plt.show()
         else:
-            fig,ax = plt.subplots(1,1)
+            fig,axes = plt.subplots(1,1)
             for ens in ensembles:
                 phi = np.degrees(mdtraj.compute_phi(ensembles[ens].trajectory)[1])
                 psi = np.degrees(mdtraj.compute_psi(ensembles[ens].trajectory)[1])
                 plt.scatter(phi, psi, s=1, label= ens)
-            ax.set_xlabel('Phi (ϕ) Angle (degrees)')
-            ax.set_ylabel('Psi (ψ) Angle (degrees)')
+            axes.set_xlabel('Phi (ϕ) Angle (degrees)')
+            axes.set_ylabel('Psi (ψ) Angle (degrees)')
             plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
             plt.show()
 
         self.figures['plot_ramachandran_plot'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'ramachandran_' + self.analysis.ens_codes[0]))  
+
+        return axes
 
     def plot_ss_measure_disorder(self, pointer: list = None, figsize: Tuple = (15,5), save: bool = False):
         
@@ -1364,6 +1411,8 @@ class Visualization:
         self.figures['plot_ss_measure_disorder'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'ss_measure_disorder_' + self.analysis.ens_codes[0]))  
+
+        return axes
             
     def plot_ss_order_parameter(self, pointer: list = None , figsize: Tuple = (15,5), save: bool = False): 
         
@@ -1410,6 +1459,8 @@ class Visualization:
         self.figures['plot_ss_order_parameter'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'ss_order_' + self.analysis.ens_codes[0]))  
+        
+        return axes
 
     def plot_local_sasa(self, figsize: Tuple = (15,5), pointer: list = None, save: bool = False): 
 
@@ -1460,6 +1511,7 @@ class Visualization:
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'local_sasa_' + self.analysis.ens_codes[0]))  
 
+        return ax
 
     def plot_dist_ca_com(self, min_sep=2, max_sep=None, get_names=True, inverse=False, figsize=(6, 2.5), save=False):
         """
@@ -1491,6 +1543,8 @@ class Visualization:
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
+        
+        axes = []
 
         analysis = self.analysis
         for ens in analysis.ensembles:
@@ -1521,7 +1575,11 @@ class Visualization:
 
             self.figures['plot_dist_ca_com'] = fig
             if save:
-                fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + self.analysis.ens_codes[0]))  
+                fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + ens))  
+
+            axes.append(ax)
+
+        return axes
     #----------------------------------------------------------------------
     #------------- Functions for generating PDF reports -------------------
     #----------------------------------------------------------------------
@@ -1542,7 +1600,6 @@ class Visualization:
         print(f"Plots saved to {pdf_file_path}")
 
     def _generate_dimenfix_report(self):
-        analysis = self.analysis
         pdf_file_path = os.path.join(self.plot_dir, 'dimenfix.pdf')
         with PdfPages(pdf_file_path) as pdf:
             self.dimenfix_scatter()
@@ -1552,7 +1609,6 @@ class Visualization:
         print(f"Plots saved to {pdf_file_path}")
 
     def _generate_pca_report(self):
-        analysis = self.analysis
         pdf_file_path = os.path.join(self.plot_dir, 'pca.pdf')
         with PdfPages(pdf_file_path) as pdf:
         
@@ -1568,7 +1624,7 @@ class Visualization:
             pdf.savefig()
             plt.close()
 
-            self.pca_rg_correlation(analysis)
+            self.pca_rg_correlation()
             pdf.savefig()
             plt.close()
 

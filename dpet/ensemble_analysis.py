@@ -16,6 +16,7 @@ from dpet.featurization.distances import featurize_ca_dist
 class EnsembleAnalysis:
     def __init__(self, ens_codes:list[str], data_dir:str):
         self.data_dir = Path(data_dir)
+        os.makedirs(self.data_dir, exist_ok=True)
         self.api_client = APIClient()
         self.feature_names = []
         self.all_labels = []
