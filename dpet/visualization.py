@@ -23,17 +23,24 @@ class Visualization:
         os.makedirs(self.plot_dir, exist_ok=True)
         self.figures = {}
 
-    def tsne_ramachandran_plot_density(self, save:bool=False):
-
+    def tsne_ramachandran_plot_density(self, save: bool = False) -> Union[plt.Axes, List[plt.Axes]]:
         """
-        Plot the 2-D histogram ramachandran plots of the
-        clusters from t-SNE analysis. \n
-        The results is only meaningful when the extracted feature is "phi_psi".
+        Plot the 2-D histogram Ramachandran plots of the clusters from t-SNE analysis.
 
         Parameters
-        -----------
+        ----------
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
+
+        Returns
+        -------
+        axes : Union[plt.Axes, List[plt.Axes]]
+            The axes of the created subplots. If only one subplot is created, a single Axes object is returned,
+            otherwise, a list of Axes objects is returned.
+
+        Notes
+        -----
+        This analysis is only valid for t-SNE reduction with phi_psi feature extraction.
         """
 
         analysis = self.analysis
@@ -82,123 +89,134 @@ class Visualization:
 
         return axes
 
-    def tsne_scatter_plot(self, save:bool=False):
-
+    def tsne_scatter_plot(self, save: bool = False) -> List[plt.Axes]:
         """
         Plot the results of t-SNE analysis. 
-        Three scatter plot will be generated based on original, clustering and Rg labels. 
+
+        Three scatter plots will be generated based on original, clustering, and Rg labels. 
         One KDE density plot will also be generated to show the most populated areas in 
         the reduced dimension.   
 
         Parameters
-        -----------
+        ----------
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
+
+        Returns
+        -------
+        List[plt.Axes]
+            List containing Axes objects for the scatter plot of original labels, clustering labels, Rg labels, and the KDE density plot, respectively.
+
+        Notes
+        ------
+        This analysis is only valid for t-SNE dimensionality reduction.
         """
 
         analysis = self.analysis
 
         if analysis.reduce_dim_method != "tsne":
-                print("Analysis is only valid for t-SNE dimensionality reduction.")
-                return
-        
-        bestclust = analysis.reducer.best_kmeans.labels_
-        fig , (ax1, ax2, ax3, ax4) = plt.subplots(1,4, figsize=(14 ,4)) 
+            print("Analysis is only valid for t-SNE dimensionality reduction.")
+            return []
 
-        # scatter original  labels
+        bestclust = analysis.reducer.best_kmeans.labels_
+        fig, ax = plt.subplots(1, 4, figsize=(14, 4))
+
+        # scatter original labels
         label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
         point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
-        scatter_labeled = ax1.scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=point_colors, s=10, alpha = 0.5)
-        
+        scatter_labeled = ax[0].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=point_colors, s=10, alpha=0.5)
+
         # scatter Rg labels 
-        # Rg in Angstrom
-        rg_labeled = ax3.scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c= [rg for rg in analysis.rg], s=10, alpha=0.5) 
-        cbar = plt.colorbar(rg_labeled, ax=ax3)
-        
+        rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=[rg for rg in analysis.rg], s=10, alpha=0.5) 
+        cbar = plt.colorbar(rg_labeled, ax=ax[2])
+
         # scatter cluster labels
         cmap = cm.get_cmap('jet', analysis.reducer.bestK)
-        scatter_cluster = ax2.scatter(analysis.reducer.best_tsne[:,0], analysis.reducer.best_tsne[:,1], c= bestclust.astype(float), s=10,cmap=cmap ,alpha=0.5)
-        
+        scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=10, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
+
         # manage legend
         legend_labels = list(label_colors.keys())
         legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='lower left')
 
         # KDE plot
-        #sns.kdeplot(x=analysis.reducer.best_tsne[:, 0], y=analysis.reducer.best_tsne[:, 1], ax=ax4, fill=True, cmap='Blues', levels=5)
         kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])
         xi, yi = np.mgrid[min(analysis.reducer.best_tsne[:, 0]):max(analysis.reducer.best_tsne[:, 0]):100j,
                         min(analysis.reducer.best_tsne[:, 1]):max(analysis.reducer.best_tsne[:, 1]):100j]
         zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
-        ax4.contour(xi, yi, zi.reshape(xi.shape), levels=5, cmap='Blues')
-        
-        # ax1.scatter(grid_positions[0, densest_indices], grid_positions[1, densest_indices], c='red', marker='x', s=50, label='Densest Points')
-        ax1.set_title('Scatter plot (original labels)')
-        ax2.set_title('Scatter plot (clustering labels)')
-        ax3.set_title('Scatter plot (Rg labels)')
-        ax4.set_title('Density Plot ')
+        ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, cmap='Blues')
+
+        ax[0].set_title('Scatter plot (original labels)')
+        ax[1].set_title('Scatter plot (clustering labels)')
+        ax[2].set_title('Scatter plot (Rg labels)')
+        ax[3].set_title('Density Plot')
 
         self.figures["tsne_scatter_plot"] = fig
         
         if save:
             plt.savefig(self.plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter.png', dpi=800)
 
-        return ax1, ax2, ax3, ax4
+        return ax
 
-    def dimenfix_scatter(self, save:bool=False):
-
+    def dimenfix_scatter(self, save: bool = False) -> List[plt.Axes]:
         """
-        Plot the the complete results for dimenfix method. 
+        Plot the complete results for dimenfix method. 
 
         Parameters
         -----------
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
+
+        Returns
+        --------
+        List[plt.Axes]
+            List containing Axes objects for the scatter plot of original labels, clustering labels, and Rg labels, respectively.
+
+        Notes
+        ------
+        This analysis is only valid for dimenfix dimensionality reduction.
         """
 
         analysis = self.analysis
 
         if analysis.reduce_dim_method != "dimenfix":
-                print("Analysis is only valid for dimenfix dimensionality reduction.")
-                return
-        
-        fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(14,4))
+            print("Analysis is only valid for dimenfix dimensionality reduction.")
+            return []
 
-        # scatter original  labels
+        fig, ax = plt.subplots(1, 3, figsize=(14, 4))
+
+        # scatter original labels
         label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
         point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
-        scatter_labeled = ax1.scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha = 0.5)
+        scatter_labeled = ax[0].scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
 
         # scatter Rg labels
-        rg_labeled = ax3.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c= [rg for rg in analysis.rg], s=10, alpha=0.5) 
-        cbar = plt.colorbar(rg_labeled, ax=ax3)
+        rg_labeled = ax[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=[rg for rg in analysis.rg], s=10, alpha=0.5) 
+        cbar = plt.colorbar(rg_labeled, ax=ax[2])
 
         # scatter cluster label
-        
-        
-        kmeans = KMeans(n_clusters= max(analysis.reducer.sil_scores, key=lambda x: x[1])[0], random_state=42)
+        kmeans = KMeans(n_clusters=max(analysis.reducer.sil_scores, key=lambda x: x[1])[0], random_state=42)
         labels = kmeans.fit_predict(analysis.transformed_data)
-        scatter = ax2.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
+        scatter = ax[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
 
-        ax1.set_title('Scatter plot (original labels)')
-        ax2.set_title('Scatter plot (clustering labels)')
-        ax3.set_title('Scatter plot (Rg labels)')
+        ax[0].set_title('Scatter plot (original labels)')
+        ax[1].set_title('Scatter plot (clustering labels)')
+        ax[2].set_title('Scatter plot (Rg labels)')
 
-
-        #manage legends
+        # manage legends
         legend_labels = list(label_colors.keys())
         legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Origanl Labels', loc = 'lower left')
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='lower left')
 
         self.figures["dimenfix_scatter"] = fig
 
         if save:
-            plt.savefig(self.plot_dir  + '/dimenfix_scatter.png', dpi=800)
+            plt.savefig(self.plot_dir + '/dimenfix_scatter.png', dpi=800)
         
-        return ax1, ax2, ax3
-        
-    def umap_scatter(self, save:bool=False): 
+        return ax
 
+
+    def umap_scatter(self, save: bool = False) -> plt.Axes:
         """
         Generate a scatter plot of the transformed data using UMAP.
 
@@ -207,51 +225,56 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 
+        Returns
+        -------
+        plt.Axes
+            The Axes object for the scatter plot.
+
         Notes
         -----
-        This method creates a scatter plot of the transformed data using UMAP, with two subplots:
-        - The first subplot shows the scatter plot with points colored by original labels.
-        - The second subplot shows the scatter plot with points colored by Rg labels.
-
+        This method creates a scatter plot of the transformed data using UMAP.
         """
 
         analysis = self.analysis
-        fig, (ax1, ax3) = plt.subplots(1,2, figsize=(14,4))
+        fig, ax = plt.subplots(1, 2, figsize=(14, 4))
 
         label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
         point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
-        scatter_labeled = ax1.scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha = 0.5)
+        scatter_labeled = ax[0].scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
 
-        rg_labeled = ax3.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c= [rg for rg in analysis.rg], s=10, alpha=0.5) 
-        cbar = plt.colorbar(rg_labeled, ax=ax3)
+        rg_labeled = ax[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=[rg for rg in analysis.rg], s=10, alpha=0.5) 
+        cbar = plt.colorbar(rg_labeled, ax=ax[1])
 
-        ax1.set_title('Scatter plot (original labels)')
-        ax3.set_title('Scatter plot (Rg labels)')
+        ax[0].set_title('Scatter plot (original labels)')
+        ax[1].set_title('Scatter plot (Rg labels)')
 
         legend_labels = list(label_colors.keys())
         legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Original Labels', loc = 'lower left')
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='lower left')
 
         self.figures["umap_scatter"] = fig
 
         if save:
             plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(plot_dir  + '/umap_scatter.png', dpi=800)
+            plt.savefig(plot_dir + '/umap_scatter.png', dpi=800)
 
-        return ax1, ax3
+        return ax
 
-
-    def pca_cumulative_explained_variance(self, save:bool=False):
-
+    def pca_cumulative_explained_variance(self, save: bool = False) -> plt.Axes:
         """
         Plot the cumulative variance. Only applicable when the
-        dimensionality reduction method is "pca"
+        dimensionality reduction method is "pca".
 
         Parameters
-        -----------
+        ----------
         save: bool, optional
-            If True the plot will be saved in the data directory. Default is False.
-        """
+            If True, the plot will be saved in the data directory. Default is False.
+
+        Returns
+        -------
+        plt.Axes
+            The Axes object for the cumulative explained variance plot.
+        """ 
         
         analysis = self.analysis
 
@@ -279,16 +302,19 @@ class Visualization:
         ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
         ax.set_ylabel(f"{reduce_dim_method} dim {dim_y+1}")
 
-    def pca_plot_2d_landscapes(self, save:bool=False):
-
+    def pca_plot_2d_landscapes(self, save: bool = False) -> List[plt.Axes]:
         """
-        Plot 2D landscapes when the dimensionality reduction method 
-        is "pca" or "kpca"
+        Plot 2D landscapes when the dimensionality reduction method is "pca" or "kpca".
 
         Parameters
-        -----------
+        ----------
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
+
+        Returns
+        -------
+        List[plt.Axes]
+            A list of plt.Axes objects representing the subplots created.
         """
         
         analysis = self.analysis
@@ -342,16 +368,19 @@ class Visualization:
 
         return ax
 
-    def pca_plot_1d_histograms(self, save:bool=False):
-        
+    def pca_plot_1d_histograms(self, save: bool = False) -> List[plt.Axes]:
         """
-        Plot 1D histogram when the dimensionality reduction method 
-        is "pca" or "kpca"
+        Plot 1D histogram when the dimensionality reduction method is "pca" or "kpca".
 
         Parameters
-        -----------
+        ----------
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
+
+        Returns
+        -------
+        List[plt.Axes]
+            A list of plt.Axes objects representing the subplots created.
         """
 
         analysis = self.analysis
@@ -402,7 +431,7 @@ class Visualization:
         return ax
 
 
-    def pca_correlation_plot(self, num_residues: int, sel_dims: List[int], save: bool = False):
+    def pca_correlation_plot(self, num_residues: int, sel_dims: List[int], save: bool = False) -> List[plt.Axes]:
         """
         Plot the correlation between residues based on PCA weights.
 
@@ -415,6 +444,11 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 
+        Returns
+        -------
+        List[plt.Axes]
+            A list of plt.Axes objects representing the subplots created.
+
         Notes
         -----
         This method generates a correlation plot showing the weights of pairwise residue distances
@@ -424,6 +458,7 @@ class Visualization:
         The analysis is only valid on PCA and kernel PCA dimensionality reduction with 'ca_dist' feature extraction.
 
         """
+
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca") or analysis.featurization != "ca_dist":
@@ -462,16 +497,21 @@ class Visualization:
         return ax
 
 
-    def pca_rg_correlation(self, save: bool = False):
-
+    def pca_rg_correlation(self, save: bool = False) -> List[plt.Axes]:
         """
-        Examine and plot the correlation between PC dimension 1 and the amount of Rg
+        Examine and plot the correlation between PC dimension 1 and the amount of Rg.
         Typically high correlation can be detected here. 
 
         Parameters
-        -----------
-        save: bool, optional
-            If True the plot will be saved in the data directory. Default is False.
+        ----------
+        save : bool, optional
+            If True, the plot will be saved in the data directory. Default is False.
+
+        Returns
+        -------
+        List[plt.Axes]
+            A list of plt.Axes objects representing the subplots created.
+
         """
         
         analysis = self.analysis
@@ -505,25 +545,24 @@ class Visualization:
 
         return ax
 
-    def plot_global_sasa(self, showmeans: bool = True, showmedians: bool = True ,save: bool =False):
-
+    def plot_global_sasa(self, showmeans: bool = True, showmedians: bool = True, save: bool = False) -> plt.Axes:
         """
-        Plot the distribution of SASA for each conformation 
-        within the ensembles.
+        Plot the distribution of SASA for each conformation within the ensembles.
 
         Parameters
         ----------
-        save: bool, optional
-            If True the plot will be saved in the data directory. Default is False.
+        showmeans : bool, optional
+            If True, it will show the mean. Default is True.
+        showmedians : bool, optional
+            If True, it will show the median. Default is True.
+        save : bool, optional
+            If True, the plot will be saved in the data directory. Default is False.
 
-        showmean: bool, optional
-            if True it will show the mean. Default is True.
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
 
-        showmedian: bool, optional
-            if True it will show the median. Default is True.
-        
-        save: bool, optional
-            If True the plot will be saved in the data directory. Default is False.
         """
 
         analysis = self.analysis
@@ -547,17 +586,22 @@ class Visualization:
             plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))
         return ax
 
-    def plot_rg_vs_asphericity(self, save: bool = False):
+    def plot_rg_vs_asphericity(self, save: bool = False) -> plt.Axes:
         """
         Plot the Rg versus Asphericity and get the pearson correlation coefficient to evaluate 
         the correlation between Rg and Asphericity.
-        
-        Parameters:
-        -----------
+
+        Parameters
+        ----------
         save: bool, optional
-            If True the plot will be saved in the data directory. Default is False.
+            If True, the plot will be saved in the data directory. Default is False.
+
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
         """
-        
+
         analysis = self.analysis
         
         fig, ax = plt.subplots()  # Create a new figure
@@ -579,7 +623,7 @@ class Visualization:
         return ax
     
   
-    def plot_rg_vs_prolateness(self, save: bool = False):
+    def plot_rg_vs_prolateness(self, save: bool = False) -> plt.Axes:
         """
         Plot the Rg versus Prolateness and get the Pearson correlation coefficient to evaluate 
         the correlation between Rg and Prolateness. 
@@ -587,9 +631,14 @@ class Visualization:
         Parameters
         ----------
         save: bool, optional
-            If True the plot will be saved in the data directory. Default is False.
+            If True, the plot will be saved in the data directory. Default is False.
 
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
         """
+
         analysis = self.analysis
         
         # Create a new figure object
@@ -614,7 +663,7 @@ class Visualization:
         return ax
 
 
-    def plot_alpha_angle_dihedral(self, bins: int = 50, save: bool = False):
+    def plot_alpha_angle_dihedral(self, bins: int = 50, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of dihedral angles between four consecutive Cα beads.
 
@@ -625,7 +674,12 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved in the data directory. Default is False.
 
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
         """
+
         analysis = self.analysis
         
         # Create a new figure object
@@ -654,7 +708,7 @@ class Visualization:
             dssp_data_dict[ens_code] = mdtraj.compute_dssp(ensemble.trajectory)
         return dssp_data_dict
 
-    def plot_relative_helix_content(self, save: bool = False):
+    def plot_relative_helix_content(self, save: bool = False) -> plt.Axes:
         """
         Plot the relative helix content in each ensemble for each residue. 
 
@@ -663,7 +717,12 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved in the data directory. Default is False.
 
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
         """
+
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
@@ -705,7 +764,7 @@ class Visualization:
             rg_dict[ens_code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
 
-    def trajectories_plot_rg_comparison(self, n_bins: int = 50, dpi: int = 96, save: bool = False):
+    def trajectories_plot_rg_comparison(self, n_bins: int = 50, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
         """
         Plot the distribution of the radius of gyration (Rg) within each ensemble.
 
@@ -718,6 +777,10 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 
+        Returns
+        -------
+        Union[List[plt.Axes], plt.Axes]
+            If multiple systems are plotted, returns a list of Axes objects, otherwise returns a single Axes object.
 
         Notes
         -----
@@ -796,7 +859,7 @@ class Visualization:
                                     title_fontsize: int = 14,
                                     dpi: int = 96,
                                     use_ylabel: bool = True,
-                                    save: bool = False):
+                                    save: bool = False) -> Union[List[List[plt.Axes]], List[plt.Axes]]:
         """
         Plot the average distance maps for selected ensembles.
         
@@ -814,6 +877,12 @@ class Visualization:
             If True, y-axis labels are displayed on the subplots. Default is True.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+
+        Returns
+        -------
+        Union[List[List[plt.Axes]], List[plt.Axes]]
+            Returns a list of lists of Axes objects if there are multiple proteins, 
+            otherwise returns a list of Axes objects.
 
         Notes
         -----
@@ -873,7 +942,7 @@ class Visualization:
                             dpi: int = 96,
                             cmap_min: float = -3.5,
                             use_ylabel: bool = True,
-                            save: bool = False):
+                            save: bool = False) -> Union[List[List[plt.Axes]], List[plt.Axes]]:
         """
         Plot the comparison of contact probability maps (Cmaps) for selected ensembles.
 
@@ -895,6 +964,12 @@ class Visualization:
             If True, y-axis labels are displayed on the subplots. Default is True.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+
+        Returns
+        -------
+        Union[List[List[plt.Axes]], List[plt.Axes]]
+            Returns a list of lists of Axes objects if there are multiple proteins, 
+            otherwise returns a list of Axes objects.
 
         Notes
         -----
