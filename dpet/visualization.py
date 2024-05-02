@@ -23,7 +23,7 @@ class Visualization:
         os.makedirs(self.plot_dir, exist_ok=True)
         self.figures = {}
 
-    def tsne_ramachandran_plot_density(self, save: bool = False) -> Union[plt.Axes, List[plt.Axes]]:
+    def tsne_ramachandran_plot_density(self, save: bool = False) -> List[plt.Axes]:
         """
         Plot the 2-D histogram Ramachandran plots of the clusters from t-SNE analysis.
 
@@ -34,9 +34,8 @@ class Visualization:
 
         Returns
         -------
-        axes : Union[plt.Axes, List[plt.Axes]]
-            The axes of the created subplots. If only one subplot is created, a single Axes object is returned,
-            otherwise, a list of Axes objects is returned.
+        List[plt.Axes]
+            The axes of the created subplots.
 
         Notes
         -----
@@ -892,7 +891,7 @@ class Visualization:
         ens_dict = self._get_distance_matrix_ens_dict()
         num_proteins = len(ens_dict)
         cols = 2  # Number of columns for subplots
-        rows = (num_proteins + cols - 1) // cols
+        rows = num_proteins
         fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
         axes = axes.reshape((rows, cols))  # Reshape axes to ensure it's 2D
         
@@ -940,7 +939,7 @@ class Visualization:
                             dpi: int = 96,
                             cmap_min: float = -3.5,
                             use_ylabel: bool = True,
-                            save: bool = False) -> Union[List[List[plt.Axes]], List[plt.Axes]]:
+                            save: bool = False) -> List[List[plt.Axes]]:
         """
         Plot the comparison of contact probability maps (Cmaps) for selected ensembles.
 
@@ -965,9 +964,9 @@ class Visualization:
 
         Returns
         -------
-        Union[List[List[plt.Axes]], List[plt.Axes]]
-            Returns a list of lists of Axes objects if there are multiple proteins, 
-            otherwise returns a list of Axes objects.
+        List[List[plt.Axes]]
+            A list of lists of Axes objects representing the subplots. Each inner list contains Axes objects 
+            for each ensemble's contact probability map.
 
         Notes
         -----
@@ -981,7 +980,7 @@ class Visualization:
         cmap_ens_dict = self._get_contact_ens_dict()
         num_proteins = len(cmap_ens_dict)
         cols = 2  # Number of columns for subplots
-        rows = (num_proteins + cols - 1) // cols
+        rows = num_proteins
         fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
         axes = axes.reshape((rows, cols))  # Reshape axes to ensure it's 2D
         
@@ -991,7 +990,7 @@ class Visualization:
         for i, (protein_name, cmap_ens) in enumerate(cmap_ens_dict.items()):
             row = i // cols
             col = i % cols
-            ax = axes[row, col] if num_proteins > 1 else axes[0]
+            ax = axes[row, col]
             
             cmap_ens = np.log10(cmap_ens)
             cmap_ens = np.triu(cmap_ens)
@@ -999,15 +998,16 @@ class Visualization:
             im = ax.imshow(cmap_ens, cmap=cmap, norm=norm)
             ax.set_title(f"Contact Probability Map: {protein_name}", fontsize=title_fontsize)
             ax.tick_params(axis='both', which='major', labelsize=ticks_fontsize)
+            
             if not use_ylabel:
-                ax.set_yticks([])
+                ax.set_yticks([])  # Set y-axis ticks to an empty list
             
             cbar = fig.colorbar(im, ax=ax)
             cbar.set_label(r'$log_{10}(p_{ij})$', fontsize=cbar_fontsize)
             cbar.ax.tick_params(labelsize=cbar_fontsize)
             
             im.set_clim(cmap_min, 0)
-        
+
         # Remove any empty subplots
         for i in range(num_proteins, rows * cols):
             fig.delaxes(axes.flatten()[i])
@@ -1022,7 +1022,7 @@ class Visualization:
         
         return axes
 
-    def plot_distance_distribution_multiple(self, dpi: int = 96, save: bool = False):
+    def plot_distance_distribution_multiple(self, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
         """
         Plot the distribution of distances for multiple proteins.
 
@@ -1033,10 +1033,16 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 
+        Returns
+        -------
+        List[plt.Axes]
+            A list of Axes objects representing the subplots, each containing the distance distribution plot 
+            for a specific protein.
+
         Notes
         -----
         This method plots the distribution of distances for multiple proteins based on their distance matrices.
-        Each subplot in the resulting grid represents the distance distribution for a specific protein.
+        Each subplot represents the distance distribution for a specific protein.
 
         The distance distributions are visualized as histograms, where the x-axis represents the distance
         in nanometers and the y-axis represents the density of distances.
@@ -1399,30 +1405,35 @@ class Visualization:
 
     '''
     
-    def plot_ramachandran_plot(self, two_d_hist: bool = True, linespaces: Tuple = (-180, 180, 80), save:bool = False):
-        
+    def plot_ramachandran_plot(self, two_d_hist: bool = True, linespaces: Tuple = (-180, 180, 80), save: bool = False) -> Union[List[plt.Axes], plt.Axes]:
         """
-        Ramachandran plot. If two_d_hist= True it returns 2D histogram 
-        for each ensembles. If two_d_hist=False it returns a simple scatter plot 
-        for ell ensembles in one plot.
+        Ramachandran plot. If two_d_hist=True it returns a 2D histogram 
+        for each ensemble. If two_d_hist=False it returns a simple scatter plot 
+        for all ensembles in one plot.
 
         Parameters
         ----------
-
-        two_d_hist: bool, optional
-            If True it returns 2D histogram for each ensemble. Default is True.
-
-        linespaces: tuple, optional
+        two_d_hist : bool, optional
+            If True, it returns a 2D histogram for each ensemble. Default is True.
+        linespaces : tuple, optional
             You can customize the bins for 2D histogram. Default is (-180, 180, 80).
-
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+
+        Returns
+        -------
+        Union[List[plt.Axes], plt.Axes]
+            If two_d_hist=True, returns a list of Axes objects representing the subplot grid for each ensemble. 
+            If two_d_hist=False, returns a single Axes object representing the scatter plot for all ensembles.
 
         """
         
         ensembles = self.analysis.ensembles
         if two_d_hist:
             fig, axes = plt.subplots(1, len(ensembles), figsize=(5*len(ensembles), 5))
+            # Ensure axes is always a list
+            if not isinstance(axes, np.ndarray):
+                axes = [axes]
             rama_linspace = np.linspace(linespaces[0], linespaces[1], linespaces[2])
             for ens, ax in zip(ensembles, axes):
                 phi_flat = np.degrees(mdtraj.compute_phi(ensembles[ens].trajectory)[1]).ravel()

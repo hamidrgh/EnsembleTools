@@ -10,8 +10,6 @@ import os
 import mdtraj
 import numpy as np
 from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
-from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi, featurize_tr_angle
-from dpet.featurization.distances import featurize_ca_dist
 
 class EnsembleAnalysis:
     def __init__(self, ens_codes:list[str], data_dir:str):
@@ -28,9 +26,10 @@ class EnsembleAnalysis:
         """
         Get the trajectories associated with each ensemble.
 
-        Returns:
-            Dict[str, mdtraj.Trajectory]: A dictionary where keys are ensemble IDs
-            and values are the corresponding MDTraj trajectories.
+        Returns
+        -------
+        Dict[str, mdtraj.Trajectory]
+            A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.
         """
         return {ens_id: ensemble.trajectory for ens_id, ensemble in self.ensembles.items()}
 
@@ -39,9 +38,10 @@ class EnsembleAnalysis:
         """
         Get the features associated with each ensemble.
 
-        Returns:
-            Dict[str, np.ndarray]: A dictionary where keys are ensemble IDs
-            and values are the corresponding feature arrays.
+        Returns
+        -------
+        Dict[str, np.ndarray]
+            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
         return {ens_id: ensemble.features for ens_id, ensemble in self.ensembles.items()}
 
@@ -186,7 +186,7 @@ class EnsembleAnalysis:
         elif database == "atlas":
             self.download_from_atlas()
 
-    def generate_trajectories(self):
+    def generate_trajectories(self) -> Dict[str, mdtraj.Trajectory]:
         """
         Load trajectory files into mdtraj objects.
         
@@ -200,6 +200,11 @@ class EnsembleAnalysis:
             - If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.
             - If only a .pdb file exists, generate trajectory and topology files from the .pdb file.
             - If a directory [ens_code] exists containing .pdb files, generate trajectory and topology files from the directory.
+
+        Returns
+        -------
+        Dict[str, mdtraj.Trajectory]
+            A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.
 
         Note
         ----
@@ -227,7 +232,7 @@ class EnsembleAnalysis:
             ensemble.random_sample_trajectory(sample_size)
         return self.trajectories
 
-    def extract_features(self, featurization: str, normalize: bool = False, min_sep: int = 2, max_sep: int = None):
+    def extract_features(self, featurization: str, normalize: bool = False, min_sep: int = 2, max_sep: int = None) -> Dict[str, np.ndarray]:
         """
         Extract the selected feature.
 
@@ -244,6 +249,11 @@ class EnsembleAnalysis:
 
         max_sep : int, optional
             Maximum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is None.
+
+        Returns
+        -------
+        Dict[str, np.ndarray]
+            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
         self._featurize(featurization=featurization, min_sep=min_sep, max_sep=max_sep)
         self.concat_features = self._get_concat_features()
@@ -252,9 +262,14 @@ class EnsembleAnalysis:
             self._normalize_data()
         return self.features
 
-    def exists_coarse_grained(self):
+    def exists_coarse_grained(self) -> bool:
         """
         Check if at least one of the loaded ensembles is coarse-grained after loading trajectories.
+
+        Returns
+        -------
+        bool
+            True if at least one ensemble is coarse-grained, False otherwise.
         """
         return any(ensemble.coarse_grained for ensemble in self.ensembles.values())
 
@@ -284,16 +299,22 @@ class EnsembleAnalysis:
         return [mdtraj.compute_rg(frame) for frame in trajectory]
 
     @property
-    def rg(self):
+    def rg(self) -> List[float]:
         """
-        Calculates Rg for each conformations in the loaded ensembles.
+        Calculates Rg for each conformation in the loaded ensembles.
         The returned values are in Angstrom.  
+
+        Returns
+        -------
+        List[float]
+            A list of Rg values for each conformation in the loaded ensembles, in Angstrom.
         """
         rg_values_list = []
         for ensemble in self.ensembles.values():
             traj = ensemble.trajectory
             rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
         return [item[0] * 10 for item in rg_values_list]
+
 
     def _get_concat_features(self, fit_on: list[str]=None):
         if fit_on and any(f not in self.ens_codes for f in fit_on):
@@ -305,7 +326,7 @@ class EnsembleAnalysis:
         print("Concatenated featurized ensemble shape:", concat_features.shape)
         return concat_features
 
-    def reduce_features(self, method: str, fit_on:list[str]=None, *args, **kwargs):
+    def reduce_features(self, method: str, fit_on:list[str]=None, *args, **kwargs) -> np.ndarray:
         """
         Perform dimensionality reduction on the extracted features.
 
@@ -355,6 +376,11 @@ class EnsembleAnalysis:
                 Number of components to keep. Default is 10.
             - gamma : float, optional
                 Kernel coefficient. Default is None.
+
+        Returns
+        -------
+        np.ndarray
+            Returns the transformed data.
 
         For more information on each method, see the corresponding documentation:
             - PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
