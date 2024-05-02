@@ -779,8 +779,8 @@ class Visualization:
 
         Returns
         -------
-        Union[List[plt.Axes], plt.Axes]
-            If multiple systems are plotted, returns a list of Axes objects, otherwise returns a single Axes object.
+        List[plt.Axes]
+            Returns a list of Axes objects containing the histogram plots.
 
         Notes
         -----
@@ -789,7 +789,6 @@ class Visualization:
         The Rg values are binned according to the specified number of bins (`n_bins`) and range (`bins_range`) and 
         displayed as histograms. Additionally, dashed lines representing the mean and median Rg values are overlaid
         on each histogram.
-
         """
 
         rg_data_dict = self._get_rg_data_dict()
@@ -802,8 +801,9 @@ class Visualization:
         bins = np.linspace(min_value, max_value, n_bins + 1)
         fig, ax = plt.subplots(1, n_systems, figsize=(3 * n_systems, 3), dpi=dpi)
         
-        if not isinstance(ax, list):
-            ax = list(ax)
+        # Ensure ax is always a list
+        if not isinstance(ax, np.ndarray):
+            ax = [ax]
 
         for i, (name_i, rg_i) in enumerate(rg_data_dict.items()):
             ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
@@ -1283,68 +1283,71 @@ class Visualization:
         return ax
 
 
-    def plot_contact_prob(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues'):
+    def plot_contact_prob(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues') -> List[List[plt.Axes]]:
         from matplotlib.colors import LogNorm
         """
-        Plot the contact probability map based on the threshold. 
-        The default value for threshold is 0.8[nm], 
+        Plot the contact probability map based on the threshold.
 
         Parameters
         ----------
-        title: str 
-            You need to specify a title for the plot
-
-        threshold: float
-            Determing the threshold fo calculating the contact frequencies. default value is 0.8[nm]
-
-        dpi: int
-            For changing the quality and dimension of the output figure
-
+        norm : bool, optional
+            If True, use log scale range. Default is True.
+        min_sep : int, optional
+            Minimum separation distance between atoms to consider. Default is 2.
+        max_sep : int, optional
+            Maximum separation distance between atoms to consider. Default is None.
+        threshold : float, optional
+            Determining the threshold for calculating the contact frequencies. Default is 0.8 [nm].
+        dpi : int, optional
+            For changing the quality and dimension of the output figure. Default is 96.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
-        
-        norm : bool
-            If True, use log scale range
+        cmap_color : str, optional
+            Select a color for the contact map. Default is "Blues".
 
-        cmap_color = select a color for the contact map. Default is "Blues"   
+        Returns
+        -------
+        List[List[plt.Axes]]
+            Returns a 2D list of Axes objects representing the subplot grid.
 
         """
-        #if self.analysis.exists_coarse_grained():
-        #    self._contact_prob_cg( threshold=threshold, dpi=dpi, min_sep=min_sep, max_sep=max_sep)
-        #else:
+
         ensembles = self.analysis.ensembles
         num_proteins = len(ensembles)
-        cols = 2
-        rows = num_proteins
-        fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+        num_cols = 2  # Number of columns for subplots
+        num_rows = (num_proteins + num_cols - 1) // num_cols  # Calculate the number of rows needed
+
+        fig, axes = plt.subplots(num_rows, num_cols, figsize=(8 * num_cols, 6 * num_rows), dpi=dpi)
         cmap = cm.get_cmap(cmap_color)
-        axes = axes.reshape((rows, cols)) 
-        for (ens_code, ensemble) , ax in zip((ensembles.items()), fig.axes):
+        axes = axes.reshape((num_rows, num_cols))
+
+        for (ens_code, ensemble), ax in zip(ensembles.items(), fig.axes):
             if ensemble.coarse_grained:
-                matrtix_p_map = contact_probability_map(ensemble.trajectory, scheme='closest', contact=self._pair_ids(min_sep=min_sep, max_sep=max_sep), threshold=threshold)
+                matrix_p_map = contact_probability_map(ensemble.trajectory, scheme='closest', contact=self._pair_ids(min_sep=min_sep, max_sep=max_sep), threshold=threshold)
             else:
-                matrtix_p_map = contact_probability_map(ensemble.trajectory, threshold=threshold)
+                matrix_p_map = contact_probability_map(ensemble.trajectory, threshold=threshold)
 
             if norm:
-                im = ax.imshow(matrtix_p_map, cmap=cmap, norm=LogNorm() )
+                im = ax.imshow(matrix_p_map, cmap=cmap, norm=LogNorm())
             else:
-                im = ax.imshow(matrtix_p_map, cmap=cmap )
+                im = ax.imshow(matrix_p_map, cmap=cmap)
             ax.set_title(f"Contact Probability Map: {ens_code}", fontsize=14)
 
             cbar = fig.colorbar(im, ax=ax)
             cbar.set_label('Frequency', fontsize=14)
             cbar.ax.tick_params(labelsize=14)
 
-        for i in range(num_proteins, rows * cols):
+        # Remove any empty subplots
+        for i in range(num_proteins, num_rows * num_cols):
             fig.delaxes(axes.flatten()[i])
-        
+
         plt.tight_layout()
         plt.show()
 
         self.figures['plot_contact_prob'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'contact_prob_' + self.analysis.ens_codes[0]))
-        
+
         return axes
 
     def _pair_ids(self, min_sep=2,max_sep = None ):
@@ -1455,28 +1458,33 @@ class Visualization:
 
         return axes
 
-    def plot_ss_measure_disorder(self, pointer: list = None, figsize: Tuple = (15,5), save: bool = False):
-        
+    def plot_ss_measure_disorder(self, 
+                             pointer: List[int] = None, 
+                             figsize: Tuple[int, int] = (15, 5), 
+                             save: bool = False) -> plt.Axes:
         """
-        Generate site specific flexibility parameter plot. Further information is available in
-        this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. 
-        In summary this score is sensitive to local flexibility based on the circular variance of the
-        Ramachandran angles φ and ψ for each residue in the ensemble.
-
-        This score ranges from 0 for identical dihederal angles for all conformers at the residue i to 1 
-        for a uniform distribution of dihederal angles at the residue i. 
-
+        Generate a plot of the site-specific flexibility parameter.
+        
+        This plot shows the site-specific measure of disorder, which is sensitive to local flexibility based on 
+        the circular variance of the Ramachandran angles φ and ψ for each residue in the ensemble.
+        The score ranges from 0 for identical dihedral angles for all conformers at the residue i to 1 for a 
+        uniform distribution of dihedral angles at the residue i.
+        
         Parameters
         ----------
-        pointer: list, optional
-            You can add the desired residues in a list and then you have a vertical dashed line to point those residues. Default is None.
-
-        figsize:tuple, optional
-            You can change the size of the figure here using a tuple. Default is (15,5).
-            
+        pointer: List[int], optional
+            A list of desired residues. Vertical dashed lines will be added to point to these residues. Default is None.
+        figsize: Tuple[int, int], optional
+            The size of the figure. Default is (15, 5).
         save : bool, optional
-            If True, the plot will be saved as an image file. Default is False.
+            If True, save the plot as an image file. Default is False.
+            
+        Returns
+        -------
+        plt.Axes
+            The matplotlib Axes object containing the plot.
         """
+        
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
@@ -1507,26 +1515,32 @@ class Visualization:
 
         return axes
             
-    def plot_ss_order_parameter(self, pointer: list = None , figsize: Tuple = (15,5), save: bool = False): 
+    def plot_ss_order_parameter(self, 
+                            pointer: list = None , 
+                            figsize: Tuple = (15,5), 
+                            save: bool = False) -> plt.Axes: 
         
         """
-        Generate site specific order parameter plot. For further information
-        you can check this paper by G.Jeschke https://onlinelibrary.wiley.com/doi/epdf/10.1002/pro.4906. 
-        In summary this score abstracts from local chain flexibility. The parameter is still site-specific, as orientation 
-        correlations in IDRs and IDPs decrease with increasing sequence distance. 
-
+        Generate a plot of the site-specific order parameter.
+        
+        This plot shows the site-specific order parameter, which abstracts from local chain flexibility.
+        The parameter is still site-specific, as orientation correlations in IDRs and IDPs decrease with increasing sequence distance.
+        
         Parameters
         ----------
         pointer: list, optional
-            You can add the desired residues in a list and then you have a vertical dashed line to point those residues. Default is None.
-
+            A list of desired residues. Vertical dashed lines will be added to point to these residues. Default is None.
         figsize:tuple, optional
-            You can change the size oof the figure here using a tuple. Default is (15,5).
-        
+            The size of the figure. Default is (15,5).
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+            
+        Returns
+        -------
+        plt.Axes
+            The matplotlib Axes object containing the plot.
         """
-        
+    
         ensembles = self.analysis.ensembles
         dict_ca_xyz = {}
         for ens_code, ensemble in ensembles.items():
@@ -1555,21 +1569,23 @@ class Visualization:
         
         return axes
 
-    def plot_local_sasa(self, figsize: Tuple = (15,5), pointer: list = None, save: bool = False): 
-
+    def plot_local_sasa(self, figsize: Tuple = (15,5), pointer: List[int] = None, save: bool = False) -> plt.Axes:
         """
-        It plots the average SASA for each residue among all conformations in an ensemble.
+        Plot the average solvent-accessible surface area (SASA) for each residue among all conformations in an ensemble.
 
         Parameters
         ----------
-        pointer: list, optional
-            You can add the desired residues in a list and then you have a vertical dashed line to point those residues. Default is None.
-
-        figsize:tuple, optional
-            You can change the size oof the figure here using a tuple. Default is (15,5).
-        
+        figsize: Tuple, optional
+            Tuple specifying the size of the figure. Default is (15, 5).
+        pointer: List[int], optional
+            List of desired residues to highlight with vertical dashed lines. Default is None.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+
+        Returns
+        -------
+        plt.Axes
+            Axes object containing the plot.
 
         """
 
@@ -1606,7 +1622,7 @@ class Visualization:
 
         return ax
 
-    def plot_dist_ca_com(self, min_sep=2, max_sep=None, get_names=True, inverse=False, figsize=(6, 2.5), save=False):
+    def plot_dist_ca_com(self, min_sep: int = 2, max_sep: Union[int, None] = None, get_names: bool = True, inverse: bool = False, figsize: Tuple[int, int] = (6, 2.5), save: bool = False) -> List[List[plt.Axes]]:
         """
         Plot the distance maps comparing the center of mass (COM) and alpha-carbon (CA) distances within each ensemble.
 
@@ -1614,7 +1630,7 @@ class Visualization:
         -----------
         min_sep : int, optional
             Minimum separation distance between atoms to consider. Default is 2.
-        max_sep : int, optional
+        max_sep : int or None, optional
             Maximum separation distance between atoms to consider. Default is None, which means no maximum separation.
         get_names : bool, optional
             Whether to get the residue names for the features. Default is True.
@@ -1625,18 +1641,22 @@ class Visualization:
         save : bool, optional
             If True, save the plot as an image file. Default is False.
 
+        Returns:
+        --------
+        List[List[plt.Axes]]
+            A list of lists, each containing two Axes objects corresponding to the plots for CA and COM distances.
+
         Notes:
         ------
         This method plots the average distance maps for the center of mass (COM) and alpha-carbon (CA) distances
         within each ensemble. It computes the distance matrices for COM and CA atoms and then calculates their
         mean values to generate the distance maps. The plots include color bars indicating the distance range.
-
         """
 
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
-            return
-        
+            return []
+
         axes = []
 
         analysis = self.analysis
@@ -1670,9 +1690,10 @@ class Visualization:
             if save:
                 fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + ens))  
 
-            axes.append(ax)
+            axes.append([ax[0], ax[1]])
 
         return axes
+    
     #----------------------------------------------------------------------
     #------------- Functions for generating PDF reports -------------------
     #----------------------------------------------------------------------
