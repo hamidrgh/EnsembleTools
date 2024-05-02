@@ -802,9 +802,8 @@ class Visualization:
         bins = np.linspace(min_value, max_value, n_bins + 1)
         fig, ax = plt.subplots(1, n_systems, figsize=(3 * n_systems, 3), dpi=dpi)
         
-        # Ensure ax is always a list
-        if not isinstance(ax, np.ndarray):
-            ax = [ax]
+        if not isinstance(ax, list):
+            ax = list(ax)
 
         for i, (name_i, rg_i) in enumerate(rg_data_dict.items()):
             ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
@@ -859,7 +858,7 @@ class Visualization:
                                     title_fontsize: int = 14,
                                     dpi: int = 96,
                                     use_ylabel: bool = True,
-                                    save: bool = False) -> Union[List[List[plt.Axes]], List[plt.Axes]]:
+                                    save: bool = False) -> List[List[plt.Axes]]:
         """
         Plot the average distance maps for selected ensembles.
         
@@ -880,9 +879,8 @@ class Visualization:
 
         Returns
         -------
-        Union[List[List[plt.Axes]], List[plt.Axes]]
-            Returns a list of lists of Axes objects if there are multiple proteins, 
-            otherwise returns a list of Axes objects.
+        List[List[plt.Axes]]
+            Returns a 2D list of Axes objects representing the subplot grid.
 
         Notes
         -----
@@ -1085,7 +1083,7 @@ class Visualization:
         return axes
         
 
-    def end_to_end_distances_plot(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False):
+    def end_to_end_distances_plot(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
 
@@ -1102,7 +1100,13 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
+
         """
+
         ensembles = self.analysis.ensembles
         dist_list = []
         positions = []
@@ -1134,7 +1138,7 @@ class Visualization:
         return ax
 
 
-    def plot_asphericity_dist(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False):
+    def plot_asphericity_dist(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot asphericity distribution in each ensemble.
         Asphericity is calculated based on the gyration tensor.
@@ -1152,7 +1156,13 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
+
         """
+
         ensembles = self.analysis.ensembles
         asph_list = []
         positions = []
@@ -1183,7 +1193,7 @@ class Visualization:
 
         return ax
 
-    def plot_prolateness_dist(self, bins: int = 50, violin_plot: bool = True, median: bool = False, mean: bool = False, save: bool =False):
+    def plot_prolateness_dist(self, bins: int = 50, violin_plot: bool = True, median: bool = False, mean: bool = False, save: bool = False) -> plt.Axes:
         """
         Plot prolateness distribution in each ensemble.
         Prolateness is calculated based on the gyration tensor.
@@ -1201,6 +1211,10 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
         """
 
         ensembles = self.analysis.ensembles
@@ -1234,7 +1248,7 @@ class Visualization:
         return ax
 
 
-    def plot_alpha_angles_dist(self, bins: int = 50, save: bool = False):
+    def plot_alpha_angles_dist(self, bins: int = 50, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of alpha angles.
 
@@ -1245,6 +1259,10 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 
+        Returns
+        -------
+        plt.Axes
+            The Axes object containing the plot.
         """
 
         ensembles = self.analysis.ensembles
