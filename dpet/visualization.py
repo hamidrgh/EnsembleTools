@@ -544,7 +544,7 @@ class Visualization:
 
         return ax
 
-    def global_sasa(self, showmeans: bool = True, showmedians: bool = True, save: bool = False) -> plt.Axes:
+    def global_sasa_dist(self, showmeans: bool = True, showmedians: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of SASA for each conformation within the ensembles.
 
@@ -662,7 +662,7 @@ class Visualization:
         return ax
 
 
-    def alpha_angle_dihedral(self, bins: int = 50, save: bool = False) -> plt.Axes:
+    def alpha_angle_dihedral_dist(self, bins: int = 50, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of dihedral angles between four consecutive Cα beads.
 
@@ -763,7 +763,7 @@ class Visualization:
             rg_dict[ens_code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
 
-    def rg_comparison(self, n_bins: int = 50, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
+    def rg_comp_dist(self, n_bins: int = 50, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
         """
         Plot the distribution of the radius of gyration (Rg) within each ensemble.
 
@@ -851,13 +851,13 @@ class Visualization:
             contact_ens_dict[ens_code] = get_contact_map(distance_matrix_ens_dict[ens_code])
         return contact_ens_dict
 
-    def average_dmap_comparison(self, 
-                                    ticks_fontsize: int = 14,
-                                    cbar_fontsize: int = 14,
-                                    title_fontsize: int = 14,
-                                    dpi: int = 96,
-                                    use_ylabel: bool = True,
-                                    save: bool = False) -> List[List[plt.Axes]]:
+    def average_dmap_comp(self, 
+                            ticks_fontsize: int = 14,
+                            cbar_fontsize: int = 14,
+                            title_fontsize: int = 14,
+                            dpi: int = 96,
+                            use_ylabel: bool = True,
+                            save: bool = False) -> List[List[plt.Axes]]:
         """
         Plot the average distance maps for selected ensembles.
         
@@ -931,15 +931,15 @@ class Visualization:
 
         return axes
 
-    def contact_map_comparison(self, 
-                            title: str,
-                            ticks_fontsize: int = 14,
-                            cbar_fontsize: int = 14,
-                            title_fontsize: int = 14,
-                            dpi: int = 96,
-                            cmap_min: float = -3.5,
-                            use_ylabel: bool = True,
-                            save: bool = False) -> List[List[plt.Axes]]:
+    def contact_map_comp(self, 
+                        title: str,
+                        ticks_fontsize: int = 14,
+                        cbar_fontsize: int = 14,
+                        title_fontsize: int = 14,
+                        dpi: int = 96,
+                        cmap_min: float = -3.5,
+                        use_ylabel: bool = True,
+                        save: bool = False) -> List[List[plt.Axes]]:
         """
         Plot the comparison of contact probability maps (Cmaps) for selected ensembles.
 
@@ -1580,7 +1580,7 @@ class Visualization:
         
         return axes
 
-    def local_sasa(self, figsize: Tuple = (15,5), pointer: List[int] = None, save: bool = False) -> plt.Axes:
+    def local_sasa_dist(self, figsize: Tuple = (15,5), pointer: List[int] = None, save: bool = False) -> plt.Axes:
         """
         Plot the average solvent-accessible surface area (SASA) for each residue among all conformations in an ensemble.
 
