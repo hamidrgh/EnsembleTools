@@ -16,6 +16,12 @@ from scipy.stats import gaussian_kde
 PLOT_DIR = "plots"
 
 class Visualization:
+    """
+    Visualization class for ensemble analysis.
+
+    Parameters:
+        analysis (EnsembleAnalysis): An instance of EnsembleAnalysis providing data for visualization.
+    """
 
     def __init__(self, analysis: EnsembleAnalysis):
         self.analysis = analysis

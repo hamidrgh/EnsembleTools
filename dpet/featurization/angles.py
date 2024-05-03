@@ -7,10 +7,30 @@ from dpet.featurization.utils import get_triu_indices
 # Commonly used protein structure angles. -
 #------------------------------------------
 
-def featurize_phi_psi(
-        traj: mdtraj.Trajectory,
-        get_names: bool = True,
-        ravel: bool = True):
+def featurize_phi_psi(traj: mdtraj.Trajectory, get_names: bool = True, ravel: bool = True) -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
+    """
+    Calculate phi (ϕ) and psi (ψ) angles from a given MD trajectory.
+
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDTraj trajectory containing the protein structure.
+    get_names : bool, optional
+        If True, returns feature names along with the phi and psi angles. Default is True.
+    ravel : bool, optional
+        If True, returns the angles in a flattened array. Default is True.
+
+    Returns
+    -------
+    Union[np.ndarray, Tuple[np.ndarray, List[str]]]
+        If `get_names` is True, returns a tuple with phi and psi angles along with feature names.
+        If `get_names` is False, returns an array of phi and psi angles.
+
+    Notes
+    -----
+    This function calculates phi (ϕ) and psi (ψ) angles from a given MD trajectory.
+    """
+
     if not ravel and get_names:
         raise ValueError("Cannot use ravel when returning feature names")
 
@@ -33,7 +53,30 @@ def featurize_phi_psi(
         return phi_psi
 
 
-def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True, atom_selector:str = "protein and name CA"):
+def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True, atom_selector:str = "protein and name CA") -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
+    """
+    Calculate alpha (ϕ) angles from a given MD trajectory.
+
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDTraj trajectory containing the protein structure.
+    get_names : bool, optional
+        If True, returns feature names along with the alpha angles. Default is True.
+    atom_selector : str, optional
+        The atom selection string for C-alpha atoms. Default is "protein and name CA".
+
+    Returns
+    -------
+    Union[np.ndarray, Tuple[np.ndarray, List[str]]]
+        If `get_names` is True, returns a tuple with alpha angle values and feature names.
+        If `get_names` is False, returns an array of alpha angle values.
+
+    Notes
+    -----
+    This function calculates alpha (ϕ) angles from a given MD trajectory.
+    """
+
     # Get all C-alpha indices.
     ca_ids = traj.topology.select(atom_selector)
     atoms = list(traj.topology.atoms)
@@ -123,13 +166,36 @@ def featurize_tr_omega(
         max_sep: int = None,
         ravel: bool = True,
         get_names: bool = True
-    ):
+    ) -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
     """
-    Calculate omega angles from trRosetta. Those are torsion angles defined
+    Calculate omega angles from trRosetta. These angles are torsion angles defined
     between a pair of residues `i` and `j` and involving the following atoms:
         `Ca(i) -- Cb(i) -- Cb(j) -- Ca(j)`
-    if a residue does not have a Cb atom, an pseudo-Cb will be added
-    automatically.
+    If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.
+
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDTraj trajectory containing the protein structure.
+    min_sep : int, optional
+        The minimum separation between residues for computing omega angles. Default is 2.
+    max_sep : int, optional
+        The maximum separation between residues for computing omega angles. Default is None.
+    ravel : bool, optional
+        If True, returns a flattened array of omega angle values. Default is True.
+    get_names : bool, optional
+        If True, returns feature names along with the omega angles. Default is True.
+
+    Returns
+    -------
+    Union[np.ndarray, Tuple[np.ndarray, List[str]]]
+        If `ravel` is True, returns a flattened array of omega angle values.
+        If `ravel` is False, returns a 3D array of omega angle values.
+        If `get_names` is True, returns a tuple with feature names along with the omega angles.
+
+    Notes
+    -----
+    This function calculates omega angles from trRosetta for a given MD trajectory.
     """
 
     if not ravel and get_names:
@@ -177,14 +243,37 @@ def featurize_tr_phi(
         max_sep: int = None,
         ravel: bool = True,
         get_names: bool = True
-    ):
+    ) -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
     """
-    Calculate phi angles from trRosetta. Those are angles defined between a
+    Calculate phi angles from trRosetta. These angles are defined between a
     pair of residues `i` and `j` and involve the following atoms:
         `Ca(i) -- Cb(i) -- Cb(j)`
         `Ca(j) -- Cb(j) -- Cb(i)`
-    if a residue does not have a Cb atom, an pseudo-Cb will be added
-    automatically.
+    If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.
+
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDTraj trajectory containing the protein structure.
+    min_sep : int, optional
+        The minimum separation between residues for computing phi angles. Default is 2.
+    max_sep : int, optional
+        The maximum separation between residues for computing phi angles. Default is None.
+    ravel : bool, optional
+        If True, returns a flattened array of phi angle values. Default is True.
+    get_names : bool, optional
+        If True, returns feature names along with the phi angles. Default is True.
+
+    Returns
+    -------
+    Union[np.ndarray, Tuple[np.ndarray, List[str]]]
+        If `ravel` is True, returns a flattened array of phi angle values.
+        If `ravel` is False, returns a 3D array of phi angle values.
+        If `get_names` is True, returns a tuple with feature names along with the phi angles.
+
+    Notes
+    -----
+    This function calculates phi angles from trRosetta for a given MD trajectory.
     """
 
     if not ravel and get_names:
