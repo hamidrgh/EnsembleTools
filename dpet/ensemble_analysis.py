@@ -12,6 +12,17 @@ import numpy as np
 from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
 
 class EnsembleAnalysis:
+    """
+    Data analysis pipeline for ensemble data.
+
+    Initializes with a list of ensemble codes and a directory path
+    for storing data.
+
+    Parameters:
+        ens_codes (list[str]): List of ensemble codes.
+        data_dir (str): Directory path for storing data.
+    """
+    
     def __init__(self, ens_codes:list[str], data_dir:str):
         self.data_dir = Path(data_dir)
         os.makedirs(self.data_dir, exist_ok=True)
@@ -299,14 +310,14 @@ class EnsembleAnalysis:
         return [mdtraj.compute_rg(frame) for frame in trajectory]
 
     @property
-    def rg(self) -> List[float]:
+    def rg(self) -> list[float]:
         """
         Calculates Rg for each conformation in the loaded ensembles.
         The returned values are in Angstrom.  
 
         Returns
         -------
-        List[float]
+        list[float]
             A list of Rg values for each conformation in the loaded ensembles, in Angstrom.
         """
         rg_values_list = []
@@ -314,7 +325,6 @@ class EnsembleAnalysis:
             traj = ensemble.trajectory
             rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
         return [item[0] * 10 for item in rg_values_list]
-
 
     def _get_concat_features(self, fit_on: list[str]=None):
         if fit_on and any(f not in self.ens_codes for f in fit_on):
@@ -461,6 +471,6 @@ class EnsembleAnalysis:
         
         features_dict = {}
         for ens_code, ensemble in self.ensembles.items():
-            features = ensemble._featurize(featurization=featurization, min_sep= min_sep, max_sep=max_sep)
+            features = ensemble.featurize(featurization=featurization, min_sep= min_sep, max_sep=max_sep)
             features_dict[ens_code] = features
         return features_dict

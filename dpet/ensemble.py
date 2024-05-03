@@ -66,10 +66,10 @@ class Ensemble():
         
     def extract_features(self, featurization:str, min_sep:int, max_sep:int):
         print(f"Performing feature extraction for Ensemble: {self.ens_code}.")
-        self.features, self.names = self._featurize(featurization, min_sep, max_sep, get_names=True)
+        self.features, self.names = self.featurize(featurization, min_sep, max_sep, get_names=True)
         print("Transformed ensemble shape:", self.features.shape)
 
-    def _featurize(self, featurization: str, min_sep: int, max_sep: int, get_names: bool = False):
+    def featurize(self, featurization: str, min_sep: int, max_sep: int, get_names: bool = False):
         if featurization == "ca_dist":
             return featurize_ca_dist(
                 traj=self.trajectory, 
