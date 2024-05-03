@@ -55,6 +55,18 @@ class EnsembleAnalysis:
             A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
         return {ens_id: ensemble.features for ens_id, ensemble in self.ensembles.items()}
+    
+    @property
+    def reduce_dim_data(self) -> Dict[str, np.ndarray]:
+        """
+        Get the transformed data associated with each ensemble.
+
+        Returns
+        -------
+        Dict[str, np.ndarray]
+            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
+        """
+        return {ens_id: ensemble.reduce_dim_data for ens_id, ensemble in self.ensembles.items()}
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -405,7 +417,6 @@ class EnsembleAnalysis:
         if method in ("pca","kpca"):
             fit_on_data = self._get_concat_features(fit_on=fit_on)
             self.reduce_dim_model = self.reducer.fit(data=fit_on_data)
-            self.reduce_dim_data = {}
             for ensemble in self.ensembles.values():
                 ensemble.reduce_dim_data = self.reducer.transform(ensemble.features)
                 print("Reduced dimensionality ensemble shape:", ensemble.reduce_dim_data.shape)
