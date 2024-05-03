@@ -23,7 +23,7 @@ class Visualization:
         os.makedirs(self.plot_dir, exist_ok=True)
         self.figures = {}
 
-    def tsne_ramachandran_plot_density(self, save: bool = False) -> List[plt.Axes]:
+    def tsne_ramachandran_density(self, save: bool = False) -> List[plt.Axes]:
         """
         Plot the 2-D histogram Ramachandran plots of the clusters from t-SNE analysis.
 
@@ -88,7 +88,7 @@ class Visualization:
 
         return axes
 
-    def tsne_scatter_plot(self, save: bool = False) -> List[plt.Axes]:
+    def tsne_scatter(self, save: bool = False) -> List[plt.Axes]:
         """
         Plot the results of t-SNE analysis. 
 
@@ -301,7 +301,7 @@ class Visualization:
         ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
         ax.set_ylabel(f"{reduce_dim_method} dim {dim_y+1}")
 
-    def pca_plot_2d_landscapes(self, save: bool = False) -> List[plt.Axes]:
+    def pca_2d_landscapes(self, save: bool = False) -> List[plt.Axes]:
         """
         Plot 2D landscapes when the dimensionality reduction method is "pca" or "kpca".
 
@@ -367,7 +367,7 @@ class Visualization:
 
         return ax
 
-    def pca_plot_1d_histograms(self, save: bool = False) -> List[plt.Axes]:
+    def pca_1d_histograms(self, save: bool = False) -> List[plt.Axes]:
         """
         Plot 1D histogram when the dimensionality reduction method is "pca" or "kpca".
 
@@ -430,7 +430,7 @@ class Visualization:
         return ax
 
 
-    def pca_correlation_plot(self, num_residues: int, sel_dims: List[int], save: bool = False) -> List[plt.Axes]:
+    def pca_correlation(self, num_residues: int, sel_dims: List[int], save: bool = False) -> List[plt.Axes]:
         """
         Plot the correlation between residues based on PCA weights.
 
@@ -544,7 +544,7 @@ class Visualization:
 
         return ax
 
-    def plot_global_sasa(self, showmeans: bool = True, showmedians: bool = True, save: bool = False) -> plt.Axes:
+    def global_sasa(self, showmeans: bool = True, showmedians: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of SASA for each conformation within the ensembles.
 
@@ -585,7 +585,7 @@ class Visualization:
             plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))
         return ax
 
-    def plot_rg_vs_asphericity(self, save: bool = False) -> plt.Axes:
+    def rg_vs_asphericity(self, save: bool = False) -> plt.Axes:
         """
         Plot the Rg versus Asphericity and get the pearson correlation coefficient to evaluate 
         the correlation between Rg and Asphericity.
@@ -622,7 +622,7 @@ class Visualization:
         return ax
     
   
-    def plot_rg_vs_prolateness(self, save: bool = False) -> plt.Axes:
+    def rg_vs_prolateness(self, save: bool = False) -> plt.Axes:
         """
         Plot the Rg versus Prolateness and get the Pearson correlation coefficient to evaluate 
         the correlation between Rg and Prolateness. 
@@ -662,7 +662,7 @@ class Visualization:
         return ax
 
 
-    def plot_alpha_angle_dihedral(self, bins: int = 50, save: bool = False) -> plt.Axes:
+    def alpha_angle_dihedral(self, bins: int = 50, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of dihedral angles between four consecutive Cα beads.
 
@@ -707,7 +707,7 @@ class Visualization:
             dssp_data_dict[ens_code] = mdtraj.compute_dssp(ensemble.trajectory)
         return dssp_data_dict
 
-    def plot_relative_helix_content(self, save: bool = False) -> plt.Axes:
+    def relative_helix_content(self, save: bool = False) -> plt.Axes:
         """
         Plot the relative helix content in each ensemble for each residue. 
 
@@ -763,7 +763,7 @@ class Visualization:
             rg_dict[ens_code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
 
-    def trajectories_plot_rg_comparison(self, n_bins: int = 50, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
+    def rg_comparison(self, n_bins: int = 50, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
         """
         Plot the distribution of the radius of gyration (Rg) within each ensemble.
 
@@ -851,7 +851,7 @@ class Visualization:
             contact_ens_dict[ens_code] = get_contact_map(distance_matrix_ens_dict[ens_code])
         return contact_ens_dict
 
-    def plot_average_dmap_comparison(self, 
+    def average_dmap_comparison(self, 
                                     ticks_fontsize: int = 14,
                                     cbar_fontsize: int = 14,
                                     title_fontsize: int = 14,
@@ -931,7 +931,7 @@ class Visualization:
 
         return axes
 
-    def plot_cmap_comparison(self, 
+    def contact_map_comparison(self, 
                             title: str,
                             ticks_fontsize: int = 14,
                             cbar_fontsize: int = 14,
@@ -1022,7 +1022,7 @@ class Visualization:
         
         return axes
 
-    def plot_distance_distribution_multiple(self, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
+    def distance_multiple_dist(self, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
         """
         Plot the distribution of distances for multiple proteins.
 
@@ -1089,7 +1089,7 @@ class Visualization:
         return axes
         
 
-    def end_to_end_distances_plot(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
+    def end_to_end_dist(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
 
@@ -1144,7 +1144,7 @@ class Visualization:
         return ax
 
 
-    def plot_asphericity_dist(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
+    def asphericity_dist(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot asphericity distribution in each ensemble.
         Asphericity is calculated based on the gyration tensor.
@@ -1199,7 +1199,7 @@ class Visualization:
 
         return ax
 
-    def plot_prolateness_dist(self, bins: int = 50, violin_plot: bool = True, median: bool = False, mean: bool = False, save: bool = False) -> plt.Axes:
+    def prolateness_dist(self, bins: int = 50, violin_plot: bool = True, median: bool = False, mean: bool = False, save: bool = False) -> plt.Axes:
         """
         Plot prolateness distribution in each ensemble.
         Prolateness is calculated based on the gyration tensor.
@@ -1254,7 +1254,7 @@ class Visualization:
         return ax
 
 
-    def plot_alpha_angles_dist(self, bins: int = 50, save: bool = False) -> plt.Axes:
+    def alpha_angles_dist(self, bins: int = 50, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of alpha angles.
 
@@ -1289,7 +1289,7 @@ class Visualization:
         return ax
 
 
-    def plot_contact_prob(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues') -> List[List[plt.Axes]]:
+    def contact_prob_map(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues') -> List[List[plt.Axes]]:
         from matplotlib.colors import LogNorm
         """
         Plot the contact probability map based on the threshold.
@@ -1405,7 +1405,7 @@ class Visualization:
 
     '''
     
-    def plot_ramachandran_plot(self, two_d_hist: bool = True, linespaces: Tuple = (-180, 180, 80), save: bool = False) -> Union[List[plt.Axes], plt.Axes]:
+    def ramachandran(self, two_d_hist: bool = True, linespaces: Tuple = (-180, 180, 80), save: bool = False) -> Union[List[plt.Axes], plt.Axes]:
         """
         Ramachandran plot. If two_d_hist=True it returns a 2D histogram 
         for each ensemble. If two_d_hist=False it returns a simple scatter plot 
@@ -1469,7 +1469,7 @@ class Visualization:
 
         return axes
 
-    def plot_ss_measure_disorder(self, 
+    def ss_flexibility_parameter(self, 
                              pointer: List[int] = None, 
                              figsize: Tuple[int, int] = (15, 5), 
                              save: bool = False) -> plt.Axes:
@@ -1513,20 +1513,20 @@ class Visualization:
         
         axes.set_xticks([i for i in x if  i==1 or i%5 == 0])
         axes.set_xlabel("Residue Index")
-        axes.set_ylabel("Site-specific measure of disorder")
+        axes.set_ylabel("Site-specific flexibility parameter")
         axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         if pointer is not None:
             for res in pointer:
                 axes.axvline(x= res, c= 'blue', linestyle= '--', alpha= 0.3, linewidth= 1)
         plt.show()
 
-        self.figures['plot_ss_measure_disorder'] = fig
+        self.figures['plot_ss_flexibility_parameter'] = fig
         if save:
-            fig.savefig(os.path.join(self.plot_dir, 'ss_measure_disorder_' + self.analysis.ens_codes[0]))  
+            fig.savefig(os.path.join(self.plot_dir, 'ss_flexibility_' + self.analysis.ens_codes[0]))  
 
         return axes
             
-    def plot_ss_order_parameter(self, 
+    def ss_order_parameter(self, 
                             pointer: list = None , 
                             figsize: Tuple = (15,5), 
                             save: bool = False) -> plt.Axes: 
@@ -1580,7 +1580,7 @@ class Visualization:
         
         return axes
 
-    def plot_local_sasa(self, figsize: Tuple = (15,5), pointer: List[int] = None, save: bool = False) -> plt.Axes:
+    def local_sasa(self, figsize: Tuple = (15,5), pointer: List[int] = None, save: bool = False) -> plt.Axes:
         """
         Plot the average solvent-accessible surface area (SASA) for each residue among all conformations in an ensemble.
 
@@ -1633,7 +1633,7 @@ class Visualization:
 
         return ax
 
-    def plot_dist_ca_com(self, min_sep: int = 2, max_sep: Union[int, None] = None, get_names: bool = True, inverse: bool = False, figsize: Tuple[int, int] = (6, 2.5), save: bool = False) -> List[List[plt.Axes]]:
+    def ca_com_dist(self, min_sep: int = 2, max_sep: Union[int, None] = None, get_names: bool = True, inverse: bool = False, figsize: Tuple[int, int] = (6, 2.5), save: bool = False) -> List[List[plt.Axes]]:
         """
         Plot the distance maps comparing the center of mass (COM) and alpha-carbon (CA) distances within each ensemble.
 
