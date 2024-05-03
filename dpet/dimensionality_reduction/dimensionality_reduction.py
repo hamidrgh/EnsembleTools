@@ -329,7 +329,7 @@ class DimensionalityReductionFactory:
 
     Methods
     -------
-    get_reducer(method, *args, **kwargs)
+    get_reducer(method, \*args, \*\*kwargs)
         Get an instance of the specified dimensionality reduction algorithm.
     """
 
@@ -342,9 +342,9 @@ class DimensionalityReductionFactory:
         ----------
         method : str
             Name of the dimensionality reduction method.
-        *args
+        \*args
             Positional arguments to pass to the constructor of the selected method.
-        **kwargs
+        \*\*kwargs
             Keyword arguments to pass to the constructor of the selected method.
 
         Returns
@@ -372,14 +372,18 @@ class DimensionalityReductionFactory:
 #----------------------------------------------------------------------
 
 def unit_vectorize(a: np.ndarray) -> np.ndarray:
-    """Convert an array with (*, N) angles in an array with (*, N, 2) sine and
-    cosine values for the N angles."""
+    """
+    Convert an array with (\*, N) angles in an array with (\*, N, 2) sine and
+    cosine values for the N angles.
+    """
     v = np.concatenate([np.cos(a)[...,None], np.sin(a)[...,None]], axis=-1)
     return v
 
 def unit_vector_distance(a0: np.ndarray, a1: np.ndarray, sqrt: bool = True):
-    """Compute the sum of distances between two (*, N) arrays storing the
-    values of N angles."""
+    """
+    Compute the sum of distances between two (\*, N) arrays storing the
+    values of N angles.
+    """
     v0 = unit_vectorize(a0)
     v1 = unit_vectorize(a1)
     # Distance between N pairs of angles.

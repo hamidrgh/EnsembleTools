@@ -13,11 +13,11 @@ def featurize_phi_psi(traj: mdtraj.Trajectory, get_names: bool = True, ravel: bo
 
     Parameters
     ----------
-    traj : mdtraj.Trajectory
+    traj: mdtraj.Trajectory
         The MDTraj trajectory containing the protein structure.
-    get_names : bool, optional
+    get_names: bool, optional
         If True, returns feature names along with the phi and psi angles. Default is True.
-    ravel : bool, optional
+    ravel: bool, optional
         If True, returns the angles in a flattened array. Default is True.
 
     Returns
@@ -29,6 +29,7 @@ def featurize_phi_psi(traj: mdtraj.Trajectory, get_names: bool = True, ravel: bo
     Notes
     -----
     This function calculates phi (ϕ) and psi (ψ) angles from a given MD trajectory.
+
     """
 
     if not ravel and get_names:
@@ -59,11 +60,11 @@ def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True, atom_sele
 
     Parameters
     ----------
-    traj : mdtraj.Trajectory
+    traj: mdtraj.Trajectory
         The MDTraj trajectory containing the protein structure.
-    get_names : bool, optional
+    get_names: bool, optional
         If True, returns feature names along with the alpha angles. Default is True.
-    atom_selector : str, optional
+    atom_selector: str, optional
         The atom selection string for C-alpha atoms. Default is "protein and name CA".
 
     Returns
@@ -75,6 +76,7 @@ def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True, atom_sele
     Notes
     -----
     This function calculates alpha (ϕ) angles from a given MD trajectory.
+
     """
 
     # Get all C-alpha indices.
@@ -135,8 +137,10 @@ def featurize_tr_angle(
             indexed. If `False`, a (N, L, L) array will be returned.
         get_names: when `ravel` is `True`, also return the names of the
             corresponding features.
+
     returns:
         angles: numpy array storing the angle values.
+
     """
 
     if type == "omega":
@@ -175,15 +179,15 @@ def featurize_tr_omega(
 
     Parameters
     ----------
-    traj : mdtraj.Trajectory
+    traj: mdtraj.Trajectory
         The MDTraj trajectory containing the protein structure.
-    min_sep : int, optional
+    min_sep: int, optional
         The minimum separation between residues for computing omega angles. Default is 2.
-    max_sep : int, optional
+    max_sep: int, optional
         The maximum separation between residues for computing omega angles. Default is None.
-    ravel : bool, optional
+    ravel: bool, optional
         If True, returns a flattened array of omega angle values. Default is True.
-    get_names : bool, optional
+    get_names: bool, optional
         If True, returns feature names along with the omega angles. Default is True.
 
     Returns
@@ -196,6 +200,7 @@ def featurize_tr_omega(
     Notes
     -----
     This function calculates omega angles from trRosetta for a given MD trajectory.
+
     """
 
     if not ravel and get_names:
@@ -253,15 +258,15 @@ def featurize_tr_phi(
 
     Parameters
     ----------
-    traj : mdtraj.Trajectory
+    traj: mdtraj.Trajectory
         The MDTraj trajectory containing the protein structure.
-    min_sep : int, optional
+    min_sep: int, optional
         The minimum separation between residues for computing phi angles. Default is 2.
-    max_sep : int, optional
+    max_sep: int, optional
         The maximum separation between residues for computing phi angles. Default is None.
-    ravel : bool, optional
+    ravel: bool, optional
         If True, returns a flattened array of phi angle values. Default is True.
-    get_names : bool, optional
+    get_names: bool, optional
         If True, returns feature names along with the phi angles. Default is True.
 
     Returns
@@ -345,6 +350,7 @@ def _get_tr_omega_coords(
     Get from an mdtraj trajectory the coordinates of the atoms needed to
     calculate trRosetta angles.
     """
+    
     pos_ca = traj.xyz[:,atoms["CA"].index,:]
     if "CB" in atoms:  # Get the original Cbeta atom.
         pos_cb = traj.xyz[:,atoms["CB"].index,:]
@@ -366,6 +372,7 @@ def get_dihedrals(a, b, c, d):
     """
     calculate dihedral angles defined by 4 sets of points.
     """
+
     b0 = -1.0*(b - a)
     b1 = c - b
     b2 = d - c
@@ -380,6 +387,7 @@ def get_angles(a, b, c):
     """
     Calculate planar angles defined by 3 sets of points.
     """
+
     v = a - b
     v /= np.linalg.norm(v, axis=-1)[:,None]
     w = c - b

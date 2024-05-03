@@ -1,6 +1,16 @@
 dpet package
 ============
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Subpackages:
+
+   dpet.dimensionality_reduction
+   dpet.featurization
+
 Submodules
 ----------
 

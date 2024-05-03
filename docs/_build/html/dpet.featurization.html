@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dpet.featurization package &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="dpet.dimensionality_reduction package" href="dpet.dimensionality_reduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Disordered Protein Ensemble Tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">EnsembleTools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dpet.dimensionality_reduction.html">dpet.dimensionality_reduction package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">dpet.featurization package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dpet.featurization.angles">dpet.featurization.angles module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_a_angle"><code class="docutils literal notranslate"><span class="pre">featurize_a_angle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_phi_psi"><code class="docutils literal notranslate"><span class="pre">featurize_phi_psi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_tr_angle"><code class="docutils literal notranslate"><span class="pre">featurize_tr_angle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_tr_omega"><code class="docutils literal notranslate"><span class="pre">featurize_tr_omega()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_tr_phi"><code class="docutils literal notranslate"><span class="pre">featurize_tr_phi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.get_angles"><code class="docutils literal notranslate"><span class="pre">get_angles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.get_dihedrals"><code class="docutils literal notranslate"><span class="pre">get_dihedrals()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dpet.featurization.distances">dpet.featurization.distances module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.distances.calc_ca_dmap"><code class="docutils literal notranslate"><span class="pre">calc_ca_dmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.distances.calc_com_dmap"><code class="docutils literal notranslate"><span class="pre">calc_com_dmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.distances.featurize_ca_dist"><code class="docutils literal notranslate"><span class="pre">featurize_ca_dist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.distances.featurize_com_dist"><code class="docutils literal notranslate"><span class="pre">featurize_com_dist()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dpet.featurization.utils">dpet.featurization.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.utils.get_max_sep"><code class="docutils literal notranslate"><span class="pre">get_max_sep()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.utils.get_triu_indices"><code class="docutils literal notranslate"><span class="pre">get_triu_indices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dpet.featurization">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Disordered Protein Ensemble Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">dpet.featurization package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dpet.featurization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dpet-featurization-package">
+<h1>dpet.featurization package<a class="headerlink" href="#dpet-featurization-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-dpet.featurization.angles">
+<span id="dpet-featurization-angles-module"></span><h2>dpet.featurization.angles module<a class="headerlink" href="#module-dpet.featurization.angles" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_a_angle">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_a_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'protein</span> <span class="pre">and</span> <span class="pre">name</span> <span class="pre">CA'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/featurization/angles.html#featurize_a_angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.angles.featurize_a_angle" title="Link to this definition"></a></dt>
+<dd><p>Calculate alpha (ϕ) angles from a given MD trajectory.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>traj: mdtraj.Trajectory</dt><dd><p>The MDTraj trajectory containing the protein structure.</p>
+</dd>
+<dt>get_names: bool, optional</dt><dd><p>If True, returns feature names along with the alpha angles. Default is True.</p>
+</dd>
+<dt>atom_selector: str, optional</dt><dd><p>The atom selection string for C-alpha atoms. Default is “protein and name CA”.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Union[np.ndarray, Tuple[np.ndarray, List[str]]]</dt><dd><p>If <cite>get_names</cite> is True, returns a tuple with alpha angle values and feature names.
+If <cite>get_names</cite> is False, returns an array of alpha angle values.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This function calculates alpha (ϕ) angles from a given MD trajectory.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_phi_psi">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_phi_psi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/featurization/angles.html#featurize_phi_psi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.angles.featurize_phi_psi" title="Link to this definition"></a></dt>
+<dd><p>Calculate phi (ϕ) and psi (ψ) angles from a given MD trajectory.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>traj: mdtraj.Trajectory</dt><dd><p>The MDTraj trajectory containing the protein structure.</p>
+</dd>
+<dt>get_names: bool, optional</dt><dd><p>If True, returns feature names along with the phi and psi angles. Default is True.</p>
+</dd>
+<dt>ravel: bool, optional</dt><dd><p>If True, returns the angles in a flattened array. Default is True.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Union[np.ndarray, Tuple[np.ndarray, List[str]]]</dt><dd><p>If <cite>get_names</cite> is True, returns a tuple with phi and psi angles along with feature names.
+If <cite>get_names</cite> is False, returns an array of phi and psi angles.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h3>Notes<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>This function calculates phi (ϕ) and psi (ψ) angles from a given MD trajectory.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_tr_angle">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_tr_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/dpet/featurization/angles.html#featurize_tr_angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.angles.featurize_tr_angle" title="Link to this definition"></a></dt>
+<dd><p>Calculate trRosetta angles between pair of residue. See the original
+trRosetta paper (<a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/31896580/">https://pubmed.ncbi.nlm.nih.gov/31896580/</a>) for more
+information.</p>
+<dl>
+<dt>arguments:</dt><dd><p>traj: input mdtraj trajectory.
+type: string with the type of angle feature. “omega” for omega torsion</p>
+<blockquote>
+<div><p>angles, “phi” for phi angles.</p>
+</div></blockquote>
+<p>min_sep: minimum sequence separation between a pair of residues.
+max_sep: max sequence separation between a pair of residues. If <cite>None</cite>,</p>
+<blockquote>
+<div><p>there will be no maximum separation. If it is a float, the maximum
+separation will be <cite>int(max_sep*L)</cite> where <cite>L</cite> is the number of amino
+acids in the protein.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ravel: if <cite>True</cite>, values from all the pair of residues indexed via the</dt><dd><p><cite>min_sep</cite>, <cite>max_sep</cite> will be flattened in a vector, so the function
+will return a <cite>(N, *)</cite> array, where <cite>N</cite> is the number of conformers
+in the trajectory and <cite>*</cite> will be the number of features being
+indexed. If <cite>False</cite>, a (N, L, L) array will be returned.</p>
+</dd>
+<dt>get_names: when <cite>ravel</cite> is <cite>True</cite>, also return the names of the</dt><dd><p>corresponding features.</p>
+</dd>
+</dl>
+</dd>
+<dt>returns:</dt><dd><p>angles: numpy array storing the angle values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_tr_omega">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_tr_omega</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/featurization/angles.html#featurize_tr_omega"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.angles.featurize_tr_omega" title="Link to this definition"></a></dt>
+<dd><p>Calculate omega angles from trRosetta. These angles are torsion angles defined
+between a pair of residues <cite>i</cite> and <cite>j</cite> and involving the following atoms:</p>
+<blockquote>
+<div><p><cite>Ca(i) – Cb(i) – Cb(j) – Ca(j)</cite></p>
+</div></blockquote>
+<p>If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>traj: mdtraj.Trajectory</dt><dd><p>The MDTraj trajectory containing the protein structure.</p>
+</dd>
+<dt>min_sep: int, optional</dt><dd><p>The minimum separation between residues for computing omega angles. Default is 2.</p>
+</dd>
+<dt>max_sep: int, optional</dt><dd><p>The maximum separation between residues for computing omega angles. Default is None.</p>
+</dd>
+<dt>ravel: bool, optional</dt><dd><p>If True, returns a flattened array of omega angle values. Default is True.</p>
+</dd>
+<dt>get_names: bool, optional</dt><dd><p>If True, returns feature names along with the omega angles. Default is True.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Union[np.ndarray, Tuple[np.ndarray, List[str]]]</dt><dd><p>If <cite>ravel</cite> is True, returns a flattened array of omega angle values.
+If <cite>ravel</cite> is False, returns a 3D array of omega angle values.
+If <cite>get_names</cite> is True, returns a tuple with feature names along with the omega angles.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Notes<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>This function calculates omega angles from trRosetta for a given MD trajectory.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_tr_phi">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_tr_phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/featurization/angles.html#featurize_tr_phi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.angles.featurize_tr_phi" title="Link to this definition"></a></dt>
+<dd><p>Calculate phi angles from trRosetta. These angles are defined between a
+pair of residues <cite>i</cite> and <cite>j</cite> and involve the following atoms:</p>
+<blockquote>
+<div><p><cite>Ca(i) – Cb(i) – Cb(j)</cite>
+<cite>Ca(j) – Cb(j) – Cb(i)</cite></p>
+</div></blockquote>
+<p>If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>traj: mdtraj.Trajectory</dt><dd><p>The MDTraj trajectory containing the protein structure.</p>
+</dd>
+<dt>min_sep: int, optional</dt><dd><p>The minimum separation between residues for computing phi angles. Default is 2.</p>
+</dd>
+<dt>max_sep: int, optional</dt><dd><p>The maximum separation between residues for computing phi angles. Default is None.</p>
+</dd>
+<dt>ravel: bool, optional</dt><dd><p>If True, returns a flattened array of phi angle values. Default is True.</p>
+</dd>
+<dt>get_names: bool, optional</dt><dd><p>If True, returns feature names along with the phi angles. Default is True.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Union[np.ndarray, Tuple[np.ndarray, List[str]]]</dt><dd><p>If <cite>ravel</cite> is True, returns a flattened array of phi angle values.
+If <cite>ravel</cite> is False, returns a 3D array of phi angle values.
+If <cite>get_names</cite> is True, returns a tuple with feature names along with the phi angles.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Notes<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>This function calculates phi angles from trRosetta for a given MD trajectory.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.get_angles">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">get_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/featurization/angles.html#get_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.angles.get_angles" title="Link to this definition"></a></dt>
+<dd><p>Calculate planar angles defined by 3 sets of points.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.get_dihedrals">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">get_dihedrals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/featurization/angles.html#get_dihedrals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.angles.get_dihedrals" title="Link to this definition"></a></dt>
+<dd><p>calculate dihedral angles defined by 4 sets of points.</p>
+</dd></dl>
+
+</section>
+<section id="module-dpet.featurization.distances">
+<span id="dpet-featurization-distances-module"></span><h2>dpet.featurization.distances module<a class="headerlink" href="#module-dpet.featurization.distances" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.calc_ca_dmap">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">calc_ca_dmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/featurization/distances.html#calc_ca_dmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.distances.calc_ca_dmap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.calc_com_dmap">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">calc_com_dmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/featurization/distances.html#calc_com_dmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.distances.calc_com_dmap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.featurize_ca_dist">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">featurize_ca_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'name</span> <span class="pre">CA'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/featurization/distances.html#featurize_ca_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.distances.featurize_ca_dist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.featurize_com_dist">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">featurize_com_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'name</span> <span class="pre">==</span> <span class="pre">CA'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/featurization/distances.html#featurize_com_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.distances.featurize_com_dist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-dpet.featurization.utils">
+<span id="dpet-featurization-utils-module"></span><h2>dpet.featurization.utils module<a class="headerlink" href="#module-dpet.featurization.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.utils.get_max_sep">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.utils.</span></span><span class="sig-name descname"><span class="pre">get_max_sep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/dpet/featurization/utils.html#get_max_sep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.utils.get_max_sep" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.utils.get_triu_indices">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.utils.</span></span><span class="sig-name descname"><span class="pre">get_triu_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/featurization/utils.html#get_triu_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.utils.get_triu_indices" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-dpet.featurization">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dpet.featurization" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dpet.dimensionality_reduction.html" class="btn btn-neutral float-left" title="dpet.dimensionality_reduction package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson, Nikola Ivanović.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
