@@ -7,10 +7,17 @@ from dpet.featurization.distances import featurize_ca_dist
 
 
 class Ensemble():
+    '''
     def __init__(self, ens_code, data_dir) -> None:
         self.ens_code = ens_code
         self.data_dir = data_dir
-
+    '''
+    
+    def __init__(self, ens_code: str, data_path: str = None, top_path: str = None) -> None:
+        self.ens_code = ens_code
+        self.data_path = data_path
+        self.top_path = top_path
+    '''
     def load_trajectory(self):
         pdb_filename = f'{self.ens_code}.pdb'
         pdb_file = os.path.join(self.data_dir, pdb_filename)
@@ -47,7 +54,37 @@ class Ensemble():
             print(f"File or directory for ensemble {self.ens_code} doesn't exist.")
             return
         self.original_trajectory = self.trajectory[:]
-        
+    
+    '''
+
+    def load_trajectory(self):  
+        if not os.path.exists(self.data_path):
+            print(f"Data file or directory for ensemble {self.ens_code} doesn't exist.")
+        elif self.data_path.endswith('.pdb'):
+            print(f'Generating trajectory from PDB file: {self.data_path}.')
+            self.trajectory = mdtraj.load(self.data_path)
+            print(f'Saving trajectory.')
+            # self.trajectory.save(traj_dcd)
+            # self.trajectory[0].save(traj_top)
+        elif (self.data_path.endswith('.dcd') or self.data_path.endswith('.xtc')) and os.path.exists(self.top_path):
+            print(f'Trajectory already exists for ensemble {self.ens_code}. Loading trajectory.')
+            self.trajectory = mdtraj.load(self.data_path, top=(self.top_path))
+        elif os.path.isdir(self.data_path):
+            files_in_dir = [f for f in os.listdir(self.data_path) if f.endswith('.pdb')]
+            if files_in_dir:
+                full_paths = [os.path.join(self.data_path, file) for file in files_in_dir]
+                print(f'Generating trajectory from directory: {self.data_path}.')
+                self.trajectory = mdtraj.load(full_paths)
+                print(f'Saving trajectory.')
+                #self.trajectory.save(traj_dcd)
+                #self.trajectory[0].save(traj_top)
+            else:
+                print(f"No DCD files found in directory: {self.data_path}")
+        else:
+            print(f'Unsupported file format for data file: {self.data_path}')
+
+
+            
     def check_coarse_grained(self):
         topology = self.trajectory.topology
         atoms = topology.atoms

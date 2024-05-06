@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 import shutil
-from typing import Dict
+from typing import Dict, List
 import zipfile
 from dpet.data.api_client import APIClient
 from dpet.ensemble import Ensemble
@@ -23,14 +23,25 @@ class EnsembleAnalysis:
         data_dir (str): Directory path for storing data.
     """
     
-    def __init__(self, ens_codes:list[str], data_dir:str):
+    def __init__(self, ensembles:list[Ensemble], data_dir:str):
         self.data_dir = Path(data_dir)
         os.makedirs(self.data_dir, exist_ok=True)
         self.api_client = APIClient()
         self.feature_names = []
         self.all_labels = []
-        self.ens_codes = ens_codes
-        self.ensembles: Dict[str, Ensemble] = {}
+        self.ensembles = ensembles
+
+    @property
+    def ens_codes(self) -> List[str]:
+        """
+        Get the ensemble codes.
+
+        Returns
+        -------
+        List[str]
+            A list of ensemble codes.
+        """
+        return [ensemble.ens_code for ensemble in self.ensembles]
 
     @property
     def trajectories(self) -> Dict[str, mdtraj.Trajectory]:
@@ -42,7 +53,7 @@ class EnsembleAnalysis:
         Dict[str, mdtraj.Trajectory]
             A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.
         """
-        return {ens_id: ensemble.trajectory for ens_id, ensemble in self.ensembles.items()}
+        return {ensemble.ens_code: ensemble.trajectory for ensemble in self.ensembles}
 
     @property
     def features(self) -> Dict[str, np.ndarray]:
@@ -54,7 +65,7 @@ class EnsembleAnalysis:
         Dict[str, np.ndarray]
             A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
-        return {ens_id: ensemble.features for ens_id, ensemble in self.ensembles.items()}
+        return {ensemble.ens_code: ensemble.features for ensemble in self.ensembles}
     
     @property
     def reduce_dim_data(self) -> Dict[str, np.ndarray]:
@@ -66,7 +77,7 @@ class EnsembleAnalysis:
         Dict[str, np.ndarray]
             A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
-        return {ens_id: ensemble.reduce_dim_data for ens_id, ensemble in self.ensembles.items()}
+        return {ensemble.ens_code: ensemble.reduce_dim_data for ensemble in self.ensembles}
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -85,7 +96,9 @@ class EnsembleAnalysis:
         ped_pattern = r'^(PED\d{5})(e\d{3})$'
 
         # Filter the ens_codes list using regex
-        for ens_code in self.ens_codes:
+        for ensemble in self.ensembles:
+            
+            ens_code = ensemble.ens_code
             match = re.match(ped_pattern, ens_code)
             if not match:
                 print(f"Entry {ens_code} does not match the PED ID pattern and will be skipped.")
@@ -118,6 +131,9 @@ class EnsembleAnalysis:
                 print(f"Extracted file {pdb_filename}.")
             else:
                 print(f"File {pdb_filename} already exists. Skipping extraction.")
+            
+            # Set the data path to the downloaded file
+            ensemble.data_path = pdb_file
     
     def download_from_atlas(self):
         """ 
@@ -130,8 +146,8 @@ class EnsembleAnalysis:
         """
         pdb_pattern = r'^\d\w{3}_[A-Z]$'
         new_ens_codes_mapping = {}
-        for ens_code in self.ens_codes:
-
+        for ensemble in self.ensembles:
+            ens_code = ensemble.ens_code
             if not re.match(pdb_pattern, ens_code):
                 print(f"Entry {ens_code} does not match the PDB ID pattern and will be skipped.")
                 continue
@@ -176,13 +192,16 @@ class EnsembleAnalysis:
             # Delete old topology file
             os.remove(old_pdb_file)
 
-        # Update self.ens_codes using the mapping
-        updated_ens_codes = []
-        for old_code in self.ens_codes:
-            updated_ens_codes.extend(new_ens_codes_mapping.get(old_code, [old_code]))
+        # Update self.ensembles using the mapping
+        updated_ensembles = []
+        for ensemble in self.ensembles:
+            new_ens_codes = new_ens_codes_mapping.get(ensemble.ens_code, [ensemble.ens_code])
+            # TODO: Fix the data path
+            updated_ensembles.extend([Ensemble(code, os.path.join(self.data_dir, f'{code}.xtc'), os.path.join(self.data_dir, f'{code}.top.pdb')) for code in new_ens_codes])
 
-        self.ens_codes = updated_ens_codes
-        print("Analysing ensembles:", self.ens_codes)
+        self.ensembles = updated_ensembles
+        print("Analysing ensembles:", [ensemble.ens_code for ensemble in self.ensembles])
+
 
     def download_from_database(self, database: str =None):
         """ 
@@ -209,6 +228,7 @@ class EnsembleAnalysis:
         elif database == "atlas":
             self.download_from_atlas()
 
+    '''
     def generate_trajectories(self) -> Dict[str, mdtraj.Trajectory]:
         """
         Load trajectory files into mdtraj objects.
@@ -240,7 +260,16 @@ class EnsembleAnalysis:
             ensemble.check_coarse_grained()
             self.ensembles[ens_code] = ensemble
         return self.trajectories
-            
+    
+    '''
+
+    def load_trajectories(self):
+        for ensemble in self.ensembles:
+            ensemble.load_trajectory()
+            ensemble.select_chain()
+            ensemble.check_coarse_grained()
+        pass
+
     def random_sample_trajectories(self, sample_size: int):
         """
         Sample a defined random number of conformations from the ensemble 
@@ -251,7 +280,7 @@ class EnsembleAnalysis:
         sample_size: int
             Number of conformations sampled from the ensemble. 
         """
-        for ensemble in self.ensembles.values():
+        for ensemble in self.ensembles:
             ensemble.random_sample_trajectory(sample_size)
         return self.trajectories
 
@@ -294,28 +323,28 @@ class EnsembleAnalysis:
         bool
             True if at least one ensemble is coarse-grained, False otherwise.
         """
-        return any(ensemble.coarse_grained for ensemble in self.ensembles.values())
+        return any(ensemble.coarse_grained for ensemble in self.ensembles)
 
     def _featurize(self, featurization: str, min_sep, max_sep):
         if featurization in ("phi_psi", "tr_omega", "tr_phi") and self.exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         self.featurization = featurization
-        for ensemble in self.ensembles.values():
+        for ensemble in self.ensembles:
             ensemble.extract_features(featurization, min_sep, max_sep)
-        self.feature_names = list(self.ensembles.values())[0].names
+        self.feature_names = list(self.ensembles)[0].names
         print("Feature names:", self.feature_names)
 
     def _create_all_labels(self):
         self.all_labels = []
-        for ens_id, ensemble in self.ensembles.items():
+        for ensemble in self.ensembles:
             num_data_points = len(ensemble.features)
-            self.all_labels.extend([ens_id] * num_data_points)
+            self.all_labels.extend([ensemble.ens_code] * num_data_points)
 
     def _normalize_data(self):
         mean = self.concat_features.mean(axis=0)
         std = self.concat_features.std(axis=0)
         self.concat_features = (self.concat_features - mean) / std
-        for ensemble in self.ensembles.values():
+        for ensemble in self.ensembles:
             ensemble.normalize_features(mean, std)
 
     def _calculate_rg_for_trajectory(self, trajectory:mdtraj.Trajectory):
@@ -333,7 +362,7 @@ class EnsembleAnalysis:
             A list of Rg values for each conformation in the loaded ensembles, in Angstrom.
         """
         rg_values_list = []
-        for ensemble in self.ensembles.values():
+        for ensemble in self.ensembles:
             traj = ensemble.trajectory
             rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
         return [item[0] * 10 for item in rg_values_list]
@@ -343,7 +372,7 @@ class EnsembleAnalysis:
             raise ValueError("Cannot fit on ensembles that were not provided as input.")
         if fit_on is None:
             fit_on = self.ens_codes
-        concat_features = [ensemble.features for ens_code, ensemble in self.ensembles.items() if ens_code in fit_on]
+        concat_features = [ensemble.features for ensemble in self.ensembles if ensemble.ens_code in fit_on]
         concat_features = np.concatenate(concat_features, axis=0)
         print("Concatenated featurized ensemble shape:", concat_features.shape)
         return concat_features
@@ -417,7 +446,7 @@ class EnsembleAnalysis:
         if method in ("pca","kpca"):
             fit_on_data = self._get_concat_features(fit_on=fit_on)
             self.reduce_dim_model = self.reducer.fit(data=fit_on_data)
-            for ensemble in self.ensembles.values():
+            for ensemble in self.ensembles:
                 ensemble.reduce_dim_data = self.reducer.transform(ensemble.features)
                 print("Reduced dimensionality ensemble shape:", ensemble.reduce_dim_data.shape)
             self.transformed_data = self.reducer.transform(data=self.concat_features)
@@ -481,7 +510,7 @@ class EnsembleAnalysis:
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         
         features_dict = {}
-        for ens_code, ensemble in self.ensembles.items():
+        for ensemble in self.ensembles:
             features = ensemble.featurize(featurization=featurization, min_sep= min_sep, max_sep=max_sep)
-            features_dict[ens_code] = features
+            features_dict[ensemble.ens_code] = features
         return features_dict
