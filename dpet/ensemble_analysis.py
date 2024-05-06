@@ -134,6 +134,8 @@ class EnsembleAnalysis:
             
             # Set the data path to the downloaded file
             ensemble.data_path = pdb_file
+        
+        return self.ensembles
     
     def download_from_atlas(self):
         """ 
@@ -145,7 +147,7 @@ class EnsembleAnalysis:
         Example: '3a1g_B'
         """
         pdb_pattern = r'^\d\w{3}_[A-Z]$'
-        new_ens_codes_mapping = {}
+        new_ensembles_mapping = {}
         for ensemble in self.ensembles:
             ens_code = ensemble.ens_code
             if not re.match(pdb_pattern, ens_code):
@@ -172,8 +174,15 @@ class EnsembleAnalysis:
             with zipfile.ZipFile(zip_file, 'r') as zip_ref:
                 # Map reps to original ensemble code
                 zip_contents = zip_ref.namelist()
-                new_ens_codes = [fname.split('.')[0] for fname in zip_contents if fname.endswith('.xtc')]
-                new_ens_codes_mapping[ens_code] = new_ens_codes
+                new_ensembles = []
+                for fname in zip_contents:
+                    if fname.endswith('.xtc'):
+                        new_ens_code = fname.split('.')[0]
+                        data_path = os.path.join(self.data_dir, fname)
+                        top_path = os.path.join(self.data_dir, f"{ens_code}.pdb")
+                        ensemble = Ensemble(ens_code=new_ens_code, data_path=data_path, top_path=top_path)
+                        new_ensembles.append(ensemble)
+                new_ensembles_mapping[ens_code] = new_ensembles
                 # Unzip
                 zip_ref.extractall(self.data_dir)
                 print(f"Extracted file {zip_file}.")
@@ -183,24 +192,14 @@ class EnsembleAnalysis:
                 os.remove(unused_path)
             os.remove(os.path.join(self.data_dir, "README.txt"))
 
-            # Copy and rename topology file
-            old_pdb_file = os.path.join(self.data_dir,f"{ens_code}.pdb")
-            for new_code in new_ens_codes:
-                new_pdb_file = os.path.join(self.data_dir,f"{new_code}.top.pdb")
-                shutil.copy(old_pdb_file, new_pdb_file)
-                print(f"Copied and renamed {old_pdb_file} to {new_pdb_file}.")
-            # Delete old topology file
-            os.remove(old_pdb_file)
-
         # Update self.ensembles using the mapping
         updated_ensembles = []
         for ensemble in self.ensembles:
-            new_ens_codes = new_ens_codes_mapping.get(ensemble.ens_code, [ensemble.ens_code])
-            # TODO: Fix the data path
-            updated_ensembles.extend([Ensemble(code, os.path.join(self.data_dir, f'{code}.xtc'), os.path.join(self.data_dir, f'{code}.top.pdb')) for code in new_ens_codes])
-
+            new_ensembles = new_ensembles_mapping.get(ensemble.ens_code, [ensemble])
+            updated_ensembles.extend(new_ensembles)
         self.ensembles = updated_ensembles
-        print("Analysing ensembles:", [ensemble.ens_code for ensemble in self.ensembles])
+
+        return self.ensembles
 
 
     def download_from_database(self, database: str =None):
@@ -224,44 +223,9 @@ class EnsembleAnalysis:
             Example: '3a1g_B'
         """
         if database == "ped":
-            self.download_from_ped()
+            return self.download_from_ped()
         elif database == "atlas":
-            self.download_from_atlas()
-
-    '''
-    def generate_trajectories(self) -> Dict[str, mdtraj.Trajectory]:
-        """
-        Load trajectory files into mdtraj objects.
-        
-        Supported file formats:
-            1. [ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)
-            2. [ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)
-            3. [ens_code].pdb
-            4. Directory [ens_code] containing several .pdb files
-        
-        For each ensemble code (ens_code):
-            - If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.
-            - If only a .pdb file exists, generate trajectory and topology files from the .pdb file.
-            - If a directory [ens_code] exists containing .pdb files, generate trajectory and topology files from the directory.
-
-        Returns
-        -------
-        Dict[str, mdtraj.Trajectory]
-            A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.
-
-        Note
-        ----
-        Using 'download_from_database' transforms the downloaded data into the appropriate format.
-        """
-        for ens_code in self.ens_codes:
-            ensemble = Ensemble(ens_code, self.data_dir)
-            ensemble.load_trajectory()
-            ensemble.select_chain()
-            ensemble.check_coarse_grained()
-            self.ensembles[ens_code] = ensemble
-        return self.trajectories
-    
-    '''
+            return self.download_from_atlas()
 
     def load_trajectories(self):
         for ensemble in self.ensembles:
