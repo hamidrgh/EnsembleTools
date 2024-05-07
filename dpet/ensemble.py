@@ -7,6 +7,21 @@ from dpet.featurization.distances import featurize_ca_dist
 
 
 class Ensemble():
+
+    """
+    Represents a molecular dynamics ensemble.
+
+    Parameters
+    ----------
+    ens_code : str
+        The code identifier of the ensemble.
+    data_path : str, optional
+        The path to the data file associated with the ensemble. Default is None.
+    top_path : str, optional
+        The path to the topology file associated with the ensemble. Default is None.
+    database : str, optional
+        The database from which to download the ensemble. Options are 'ped' and 'atlas'. Default is None.
+    """
     
     def __init__(self, ens_code: str, data_path: str = None, top_path: str = None, database: str = None) -> None:
         self.ens_code = ens_code

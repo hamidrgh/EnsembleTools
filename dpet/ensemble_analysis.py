@@ -18,13 +18,13 @@ class EnsembleAnalysis:
     for storing data.
 
     Parameters:
-        ens_codes (list[str]): List of ensemble codes.
-        data_dir (str): Directory path for storing data.
+        ensembles (list[Ensemble]): List of ensembles.
+        output_dir (str): Directory path for storing data.
     """
     
-    def __init__(self, ensembles:list[Ensemble], data_dir:str):
-        self.data_dir = Path(data_dir)
-        os.makedirs(self.data_dir, exist_ok=True)
+    def __init__(self, ensembles:list[Ensemble], output_dir:str):
+        self.output_dir = Path(output_dir)
+        os.makedirs(self.output_dir, exist_ok=True)
         self.api_client = APIClient()
         self.feature_names = []
         self.all_labels = []
@@ -82,7 +82,7 @@ class EnsembleAnalysis:
         if hasattr(self, 'api_client'):
             self.api_client.close_session()
     
-    def download_from_ped(self, ensemble: Ensemble):
+    def _download_from_ped(self, ensemble: Ensemble):
         ped_pattern = r'^(PED\d{5})(e\d{3})$'
 
         ens_code = ensemble.ens_code
@@ -94,10 +94,10 @@ class EnsembleAnalysis:
         ped_id = match.group(1)
         ensemble_id = match.group(2)
         tar_gz_filename = f'{ens_code}.tar.gz'
-        tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
+        tar_gz_file = os.path.join(self.output_dir, tar_gz_filename)
 
         pdb_filename = f'{ens_code}.pdb'
-        pdb_file = os.path.join(self.data_dir, pdb_filename)
+        pdb_file = os.path.join(self.output_dir, pdb_filename)
 
         if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
             url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
@@ -114,7 +114,7 @@ class EnsembleAnalysis:
 
         # Extract the .tar.gz file
         if not os.path.exists(pdb_file):
-            extract_tar_gz(tar_gz_file, self.data_dir, pdb_filename)
+            extract_tar_gz(tar_gz_file, self.output_dir, pdb_filename)
             print(f"Extracted file {pdb_filename}.")
         else:
             print(f"File {pdb_filename} already exists. Skipping extraction.")
@@ -122,7 +122,7 @@ class EnsembleAnalysis:
         # Set the data path to the downloaded file
         ensemble.data_path = pdb_file
     
-    def download_from_atlas(self, ensemble: Ensemble):
+    def _download_from_atlas(self, ensemble: Ensemble):
         pdb_pattern = r'^\d\w{3}_[A-Z]$'
         ens_code = ensemble.ens_code
         if not re.match(pdb_pattern, ens_code):
@@ -130,7 +130,7 @@ class EnsembleAnalysis:
             return []
 
         zip_filename = f'{ens_code}.zip'
-        zip_file = os.path.join(self.data_dir, zip_filename)
+        zip_file = os.path.join(self.output_dir, zip_filename)
 
         if not os.path.exists(zip_file):
             print(f"Downloading entry {ens_code} from Atlas.")
@@ -153,28 +153,45 @@ class EnsembleAnalysis:
             for fname in zip_contents:
                 if fname.endswith('.xtc'):
                     new_ens_code = fname.split('.')[0]
-                    data_path = os.path.join(self.data_dir, fname)
-                    top_path = os.path.join(self.data_dir, f"{ens_code}.pdb")
+                    data_path = os.path.join(self.output_dir, fname)
+                    top_path = os.path.join(self.output_dir, f"{ens_code}.pdb")
                     ensemble = Ensemble(ens_code=new_ens_code, data_path=data_path, top_path=top_path)
                     new_ensembles.append(ensemble)
             # Unzip
-            zip_ref.extractall(self.data_dir)
+            zip_ref.extractall(self.output_dir)
             print(f"Extracted file {zip_file}.")
 
             # Remove unused files.
-            for unused_path in self.data_dir.glob("*.tpr"):
+            for unused_path in self.output_dir.glob("*.tpr"):
                 os.remove(unused_path)
-            os.remove(os.path.join(self.data_dir, "README.txt"))
+            os.remove(os.path.join(self.output_dir, "README.txt"))
 
         return new_ensembles
 
-    def load_trajectories(self): 
+    def load_trajectories(self) -> Dict[str, mdtraj.Trajectory]:
+        """
+        Load trajectories for all ensembles.
+
+        This method iterates over each ensemble in the `ensembles` list and downloads
+        data files if they are not already available. 
+        Trajectories are then loaded for each ensemble.
+
+        Returns
+        -------
+        Dict[str, mdtraj.Trajectory]
+            A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.
+
+        Note
+        ----
+        This method assumes that the `output_dir` attribute of the class specifies the directory
+        where trajectory files will be saved or extracted.
+        """
         new_ensembles_mapping = {}
         for ensemble in self.ensembles:
             if ensemble.database == 'ped':
-                self.download_from_ped(ensemble)
+                self._download_from_ped(ensemble)
             elif ensemble.database == 'atlas':
-                new_ensembles = self.download_from_atlas(ensemble)
+                new_ensembles = self._download_from_atlas(ensemble)
                 new_ensembles_mapping[ensemble.ens_code] = new_ensembles
 
         # Update self.ensembles using the mapping
@@ -185,9 +202,11 @@ class EnsembleAnalysis:
         self.ensembles = updated_ensembles
         
         for ensemble in self.ensembles:
-            ensemble.load_trajectory(self.data_dir)
+            ensemble.load_trajectory(self.output_dir)
             ensemble.select_chain()
             ensemble.check_coarse_grained()
+        
+        return self.trajectories
 
     def random_sample_trajectories(self, sample_size: int):
         """
@@ -373,7 +392,7 @@ class EnsembleAnalysis:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
         return self.transformed_data
 
-    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, database:str=None, subsample_size:int=None):
+    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, subsample_size:int=None):
         """
         Execute the data analysis pipeline end-to-end. The pipeline includes:
             1. Download from database (optional)
@@ -391,9 +410,6 @@ class EnsembleAnalysis:
         reduce_dim_params: dict
             Parameters for dimensionality reduction. The only required parameter is "method",
             which can be "pca", "tsne", "dimenfix", "mds" or "kpca".
-        database: str, optional
-            Optional parameter that specifies the database from which the entries should be downloaded.
-            Options are "ped" and "atlas". Default is None.
         subsample_size: int, optional
             Optional parameter that specifies the trajectory subsample size. Default is None.
         """

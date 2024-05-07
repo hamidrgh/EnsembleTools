@@ -25,7 +25,7 @@ class Visualization:
 
     def __init__(self, analysis: EnsembleAnalysis):
         self.analysis = analysis
-        self.plot_dir = os.path.join(self.analysis.data_dir, PLOT_DIR)
+        self.plot_dir = os.path.join(self.analysis.output_dir, PLOT_DIR)
         os.makedirs(self.plot_dir, exist_ok=True)
         self.figures = {}
 
@@ -260,8 +260,7 @@ class Visualization:
         self.figures["umap_scatter"] = fig
 
         if save:
-            plot_dir = os.path.join(analysis.data_dir, PLOT_DIR)
-            plt.savefig(plot_dir + '/umap_scatter.png', dpi=800)
+            plt.savefig(self.plot_dir + '/umap_scatter.png', dpi=800)
 
         return ax
 
