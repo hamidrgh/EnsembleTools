@@ -185,7 +185,7 @@ class EnsembleAnalysis:
         self.ensembles = updated_ensembles
         
         for ensemble in self.ensembles:
-            ensemble.load_trajectory()
+            ensemble.load_trajectory(self.data_dir)
             ensemble.select_chain()
             ensemble.check_coarse_grained()
 

@@ -14,31 +14,35 @@ class Ensemble():
         self.top_path = top_path
         self.database = database
     
-    def load_trajectory(self):  
+    def load_trajectory(self, data_dir: str):  
         print(self.ens_code)
         if not os.path.exists(self.data_path):
             print(f"Data file or directory for ensemble {self.ens_code} doesn't exist.")
             return
         elif self.data_path.endswith('.pdb'):
-            print(f'Generating trajectory from PDB file: {self.data_path}.')
+            print(f"Generating trajectory for {self.ens_code}...")
             self.trajectory = mdtraj.load(self.data_path)
-            print(f'Saving trajectory.')
-            # self.trajectory.save(traj_dcd)
-            # self.trajectory[0].save(traj_top)
+            traj_dcd = os.path.join(data_dir, f'{self.ens_code}.dcd')
+            traj_top = os.path.join(data_dir, f'{self.ens_code}.top.pdb')
+            self.trajectory.save(traj_dcd)
+            self.trajectory[0].save(traj_top)
+            print(f"Generated trajectory saved to {data_dir}.")
         elif (self.data_path.endswith('.dcd') or self.data_path.endswith('.xtc')) and os.path.exists(self.top_path):
-            print(f'Trajectory already exists for ensemble {self.ens_code}. Loading trajectory.')
+            print(f"Loading trajectory for {self.ens_code}...")
             self.trajectory = mdtraj.load(self.data_path, top=(self.top_path))
         elif os.path.isdir(self.data_path):
             files_in_dir = [f for f in os.listdir(self.data_path) if f.endswith('.pdb')]
             if files_in_dir:
+                print(f"Generating trajectory for {self.ens_code}...")
                 full_paths = [os.path.join(self.data_path, file) for file in files_in_dir]
-                print(f'Generating trajectory from directory: {self.data_path}.')
                 self.trajectory = mdtraj.load(full_paths)
-                print(f'Saving trajectory.')
-                #self.trajectory.save(traj_dcd)
-                #self.trajectory[0].save(traj_top)
+                traj_dcd = os.path.join(data_dir, f'{self.ens_code}.dcd')
+                traj_top = os.path.join(data_dir, f'{self.ens_code}.top.pdb')
+                self.trajectory.save(traj_dcd)
+                self.trajectory[0].save(traj_top)
+                print(f"Generated trajectory saved to {data_dir}.")
             else:
-                print(f"No DCD files found in directory: {self.data_path}")
+                print(f"No PDB files found in directory: {self.data_path}")
         else:
             print(f'Unsupported file format for data file: {self.data_path}')
             return
