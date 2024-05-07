@@ -8,14 +8,17 @@ from dpet.featurization.distances import featurize_ca_dist
 
 class Ensemble():
     
-    def __init__(self, ens_code: str, data_path: str = None, top_path: str = None) -> None:
+    def __init__(self, ens_code: str, data_path: str = None, top_path: str = None, database: str = None) -> None:
         self.ens_code = ens_code
         self.data_path = data_path
         self.top_path = top_path
+        self.database = database
     
     def load_trajectory(self):  
+        print(self.ens_code)
         if not os.path.exists(self.data_path):
             print(f"Data file or directory for ensemble {self.ens_code} doesn't exist.")
+            return
         elif self.data_path.endswith('.pdb'):
             print(f'Generating trajectory from PDB file: {self.data_path}.')
             self.trajectory = mdtraj.load(self.data_path)
@@ -39,6 +42,7 @@ class Ensemble():
         else:
             print(f'Unsupported file format for data file: {self.data_path}')
             return
+        # Save a copy of the trajectory for sampling
         self.original_trajectory = self.trajectory
             
     def check_coarse_grained(self):

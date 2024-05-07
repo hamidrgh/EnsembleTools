@@ -1,6 +1,5 @@
 from pathlib import Path
 import re
-import shutil
 from typing import Dict, List
 import zipfile
 from dpet.data.api_client import APIClient
@@ -15,7 +14,7 @@ class EnsembleAnalysis:
     """
     Data analysis pipeline for ensemble data.
 
-    Initializes with a list of ensemble codes and a directory path
+    Initializes with a list of ensemble objects and a directory path
     for storing data.
 
     Parameters:
@@ -83,114 +82,100 @@ class EnsembleAnalysis:
         if hasattr(self, 'api_client'):
             self.api_client.close_session()
     
-    def download_from_ped(self):
-        """
-        Automate Downloading ensembles using PED API 
-
-        Note
-        ----
-        The function only downloads ensembles in the PED ID format, which consists of a string starting with 'PED'
-        followed by a numeric identifier and 'e' followed by another numeric identifier.
-        Example: 'PED00423e001', 'PED00424e001'
-        """
+    def download_from_ped(self, ensemble: Ensemble):
         ped_pattern = r'^(PED\d{5})(e\d{3})$'
 
-        # Filter the ens_codes list using regex
-        for ensemble in self.ensembles:
-            
-            ens_code = ensemble.ens_code
-            match = re.match(ped_pattern, ens_code)
-            if not match:
-                print(f"Entry {ens_code} does not match the PED ID pattern and will be skipped.")
-                continue
-            
-            ped_id = match.group(1)
-            ensemble_id = match.group(2)
-            tar_gz_filename = f'{ens_code}.tar.gz'
-            tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
-
-            pdb_filename = f'{ens_code}.pdb'
-            pdb_file = os.path.join(self.data_dir, pdb_filename)
-
-            if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
-                url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
-                print(f"Downloading entry {ens_code} from PED.")
-                headers = {'accept': '*/*'}
-
-                response = self.api_client.perform_get_request(url, headers=headers)
-                if response:
-                    # Download and save the response content to a file
-                    self.api_client.download_response_content(response, tar_gz_file)
-                    print(f"Downloaded file {tar_gz_filename} from PED.")
-            else:
-                print(f"Ensemble {ens_code} already downloaded. Skipping.")
-
-            # Extract the .tar.gz file
-            if not os.path.exists(pdb_file):
-                extract_tar_gz(tar_gz_file, self.data_dir, pdb_filename)
-                print(f"Extracted file {pdb_filename}.")
-            else:
-                print(f"File {pdb_filename} already exists. Skipping extraction.")
-            
-            # Set the data path to the downloaded file
-            ensemble.data_path = pdb_file
+        ens_code = ensemble.ens_code
+        match = re.match(ped_pattern, ens_code)
+        if not match:
+            print(f"Entry {ens_code} does not match the PED ID pattern and will be skipped.")
+            return
         
-        return self.ensembles
-    
-    def download_from_atlas(self):
-        """ 
-        Automate Downloading MD ensembles from Atlas. 
+        ped_id = match.group(1)
+        ensemble_id = match.group(2)
+        tar_gz_filename = f'{ens_code}.tar.gz'
+        tar_gz_file = os.path.join(self.data_dir, tar_gz_filename)
 
-        Note
-        ----
-        The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
-        Example: '3a1g_B'
-        """
-        pdb_pattern = r'^\d\w{3}_[A-Z]$'
-        new_ensembles_mapping = {}
-        for ensemble in self.ensembles:
-            ens_code = ensemble.ens_code
-            if not re.match(pdb_pattern, ens_code):
-                print(f"Entry {ens_code} does not match the PDB ID pattern and will be skipped.")
-                continue
+        pdb_filename = f'{ens_code}.pdb'
+        pdb_file = os.path.join(self.data_dir, pdb_filename)
 
-            zip_filename = f'{ens_code}.zip'
-            zip_file = os.path.join(self.data_dir, zip_filename)
+        if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
+            url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
+            print(f"Downloading entry {ens_code} from PED.")
+            headers = {'accept': '*/*'}
 
-            if not os.path.exists(zip_file):
-                print(f"Downloading entry {ens_code} from Atlas.")
-                url = f"https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/{ens_code}/{ens_code}_protein.zip"
-                headers = {'accept': '*/*'}
-
-                response = self.api_client.perform_get_request(url, headers=headers)
-                if not response:
-                    continue
+            response = self.api_client.perform_get_request(url, headers=headers)
+            if response:
                 # Download and save the response content to a file
-                self.api_client.download_response_content(response, zip_file)
-                print(f"Downloaded file {zip_filename} from Atlas.")
-            else:
-                print("File already exists. Skipping download.")
+                self.api_client.download_response_content(response, tar_gz_file)
+                print(f"Downloaded file {tar_gz_filename} from PED.")
+        else:
+            print(f"Ensemble {ens_code} already downloaded. Skipping.")
 
-            with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-                # Map reps to original ensemble code
-                zip_contents = zip_ref.namelist()
-                new_ensembles = []
-                for fname in zip_contents:
-                    if fname.endswith('.xtc'):
-                        new_ens_code = fname.split('.')[0]
-                        data_path = os.path.join(self.data_dir, fname)
-                        top_path = os.path.join(self.data_dir, f"{ens_code}.pdb")
-                        ensemble = Ensemble(ens_code=new_ens_code, data_path=data_path, top_path=top_path)
-                        new_ensembles.append(ensemble)
-                new_ensembles_mapping[ens_code] = new_ensembles
-                # Unzip
-                zip_ref.extractall(self.data_dir)
-                print(f"Extracted file {zip_file}.")
+        # Extract the .tar.gz file
+        if not os.path.exists(pdb_file):
+            extract_tar_gz(tar_gz_file, self.data_dir, pdb_filename)
+            print(f"Extracted file {pdb_filename}.")
+        else:
+            print(f"File {pdb_filename} already exists. Skipping extraction.")
+        
+        # Set the data path to the downloaded file
+        ensemble.data_path = pdb_file
+    
+    def download_from_atlas(self, ensemble: Ensemble):
+        pdb_pattern = r'^\d\w{3}_[A-Z]$'
+        ens_code = ensemble.ens_code
+        if not re.match(pdb_pattern, ens_code):
+            print(f"Entry {ens_code} does not match the PDB ID pattern and will be skipped.")
+            return []
+
+        zip_filename = f'{ens_code}.zip'
+        zip_file = os.path.join(self.data_dir, zip_filename)
+
+        if not os.path.exists(zip_file):
+            print(f"Downloading entry {ens_code} from Atlas.")
+            url = f"https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/{ens_code}/{ens_code}_protein.zip"
+            headers = {'accept': '*/*'}
+
+            response = self.api_client.perform_get_request(url, headers=headers)
+            if not response:
+                return
+            # Download and save the response content to a file
+            self.api_client.download_response_content(response, zip_file)
+            print(f"Downloaded file {zip_filename} from Atlas.")
+        else:
+            print("File already exists. Skipping download.")
+
+        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+            # Map reps to original ensemble code
+            zip_contents = zip_ref.namelist()
+            new_ensembles = []
+            for fname in zip_contents:
+                if fname.endswith('.xtc'):
+                    new_ens_code = fname.split('.')[0]
+                    data_path = os.path.join(self.data_dir, fname)
+                    top_path = os.path.join(self.data_dir, f"{ens_code}.pdb")
+                    ensemble = Ensemble(ens_code=new_ens_code, data_path=data_path, top_path=top_path)
+                    new_ensembles.append(ensemble)
+            # Unzip
+            zip_ref.extractall(self.data_dir)
+            print(f"Extracted file {zip_file}.")
 
             # Remove unused files.
             for unused_path in self.data_dir.glob("*.tpr"):
                 os.remove(unused_path)
             os.remove(os.path.join(self.data_dir, "README.txt"))
+
+        return new_ensembles
+
+    def load_trajectories(self): 
+        new_ensembles_mapping = {}
+        for ensemble in self.ensembles:
+            if ensemble.database == 'ped':
+                self.download_from_ped(ensemble)
+            elif ensemble.database == 'atlas':
+                new_ensembles = self.download_from_atlas(ensemble)
+                new_ensembles_mapping[ensemble.ens_code] = new_ensembles
 
         # Update self.ensembles using the mapping
         updated_ensembles = []
@@ -198,41 +183,11 @@ class EnsembleAnalysis:
             new_ensembles = new_ensembles_mapping.get(ensemble.ens_code, [ensemble])
             updated_ensembles.extend(new_ensembles)
         self.ensembles = updated_ensembles
-
-        return self.ensembles
-
-
-    def download_from_database(self, database: str =None):
-        """ 
-        Download ensembles from databases.
-
-        Parameters
-        ----------
-        database : str
-            Choose the database you want to download from ('ped'/'atlas').
-
-        Note
-        ----
-        For PED database:
-            The function only downloads ensembles in the PED ID format, which consists of a string starting with 'PED'
-            followed by a numeric identifier and 'e' followed by another numeric identifier.
-            Example: 'PED00423e001', 'PED00424e001'
-
-        For atlas database:
-            The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.
-            Example: '3a1g_B'
-        """
-        if database == "ped":
-            return self.download_from_ped()
-        elif database == "atlas":
-            return self.download_from_atlas()
-
-    def load_trajectories(self):
+        
         for ensemble in self.ensembles:
             ensemble.load_trajectory()
             ensemble.select_chain()
             ensemble.check_coarse_grained()
-        pass
 
     def random_sample_trajectories(self, sample_size: int):
         """
@@ -442,8 +397,7 @@ class EnsembleAnalysis:
         subsample_size: int, optional
             Optional parameter that specifies the trajectory subsample size. Default is None.
         """
-        self.download_from_database(database)
-        self.generate_trajectories()
+        self.load_trajectories()
         if subsample_size is not None:
             self.random_sample_trajectories(subsample_size)
         self.extract_features(**featurization_params)
