@@ -246,7 +246,6 @@ class EnsembleAnalysis:
             A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
         self._featurize(featurization=featurization, min_sep=min_sep, max_sep=max_sep)
-        self.concat_features = self._get_concat_features()
         self._create_all_labels()
         if normalize and featurization == "ca_dist":
             self._normalize_data()
@@ -378,7 +377,12 @@ class EnsembleAnalysis:
             - MDS: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html
             - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html
         """
-
+        # Check if all ensemble features have the same size
+        feature_sizes = set(ensemble.features.shape[1] for ensemble in self.ensembles)
+        if len(feature_sizes) > 1:
+            print("Error: Features from ensembles have different sizes. Cannot concatenate.")
+            return None
+        self.concat_features = self._get_concat_features()
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
         if method in ("pca","kpca"):

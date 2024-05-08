@@ -711,7 +711,7 @@ class Visualization:
         for ensemble in ensembles:
             dssp_data_dict[ensemble.ens_code] = mdtraj.compute_dssp(ensemble.trajectory)
         return dssp_data_dict
-
+    
     def relative_helix_content(self, save: bool = False) -> plt.Axes:
         """
         Plot the relative helix content in each ensemble for each residue. 
@@ -730,9 +730,11 @@ class Visualization:
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
+        
         protein_dssp_data_dict = self._get_protein_dssp_data_dict()
         fig, ax = plt.subplots(figsize=(10, 5))
-        bottom = np.zeros(next(iter(protein_dssp_data_dict.values())).shape[1])
+        bottom = np.zeros(max(data.shape[1] for data in protein_dssp_data_dict.values()))
+        max_length = len(bottom)
 
         for protein_name, dssp_data in protein_dssp_data_dict.items():
             # Count the occurrences of 'H' in each column
@@ -743,16 +745,22 @@ class Visualization:
             
             # Calculate the relative content of 'H' for each residue
             relative_h_content = h_counts / total_residues
+
+            # Interpolate or pad the relative content to ensure all ensembles have the same length
+            if len(relative_h_content) < max_length:
+                relative_h_content = np.pad(relative_h_content, (0, max_length - len(relative_h_content)), mode='constant')
             
             # Plot the relative content for each protein
-            ax.plot(range(len(relative_h_content)), relative_h_content,marker='o', linestyle='dashed' ,label=protein_name, alpha= 0.5)
+            x = np.arange(len(relative_h_content))
+            mask = x < len(dssp_data[0])  # Create a mask to filter out padded values
+            ax.plot(x[mask], relative_h_content[mask], marker='o', linestyle='dashed', label=protein_name, alpha=0.5)
 
             bottom += relative_h_content
         
         ax.set_xlabel('Residue Index')
         ax.set_ylabel('Relative Content of H (Helix)')
         ax.set_title('Relative Content of H in Each Residue in the ensembles')
-        ax.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
+        ax.legend(bbox_to_anchor=(1.04,0), loc="lower left")
         plt.show()
 
         self.figures["plot_relative_helix_content"] = fig
@@ -760,7 +768,7 @@ class Visualization:
             fig.savefig(os.path.join(self.plot_dir, 'relative_helix_' + self.analysis.ens_codes[0]))
         
         return ax
-
+    
     def _get_rg_data_dict(self):
         ensembles = self.analysis.ensembles
         rg_dict = {}
