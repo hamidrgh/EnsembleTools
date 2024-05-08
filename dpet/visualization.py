@@ -1479,22 +1479,25 @@ class Visualization:
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return
+        
         features_dict = self.analysis.get_features(featurization='phi_psi')
         
         f = ss_measure_disorder(features_dict)
         fig, axes = plt.subplots(1,1, figsize=figsize)
-        keys = list(features_dict.keys())
-        x = [i+1 for i in range(len(f[keys[0]]))]
-        for key, values in f.items():
-            axes.scatter(x, values, label= key)
         
-        axes.set_xticks([i for i in x if  i==1 or i%5 == 0])
+        for key, values in f.items():
+            x = np.array([i+1 for i in range(len(values))])
+            axes.plot(x, values, marker='o', linestyle='-', label=key)
+        
+        axes.set_xticks([i for i in x if i == 1 or i % 5 == 0])
         axes.set_xlabel("Residue Index")
         axes.set_ylabel("Site-specific flexibility parameter")
         axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        
         if pointer is not None:
             for res in pointer:
-                axes.axvline(x= res, c= 'blue', linestyle= '--', alpha= 0.3, linewidth= 1)
+                axes.axvline(x=res, c='blue', linestyle='--', alpha=0.3, linewidth=1)
+        
         plt.show()
 
         self.figures['plot_ss_flexibility_parameter'] = fig
@@ -1502,7 +1505,7 @@ class Visualization:
             fig.savefig(os.path.join(self.plot_dir, 'ss_flexibility_' + self.analysis.ens_codes[0]))  
 
         return axes
-            
+
     def ss_order_parameter(self, 
                             pointer: list = None , 
                             figsize: Tuple = (15,5), 
@@ -1538,8 +1541,9 @@ class Visualization:
         dict_order_parameter = site_specific_order_parameter(dict_ca_xyz)
         fig, axes = plt.subplots(1,1, figsize=figsize)
         keys = list(dict_order_parameter.keys())
-        x = [i+1 for i in range(len(dict_order_parameter[keys[0]]))]
+
         for key, values in dict_order_parameter.items():
+            x = np.array([i+1 for i in range(len(values))])
             axes.scatter(x, values, label= key, alpha= 0.5)
         axes.set_xticks([i for i in x if  i==1 or i%5 == 0])
         axes.set_xlabel("Residue Index")

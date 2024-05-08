@@ -30,7 +30,6 @@ class Ensemble():
         self.database = database
     
     def load_trajectory(self, data_dir: str):  
-        print(self.ens_code)
         if not os.path.exists(self.data_path):
             print(f"Data file or directory for ensemble {self.ens_code} doesn't exist.")
             return
