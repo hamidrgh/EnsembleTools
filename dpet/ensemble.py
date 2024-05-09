@@ -1,4 +1,5 @@
 import os
+import sys
 import mdtraj
 import numpy as np
 
@@ -7,7 +8,6 @@ from dpet.featurization.distances import featurize_ca_dist
 
 
 class Ensemble():
-
     """
     Represents a molecular dynamics ensemble.
 
@@ -21,13 +21,23 @@ class Ensemble():
         The path to the topology file associated with the ensemble. Default is None.
     database : str, optional
         The database from which to download the ensemble. Options are 'ped' and 'atlas'. Default is None.
+    chain_id : int, optional
+        MDtraj chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.
+
+    Notes
+    -----
+    - If the database is 'atlas', the ensemble code should be provided as a PDB ID with a chain identifier separated by an underscore. 
+    Example: '3a1g_B'.
+    - If the database is 'ped', the ensemble code should be in the PED ID format, which consists of a string starting with 'PED' followed by a numeric identifier,
+    and 'e' followed by another numeric identifier. Example: 'PED00423e001'.
+    - `chain_id` is always assigned in order to the actual chains. For example, chains A, C, D would have `chain_id` 0, 1, 2 respectively.
     """
-    
-    def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None) -> None:
+    def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None, chain_id: int = None) -> None:
         self.code = code
         self.data_path = data_path
         self.top_path = top_path
         self.database = database
+        self.chain_id = chain_id
     
     def load_trajectory(self, data_dir: str):  
         if not os.path.exists(self.data_path):
@@ -132,13 +142,23 @@ class Ensemble():
         # Get all unique chain IDs from the topology
         chain_ids = set(chain.index for chain in topology.chains)
 
-        print("Ensemble has multiple chains. Enter the chain ID you want to select. Available chain IDs:", chain_ids)
+        while True:
+            if self.chain_id is None:
+                print(f"Ensemble {self.code} has multiple chains. Enter the chain ID you want to select. Available chain IDs:", chain_ids)
+                sys.stdout.flush()  # Flush the output buffer
+                self.chain_id = input("Enter the chain ID you want to select: ")
 
-        selected_chain = input("Enter the chain ID you want to select: ")
+            try:
+                chain_id_input = int(self.chain_id)
+                if chain_id_input not in chain_ids:
+                    print("Invalid chain ID. Please select from the available options.")
+                    self.chain_id = None
+                else:
+                    break
+            except ValueError:
+                print("Invalid input. Please enter a valid chain ID.")
+                self.chain_id = None  # Reset chain_id to None to prompt again for input
 
-        if int(selected_chain) not in chain_ids:
-            print("Invalid chain ID. Please select from the available options.")
-            return
-
-        chain_A_indices = topology.select(f"chainid {selected_chain}")
+        chain_A_indices = topology.select(f"chainid {self.chain_id}")
         self.trajectory = self.trajectory.atom_slice(chain_A_indices)
+
