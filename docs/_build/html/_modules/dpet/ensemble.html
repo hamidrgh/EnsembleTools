@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dpet.ensemble &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Disordered Protein Ensemble Tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">EnsembleTools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Disordered Protein Ensemble Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dpet.ensemble</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for dpet.ensemble</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">mdtraj</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">dpet.featurization.angles</span> <span class="kn">import</span> <span class="n">featurize_a_angle</span><span class="p">,</span> <span class="n">featurize_phi_psi</span><span class="p">,</span> <span class="n">featurize_tr_angle</span>
+<span class="kn">from</span> <span class="nn">dpet.featurization.distances</span> <span class="kn">import</span> <span class="n">featurize_ca_dist</span>
+
+
+<div class="viewcode-block" id="Ensemble">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble.Ensemble">[docs]</a>
+<span class="k">class</span> <span class="nc">Ensemble</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a molecular dynamics ensemble.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    code : str</span>
+<span class="sd">        The code identifier of the ensemble.</span>
+
+<span class="sd">    data_path : str, optional</span>
+<span class="sd">        The path to the data file associated with the ensemble. Default is None.</span>
+
+<span class="sd">    top_path : str, optional</span>
+<span class="sd">        The path to the topology file associated with the ensemble. Default is None.</span>
+
+<span class="sd">    database : str, optional</span>
+<span class="sd">        The database from which to download the ensemble. Options are &#39;ped&#39; and &#39;atlas&#39;. Default is None.</span>
+<span class="sd">        </span>
+<span class="sd">    chain_id : int, optional</span>
+<span class="sd">        MDtraj chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - If the database is &#39;atlas&#39;, the ensemble code should be provided as a PDB ID with a chain identifier separated by an underscore. Example: &#39;3a1g_B&#39;.</span>
+<span class="sd">    - If the database is &#39;ped&#39;, the ensemble code should be in the PED ID format, which consists of a string starting with &#39;PED&#39; followed by a numeric identifier, and &#39;e&#39; followed by another numeric identifier. Example: &#39;PED00423e001&#39;.</span>
+<span class="sd">    - &#39;chain_id&#39; is always assigned in order to the actual chains. For example, chains A, C, D would have &#39;chain_id&#39; 0, 1, 2 respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">top_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_path</span> <span class="o">=</span> <span class="n">top_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span> <span class="o">=</span> <span class="n">chain_id</span>
+    
+<div class="viewcode-block" id="Ensemble.load_trajectory">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble.Ensemble.load_trajectory">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load a trajectory for the ensemble.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_dir : str</span>
+<span class="sd">            The directory where the trajectory data is located or where generated trajectory files will be saved.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method loads a trajectory for the ensemble based on the specified data path. </span>
+<span class="sd">        It supports loading from various file formats such as PDB, DCD, and XTC.</span>
+<span class="sd">        If the data path points to a directory, it searches for PDB files within the directory </span>
+<span class="sd">        and generates a trajectory from them.</span>
+<span class="sd">        Additional processing steps include checking for coarse-grained models and selecting a single chain if multiple chains were loaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data file or directory for ensemble </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2"> doesn&#39;t exist.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdb&#39;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating trajectory for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">)</span>
+            <span class="n">traj_dcd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s1">.dcd&#39;</span><span class="p">)</span>
+            <span class="n">traj_top</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s1">.top.pdb&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">traj_dcd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">traj_top</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated trajectory saved to </span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.dcd&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xtc&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">top_path</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading trajectory for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">top_path</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">):</span>
+            <span class="n">files_in_dir</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdb&#39;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">files_in_dir</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating trajectory for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+                <span class="n">full_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files_in_dir</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">full_paths</span><span class="p">)</span>
+                <span class="n">traj_dcd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s1">.dcd&#39;</span><span class="p">)</span>
+                <span class="n">traj_top</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s1">.top.pdb&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">traj_dcd</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">traj_top</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated trajectory saved to </span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No PDB files found in directory: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported file format for data file: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c1"># Save the trajectory for sampling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_trajectory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span>
+        <span class="c1"># Check if a coarse-grained model was loaded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_coarse_grained</span><span class="p">()</span>
+        <span class="c1"># Select a single chain if multiple chains were loaded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_select_chain</span><span class="p">()</span></div>
+
+            
+    <span class="k">def</span> <span class="nf">_check_coarse_grained</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">topology</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">atoms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">symbol</span> <span class="o">==</span> <span class="s1">&#39;C&#39;</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_selector</span> <span class="o">=</span> <span class="s2">&quot;protein&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">else</span> <span class="s2">&quot;name == CA&quot;</span>
+
+<div class="viewcode-block" id="Ensemble.random_sample_trajectory">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble.Ensemble.random_sample_trajectory">[docs]</a>
+    <span class="k">def</span> <span class="nf">random_sample_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Randomly sample frames from the original trajectory.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sample_size : int</span>
+<span class="sd">            The number of frames to sample from the original trajectory.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method samples frames randomly from the original trajectory and updates the ensemble&#39;s trajectory attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total_frames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_trajectory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sample_size</span> <span class="o">&gt;</span> <span class="n">total_frames</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sample size cannot be larger than the total number of frames in the trajectory.&quot;</span><span class="p">)</span>
+        <span class="n">random_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">total_frames</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">sample_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">(</span>
+            <span class="n">xyz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">original_trajectory</span><span class="o">.</span><span class="n">xyz</span><span class="p">[</span><span class="n">random_indices</span><span class="p">],</span>
+            <span class="n">topology</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">original_trajectory</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample_size</span><span class="si">}</span><span class="s2"> conformations sampled from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2"> trajectory.&quot;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Ensemble.extract_features">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble.Ensemble.extract_features">[docs]</a>
+    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract features from the trajectory using the specified featurization method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        featurization : str</span>
+<span class="sd">            The method to use for feature extraction. Supported options: &#39;ca_dist&#39;, &#39;phi_psi&#39;, &#39;a_angle&#39;, &#39;tr_omega&#39;, &#39;tr_phi&#39;, &#39;rg&#39;.</span>
+<span class="sd">        min_sep : int</span>
+<span class="sd">            The minimum sequence separation for angle calculations.</span>
+<span class="sd">        max_sep : int</span>
+<span class="sd">            The maximum sequence separation for angle calculations.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method extracts features from the trajectory using the specified featurization method and updates the ensemble&#39;s features attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Performing feature extraction for Ensemble: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">,</span> <span class="n">get_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Transformed ensemble shape:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Ensemble.get_features">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble.Ensemble.get_features">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">get_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Sequence</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get features from the trajectory using the specified featurization method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        featurization : str</span>
+<span class="sd">            The method to use for feature extraction. Supported options: &#39;ca_dist&#39;, &#39;phi_psi&#39;, &#39;a_angle&#39;, &#39;tr_omega&#39;, &#39;tr_phi&#39;, &#39;rg&#39;.</span>
+<span class="sd">        min_sep : int</span>
+<span class="sd">            The minimum sequence separation for angle calculations.</span>
+<span class="sd">        max_sep : int</span>
+<span class="sd">            The maximum sequence separation for angle calculations.</span>
+<span class="sd">        get_names : bool, optional</span>
+<span class="sd">            Whether to return feature names along with features. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        features : Sequence</span>
+<span class="sd">            The extracted features.</span>
+<span class="sd">        names : Sequence or None</span>
+<span class="sd">            If `get_names` is True, returns a sequence of feature names corresponding to the extracted features. Otherwise, returns None.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method extracts features from the trajectory using the specified featurization method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">featurize_ca_dist</span><span class="p">(</span>
+                <span class="n">traj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">,</span> 
+                <span class="n">get_names</span><span class="o">=</span><span class="n">get_names</span><span class="p">,</span>
+                <span class="n">atom_selector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_selector</span><span class="p">,</span>
+                <span class="n">min_sep</span><span class="o">=</span><span class="n">min_sep</span><span class="p">,</span>
+                <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;phi_psi&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">featurize_phi_psi</span><span class="p">(</span>
+                <span class="n">traj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">,</span> 
+                <span class="n">get_names</span><span class="o">=</span><span class="n">get_names</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;a_angle&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">featurize_a_angle</span><span class="p">(</span>
+                <span class="n">traj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">,</span> 
+                <span class="n">get_names</span><span class="o">=</span><span class="n">get_names</span><span class="p">,</span> 
+                <span class="n">atom_selector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_selector</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">featurize_tr_angle</span><span class="p">(</span>
+                <span class="n">traj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;omega&quot;</span><span class="p">,</span>
+                <span class="n">get_names</span><span class="o">=</span><span class="n">get_names</span><span class="p">,</span>
+                <span class="n">min_sep</span><span class="o">=</span><span class="n">min_sep</span><span class="p">,</span>
+                <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">featurize_tr_angle</span><span class="p">(</span>
+                <span class="n">traj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span>
+                <span class="n">get_names</span><span class="o">=</span><span class="n">get_names</span><span class="p">,</span>
+                <span class="n">min_sep</span><span class="o">=</span><span class="n">min_sep</span><span class="p">,</span>
+                <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;rg&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_rg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">),</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">get_names</span> <span class="k">else</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_rg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Unsupported feature extraction method.&quot;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Ensemble.normalize_features">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble.Ensemble.normalize_features">[docs]</a>
+    <span class="k">def</span> <span class="nf">normalize_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">std</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Normalize the extracted features using the provided mean and standard deviation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mean : float</span>
+<span class="sd">            The mean value used for normalization.</span>
+<span class="sd">        std : float</span>
+<span class="sd">            The standard deviation used for normalization.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method normalizes the ensemble&#39;s features using the provided mean and standard deviation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_select_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">topology</span>
+
+        <span class="k">if</span> <span class="n">topology</span><span class="o">.</span><span class="n">n_chains</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Get all unique chain IDs from the topology</span>
+        <span class="n">chain_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ensemble </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2"> has multiple chains. Enter the chain ID you want to select. Available chain IDs:&quot;</span><span class="p">,</span> <span class="n">chain_ids</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>  <span class="c1"># Flush the output buffer</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter the chain ID you want to select: &quot;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">chain_id_input</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">chain_id_input</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chain_ids</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid chain ID. Please select from the available options.&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid input. Please enter a valid chain ID.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Reset chain_id to None to prompt again for input</span>
+
+        <span class="n">chain_A_indices</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chainid </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">atom_slice</span><span class="p">(</span><span class="n">chain_A_indices</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson, Nikola Ivanović.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

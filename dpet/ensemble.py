@@ -16,21 +16,23 @@ class Ensemble():
     ----------
     code : str
         The code identifier of the ensemble.
+
     data_path : str, optional
         The path to the data file associated with the ensemble. Default is None.
+
     top_path : str, optional
         The path to the topology file associated with the ensemble. Default is None.
+
     database : str, optional
         The database from which to download the ensemble. Options are 'ped' and 'atlas'. Default is None.
+        
     chain_id : int, optional
         MDtraj chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.
 
     Notes
     -----
-    - If the database is 'atlas', the ensemble code should be provided as a PDB ID with a chain identifier separated by an underscore. 
-    Example: '3a1g_B'.
-    - If the database is 'ped', the ensemble code should be in the PED ID format, which consists of a string starting with 'PED' followed by a numeric identifier,
-    and 'e' followed by another numeric identifier. Example: 'PED00423e001'.
+    - If the database is 'atlas', the ensemble code should be provided as a PDB ID with a chain identifier separated by an underscore. Example: '3a1g_B'.
+    - If the database is 'ped', the ensemble code should be in the PED ID format, which consists of a string starting with 'PED' followed by a numeric identifier, and 'e' followed by another numeric identifier. Example: 'PED00423e001'.
     - 'chain_id' is always assigned in order to the actual chains. For example, chains A, C, D would have 'chain_id' 0, 1, 2 respectively.
     """
     def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None, chain_id: int = None) -> None:

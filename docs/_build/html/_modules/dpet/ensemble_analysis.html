@@ -74,8 +74,7 @@
   <h1>Source code for dpet.ensemble_analysis</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">from</span> <span class="nn">dpet.data.api_client</span> <span class="kn">import</span> <span class="n">APIClient</span>
 <span class="kn">from</span> <span class="nn">dpet.ensemble</span> <span class="kn">import</span> <span class="n">Ensemble</span>
@@ -91,22 +90,33 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Data analysis pipeline for ensemble data.</span>
 
-<span class="sd">    Initializes with a list of ensemble codes and a directory path</span>
+<span class="sd">    Initializes with a list of ensemble objects and a directory path</span>
 <span class="sd">    for storing data.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">        ens_codes (list[str]): List of ensemble codes.</span>
-<span class="sd">        data_dir (str): Directory path for storing data.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ensembles (list[Ensemble]): List of ensembles.</span>
+<span class="sd">    output_dir (str): Directory path for storing data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ens_codes</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">data_dir</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensembles</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="n">Ensemble</span><span class="p">],</span> <span class="n">output_dir</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span> <span class="o">=</span> <span class="n">ens_codes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Ensemble</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Ensemble</span><span class="p">]</span> <span class="o">=</span> <span class="n">ensembles</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ens_codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the ensemble codes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of ensemble codes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">]:</span>
@@ -118,7 +128,7 @@
 <span class="sd">        Dict[str, mdtraj.Trajectory]</span>
 <span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">ens_id</span><span class="p">:</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">trajectory</span> <span class="k">for</span> <span class="n">ens_id</span><span class="p">,</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">:</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">trajectory</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">}</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">features</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
@@ -130,174 +140,127 @@
 <span class="sd">        Dict[str, np.ndarray]</span>
 <span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">ens_id</span><span class="p">:</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">features</span> <span class="k">for</span> <span class="n">ens_id</span><span class="p">,</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">:</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">features</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">}</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reduce_dim_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the transformed data associated with each ensemble.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, np.ndarray]</span>
+<span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">:</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">reduce_dim_data</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;api_client&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">close_session</span><span class="p">()</span>
     
-<div class="viewcode-block" id="EnsembleAnalysis.download_from_ped">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.download_from_ped">[docs]</a>
-    <span class="k">def</span> <span class="nf">download_from_ped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Automate Downloading ensembles using PED API </span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-<span class="sd">        The function only downloads ensembles in the PED ID format, which consists of a string starting with &#39;PED&#39;</span>
-<span class="sd">        followed by a numeric identifier and &#39;e&#39; followed by another numeric identifier.</span>
-<span class="sd">        Example: &#39;PED00423e001&#39;, &#39;PED00424e001&#39;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_download_from_ped</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensemble</span><span class="p">:</span> <span class="n">Ensemble</span><span class="p">):</span>
         <span class="n">ped_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^(PED\d</span><span class="si">{5}</span><span class="s1">)(e\d</span><span class="si">{3}</span><span class="s1">)$&#39;</span>
 
-        <span class="c1"># Filter the ens_codes list using regex</span>
-        <span class="k">for</span> <span class="n">ens_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
-            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">ped_pattern</span><span class="p">,</span> <span class="n">ens_code</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> does not match the PED ID pattern and will be skipped.&quot;</span><span class="p">)</span>
-                <span class="k">continue</span>
-            
-            <span class="n">ped_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">ensemble_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">tar_gz_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s1">.tar.gz&#39;</span>
-            <span class="n">tar_gz_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">tar_gz_filename</span><span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">ped_pattern</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> does not match the PED ID pattern and will be skipped.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="n">ped_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ensemble_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">tar_gz_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.tar.gz&#39;</span>
+        <span class="n">tar_gz_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">tar_gz_filename</span><span class="p">)</span>
 
-            <span class="n">pdb_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s1">.pdb&#39;</span>
-            <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">pdb_filename</span><span class="p">)</span>
+        <span class="n">pdb_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.pdb&#39;</span>
+        <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">pdb_filename</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tar_gz_file</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
-                <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://deposition.proteinensemble.org/api/v1/entries/</span><span class="si">{</span><span class="n">ped_id</span><span class="si">}</span><span class="s1">/ensembles/</span><span class="si">{</span><span class="n">ensemble_id</span><span class="si">}</span><span class="s1">/ensemble-pdb&#39;</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading entry </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> from PED.&quot;</span><span class="p">)</span>
-                <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;*/*&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tar_gz_file</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://deposition.proteinensemble.org/api/v1/entries/</span><span class="si">{</span><span class="n">ped_id</span><span class="si">}</span><span class="s1">/ensembles/</span><span class="si">{</span><span class="n">ensemble_id</span><span class="si">}</span><span class="s1">/ensemble-pdb&#39;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> from PED.&quot;</span><span class="p">)</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;*/*&#39;</span><span class="p">}</span>
 
-                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">perform_get_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
-                    <span class="c1"># Download and save the response content to a file</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">download_response_content</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">tar_gz_file</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded file </span><span class="si">{</span><span class="n">tar_gz_filename</span><span class="si">}</span><span class="s2"> from PED.&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ensemble </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> already downloaded. Skipping.&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Extract the .tar.gz file</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
-                <span class="n">extract_tar_gz</span><span class="p">(</span><span class="n">tar_gz_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">pdb_filename</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted file </span><span class="si">{</span><span class="n">pdb_filename</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">pdb_filename</span><span class="si">}</span><span class="s2"> already exists. Skipping extraction.&quot;</span><span class="p">)</span></div>
-
-    
-<div class="viewcode-block" id="EnsembleAnalysis.download_from_atlas">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.download_from_atlas">[docs]</a>
-    <span class="k">def</span> <span class="nf">download_from_atlas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">        Automate Downloading MD ensembles from Atlas. </span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-<span class="sd">        The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.</span>
-<span class="sd">        Example: &#39;3a1g_B&#39;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pdb_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\d\w</span><span class="si">{3}</span><span class="s1">_[A-Z]$&#39;</span>
-        <span class="n">new_ens_codes_mapping</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">ens_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pdb_pattern</span><span class="p">,</span> <span class="n">ens_code</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> does not match the PDB ID pattern and will be skipped.&quot;</span><span class="p">)</span>
-                <span class="k">continue</span>
-
-            <span class="n">zip_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s1">.zip&#39;</span>
-            <span class="n">zip_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">zip_filename</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">zip_file</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading entry </span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2"> from Atlas.&quot;</span><span class="p">)</span>
-                <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2">_protein.zip&quot;</span>
-                <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;*/*&#39;</span><span class="p">}</span>
-
-                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">perform_get_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="p">:</span>
-                    <span class="k">continue</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">perform_get_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">:</span>
                 <span class="c1"># Download and save the response content to a file</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">download_response_content</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">zip_file</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded file </span><span class="si">{</span><span class="n">zip_filename</span><span class="si">}</span><span class="s2"> from Atlas.&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File already exists. Skipping download.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">download_response_content</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">tar_gz_file</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded file </span><span class="si">{</span><span class="n">tar_gz_filename</span><span class="si">}</span><span class="s2"> from PED.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ensemble </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> already downloaded. Skipping.&quot;</span><span class="p">)</span>
 
-            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
-                <span class="c1"># Map reps to original ensemble code</span>
-                <span class="n">zip_contents</span> <span class="o">=</span> <span class="n">zip_ref</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span>
-                <span class="n">new_ens_codes</span> <span class="o">=</span> <span class="p">[</span><span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">zip_contents</span> <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xtc&#39;</span><span class="p">)]</span>
-                <span class="n">new_ens_codes_mapping</span><span class="p">[</span><span class="n">ens_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_ens_codes</span>
-                <span class="c1"># Unzip</span>
-                <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted file </span><span class="si">{</span><span class="n">zip_file</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="c1"># Extract the .tar.gz file</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
+            <span class="n">extract_tar_gz</span><span class="p">(</span><span class="n">tar_gz_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">pdb_filename</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted file </span><span class="si">{</span><span class="n">pdb_filename</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">pdb_filename</span><span class="si">}</span><span class="s2"> already exists. Skipping extraction.&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Set the data path to the downloaded file</span>
+        <span class="c1"># If the trajectory is already generated it will be used instead of the pdb file</span>
+        <span class="n">traj_dcd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.dcd&#39;</span><span class="p">)</span>
+        <span class="n">traj_top</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.top.pdb&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">traj_dcd</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">traj_top</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trajectory already exists for ensemble </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">traj_dcd</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">top_path</span> <span class="o">=</span> <span class="n">traj_top</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">pdb_file</span>
+    
+    <span class="k">def</span> <span class="nf">_download_from_atlas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensemble</span><span class="p">:</span> <span class="n">Ensemble</span><span class="p">):</span>
+        <span class="n">pdb_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\d\w</span><span class="si">{3}</span><span class="s1">_[A-Z]$&#39;</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">code</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pdb_pattern</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> does not match the PDB ID pattern and will be skipped.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">zip_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.zip&#39;</span>
+        <span class="n">zip_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">zip_filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">zip_file</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> from Atlas.&quot;</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">_protein.zip&quot;</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;*/*&#39;</span><span class="p">}</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">perform_get_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="c1"># Download and save the response content to a file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">download_response_content</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">zip_file</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded file </span><span class="si">{</span><span class="n">zip_filename</span><span class="si">}</span><span class="s2"> from Atlas.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File already exists. Skipping download.&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+            <span class="c1"># Map reps to original ensemble code</span>
+            <span class="n">zip_contents</span> <span class="o">=</span> <span class="n">zip_ref</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span>
+            <span class="n">new_ensembles</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">zip_contents</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xtc&#39;</span><span class="p">):</span>
+                    <span class="n">new_code</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+                    <span class="n">top_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">.pdb&quot;</span><span class="p">)</span>
+                    <span class="n">ensemble</span> <span class="o">=</span> <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">new_code</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">top_path</span><span class="o">=</span><span class="n">top_path</span><span class="p">)</span>
+                    <span class="n">new_ensembles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ensemble</span><span class="p">)</span>
+            <span class="c1"># Unzip</span>
+            <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted file </span><span class="si">{</span><span class="n">zip_file</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
             <span class="c1"># Remove unused files.</span>
-            <span class="k">for</span> <span class="n">unused_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.tpr&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">unused_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.tpr&quot;</span><span class="p">):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">unused_path</span><span class="p">)</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;README.txt&quot;</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;README.txt&quot;</span><span class="p">))</span>
 
-            <span class="c1"># Copy and rename topology file</span>
-            <span class="n">old_pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ens_code</span><span class="si">}</span><span class="s2">.pdb&quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">new_code</span> <span class="ow">in</span> <span class="n">new_ens_codes</span><span class="p">:</span>
-                <span class="n">new_pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_code</span><span class="si">}</span><span class="s2">.top.pdb&quot;</span><span class="p">)</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">old_pdb_file</span><span class="p">,</span> <span class="n">new_pdb_file</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copied and renamed </span><span class="si">{</span><span class="n">old_pdb_file</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_pdb_file</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-            <span class="c1"># Delete old topology file</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">old_pdb_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_ensembles</span>
 
-        <span class="c1"># Update self.ens_codes using the mapping</span>
-        <span class="n">updated_ens_codes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">old_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
-            <span class="n">updated_ens_codes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_ens_codes_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">old_code</span><span class="p">,</span> <span class="p">[</span><span class="n">old_code</span><span class="p">]))</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span> <span class="o">=</span> <span class="n">updated_ens_codes</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analysing ensembles:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="EnsembleAnalysis.download_from_database">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.download_from_database">[docs]</a>
-    <span class="k">def</span> <span class="nf">download_from_database</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">        Download ensembles from databases.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        database : str</span>
-<span class="sd">            Choose the database you want to download from (&#39;ped&#39;/&#39;atlas&#39;).</span>
-
-<span class="sd">        Note</span>
-<span class="sd">        ----</span>
-<span class="sd">        For PED database:</span>
-<span class="sd">            The function only downloads ensembles in the PED ID format, which consists of a string starting with &#39;PED&#39;</span>
-<span class="sd">            followed by a numeric identifier and &#39;e&#39; followed by another numeric identifier.</span>
-<span class="sd">            Example: &#39;PED00423e001&#39;, &#39;PED00424e001&#39;</span>
-
-<span class="sd">        For atlas database:</span>
-<span class="sd">            The function only downloads ensembles provided as PDB ID with a chain identifier separated by an underscore.</span>
-<span class="sd">            Example: &#39;3a1g_B&#39;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;ped&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">download_from_ped</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">database</span> <span class="o">==</span> <span class="s2">&quot;atlas&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">download_from_atlas</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="EnsembleAnalysis.generate_trajectories">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.generate_trajectories">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">]:</span>
+<div class="viewcode-block" id="EnsembleAnalysis.load_trajectories">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.load_trajectories">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load trajectory files into mdtraj objects.</span>
-<span class="sd">        </span>
-<span class="sd">        Supported file formats:</span>
-<span class="sd">            1. [ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)</span>
-<span class="sd">            2. [ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)</span>
-<span class="sd">            3. [ens_code].pdb</span>
-<span class="sd">            4. Directory [ens_code] containing several .pdb files</span>
-<span class="sd">        </span>
-<span class="sd">        For each ensemble code (ens_code):</span>
-<span class="sd">            - If both trajectory (.dcd or .xtc) and topology (.top.pdb) files exist, load the trajectory.</span>
-<span class="sd">            - If only a .pdb file exists, generate trajectory and topology files from the .pdb file.</span>
-<span class="sd">            - If a directory [ens_code] exists containing .pdb files, generate trajectory and topology files from the directory.</span>
+<span class="sd">        Load trajectories for all ensembles.</span>
+
+<span class="sd">        This method iterates over each ensemble in the `ensembles` list and downloads</span>
+<span class="sd">        data files if they are not already available. </span>
+<span class="sd">        Trajectories are then loaded for each ensemble.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -306,17 +269,30 @@
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        Using &#39;download_from_database&#39; transforms the downloaded data into the appropriate format.</span>
+<span class="sd">        This method assumes that the `output_dir` attribute of the class specifies the directory</span>
+<span class="sd">        where trajectory files will be saved or extracted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">ens_code</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
-            <span class="n">ensemble</span> <span class="o">=</span> <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
-            <span class="n">ensemble</span><span class="o">.</span><span class="n">load_trajectory</span><span class="p">()</span>
-            <span class="n">ensemble</span><span class="o">.</span><span class="n">select_chain</span><span class="p">()</span>
-            <span class="n">ensemble</span><span class="o">.</span><span class="n">check_coarse_grained</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">[</span><span class="n">ens_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">ensemble</span>
+        <span class="n">new_ensembles_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="s1">&#39;ped&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_download_from_ped</span><span class="p">(</span><span class="n">ensemble</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="s1">&#39;atlas&#39;</span><span class="p">:</span>
+                <span class="n">new_ensembles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_from_atlas</span><span class="p">(</span><span class="n">ensemble</span><span class="p">)</span>
+                <span class="n">new_ensembles_mapping</span><span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_ensembles</span>
+
+        <span class="c1"># Update self.ensembles using the mapping</span>
+        <span class="n">updated_ensembles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">new_ensembles</span> <span class="o">=</span> <span class="n">new_ensembles_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="p">[</span><span class="n">ensemble</span><span class="p">])</span>
+            <span class="n">updated_ensembles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_ensembles</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span> <span class="o">=</span> <span class="n">updated_ensembles</span>
+        
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">load_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+        
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span></div>
 
-            
+
 <div class="viewcode-block" id="EnsembleAnalysis.random_sample_trajectories">
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories">[docs]</a>
     <span class="k">def</span> <span class="nf">random_sample_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
@@ -329,7 +305,7 @@
 <span class="sd">        sample_size: int</span>
 <span class="sd">            Number of conformations sampled from the ensemble. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
             <span class="n">ensemble</span><span class="o">.</span><span class="n">random_sample_trajectory</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span></div>
 
@@ -360,7 +336,6 @@
 <span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_featurize</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="o">=</span><span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_all_labels</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_data</span><span class="p">()</span>
@@ -378,29 +353,29 @@
 <span class="sd">        bool</span>
 <span class="sd">            True if at least one ensemble is coarse-grained, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists_coarse_grained</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">featurization</span> <span class="o">=</span> <span class="n">featurization</span>
-        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
             <span class="n">ensemble</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature names:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_create_all_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">ens_id</span><span class="p">,</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
             <span class="n">num_data_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">ens_id</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_data_points</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_data_points</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
-        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
             <span class="n">ensemble</span><span class="o">.</span><span class="n">normalize_features</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_calculate_rg_for_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajectory</span><span class="p">:</span><span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">):</span>
@@ -418,7 +393,7 @@
 <span class="sd">            A list of Rg values for each conformation in the loaded ensembles, in Angstrom.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rg_values_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
             <span class="n">traj</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">trajectory</span>
             <span class="n">rg_values_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_calculate_rg_for_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">))</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rg_values_list</span><span class="p">]</span>
@@ -428,7 +403,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot fit on ensembles that were not provided as input.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">fit_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fit_on</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span>
-        <span class="n">concat_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span> <span class="k">for</span> <span class="n">ens_code</span><span class="p">,</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">ens_code</span> <span class="ow">in</span> <span class="n">fit_on</span><span class="p">]</span>
+        <span class="n">concat_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span> <span class="k">if</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">code</span> <span class="ow">in</span> <span class="n">fit_on</span><span class="p">]</span>
         <span class="n">concat_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Concatenated featurized ensemble shape:&quot;</span><span class="p">,</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">concat_features</span>
@@ -498,14 +473,18 @@
 <span class="sd">            - MDS: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html</span>
 <span class="sd">            - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        <span class="c1"># Check if all ensemble features have the same size</span>
+        <span class="n">feature_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Features from ensembles have different sizes. Cannot concatenate.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span> <span class="o">=</span> <span class="n">DimensionalityReductionFactory</span><span class="o">.</span><span class="n">get_reducer</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">=</span> <span class="n">method</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span><span class="s2">&quot;kpca&quot;</span><span class="p">):</span>
             <span class="n">fit_on_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">(</span><span class="n">fit_on</span><span class="o">=</span><span class="n">fit_on</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">fit_on_data</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_data</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
                 <span class="n">ensemble</span><span class="o">.</span><span class="n">reduce_dim_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reduced dimensionality ensemble shape:&quot;</span><span class="p">,</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">reduce_dim_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">)</span>
@@ -516,7 +495,7 @@
 
 <div class="viewcode-block" id="EnsembleAnalysis.execute_pipeline">
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">[docs]</a>
-    <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute the data analysis pipeline end-to-end. The pipeline includes:</span>
 <span class="sd">            1. Download from database (optional)</span>
@@ -534,14 +513,10 @@
 <span class="sd">        reduce_dim_params: dict</span>
 <span class="sd">            Parameters for dimensionality reduction. The only required parameter is &quot;method&quot;,</span>
 <span class="sd">            which can be &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; or &quot;kpca&quot;.</span>
-<span class="sd">        database: str, optional</span>
-<span class="sd">            Optional parameter that specifies the database from which the entries should be downloaded.</span>
-<span class="sd">            Options are &quot;ped&quot; and &quot;atlas&quot;. Default is None.</span>
 <span class="sd">        subsample_size: int, optional</span>
 <span class="sd">            Optional parameter that specifies the trajectory subsample size. Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">download_from_database</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">generate_trajectories</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_trajectories</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">subsample_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">random_sample_trajectories</span><span class="p">(</span><span class="n">subsample_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="o">**</span><span class="n">featurization_params</span><span class="p">)</span>
@@ -575,9 +550,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
         
         <span class="n">features_dict</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">ens_code</span><span class="p">,</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">features</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="o">=</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
-            <span class="n">features_dict</span><span class="p">[</span><span class="n">ens_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="o">=</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
+            <span class="n">features_dict</span><span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span>
         <span class="k">return</span> <span class="n">features_dict</span></div>
 </div>
 

@@ -124,7 +124,7 @@ class EnsembleAnalysis:
         traj_dcd = os.path.join(self.output_dir, f'{code}.dcd')
         traj_top = os.path.join(self.output_dir, f'{code}.top.pdb')
         if os.path.exists(traj_dcd) and os.path.exists(traj_top):
-            print(f'Trajectory already exists for ensemble {code}. Loading trajectory.')
+            print(f'Trajectory already exists for ensemble {code}.')
             ensemble.data_path = traj_dcd
             ensemble.top_path = traj_top
         else:

@@ -21,6 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction to Disordered Protein Ensemble Tools" href="introduction.html" />
     <link rel="prev" title="dpet.dimensionality_reduction package" href="dpet.dimensionality_reduction.html" /> 
 </head>
 
@@ -45,36 +46,22 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="modules.html">EnsembleTools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">EnsembleTools</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dpet.html">dpet package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="dpet.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="dpet.dimensionality_reduction.html">dpet.dimensionality_reduction package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">dpet.featurization package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dpet.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dpet.html#module-dpet.ensemble_analysis">dpet.ensemble_analysis module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dpet.html#module-dpet.ensemble">dpet.ensemble module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dpet.html#module-dpet.visualization">dpet.visualization module</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dpet.dimensionality_reduction.html">dpet.dimensionality_reduction package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">dpet.featurization package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-dpet.featurization.angles">dpet.featurization.angles module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_a_angle"><code class="docutils literal notranslate"><span class="pre">featurize_a_angle()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_phi_psi"><code class="docutils literal notranslate"><span class="pre">featurize_phi_psi()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_tr_angle"><code class="docutils literal notranslate"><span class="pre">featurize_tr_angle()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_tr_omega"><code class="docutils literal notranslate"><span class="pre">featurize_tr_omega()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.featurize_tr_phi"><code class="docutils literal notranslate"><span class="pre">featurize_tr_phi()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.get_angles"><code class="docutils literal notranslate"><span class="pre">get_angles()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.angles.get_dihedrals"><code class="docutils literal notranslate"><span class="pre">get_dihedrals()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-dpet.featurization.distances">dpet.featurization.distances module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.distances.calc_ca_dmap"><code class="docutils literal notranslate"><span class="pre">calc_ca_dmap()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.distances.calc_com_dmap"><code class="docutils literal notranslate"><span class="pre">calc_com_dmap()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.distances.featurize_ca_dist"><code class="docutils literal notranslate"><span class="pre">featurize_ca_dist()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.distances.featurize_com_dist"><code class="docutils literal notranslate"><span class="pre">featurize_com_dist()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-dpet.featurization.utils">dpet.featurization.utils module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.utils.get_max_sep"><code class="docutils literal notranslate"><span class="pre">get_max_sep()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dpet.featurization.utils.get_triu_indices"><code class="docutils literal notranslate"><span class="pre">get_triu_indices()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-dpet.featurization">Module contents</a></li>
-</ul>
-</li>
 </ul>
 
         </div>
@@ -91,6 +78,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">EnsembleTools</a></li>
+          <li class="breadcrumb-item"><a href="dpet.html">dpet package</a></li>
       <li class="breadcrumb-item active">dpet.featurization package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/dpet.featurization.rst.txt" rel="nofollow"> View page source</a>
@@ -338,6 +327,7 @@ If <cite>get_names</cite> is True, returns a tuple with feature names along with
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="dpet.dimensionality_reduction.html" class="btn btn-neutral float-left" title="dpet.dimensionality_reduction package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="introduction.html" class="btn btn-neutral float-right" title="Introduction to Disordered Protein Ensemble Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

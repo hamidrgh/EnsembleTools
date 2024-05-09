@@ -96,39 +96,21 @@
 <section id="basic-workflow-example">
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">Basic Workflow Example</a><a class="headerlink" href="#basic-workflow-example" title="Link to this heading"></a></h2>
 <p>TODO: Perhaps insert a graphical representation of the pipeline steps in order</p>
-<p>The first step of the pipeline is to instantiate the ‘EnsembleAnalysis’
-class by providing a list of ensemble codes to analyse and the path to
-the data directory.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ens_codes</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;PED00423e001&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;PED00424e001&#39;</span>
+<p>The first step of the pipeline is to instantiate the EnsembleAnalysis class by providing a list of Ensembles to analyze and the path to the output directory.
+Different input types are supported. Ensembles can be loaded from a data file (for example, a PDB file), a trajectory file with an accompanying topology file,
+or the ensembles can be downloaded from a database.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;PED00423e001&#39;</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/data/file&#39;</span><span class="p">)</span>
+    <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;PED00424e001&#39;</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/traj/file&#39;</span><span class="p">,</span> <span class="n">top_path</span> <span class="o">=</span> <span class="s1">&#39;path/to/top/file&#39;</span><span class="p">)</span>
 <span class="p">]</span>
-<span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;path/to/data/directory&#39;</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s1">&#39;path/to/output/directory&#39;</span>
 
-<span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ens_codes</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt>The pipeline expects ensemble data in the ‘data_dir’ directory in one of the following formats:</dt><dd><ol class="arabic simple">
-<li><p>[ens_code].dcd (trajectory file) + [ens_code].top.pdb (topology file)</p></li>
-<li><p>[ens_code].xtc (trajectory file) + [ens_code].top.pdb (topology file)</p></li>
-<li><p>[ens_code].pdb</p></li>
-<li><p>Directory [ens_code] containing several .pdb files</p></li>
-</ol>
-</dd>
-</dl>
-<p>Where [ens_code] corresponds to the input ensemble codes.</p>
-<p>Alternatively, it is possible to download the ensemble files and store them in the data directory
-with the following function call, by providing the appropriate database.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">download_from_database</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The next step is to generate MD trajectories from the ensemble files (or load them if trajectory data exists).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">generate_trajectories</span><span class="p">()</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ensembles</span> <span class="o">=</span> <span class="n">ensembles</span><span class="p">,</span> <span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span><span class="p">)</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">load_trajectories</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Optionally, a random number of conformations of given size is sampled from the trajectories for further analysis.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">random_sample_trajectories</span><span class="p">(</span><span class="n">sample_size</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">random_sample_trajectories</span><span class="p">(</span><span class="n">sample_size</span> <span class="o">=</span> <span class="mi">200</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, feature extraction is performed on the ensemble trajectories by selecting one of the supported methods.
@@ -146,7 +128,7 @@ best results are kept. By setting circular to True, unit vector distance is used
 <p>Once the data transformation pipeline is completed, the Visualization class is instantiated to analyse the results.
 In the example below, the figure is saved in the data directory.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span> <span class="o">=</span> <span class="n">Visualization</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
-<span class="n">visualization</span><span class="o">.</span><span class="n">tsne_scatter_plot</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">visualization</span><span class="o">.</span><span class="n">tsne_scatter</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="images/tsnep10_kmeans2_scatter.png" src="images/tsnep10_kmeans2_scatter.png" />
@@ -163,16 +145,16 @@ In the example below, the figure is saved in the data directory.</p>
 </ol>
 </dd>
 </dl>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ens_codes</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;3a1g_B&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Ensemble</span><span class="p">(</span><span class="s1">&#39;3a1g_B&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;atlas&#39;</span><span class="p">)</span>
 <span class="p">]</span>
-<span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;path/to/data/directory&#39;</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s1">&#39;path/to/output/directory&#39;</span>
 
 <span class="n">featurization_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;featurization&#39;</span><span class="p">:</span> <span class="s1">&#39;ca_dist&#39;</span><span class="p">}</span>
 <span class="n">reduce_dim_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;dimenfix&#39;</span><span class="p">,</span> <span class="s1">&#39;range_n_clusters&#39;</span><span class="p">:[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]}</span>
 
-<span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ens_codes</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
-<span class="n">analysis</span><span class="o">.</span><span class="n">execute_pipeline</span><span class="p">(</span><span class="n">featurization_params</span><span class="o">=</span><span class="n">featurization_params</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="o">=</span><span class="n">reduce_dim_params</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;atlas&#39;</span><span class="p">,</span> <span class="n">subsample_size</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ensembles</span> <span class="o">=</span> <span class="n">ensembles</span><span class="p">,</span> <span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span><span class="p">)</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">execute_pipeline</span><span class="p">(</span><span class="n">featurization_params</span> <span class="o">=</span> <span class="n">featurization_params</span><span class="p">,</span> <span class="n">reduce_dim_params</span> <span class="o">=</span> <span class="n">reduce_dim_params</span><span class="p">,</span> <span class="n">subsample_size</span><span class="o">=</span>  <span class="mi">200</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>As in the previous example, the transformed ensemble data can be visualised with supported plot functions.</p>
@@ -186,14 +168,15 @@ In the example below, the figure is saved in the data directory.</p>
 <h2><a class="toc-backref" href="#id3" role="doc-backlink">Plot Example</a><a class="headerlink" href="#plot-example" title="Link to this heading"></a></h2>
 <p>In this example, analysis is performed on the same ensembles from Atlas, extracting Cα-Cα distances as features and
 transforming them using PCA, which is fit only on replicate n°1 (3a1g_B_prod_R1_fit).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ens_codes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;3a1g_B&#39;</span><span class="p">]</span>
-<span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;path/to/data/directory&#39;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Ensemble</span><span class="p">(</span><span class="s1">&#39;3a1g_B&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;atlas&#39;</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s1">&#39;path/to/output/directory&#39;</span>
 
-<span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ens_codes</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ensembles</span> <span class="o">=</span> <span class="n">ensembles</span><span class="p">,</span> <span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span><span class="p">)</span>
 <span class="n">analysis</span><span class="o">.</span><span class="n">execute_pipeline</span><span class="p">(</span>
     <span class="n">featurization_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;featurization&#39;</span><span class="p">:</span><span class="s1">&#39;ca_dist&#39;</span><span class="p">},</span>
-    <span class="n">reduce_dim_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span><span class="s1">&#39;fit_on&#39;</span><span class="p">:[</span><span class="s2">&quot;3a1g_B_prod_R1_fit&quot;</span><span class="p">]},</span>
-    <span class="n">database</span><span class="o">=</span><span class="s1">&#39;atlas&#39;</span><span class="p">,</span>
+    <span class="n">reduce_dim_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span><span class="s1">&#39;fit_on&#39;</span><span class="p">:[</span><span class="s2">&quot;3a1g_B_prod_R1_fit&quot;</span><span class="p">]}</span>
     <span class="n">subsample_size</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -224,8 +207,19 @@ Calling the following function outputs all of them into a PDF report.</p>
 </section>
 <section id="ensemble-files-with-multiple-chains">
 <h2><a class="toc-backref" href="#id5" role="doc-backlink">Ensemble Files with Multiple Chains</a><a class="headerlink" href="#ensemble-files-with-multiple-chains" title="Link to this heading"></a></h2>
-<p>When dealing with ensemble files that contain multiple chains, the program will prompt the user to select one chain per ensemble for analysis.
-In the context of MDtraj trajectories, chain identifiers are represented as numerical indexes (e.g., 0, 1, 2, etc.) and are assigned sequentially. For example, if working with an ensemble such as PED00014e001, which contains chains labeled as A, C, and D, these chains will be assigned chain indexes 0, 1, and 2, respectively.</p>
+<p>When dealing with ensemble files that contain multiple chains, it is possible to specify which one to analyse.
+In the context of MDtraj trajectories, chain identifiers are represented as numerical indexes (e.g., 0, 1, 2, etc.) and are assigned sequentially.
+For example, chains A, C, and D will be assigned chain indexes 0, 1, and 2, respectively.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Ensemble</span><span class="p">(</span><span class="s1">&#39;PED00014e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">,</span> <span class="n">chain_id</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s1">&#39;path/to/output/directory&#39;</span>
+
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ensembles</span> <span class="o">=</span> <span class="n">ensembles</span><span class="p">,</span> <span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span><span class="p">)</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">load_trajectories</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If not specified, the program will prompt the user to select one chain per ensemble for analysis.</p>
 </section>
 </section>
 
