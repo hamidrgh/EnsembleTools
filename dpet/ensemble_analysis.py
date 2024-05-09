@@ -28,7 +28,7 @@ class EnsembleAnalysis:
         self.api_client = APIClient()
         self.feature_names = []
         self.all_labels = []
-        self.ensembles = ensembles
+        self.ensembles: List[Ensemble] = ensembles
 
     @property
     def ens_codes(self) -> List[str]:
@@ -211,8 +211,6 @@ class EnsembleAnalysis:
         
         for ensemble in self.ensembles:
             ensemble.load_trajectory(self.output_dir)
-            ensemble.select_chain()
-            ensemble.check_coarse_grained()
         
         return self.trajectories
 
@@ -457,6 +455,6 @@ class EnsembleAnalysis:
         
         features_dict = {}
         for ensemble in self.ensembles:
-            features = ensemble.featurize(featurization=featurization, min_sep= min_sep, max_sep=max_sep)
+            features = ensemble.get_features(featurization=featurization, min_sep= min_sep, max_sep=max_sep)
             features_dict[ensemble.code] = features
         return features_dict

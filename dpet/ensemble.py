@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Sequence, Tuple, Union
 import mdtraj
 import numpy as np
 
@@ -30,7 +31,7 @@ class Ensemble():
     Example: '3a1g_B'.
     - If the database is 'ped', the ensemble code should be in the PED ID format, which consists of a string starting with 'PED' followed by a numeric identifier,
     and 'e' followed by another numeric identifier. Example: 'PED00423e001'.
-    - `chain_id` is always assigned in order to the actual chains. For example, chains A, C, D would have `chain_id` 0, 1, 2 respectively.
+    - 'chain_id' is always assigned in order to the actual chains. For example, chains A, C, D would have 'chain_id' 0, 1, 2 respectively.
     """
     def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None, chain_id: int = None) -> None:
         self.code = code
@@ -40,6 +41,22 @@ class Ensemble():
         self.chain_id = chain_id
     
     def load_trajectory(self, data_dir: str):  
+        """
+        Load a trajectory for the ensemble.
+
+        Parameters
+        ----------
+        data_dir : str
+            The directory where the trajectory data is located or where generated trajectory files will be saved.
+
+        Notes
+        -----
+        This method loads a trajectory for the ensemble based on the specified data path. 
+        It supports loading from various file formats such as PDB, DCD, and XTC.
+        If the data path points to a directory, it searches for PDB files within the directory 
+        and generates a trajectory from them.
+        Additional processing steps include checking for coarse-grained models and selecting a single chain if multiple chains were loaded.
+        """
         if not os.path.exists(self.data_path):
             print(f"Data file or directory for ensemble {self.code} doesn't exist.")
             return
@@ -70,16 +87,32 @@ class Ensemble():
         else:
             print(f'Unsupported file format for data file: {self.data_path}')
             return
-        # Save a copy of the trajectory for sampling
+        # Save the trajectory for sampling
         self.original_trajectory = self.trajectory
+        # Check if a coarse-grained model was loaded
+        self._check_coarse_grained()
+        # Select a single chain if multiple chains were loaded
+        self._select_chain()
             
-    def check_coarse_grained(self):
+    def _check_coarse_grained(self):
         topology = self.trajectory.topology
         atoms = topology.atoms
         self.coarse_grained = all(atom.element.symbol == 'C' for atom in atoms)
         self.atom_selector = "protein" if self.coarse_grained else "name == CA"
 
-    def random_sample_trajectory(self, sample_size:int):
+    def random_sample_trajectory(self, sample_size: int):
+        """
+        Randomly sample frames from the original trajectory.
+
+        Parameters
+        ----------
+        sample_size : int
+            The number of frames to sample from the original trajectory.
+
+        Notes
+        -----
+        This method samples frames randomly from the original trajectory and updates the ensemble's trajectory attribute.
+        """
         total_frames = len(self.original_trajectory)
         if sample_size > total_frames:
             raise ValueError("Sample size cannot be larger than the total number of frames in the trajectory.")
@@ -89,12 +122,53 @@ class Ensemble():
             topology=self.original_trajectory.topology)
         print(f"{sample_size} conformations sampled from {self.code} trajectory.")
         
-    def extract_features(self, featurization:str, min_sep:int, max_sep:int):
+    def extract_features(self, featurization: str, min_sep: int, max_sep: int):
+        """
+        Extract features from the trajectory using the specified featurization method.
+
+        Parameters
+        ----------
+        featurization : str
+            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega', 'tr_phi', 'rg'.
+        min_sep : int
+            The minimum sequence separation for angle calculations.
+        max_sep : int
+            The maximum sequence separation for angle calculations.
+
+        Notes
+        -----
+        This method extracts features from the trajectory using the specified featurization method and updates the ensemble's features attribute.
+        """
         print(f"Performing feature extraction for Ensemble: {self.code}.")
-        self.features, self.names = self.featurize(featurization, min_sep, max_sep, get_names=True)
+        self.features, self.names = self.get_features(featurization, min_sep, max_sep, get_names=True)
         print("Transformed ensemble shape:", self.features.shape)
 
-    def featurize(self, featurization: str, min_sep: int, max_sep: int, get_names: bool = False):
+    def get_features(self, featurization: str, min_sep: int, max_sep: int, get_names: bool = False) -> Union[Tuple[Sequence, Sequence], Tuple[Sequence, None]]:
+        """
+        Get features from the trajectory using the specified featurization method.
+
+        Parameters
+        ----------
+        featurization : str
+            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega', 'tr_phi', 'rg'.
+        min_sep : int
+            The minimum sequence separation for angle calculations.
+        max_sep : int
+            The maximum sequence separation for angle calculations.
+        get_names : bool, optional
+            Whether to return feature names along with features. Default is False.
+
+        Returns
+        -------
+        features : Sequence
+            The extracted features.
+        names : Sequence or None
+            If `get_names` is True, returns a sequence of feature names corresponding to the extracted features. Otherwise, returns None.
+
+        Notes
+        -----
+        This method extracts features from the trajectory using the specified featurization method.
+        """
         if featurization == "ca_dist":
             return featurize_ca_dist(
                 traj=self.trajectory, 
@@ -130,10 +204,24 @@ class Ensemble():
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
         
-    def normalize_features(self, mean, std):
+    def normalize_features(self, mean: float, std: float):
+        """
+        Normalize the extracted features using the provided mean and standard deviation.
+
+        Parameters
+        ----------
+        mean : float
+            The mean value used for normalization.
+        std : float
+            The standard deviation used for normalization.
+
+        Notes
+        -----
+        This method normalizes the ensemble's features using the provided mean and standard deviation.
+        """
         self.features = (self.features - mean) / std
 
-    def select_chain(self):
+    def _select_chain(self):
         topology = self.trajectory.topology
 
         if topology.n_chains == 1:
@@ -161,4 +249,3 @@ class Ensemble():
 
         chain_A_indices = topology.select(f"chainid {self.chain_id}")
         self.trajectory = self.trajectory.atom_slice(chain_A_indices)
-
