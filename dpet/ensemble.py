@@ -13,7 +13,7 @@ class Ensemble():
 
     Parameters
     ----------
-    ens_code : str
+    code : str
         The code identifier of the ensemble.
     data_path : str, optional
         The path to the data file associated with the ensemble. Default is None.
@@ -23,35 +23,35 @@ class Ensemble():
         The database from which to download the ensemble. Options are 'ped' and 'atlas'. Default is None.
     """
     
-    def __init__(self, ens_code: str, data_path: str = None, top_path: str = None, database: str = None) -> None:
-        self.ens_code = ens_code
+    def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None) -> None:
+        self.code = code
         self.data_path = data_path
         self.top_path = top_path
         self.database = database
     
     def load_trajectory(self, data_dir: str):  
         if not os.path.exists(self.data_path):
-            print(f"Data file or directory for ensemble {self.ens_code} doesn't exist.")
+            print(f"Data file or directory for ensemble {self.code} doesn't exist.")
             return
         elif self.data_path.endswith('.pdb'):
-            print(f"Generating trajectory for {self.ens_code}...")
+            print(f"Generating trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path)
-            traj_dcd = os.path.join(data_dir, f'{self.ens_code}.dcd')
-            traj_top = os.path.join(data_dir, f'{self.ens_code}.top.pdb')
+            traj_dcd = os.path.join(data_dir, f'{self.code}.dcd')
+            traj_top = os.path.join(data_dir, f'{self.code}.top.pdb')
             self.trajectory.save(traj_dcd)
             self.trajectory[0].save(traj_top)
             print(f"Generated trajectory saved to {data_dir}.")
         elif (self.data_path.endswith('.dcd') or self.data_path.endswith('.xtc')) and os.path.exists(self.top_path):
-            print(f"Loading trajectory for {self.ens_code}...")
+            print(f"Loading trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path, top=(self.top_path))
         elif os.path.isdir(self.data_path):
             files_in_dir = [f for f in os.listdir(self.data_path) if f.endswith('.pdb')]
             if files_in_dir:
-                print(f"Generating trajectory for {self.ens_code}...")
+                print(f"Generating trajectory for {self.code}...")
                 full_paths = [os.path.join(self.data_path, file) for file in files_in_dir]
                 self.trajectory = mdtraj.load(full_paths)
-                traj_dcd = os.path.join(data_dir, f'{self.ens_code}.dcd')
-                traj_top = os.path.join(data_dir, f'{self.ens_code}.top.pdb')
+                traj_dcd = os.path.join(data_dir, f'{self.code}.dcd')
+                traj_top = os.path.join(data_dir, f'{self.code}.top.pdb')
                 self.trajectory.save(traj_dcd)
                 self.trajectory[0].save(traj_top)
                 print(f"Generated trajectory saved to {data_dir}.")
@@ -77,10 +77,10 @@ class Ensemble():
         self.trajectory = mdtraj.Trajectory(
             xyz=self.original_trajectory.xyz[random_indices],
             topology=self.original_trajectory.topology)
-        print(f"{sample_size} conformations sampled from {self.ens_code} trajectory.")
+        print(f"{sample_size} conformations sampled from {self.code} trajectory.")
         
     def extract_features(self, featurization:str, min_sep:int, max_sep:int):
-        print(f"Performing feature extraction for Ensemble: {self.ens_code}.")
+        print(f"Performing feature extraction for Ensemble: {self.code}.")
         self.features, self.names = self.featurize(featurization, min_sep, max_sep, get_names=True)
         print("Transformed ensemble shape:", self.features.shape)
 

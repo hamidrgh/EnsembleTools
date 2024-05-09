@@ -40,7 +40,7 @@ class EnsembleAnalysis:
         List[str]
             A list of ensemble codes.
         """
-        return [ensemble.ens_code for ensemble in self.ensembles]
+        return [ensemble.code for ensemble in self.ensembles]
 
     @property
     def trajectories(self) -> Dict[str, mdtraj.Trajectory]:
@@ -52,7 +52,7 @@ class EnsembleAnalysis:
         Dict[str, mdtraj.Trajectory]
             A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.
         """
-        return {ensemble.ens_code: ensemble.trajectory for ensemble in self.ensembles}
+        return {ensemble.code: ensemble.trajectory for ensemble in self.ensembles}
 
     @property
     def features(self) -> Dict[str, np.ndarray]:
@@ -64,7 +64,7 @@ class EnsembleAnalysis:
         Dict[str, np.ndarray]
             A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
-        return {ensemble.ens_code: ensemble.features for ensemble in self.ensembles}
+        return {ensemble.code: ensemble.features for ensemble in self.ensembles}
     
     @property
     def reduce_dim_data(self) -> Dict[str, np.ndarray]:
@@ -76,7 +76,7 @@ class EnsembleAnalysis:
         Dict[str, np.ndarray]
             A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
-        return {ensemble.ens_code: ensemble.reduce_dim_data for ensemble in self.ensembles}
+        return {ensemble.code: ensemble.reduce_dim_data for ensemble in self.ensembles}
 
     def __del__(self):
         if hasattr(self, 'api_client'):
@@ -85,23 +85,23 @@ class EnsembleAnalysis:
     def _download_from_ped(self, ensemble: Ensemble):
         ped_pattern = r'^(PED\d{5})(e\d{3})$'
 
-        ens_code = ensemble.ens_code
-        match = re.match(ped_pattern, ens_code)
+        code = ensemble.code
+        match = re.match(ped_pattern, code)
         if not match:
-            print(f"Entry {ens_code} does not match the PED ID pattern and will be skipped.")
+            print(f"Entry {code} does not match the PED ID pattern and will be skipped.")
             return
         
         ped_id = match.group(1)
         ensemble_id = match.group(2)
-        tar_gz_filename = f'{ens_code}.tar.gz'
+        tar_gz_filename = f'{code}.tar.gz'
         tar_gz_file = os.path.join(self.output_dir, tar_gz_filename)
 
-        pdb_filename = f'{ens_code}.pdb'
+        pdb_filename = f'{code}.pdb'
         pdb_file = os.path.join(self.output_dir, pdb_filename)
 
         if not os.path.exists(tar_gz_file) and not os.path.exists(pdb_file):
             url = f'https://deposition.proteinensemble.org/api/v1/entries/{ped_id}/ensembles/{ensemble_id}/ensemble-pdb'
-            print(f"Downloading entry {ens_code} from PED.")
+            print(f"Downloading entry {code} from PED.")
             headers = {'accept': '*/*'}
 
             response = self.api_client.perform_get_request(url, headers=headers)
@@ -110,7 +110,7 @@ class EnsembleAnalysis:
                 self.api_client.download_response_content(response, tar_gz_file)
                 print(f"Downloaded file {tar_gz_filename} from PED.")
         else:
-            print(f"Ensemble {ens_code} already downloaded. Skipping.")
+            print(f"Ensemble {code} already downloaded. Skipping.")
 
         # Extract the .tar.gz file
         if not os.path.exists(pdb_file):
@@ -120,11 +120,11 @@ class EnsembleAnalysis:
             print(f"File {pdb_filename} already exists. Skipping extraction.")
         
         # Set the data path to the downloaded file
-        # If the trajectory is already generated it will used instead of the pdb file
-        traj_dcd = os.path.join(self.output_dir, f'{ens_code}.dcd')
-        traj_top = os.path.join(self.output_dir, f'{ens_code}.top.pdb')
+        # If the trajectory is already generated it will be used instead of the pdb file
+        traj_dcd = os.path.join(self.output_dir, f'{code}.dcd')
+        traj_top = os.path.join(self.output_dir, f'{code}.top.pdb')
         if os.path.exists(traj_dcd) and os.path.exists(traj_top):
-            print(f'Trajectory already exists for ensemble {ens_code}. Loading trajectory.')
+            print(f'Trajectory already exists for ensemble {code}. Loading trajectory.')
             ensemble.data_path = traj_dcd
             ensemble.top_path = traj_top
         else:
@@ -132,17 +132,17 @@ class EnsembleAnalysis:
     
     def _download_from_atlas(self, ensemble: Ensemble):
         pdb_pattern = r'^\d\w{3}_[A-Z]$'
-        ens_code = ensemble.ens_code
-        if not re.match(pdb_pattern, ens_code):
-            print(f"Entry {ens_code} does not match the PDB ID pattern and will be skipped.")
+        code = ensemble.code
+        if not re.match(pdb_pattern, code):
+            print(f"Entry {code} does not match the PDB ID pattern and will be skipped.")
             return []
 
-        zip_filename = f'{ens_code}.zip'
+        zip_filename = f'{code}.zip'
         zip_file = os.path.join(self.output_dir, zip_filename)
 
         if not os.path.exists(zip_file):
-            print(f"Downloading entry {ens_code} from Atlas.")
-            url = f"https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/{ens_code}/{ens_code}_protein.zip"
+            print(f"Downloading entry {code} from Atlas.")
+            url = f"https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/{code}/{code}_protein.zip"
             headers = {'accept': '*/*'}
 
             response = self.api_client.perform_get_request(url, headers=headers)
@@ -160,10 +160,10 @@ class EnsembleAnalysis:
             new_ensembles = []
             for fname in zip_contents:
                 if fname.endswith('.xtc'):
-                    new_ens_code = fname.split('.')[0]
+                    new_code = fname.split('.')[0]
                     data_path = os.path.join(self.output_dir, fname)
-                    top_path = os.path.join(self.output_dir, f"{ens_code}.pdb")
-                    ensemble = Ensemble(ens_code=new_ens_code, data_path=data_path, top_path=top_path)
+                    top_path = os.path.join(self.output_dir, f"{code}.pdb")
+                    ensemble = Ensemble(code=new_code, data_path=data_path, top_path=top_path)
                     new_ensembles.append(ensemble)
             # Unzip
             zip_ref.extractall(self.output_dir)
@@ -200,12 +200,12 @@ class EnsembleAnalysis:
                 self._download_from_ped(ensemble)
             elif ensemble.database == 'atlas':
                 new_ensembles = self._download_from_atlas(ensemble)
-                new_ensembles_mapping[ensemble.ens_code] = new_ensembles
+                new_ensembles_mapping[ensemble.code] = new_ensembles
 
         # Update self.ensembles using the mapping
         updated_ensembles = []
         for ensemble in self.ensembles:
-            new_ensembles = new_ensembles_mapping.get(ensemble.ens_code, [ensemble])
+            new_ensembles = new_ensembles_mapping.get(ensemble.code, [ensemble])
             updated_ensembles.extend(new_ensembles)
         self.ensembles = updated_ensembles
         
@@ -283,7 +283,7 @@ class EnsembleAnalysis:
         self.all_labels = []
         for ensemble in self.ensembles:
             num_data_points = len(ensemble.features)
-            self.all_labels.extend([ensemble.ens_code] * num_data_points)
+            self.all_labels.extend([ensemble.code] * num_data_points)
 
     def _normalize_data(self):
         mean = self.concat_features.mean(axis=0)
@@ -317,7 +317,7 @@ class EnsembleAnalysis:
             raise ValueError("Cannot fit on ensembles that were not provided as input.")
         if fit_on is None:
             fit_on = self.ens_codes
-        concat_features = [ensemble.features for ensemble in self.ensembles if ensemble.ens_code in fit_on]
+        concat_features = [ensemble.features for ensemble in self.ensembles if ensemble.code in fit_on]
         concat_features = np.concatenate(concat_features, axis=0)
         print("Concatenated featurized ensemble shape:", concat_features.shape)
         return concat_features
@@ -458,5 +458,5 @@ class EnsembleAnalysis:
         features_dict = {}
         for ensemble in self.ensembles:
             features = ensemble.featurize(featurization=featurization, min_sep= min_sep, max_sep=max_sep)
-            features_dict[ensemble.ens_code] = features
+            features_dict[ensemble.code] = features
         return features_dict

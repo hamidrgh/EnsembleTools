@@ -341,7 +341,7 @@ class Visualization:
         for ensemble in analysis.ensembles:
             ax[0].scatter(ensemble.reduce_dim_data[:,dim_x],
                         ensemble.reduce_dim_data[:,dim_y],
-                        label=ensemble.ens_code, marker=marker)
+                        label=ensemble.code, marker=marker)
         ax[0].legend(**legend_kwargs)
         self._set_labels(ax[0], "pca", dim_x, dim_y)
 
@@ -350,7 +350,7 @@ class Visualization:
 
         # Plot each ensembles.
         for i, ensemble in enumerate(analysis.ensembles):
-            ax[i+1].set_title(ensemble.ens_code)
+            ax[i+1].set_title(ensemble.code)
             # Plot all data in gray
             ax[i+1].scatter(all_data[:, dim_x],
                             all_data[:, dim_y],
@@ -359,7 +359,7 @@ class Visualization:
             # Plot ensemble data in color
             ax[i+1].scatter(ensemble.reduce_dim_data[:,dim_x],
                             ensemble.reduce_dim_data[:,dim_y],
-                            label=ensemble.ens_code, c=f"C{i}",
+                            label=ensemble.code, c=f"C{i}",
                             marker=marker)
             ax[i+1].legend(**legend_kwargs)
             self._set_labels(ax[i+1], "pca", dim_x, dim_y)
@@ -408,7 +408,7 @@ class Visualization:
 
         for i, ensemble in enumerate(analysis.ensembles):
             ax[i].hist(ensemble.reduce_dim_data[:,k],
-                    label=ensemble.ens_code,
+                    label=ensemble.code,
                     bins=bins,
                     density=True,
                     color=f"C{i}",
@@ -535,7 +535,7 @@ class Visualization:
         for i, ensemble in enumerate(analysis.ensembles):
             rg_i = mdtraj.compute_rg(ensemble.trajectory)
             ax[i].scatter(ensemble.reduce_dim_data[:,pca_dim],
-                    rg_i, label=ensemble.ens_code,
+                    rg_i, label=ensemble.code,
                     color=f"C{i}"
             )
             ax[i].legend(fontsize=8)
@@ -575,7 +575,7 @@ class Visualization:
         positions = []
         dist_list = []
         for ens in analysis.ensembles:
-            positions.append(ens.ens_code)
+            positions.append(ens.code)
             sasa = mdtraj.shrake_rupley(ens.trajectory)
             total_sasa = sasa.sum(axis=1)
             dist_list.append(total_sasa)
@@ -614,8 +614,8 @@ class Visualization:
             x = mdtraj.compute_rg(ensemble.trajectory)
             y = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
             p = np.corrcoef(x, y)
-            ax.scatter(x, y, s=4, label=ensemble.ens_code)
-            print(f"Pearson coeff for {ensemble.ens_code} = {round(p[0][1], 3)}")
+            ax.scatter(x, y, s=4, label=ensemble.code)
+            print(f"Pearson coeff for {ensemble.code} = {round(p[0][1], 3)}")
         
         ax.set_ylabel("Asphericity")
         ax.set_xlabel("Rg [nm]")
@@ -652,8 +652,8 @@ class Visualization:
             x = mdtraj.compute_rg(ensemble.trajectory)
             y = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
             p = np.corrcoef(x, y)
-            ax.scatter(x, y, s=4, label=ensemble.ens_code)
-            print(f"Pearson coeff for {ensemble.ens_code} = {round(p[0][1], 3)}")
+            ax.scatter(x, y, s=4, label=ensemble.code)
+            print(f"Pearson coeff for {ensemble.code} = {round(p[0][1], 3)}")
 
         ax.set_ylabel("Prolateness")
         ax.set_xlabel("Rg [nm]")
@@ -692,7 +692,7 @@ class Visualization:
         for ensemble in analysis.ensembles:
             four_cons_indices_ca = create_consecutive_indices_matrix(ensemble.trajectory.topology.select(ensemble.atom_selector) )
             ens_dh_ca = mdtraj.compute_dihedrals(ensemble.trajectory, four_cons_indices_ca).ravel()
-            ax.hist(ens_dh_ca, bins=bins, histtype="step", density=True, label=ensemble.ens_code)
+            ax.hist(ens_dh_ca, bins=bins, histtype="step", density=True, label=ensemble.code)
 
         ax.set_title("The distribution of dihedral angles between four consecutive Cα beads.")
         ax.legend()
@@ -709,7 +709,7 @@ class Visualization:
         ensembles = self.analysis.ensembles
         dssp_data_dict = {}
         for ensemble in ensembles:
-            dssp_data_dict[ensemble.ens_code] = mdtraj.compute_dssp(ensemble.trajectory)
+            dssp_data_dict[ensemble.code] = mdtraj.compute_dssp(ensemble.trajectory)
         return dssp_data_dict
     
     def relative_helix_content(self, save: bool = False) -> plt.Axes:
@@ -773,7 +773,7 @@ class Visualization:
         ensembles = self.analysis.ensembles
         rg_dict = {}
         for ensemble in ensembles:
-            rg_dict[ensemble.ens_code] = mdtraj.compute_rg(ensemble.trajectory)
+            rg_dict[ensemble.code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
 
     def rg_comp_dist(self, n_bins: int = 50, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
@@ -851,7 +851,7 @@ class Visualization:
             selector = ensemble.atom_selector
             trajectory = ensemble.trajectory
             xyz_ens = trajectory.xyz[:,trajectory.topology.select(selector)]
-            distance_matrix_ens_dict[ensemble.ens_code] = get_distance_matrix(xyz_ens)
+            distance_matrix_ens_dict[ensemble.code] = get_distance_matrix(xyz_ens)
         return distance_matrix_ens_dict
 
     def _get_contact_ens_dict(self):
@@ -860,8 +860,8 @@ class Visualization:
         contact_ens_dict = {}
         for ensemble in ensembles:
             xyz_ens = ensemble.trajectory.xyz[:,ensemble.trajectory.topology.select(ensemble.atom_selector)]
-            distance_matrix_ens_dict[ensemble.ens_code] = get_distance_matrix(xyz_ens)
-            contact_ens_dict[ensemble.ens_code] = get_contact_map(distance_matrix_ens_dict[ensemble.ens_code])
+            distance_matrix_ens_dict[ensemble.code] = get_distance_matrix(xyz_ens)
+            contact_ens_dict[ensemble.code] = get_contact_map(distance_matrix_ens_dict[ensemble.code])
         return contact_ens_dict
 
     def average_dmap_comp(self, 
@@ -1135,7 +1135,7 @@ class Visualization:
         if violin_plot:
             for ensemble in ensembles:
                 ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
-                positions.append(ensemble.ens_code)
+                positions.append(ensemble.code)
                 dist_list.append(mdtraj.compute_distances(ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]).ravel())
             ax.violinplot(dist_list, showmeans=means, showmedians=median)
             ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
@@ -1146,7 +1146,7 @@ class Visualization:
             for ensemble in ensembles:
                 ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
                 ax.hist(mdtraj.compute_distances(ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]).ravel(),
-                        label=ensemble.ens_code, bins=bins, edgecolor='black', density=True)
+                        label=ensemble.code, bins=bins, edgecolor='black', density=True)
             ax.set_title("End-to-End distances distribution")
             ax.legend()
 
@@ -1193,7 +1193,7 @@ class Visualization:
             for ensemble in ensembles:
                 asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
                 asph_list.append(asphericity)
-                positions.append(ensemble.ens_code)
+                positions.append(ensemble.code)
             ax.violinplot(asph_list, showmeans=means, showmedians=median)
             ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
             ax.set_xticklabels(labels=positions, rotation=45.0, ha="center")
@@ -1202,7 +1202,7 @@ class Visualization:
         else:
             for ensemble in ensembles:
                 asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
-                ax.hist(asphericity, label=ensemble.ens_code, bins=bins, edgecolor='black', density=True)
+                ax.hist(asphericity, label=ensemble.code, bins=bins, edgecolor='black', density=True)
             ax.set_title("Asphericity distribution")
             ax.legend()
 
@@ -1247,7 +1247,7 @@ class Visualization:
             for ensemble in ensembles:
                 prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
                 prolat_list.append(prolat)
-                positions.append(ensemble.ens_code)
+                positions.append(ensemble.code)
             ax.violinplot(prolat_list, showmeans=mean, showmedians=median)
             ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
             ax.set_xticklabels(labels=positions, rotation=45.0, ha="center")
@@ -1256,7 +1256,7 @@ class Visualization:
         else:
             for ensemble in ensembles:
                 prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
-                ax.hist(prolat, label=ensemble.ens_code, bins=bins, edgecolor='black', density=True)
+                ax.hist(prolat, label=ensemble.code, bins=bins, edgecolor='black', density=True)
             ax.set_title("Prolateness distribution")
             ax.legend()
 
@@ -1290,7 +1290,7 @@ class Visualization:
 
         for ensemble in ensembles:
             ax.hist(featurize_a_angle(ensemble.trajectory, get_names=False, atom_selector=ensemble.atom_selector).ravel(),
-                    bins=bins, histtype="step", density=False, label=ensemble.ens_code)
+                    bins=bins, histtype="step", density=False, label=ensemble.code)
 
         ax.set_title("Distribution of alpha angles")
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -1350,7 +1350,7 @@ class Visualization:
                 im = ax.imshow(matrix_p_map, cmap=cmap, norm=LogNorm())
             else:
                 im = ax.imshow(matrix_p_map, cmap=cmap)
-            ax.set_title(f"Contact Probability Map: {ensemble.ens_code}", fontsize=14)
+            ax.set_title(f"Contact Probability Map: {ensemble.code}", fontsize=14)
 
             cbar = fig.colorbar(im, ax=ax)
             cbar.set_label('Frequency', fontsize=14)
@@ -1426,7 +1426,7 @@ class Visualization:
                 norm=colors.LogNorm(),
                 density=True)
 
-                ax.set_title(f'Ramachandran Plot for cluster {ens.ens_code}')
+                ax.set_title(f'Ramachandran Plot for cluster {ens.code}')
                 ax.set_xlabel('Phi (ϕ) Angle (degrees)')
                 ax.set_ylabel('Psi (ψ) Angle (degrees)')
 
@@ -1437,7 +1437,7 @@ class Visualization:
             for ens in ensembles:
                 phi = np.degrees(mdtraj.compute_phi(ens.trajectory)[1])
                 psi = np.degrees(mdtraj.compute_psi(ens.trajectory)[1])
-                plt.scatter(phi, psi, s=1, label= ens.ens_code)
+                plt.scatter(phi, psi, s=1, label= ens.code)
             axes.set_xlabel('Phi (ϕ) Angle (degrees)')
             axes.set_ylabel('Psi (ψ) Angle (degrees)')
             plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
@@ -1536,7 +1536,7 @@ class Visualization:
         dict_ca_xyz = {}
         for ensemble in ensembles:
             ca_index= ensemble.trajectory.topology.select(ensemble.atom_selector)
-            dict_ca_xyz[ensemble.ens_code] = ensemble.trajectory.xyz[:,ca_index,:]
+            dict_ca_xyz[ensemble.code] = ensemble.trajectory.xyz[:,ca_index,:]
 
         dict_order_parameter = site_specific_order_parameter(dict_ca_xyz)
         fig, axes = plt.subplots(1,1, figsize=figsize)
@@ -1591,7 +1591,7 @@ class Visualization:
             sasa_mean = np.mean(res_based_sasa, axis=0)
             sasa_std = np.std(res_based_sasa, axis=0)        
 
-            ax.plot(np.arange(1, len(sasa_mean)+1), sasa_mean, '-o', color=colors[i % len(colors)], label= ens.ens_code)
+            ax.plot(np.arange(1, len(sasa_mean)+1), sasa_mean, '-o', color=colors[i % len(colors)], label= ens.code)
             ax.fill_between(np.arange(1,len(sasa_mean)+1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])
 
         ax.set_xticks([i for i in np.arange(1,len(sasa_mean)+1) if  i==1 or i%5 == 0])
@@ -1655,7 +1655,7 @@ class Visualization:
         for ens in analysis.ensembles:
             traj = ens.trajectory
             feat, names = featurize_com_dist(traj=traj, min_sep=min_sep,max_sep=max_sep,inverse=inverse ,get_names=get_names)  # Compute (N, *) feature arrays.
-            print(f"# Ensemble: {ens.ens_code}")
+            print(f"# Ensemble: {ens.code}")
             print("features:", feat.shape)
 
             com_dmap = calc_ca_dmap(traj=traj)
@@ -1665,7 +1665,7 @@ class Visualization:
 
             print("distance matrix:", com_dmap_mean.shape)
             fig, ax = plt.subplots(1, 2, figsize=figsize)
-            fig.suptitle(ens.ens_code)
+            fig.suptitle(ens.code)
             im0 = ax[0].imshow(ca_dmap_mean)
             ax[0].set_title("CA")
             im1 = ax[1].imshow(com_dmap_mean)
@@ -1680,7 +1680,7 @@ class Visualization:
 
             self.figures['plot_dist_ca_com'] = fig
             if save:
-                fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + ens.ens_code))  
+                fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + ens.code))  
 
             axes.append([ax[0], ax[1]])
 
