@@ -569,12 +569,14 @@ class Visualization:
 
         """
 
-        analysis = self.analysis
+        if self.analysis.exists_coarse_grained():
+            print("This analysis is not possible with coarse-grained models.")
+            return []
 
         fig, ax = plt.subplots(1, 1 )
         positions = []
         dist_list = []
-        for ens in analysis.ensembles:
+        for ens in self.analysis.ensembles:
             positions.append(ens.code)
             sasa = mdtraj.shrake_rupley(ens.trajectory)
             total_sasa = sasa.sum(axis=1)
@@ -587,7 +589,7 @@ class Visualization:
         ax.set_ylabel('SASA (nm)^2')
         self.figures["plot_global_sasa"] = fig
         if save:
-            plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + self.analysis.ens_codes[0]))
         return ax
 
     def rg_vs_asphericity(self, save: bool = False) -> plt.Axes:
@@ -1373,8 +1375,8 @@ class Visualization:
         analysis = self.analysis
         pair_ids = []
         for ens in analysis.ensembles:
-            ca_ids = analysis.ensembles[ens].trajectory.topology.select('name')
-            atoms = list(analysis.ensembles[ens].trajectory.topology.atoms)
+            ca_ids = ens.trajectory.topology.select('name')
+            atoms = list(ens.trajectory.topology.atoms)
             max_sep = get_max_sep(L=len(atoms), max_sep=max_sep)
     # Get all pair of ids.
             for i, id_i in enumerate(ca_ids):
@@ -1407,6 +1409,10 @@ class Visualization:
             If two_d_hist=False, returns a single Axes object representing the scatter plot for all ensembles.
 
         """
+
+        if self.analysis.exists_coarse_grained():
+            print("This analysis is not possible with coarse-grained models.")
+            return
         
         ensembles = self.analysis.ensembles
         if two_d_hist:
