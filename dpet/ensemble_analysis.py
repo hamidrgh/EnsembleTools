@@ -8,7 +8,7 @@ from dpet.data.extract_tar_gz import extract_tar_gz
 import os
 import mdtraj
 import numpy as np
-from dpet.dimensionality_reduction.dimensionality_reduction import DimensionalityReductionFactory
+from dpet.dimensionality_reduction import DimensionalityReductionFactory
 
 class EnsembleAnalysis:
     """
@@ -286,6 +286,11 @@ class EnsembleAnalysis:
             self.all_labels.extend([ensemble.code] * num_data_points)
 
     def _normalize_data(self):
+        feature_sizes = set(ensemble.features.shape[1] for ensemble in self.ensembles)
+        if len(feature_sizes) > 1:
+            print("Error: Features from ensembles have different sizes. Cannot normalize data.")
+            return
+        self.concat_features = self._get_concat_features()
         mean = self.concat_features.mean(axis=0)
         std = self.concat_features.std(axis=0)
         self.concat_features = (self.concat_features - mean) / std
