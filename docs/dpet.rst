@@ -15,8 +15,16 @@ Subpackages
 Submodules
 ----------
 
-dpet.ensemble\_analysis module
-------------------------------
+dpet.dimensionality_reduction module
+------------------------------------
+
+.. automodule:: dpet.dimensionality_reduction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dpet.ensemble_analysis module
+-----------------------------
 
 .. automodule:: dpet.ensemble_analysis
    :members:
@@ -24,7 +32,7 @@ dpet.ensemble\_analysis module
    :show-inheritance:
 
 dpet.ensemble module
-------------------------------
+--------------------
 
 .. automodule:: dpet.ensemble
    :members:
@@ -32,7 +40,7 @@ dpet.ensemble module
    :show-inheritance:
 
 dpet.visualization module
-------------------------------
+-------------------------
 
 .. automodule:: dpet.visualization
    :members:
