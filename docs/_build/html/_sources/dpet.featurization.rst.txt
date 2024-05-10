@@ -27,11 +27,3 @@ dpet.featurization.utils module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: dpet.featurization
-   :members:
-   :undoc-members:
-   :show-inheritance:

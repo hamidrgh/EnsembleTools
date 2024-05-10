@@ -117,30 +117,33 @@ def featurize_tr_angle(
         get_names: bool = True
     ) -> np.array:
     """
-    Calculate trRosetta angles between pair of residue. See the original
-    trRosetta paper (https://pubmed.ncbi.nlm.nih.gov/31896580/) for more
-    information.
+    Calculate trRosetta angles between pair of residues.
 
-    arguments:
-        traj: input mdtraj trajectory.
-        type: string with the type of angle feature. "omega" for omega torsion
-            angles, "phi" for phi angles.
-        min_sep: minimum sequence separation between a pair of residues.
-        max_sep: max sequence separation between a pair of residues. If `None`,
-            there will be no maximum separation. If it is a float, the maximum
-            separation will be `int(max_sep*L)` where `L` is the number of amino
-            acids in the protein.
-        ravel: if `True`, values from all the pair of residues indexed via the
-            `min_sep`, `max_sep` will be flattened in a vector, so the function
-            will return a `(N, *)` array, where `N` is the number of conformers
-            in the trajectory and `*` will be the number of features being
-            indexed. If `False`, a (N, L, L) array will be returned.
-        get_names: when `ravel` is `True`, also return the names of the
-            corresponding features.
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDtraj trajectory object.
+        
+    type : str
+        The type of angle to calculate. Supported options: 'omega' or 'phi'.
+    min_sep : int, optional
+        The minimum sequence separation for angle calculations. Default is 2.
+    max_sep : Union[None, int, float], optional
+        The maximum sequence separation for angle calculations. Default is None.
+    ravel : bool, optional
+        Whether to flatten the output array. Default is True.
+    get_names : bool, optional
+        Whether to return the names of the calculated features. Default is True.
 
-    returns:
-        angles: numpy array storing the angle values.
+    Returns
+    -------
+    angles : numpy.ndarray
+        A numpy array storing the angle values.
 
+    Notes
+    -----
+    This function calculates trRosetta angles between pairs of residues. 
+    For more information, refer to the original trRosetta paper (https://pubmed.ncbi.nlm.nih.gov/31896580/).
     """
 
     if type == "omega":
@@ -174,7 +177,9 @@ def featurize_tr_omega(
     """
     Calculate omega angles from trRosetta. These angles are torsion angles defined
     between a pair of residues `i` and `j` and involving the following atoms:
+
         `Ca(i) -- Cb(i) -- Cb(j) -- Ca(j)`
+
     If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.
 
     Parameters
@@ -252,8 +257,9 @@ def featurize_tr_phi(
     """
     Calculate phi angles from trRosetta. These angles are defined between a
     pair of residues `i` and `j` and involve the following atoms:
+
         `Ca(i) -- Cb(i) -- Cb(j)`
-        `Ca(j) -- Cb(j) -- Cb(i)`
+
     If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.
 
     Parameters

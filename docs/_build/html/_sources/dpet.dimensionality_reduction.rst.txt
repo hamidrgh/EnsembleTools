@@ -11,11 +11,3 @@ dpet.dimensionality\_reduction.dimensionality\_reduction module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: dpet.dimensionality_reduction
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -199,30 +199,33 @@
         <span class="n">get_names</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate trRosetta angles between pair of residue. See the original</span>
-<span class="sd">    trRosetta paper (https://pubmed.ncbi.nlm.nih.gov/31896580/) for more</span>
-<span class="sd">    information.</span>
+<span class="sd">    Calculate trRosetta angles between pair of residues.</span>
 
-<span class="sd">    arguments:</span>
-<span class="sd">        traj: input mdtraj trajectory.</span>
-<span class="sd">        type: string with the type of angle feature. &quot;omega&quot; for omega torsion</span>
-<span class="sd">            angles, &quot;phi&quot; for phi angles.</span>
-<span class="sd">        min_sep: minimum sequence separation between a pair of residues.</span>
-<span class="sd">        max_sep: max sequence separation between a pair of residues. If `None`,</span>
-<span class="sd">            there will be no maximum separation. If it is a float, the maximum</span>
-<span class="sd">            separation will be `int(max_sep*L)` where `L` is the number of amino</span>
-<span class="sd">            acids in the protein.</span>
-<span class="sd">        ravel: if `True`, values from all the pair of residues indexed via the</span>
-<span class="sd">            `min_sep`, `max_sep` will be flattened in a vector, so the function</span>
-<span class="sd">            will return a `(N, *)` array, where `N` is the number of conformers</span>
-<span class="sd">            in the trajectory and `*` will be the number of features being</span>
-<span class="sd">            indexed. If `False`, a (N, L, L) array will be returned.</span>
-<span class="sd">        get_names: when `ravel` is `True`, also return the names of the</span>
-<span class="sd">            corresponding features.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    traj : mdtraj.Trajectory</span>
+<span class="sd">        The MDtraj trajectory object.</span>
+<span class="sd">        </span>
+<span class="sd">    type : str</span>
+<span class="sd">        The type of angle to calculate. Supported options: &#39;omega&#39; or &#39;phi&#39;.</span>
+<span class="sd">    min_sep : int, optional</span>
+<span class="sd">        The minimum sequence separation for angle calculations. Default is 2.</span>
+<span class="sd">    max_sep : Union[None, int, float], optional</span>
+<span class="sd">        The maximum sequence separation for angle calculations. Default is None.</span>
+<span class="sd">    ravel : bool, optional</span>
+<span class="sd">        Whether to flatten the output array. Default is True.</span>
+<span class="sd">    get_names : bool, optional</span>
+<span class="sd">        Whether to return the names of the calculated features. Default is True.</span>
 
-<span class="sd">    returns:</span>
-<span class="sd">        angles: numpy array storing the angle values.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    angles : numpy.ndarray</span>
+<span class="sd">        A numpy array storing the angle values.</span>
 
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function calculates trRosetta angles between pairs of residues. </span>
+<span class="sd">    For more information, refer to the original trRosetta paper (https://pubmed.ncbi.nlm.nih.gov/31896580/).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;omega&quot;</span><span class="p">:</span>
@@ -259,7 +262,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate omega angles from trRosetta. These angles are torsion angles defined</span>
 <span class="sd">    between a pair of residues `i` and `j` and involving the following atoms:</span>
+
 <span class="sd">        `Ca(i) -- Cb(i) -- Cb(j) -- Ca(j)`</span>
+
 <span class="sd">    If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.</span>
 
 <span class="sd">    Parameters</span>
@@ -340,8 +345,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate phi angles from trRosetta. These angles are defined between a</span>
 <span class="sd">    pair of residues `i` and `j` and involve the following atoms:</span>
+
 <span class="sd">        `Ca(i) -- Cb(i) -- Cb(j)`</span>
-<span class="sd">        `Ca(j) -- Cb(j) -- Cb(i)`</span>
+
 <span class="sd">    If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.</span>
 
 <span class="sd">    Parameters</span>

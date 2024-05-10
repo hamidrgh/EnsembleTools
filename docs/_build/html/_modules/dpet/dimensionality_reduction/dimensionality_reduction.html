@@ -89,6 +89,18 @@
 <a class="viewcode-back" href="../../../dpet.dimensionality_reduction.html#dpet.dimensionality_reduction.dimensionality_reduction.DimensionalityReduction.fit">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the dimensionality reduction model to the data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : np.ndarray</span>
+<span class="sd">            The input data array of shape (n_samples, n_features).</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method fits the dimensionality reduction model to the input data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Method &#39;fit&#39; must be implemented in subclasses.&quot;</span><span class="p">)</span></div>
 
 
@@ -96,6 +108,23 @@
 <a class="viewcode-back" href="../../../dpet.dimensionality_reduction.html#dpet.dimensionality_reduction.dimensionality_reduction.DimensionalityReduction.transform">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform the input data using the fitted dimensionality reduction model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : np.ndarray</span>
+<span class="sd">            The input data array of shape (n_samples, n_features) to be transformed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            The transformed data array of shape (n_samples, n_components).</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method transforms the input data using the fitted dimensionality reduction model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Method &#39;transform&#39; must be implemented in subclasses.&quot;</span><span class="p">)</span></div>
 
     
@@ -103,6 +132,23 @@
 <a class="viewcode-back" href="../../../dpet.dimensionality_reduction.html#dpet.dimensionality_reduction.dimensionality_reduction.DimensionalityReduction.fit_transform">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the dimensionality reduction model to the data and then transform it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : np.ndarray</span>
+<span class="sd">            The input data array of shape (n_samples, n_features).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            The transformed data array of shape (n_samples, n_components).</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method fits the dimensionality reduction model to the input data and then transforms it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Method &#39;fit_transform&#39; must be implemented in subclasses.&quot;</span><span class="p">)</span></div>
 </div>
 
@@ -577,6 +623,9 @@
 <div class="viewcode-block" id="unit_vector_kernel">
 <a class="viewcode-back" href="../../../dpet.dimensionality_reduction.html#dpet.dimensionality_reduction.dimensionality_reduction.unit_vector_kernel">[docs]</a>
 <span class="k">def</span> <span class="nf">unit_vector_kernel</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute unit vector kernel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dist</span> <span class="o">=</span> <span class="n">unit_vector_distance</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">sqrt</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gamma</span><span class="o">*</span><span class="n">dist</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sim</span></div>

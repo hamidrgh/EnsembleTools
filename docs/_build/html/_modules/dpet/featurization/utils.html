@@ -77,10 +77,28 @@
 
 <div class="viewcode-block" id="get_triu_indices">
 <a class="viewcode-back" href="../../../dpet.featurization.html#dpet.featurization.utils.get_triu_indices">[docs]</a>
-<span class="k">def</span> <span class="nf">get_triu_indices</span><span class="p">(</span>
-        <span class="n">L</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">max_sep</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">get_triu_indices</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the upper triangle indices of a square matrix with specified minimum and maximum separations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    L : int</span>
+<span class="sd">        The size of the square matrix.</span>
+<span class="sd">    min_sep : int, optional</span>
+<span class="sd">        The minimum separation between indices. Default is 1.</span>
+<span class="sd">    max_sep : Union[None, int, float], optional</span>
+<span class="sd">        The maximum separation between indices. Default is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[list]</span>
+<span class="sd">        A list of lists containing the upper triangle indices of the square matrix.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function returns the upper triangle indices of a square matrix with the specified minimum and maximum separations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[]]</span>
     <span class="n">max_sep</span> <span class="o">=</span> <span class="n">get_max_sep</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
@@ -97,6 +115,25 @@
 <div class="viewcode-block" id="get_max_sep">
 <a class="viewcode-back" href="../../../dpet.featurization.html#dpet.featurization.utils.get_max_sep">[docs]</a>
 <span class="k">def</span> <span class="nf">get_max_sep</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the maximum separation between indices.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    L : int</span>
+<span class="sd">        The size of the matrix.</span>
+<span class="sd">    max_sep : Union[None, int, float]</span>
+<span class="sd">        The maximum separation between indices.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The maximum separation between indices.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function calculates the maximum separation between indices based on the size of the matrix and the provided maximum separation value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">max_sep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">max_sep</span> <span class="o">=</span> <span class="n">L</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_sep</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>

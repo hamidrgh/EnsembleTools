@@ -50,7 +50,7 @@ best results are kept. By setting circular to True, unit vector distance is used
     analysis.reduce_features(method='tsne', perplexity_vals = [10, 50, 100], circular=True, range_n_clusters=range(2,10,1))
 
 Once the data transformation pipeline is completed, the Visualization class is instantiated to analyse the results. 
-In the example below, the figure is saved in the data directory.
+In the example below, the figure is saved in the output directory.
 
 .. code-block:: python
 
@@ -111,14 +111,14 @@ transforming them using PCA, which is fit only on replicate n°1 (3a1g_B_prod_R1
         subsample_size=200)
 
 There is an option to automatically generate a PDF report containing all plots relevant to the conducted analysis.
-The report is saved in the data directory.
+The report is saved in the output directory.
 
 .. code-block:: python
 
     visualization = Visualization(analysis)
     visualization.generate_report()
 
-Alternatively, different plots can be called explicitly, optionally setting save to True to save the plots as PNGs in the data directory.
+Alternatively, different plots can be called explicitly, optionally setting save to True to save the plots as PNGs in the output directory.
 
 .. code-block:: python
 

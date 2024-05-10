@@ -126,7 +126,7 @@ best results are kept. By setting circular to True, unit vector distance is used
 </pre></div>
 </div>
 <p>Once the data transformation pipeline is completed, the Visualization class is instantiated to analyse the results.
-In the example below, the figure is saved in the data directory.</p>
+In the example below, the figure is saved in the output directory.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span> <span class="o">=</span> <span class="n">Visualization</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
 <span class="n">visualization</span><span class="o">.</span><span class="n">tsne_scatter</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -181,12 +181,12 @@ transforming them using PCA, which is fit only on replicate n°1 (3a1g_B_prod_R1
 </pre></div>
 </div>
 <p>There is an option to automatically generate a PDF report containing all plots relevant to the conducted analysis.
-The report is saved in the data directory.</p>
+The report is saved in the output directory.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span> <span class="o">=</span> <span class="n">Visualization</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
 <span class="n">visualization</span><span class="o">.</span><span class="n">generate_report</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Alternatively, different plots can be called explicitly, optionally setting save to True to save the plots as PNGs in the data directory.</p>
+<p>Alternatively, different plots can be called explicitly, optionally setting save to True to save the plots as PNGs in the output directory.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">pca_plot_2d_landscapes</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>

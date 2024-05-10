@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Tuple, Union
 import numpy as np
 import mdtraj
 from dpet.data.topology import slice_traj_to_com
@@ -19,10 +19,44 @@ def _calc_dmap(traj: mdtraj.Trajectory):
     )
     return dmap
 
-def calc_ca_dmap(traj: mdtraj.Trajectory):
+def calc_ca_dmap(traj: mdtraj.Trajectory) -> np.ndarray:
+    """
+    Calculate the (N, L, L) distance maps between C-alpha atoms for visualization.
+
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDtraj trajectory object.
+
+    Returns
+    -------
+    dmap : numpy.ndarray
+        The distance maps of shape (N, L, L), where N is the number of frames and L is the number of C-alpha atoms.
+
+    Notes
+    -----
+    This function calculates the distance maps between C-alpha atoms for visualization purposes.
+    """
     return _calc_dmap(traj=traj)
 
-def calc_com_dmap(traj: mdtraj.Trajectory):
+def calc_com_dmap(traj: mdtraj.Trajectory) -> np.ndarray:
+    """
+    Calculate the (N, L, L) distance maps between center of mass (COM) atoms for visualization.
+
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDtraj trajectory object.
+
+    Returns
+    -------
+    dmap : numpy.ndarray
+        The distance maps of shape (N, L, L), where N is the number of frames and L is the number of center of mass (COM) atoms.
+
+    Notes
+    -----
+    This function calculates the distance maps between center of mass (COM) atoms for visualization purposes.
+    """
     traj = slice_traj_to_com(traj)
     return _calc_dmap(traj=traj)
 
@@ -71,7 +105,34 @@ def featurize_ca_dist(
         max_sep: int = None,
         inverse: bool = False,
         get_names: bool = True,
-        atom_selector: str = "name CA"):
+        atom_selector: str = "name CA") -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
+    """
+    Calculate C-alpha distances between pairs of residues.
+
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDtraj trajectory object.
+    min_sep : int, optional
+        The minimum sequence separation for distance calculations. Default is 2.
+    max_sep : int or None, optional
+        The maximum sequence separation for distance calculations. Default is None.
+    inverse : bool, optional
+        Whether to calculate inverse distances. Default is False.
+    get_names : bool, optional
+        Whether to return the names of the calculated features. Default is True.
+    atom_selector : str, optional
+        The atom selection string. Default is "name CA".
+
+    Returns
+    -------
+    distances : numpy.ndarray or tuple
+        The calculated C-alpha distances. If get_names is True, returns a tuple containing distances and corresponding feature names.
+
+    Notes
+    -----
+    This function calculates C-alpha distances between pairs of residues.
+    """
     return _featurize_dist(traj=traj,
                            min_sep=min_sep,
                            max_sep=max_sep,
@@ -85,7 +146,34 @@ def featurize_com_dist(
         max_sep: int = None,
         inverse: bool = False,
         get_names: bool = True,
-        atom_selector: str = "name == CA"):
+        atom_selector: str = "name == CA") -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
+    """
+    Calculate center of mass (COM) distances between pairs of residues.
+
+    Parameters
+    ----------
+    traj : mdtraj.Trajectory
+        The MDtraj trajectory object.
+    min_sep : int, optional
+        The minimum sequence separation for distance calculations. Default is 2.
+    max_sep : int or None, optional
+        The maximum sequence separation for distance calculations. Default is None.
+    inverse : bool, optional
+        Whether to calculate inverse distances. Default is False.
+    get_names : bool, optional
+        Whether to return the names of the calculated features. Default is True.
+    atom_selector : str, optional
+        The atom selection string. Default is "name == CA".
+
+    Returns
+    -------
+    distances : numpy.ndarray or tuple
+        The calculated center of mass (COM) distances. If get_names is True, returns a tuple containing distances and corresponding feature names.
+
+    Notes
+    -----
+    This function calculates center of mass (COM) distances between pairs of residues.
+    """
     traj = slice_traj_to_com(traj)
     return _featurize_dist(traj=traj,
                            min_sep=min_sep,

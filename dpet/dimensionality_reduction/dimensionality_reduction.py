@@ -11,14 +11,60 @@ from umap import UMAP
 class DimensionalityReduction(ABC):
     @abstractmethod
     def fit(self, data:np.ndarray):
+        """
+        Fit the dimensionality reduction model to the data.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data array of shape (n_samples, n_features).
+
+        Notes
+        -----
+        This method fits the dimensionality reduction model to the input data.
+        """
         raise NotImplementedError("Method 'fit' must be implemented in subclasses.")
 
     @abstractmethod
     def transform(self, data:np.ndarray) -> np.ndarray:
+        """
+        Transform the input data using the fitted dimensionality reduction model.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data array of shape (n_samples, n_features) to be transformed.
+
+        Returns
+        -------
+        np.ndarray
+            The transformed data array of shape (n_samples, n_components).
+
+        Notes
+        -----
+        This method transforms the input data using the fitted dimensionality reduction model.
+        """
         raise NotImplementedError("Method 'transform' must be implemented in subclasses.")
     
     @abstractmethod
     def fit_transform(self, data:np.ndarray) -> np.ndarray:
+        """
+        Fit the dimensionality reduction model to the data and then transform it.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data array of shape (n_samples, n_features).
+
+        Returns
+        -------
+        np.ndarray
+            The transformed data array of shape (n_samples, n_components).
+
+        Notes
+        -----
+        This method fits the dimensionality reduction model to the input data and then transforms it.
+        """
         raise NotImplementedError("Method 'fit_transform' must be implemented in subclasses.")
 
 class PCAReduction(DimensionalityReduction):
@@ -396,6 +442,9 @@ def unit_vector_distance(a0: np.ndarray, a1: np.ndarray, sqrt: bool = True):
     return dist
 
 def unit_vector_kernel(a1, a2, gamma):
+    """
+    Compute unit vector kernel.
+    """
     dist = unit_vector_distance(a1, a2, sqrt=False)
     sim = np.exp(-gamma*dist)
     return sim

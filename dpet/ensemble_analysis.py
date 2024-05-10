@@ -19,8 +19,10 @@ class EnsembleAnalysis:
 
     Parameters
     ----------
-    ensembles (list[Ensemble]): List of ensembles.
-    output_dir (str): Directory path for storing data.
+    ensembles : list[Ensemble])
+        List of ensembles.
+    output_dir : str
+        Directory path for storing data.
     """
     def __init__(self, ensembles:list[Ensemble], output_dir:str):
         self.output_dir = Path(output_dir)
