@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 import numpy as np
 import mdtraj
 from dpet.featurization.utils import get_triu_indices
@@ -334,7 +334,7 @@ def featurize_tr_phi(
         return phi
 
 
-def _get_tr_topology_data(traj: mdtraj.Trajectory) -> Tuple[list]:
+def _get_tr_topology_data(traj: mdtraj.Trajectory) -> Tuple[List]:
     residues = [r for r in traj.topology.residues]
     atoms = []
     for i in range(len(residues)):
@@ -351,7 +351,7 @@ def _get_tr_topology_data(traj: mdtraj.Trajectory) -> Tuple[list]:
 
 def _get_tr_omega_coords(
         traj: mdtraj.Trajectory,
-        atoms: dict) -> Tuple[np.array]:
+        atoms: Dict) -> Tuple[np.array]:
     """
     Get from an mdtraj trajectory the coordinates of the atoms needed to
     calculate trRosetta angles.

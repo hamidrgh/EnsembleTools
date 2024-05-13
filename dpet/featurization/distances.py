@@ -126,7 +126,7 @@ def featurize_ca_dist(
 
     Returns
     -------
-    distances : numpy.ndarray or tuple
+    distances : numpy.ndarray or Tuple
         The calculated C-alpha distances. If get_names is True, returns a tuple containing distances and corresponding feature names.
 
     Notes
@@ -167,7 +167,7 @@ def featurize_com_dist(
 
     Returns
     -------
-    distances : numpy.ndarray or tuple
+    distances : numpy.ndarray or Tuple
         The calculated center of mass (COM) distances. If get_names is True, returns a tuple containing distances and corresponding feature names.
 
     Notes

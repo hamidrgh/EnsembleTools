@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List, Tuple
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA, KernelPCA
 from sklearn.manifold import TSNE
@@ -100,7 +101,7 @@ class TSNEReduction(DimensionalityReduction):
 
     Parameters
     ----------
-    perplexity_vals : list[float], optional
+    perplexity_vals : List[float], optional
         List of perplexity values. Default is range(2, 10, 2).
     metric : str, optional
         Metric to use. Default is "euclidean".
@@ -110,17 +111,17 @@ class TSNEReduction(DimensionalityReduction):
         Number of dimensions of the embedded space. Default is 2.
     learning_rate : float, optional
         Learning rate. Default is 100.0.
-    range_n_clusters : list[int], optional
+    range_n_clusters : List[int], optional
         Range of cluster values. Default is range(2, 10, 1).
     """
 
     def __init__(
-            self, perplexity_vals:list[float]=range(2, 10, 2), 
+            self, perplexity_vals:List[float]=range(2, 10, 2), 
             metric:str="euclidean", 
             circular:bool=False, 
             n_components:int=2, 
             learning_rate:float=100.0, 
-            range_n_clusters:list[int] = range(2,10,1)):
+            range_n_clusters:List[int] = range(2,10,1)):
         self.perplexity_vals = perplexity_vals
         self.metric = unit_vector_distance if circular else metric
         self.n_components = n_components
@@ -197,11 +198,11 @@ class DimenFixReduction(DimensionalityReduction):
 
     Parameters
     ----------
-    range_n_clusters : list[int], optional
+    range_n_clusters : List[int], optional
         Range of cluster values. Default is range(1, 10, 1).
     """
 
-    def __init__(self, range_n_clusters:list[int] = range(1,10,1)):
+    def __init__(self, range_n_clusters:List[int] = range(1,10,1)):
         self.range_n_clusters = range_n_clusters
 
     def fit(self, data:np.ndarray):
@@ -216,13 +217,13 @@ class DimenFixReduction(DimensionalityReduction):
         self.cluster()
         return self.projection
     
-    def cluster(self) -> list:
+    def cluster(self) -> List[Tuple]:
         """
         Perform clustering using KMeans algorithm for each number of clusters in the specified range.
 
         Returns
         -------
-        list
+        List[Tuple]
             A list of tuples containing the number of clusters and the corresponding silhouette score
             for each clustering result.
         """
@@ -278,7 +279,7 @@ class UMAPReduction(DimensionalityReduction):
         The minimum distance between embedded points. Default is 0.1.
     metric : str, optional
         The metric to use for distance calculation. Default is 'euclidean'.
-    range_n_clusters : range or list, optional
+    range_n_clusters : range or List, optional
         Range of cluster values to consider for silhouette scoring. Default is range(2, 10, 1).
     """
 
@@ -302,13 +303,13 @@ class UMAPReduction(DimensionalityReduction):
         self.cluster()
         return self.embedding
     
-    def cluster(self) -> list:
+    def cluster(self) -> List[Tuple]:
         """
         Perform clustering using KMeans algorithm for each number of clusters in the specified range.
 
         Returns
         -------
-        list
+        List[Tuple]
             A list of tuples containing the number of clusters and the corresponding silhouette score
             for each clustering result.
         """

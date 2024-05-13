@@ -19,12 +19,12 @@ class EnsembleAnalysis:
 
     Parameters
     ----------
-    ensembles : list[Ensemble])
+    ensembles : List[Ensemble])
         List of ensembles.
     output_dir : str
         Directory path for storing data.
     """
-    def __init__(self, ensembles:list[Ensemble], output_dir:str):
+    def __init__(self, ensembles:List[Ensemble], output_dir:str):
         self.output_dir = Path(output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
         self.api_client = APIClient()
@@ -300,14 +300,14 @@ class EnsembleAnalysis:
         return [mdtraj.compute_rg(frame) for frame in trajectory]
 
     @property
-    def rg(self) -> list[float]:
+    def rg(self) -> List[float]:
         """
         Calculates Rg for each conformation in the loaded ensembles.
         The returned values are in Angstrom.  
 
         Returns
         -------
-        list[float]
+        List[float]
             A list of Rg values for each conformation in the loaded ensembles, in Angstrom.
         """
         rg_values_list = []
@@ -316,7 +316,7 @@ class EnsembleAnalysis:
             rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
         return [item[0] * 10 for item in rg_values_list]
 
-    def _get_concat_features(self, fit_on: list[str]=None):
+    def _get_concat_features(self, fit_on: List[str]=None):
         if fit_on and any(f not in self.ens_codes for f in fit_on):
             raise ValueError("Cannot fit on ensembles that were not provided as input.")
         if fit_on is None:
@@ -326,7 +326,7 @@ class EnsembleAnalysis:
         print("Concatenated featurized ensemble shape:", concat_features.shape)
         return concat_features
 
-    def reduce_features(self, method: str, fit_on:list[str]=None, *args, **kwargs) -> np.ndarray:
+    def reduce_features(self, method: str, fit_on:List[str]=None, *args, **kwargs) -> np.ndarray:
         """
         Perform dimensionality reduction on the extracted features.
 
@@ -335,7 +335,7 @@ class EnsembleAnalysis:
         method : str
             Choose between "pca", "tsne", "dimenfix", "mds", and "kpca".
 
-        fit_on : list[str], optional
+        fit_on : List[str], optional
             if method is "pca" or "kpca", specifies on which ensembles the models should be fit. 
             The model will then be used to transform all ensembles.
 
@@ -348,7 +348,7 @@ class EnsembleAnalysis:
                 Number of components to keep. Default is 10.
 
         - tsne:
-            - perplexity_vals : list[float], optional
+            - perplexity_vals : List[float], optional
                 List of perplexity values. Default is range(2, 10, 2).
             - metric : str, optional
                 Metric to use. Default is "euclidean". 
@@ -358,11 +358,11 @@ class EnsembleAnalysis:
                 Number of dimensions of the embedded space. Default is 2.
             - learning_rate : float, optional
                 Learning rate. Default is 100.0.
-            - range_n_clusters : list[int], optional
+            - range_n_clusters : List[int], optional
                 Range of cluster values. Default is range(2, 10, 1).
 
         - dimenfix:
-            - range_n_clusters : list[int], optional
+            - range_n_clusters : List[int], optional
                 Range of cluster values. Default is range(1, 10, 1).
 
         - mds:
@@ -409,7 +409,7 @@ class EnsembleAnalysis:
             self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
         return self.transformed_data
 
-    def execute_pipeline(self, featurization_params:dict, reduce_dim_params:dict, subsample_size:int=None):
+    def execute_pipeline(self, featurization_params:Dict, reduce_dim_params:Dict, subsample_size:int=None):
         """
         Execute the data analysis pipeline end-to-end. The pipeline includes:
             1. Download from database (optional)
@@ -420,11 +420,11 @@ class EnsembleAnalysis:
 
         Parameters
         ----------
-        featurization_params: dict
+        featurization_params: Dict
             Parameters for feature extraction. The only required parameter is "featurization",
             which can be "phi_psi", "ca_dist", "a_angle", "tr_omega" or "tr_phi". 
             Other method-specific parameters are optional.
-        reduce_dim_params: dict
+        reduce_dim_params: Dict
             Parameters for dimensionality reduction. The only required parameter is "method",
             which can be "pca", "tsne", "dimenfix", "mds" or "kpca".
         subsample_size: int, optional
