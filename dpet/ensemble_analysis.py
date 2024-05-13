@@ -288,8 +288,7 @@ class EnsembleAnalysis:
     def _normalize_data(self):
         feature_sizes = set(ensemble.features.shape[1] for ensemble in self.ensembles)
         if len(feature_sizes) > 1:
-            print("Error: Features from ensembles have different sizes. Cannot normalize data.")
-            return
+            raise ValueError("Error: Features from ensembles have different sizes. Cannot normalize data.")
         self.concat_features = self._get_concat_features()
         mean = self.concat_features.mean(axis=0)
         std = self.concat_features.std(axis=0)
@@ -391,10 +390,11 @@ class EnsembleAnalysis:
             - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html
         """
         # Check if all ensemble features have the same size
+        # Check if all ensemble features have the same size
         feature_sizes = set(ensemble.features.shape[1] for ensemble in self.ensembles)
         if len(feature_sizes) > 1:
-            print("Error: Features from ensembles have different sizes. Cannot concatenate.")
-            return None
+            raise ValueError("Features from ensembles have different sizes. Cannot concatenate.")
+
         self.concat_features = self._get_concat_features()
         self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
         self.reduce_dim_method = method
@@ -436,7 +436,7 @@ class EnsembleAnalysis:
         self.extract_features(**featurization_params)
         self.reduce_features(**reduce_dim_params)
 
-    def get_features(self, featurization: str, min_sep: int = 2, max_sep: int = None) -> Dict[str, np.ndarray]:
+    def get_features(self, featurization: str, min_sep: int = 2, max_sep: int = None, normalize: bool = False) -> Dict[str, np.ndarray]:
         """
         Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.
 
@@ -451,6 +451,9 @@ class EnsembleAnalysis:
         max_sep : int, optional
             Maximum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is None.
 
+        normalize : bool, optional
+            Whether to normalize the extracted features. Normalization is only supported when featurization is "ca_dist". Default is False.
+
         Returns:
         --------
         Dict[str, np.ndarray]
@@ -460,8 +463,22 @@ class EnsembleAnalysis:
         if featurization in ("phi_psi", "tr_omega", "tr_phi") and self.exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         
+        if normalize and featurization != "ca_dist":
+            raise ValueError("Normalization is only supported when featurization is 'ca_dist'.")
+        
         features_dict = {}
         for ensemble in self.ensembles:
-            features = ensemble.get_features(featurization=featurization, min_sep= min_sep, max_sep=max_sep)
+            features = ensemble.get_features(featurization=featurization, min_sep=min_sep, max_sep=max_sep)
             features_dict[ensemble.code] = features
+            
+        if normalize:
+            feature_sizes = set(features.shape[1] for features in features_dict.values())
+            if len(feature_sizes) > 1:
+                raise ValueError("Error: Features from ensembles have different sizes. Cannot normalize data.")
+            concat_features = np.concatenate(list(features_dict.values()), axis=0)
+            mean = concat_features.mean(axis=0)
+            std = concat_features.std(axis=0)
+            for key, features in features_dict.items():
+                features_dict[key] = (features - mean) / std
+        
         return features_dict
