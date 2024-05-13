@@ -435,14 +435,12 @@ class Visualization:
         return ax
 
 
-    def pca_correlation(self, num_residues: int, sel_dims: List[int], save: bool = False) -> List[plt.Axes]:
+    def pca_correlation(self, sel_dims: List[int], save: bool = False) -> List[plt.Axes]:
         """
         Plot the correlation between residues based on PCA weights.
 
         Parameters
         ----------
-        num_residues : int
-            The total number of residues in the system.
         sel_dims : List[int]
             A list of indices specifying the PCA dimensions to include in the plot.
         save : bool, optional
@@ -476,6 +474,9 @@ class Visualization:
 
         fig_r = 0.8
         fig, ax = plt.subplots(1, 3, dpi=dpi, figsize=(15*fig_r, 4*fig_r))
+
+        # Get the number of residues from one of the trajectories
+        num_residues = next(iter(analysis.trajectories.values())).topology.n_residues
 
         for k, sel_dim in enumerate(sel_dims):
             feature_ids_sorted_by_weight = np.flip(np.argsort(abs(analysis.reduce_dim_model.components_[sel_dim,:])))
