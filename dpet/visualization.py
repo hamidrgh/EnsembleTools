@@ -1,19 +1,137 @@
 import os
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Union
+import numpy as np
+import matplotlib
+from matplotlib.lines import Line2D
 from matplotlib import cm, colors, pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-import numpy as np
+from scipy.stats import gaussian_kde
 from sklearn.cluster import KMeans
 import mdtraj
-from matplotlib.lines import Line2D
 from dpet.featurization.distances import *
 from dpet.ensemble_analysis import EnsembleAnalysis
 from dpet.featurization.angles import featurize_a_angle
 from dpet.data.coord import *
-from scipy.stats import gaussian_kde
 
 PLOT_DIR = "plots"
+rg_axis_label = r"$R_g$ [nm]"
+
+def plot_histogram(
+        ax: plt.Axes,
+        data: List[np.ndarray],
+        labels: List[str],
+        bins: Union[int, List] = 50,
+        range: Tuple = None,
+        title: str = "Histogram",
+        xlabel: str = "x",
+        ylabel: str = "Density"
+    ):
+    """
+    Plot an histogram for different features.
+
+    Parameters
+    ----------
+    ax: plt.Axes
+        Matplotlib axis object where the histograms will be for plotted.
+    data: List[np.array]
+        List of NumPy array storing the data to be plotted.
+    labels: List[str]
+        List of strings with the labels of the arrays.
+    bins:
+        Number of bins.
+    range: Tuple, optional
+        A tuple with a min and max value for the histogram. Default is None,
+        which corresponds to using the min a max value across all data.
+    title: str, optional
+        Title of the axis object.
+    xlabel: str, optional
+        Label of the horizontal axis.
+    ylabel: str, optional
+        Label of the vertical axis.
+
+    Returns
+    -------
+    plt.Axes
+        Axis objects for the histogram plot of original labels.
+    """
+    
+    _bins = _get_hist_bins(data=data, bins=bins, range=range)
+
+    for i, data_i in enumerate(data):
+        h_i = ax.hist(
+            data_i,
+            label=labels[i],
+            bins=_bins if i == 0 else _bins,
+            density=True,
+            histtype='step',
+            # edgecolor='black',
+            # histtype='stepfilled',
+            # alpha=0.25
+        )
+        if i == 0:
+            _bins = h_i[1]
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.legend()
+    return ax
+
+def _get_hist_bins(data: List[np.ndarray], bins: int, range: Tuple = None):
+    if isinstance(bins, int):  # Make a range.
+        if range is None:
+            _min = min([min(x_i) for x_i in data])
+            _max = max([max(x_i) for x_i in data])
+        else:
+            _min = range[0]
+            _max = range[1]
+        _bins = np.linspace(_min, _max, bins+1)
+    else:  # The bins are already provided as a range.
+        _bins = bins
+    return _bins
+
+def plot_violins(
+        ax: plt.Axes,
+        data: List[np.ndarray],
+        labels: List[str],
+        means: bool = False,
+        median: bool = True,
+        title: str = "Histogram",
+        xlabel: str = "x"
+    ):
+    """
+    Make a violin plot.
+
+    Parameters
+    ----------
+    ax: plt.Axes
+        Matplotlib axis object where the histograms will be for plotted.
+    data: List[np.array]
+        List of NumPy array storing the data to be plotted.
+    labels: List[str]
+        List of strings with the labels of the arrays.
+    means : bool, optional
+            If True, means are shown in the violin plot. Default is True.
+    median : bool, optional
+        If True, medians are shown in the violin plot. Default is True.
+    title: str, optional
+        Title of the axis object.
+    xlabel: str, optional
+        Label of the horizontal axis.
+
+    Returns
+    -------
+    plt.Axes
+        Axis objects for the histogram plot of original labels.
+    """
+    
+    ax.violinplot(data, showmeans=means, showmedians=median)
+    ax.set_xticks(ticks=[y + 1 for y in range(len(labels))])
+    ax.set_xticklabels(labels=labels, rotation=45.0, ha="center")
+    ax.set_ylabel(xlabel)
+    ax.set_title(title)
+    return ax
+
 
 class Visualization:
     """
@@ -541,7 +659,7 @@ class Visualization:
             )
             ax[i].legend(fontsize=8)
             ax[i].set_xlabel(f"Dim {pca_dim+1}")
-            ax[i].set_ylabel("Rg [nm]")
+            ax[i].set_ylabel(rg_axis_label)
 
         plt.tight_layout()
         self.figures["pca_rg_correlation"] = fig
@@ -550,15 +668,22 @@ class Visualization:
 
         return ax
 
-    def global_sasa_dist(self, showmeans: bool = True, showmedians: bool = True, save: bool = False) -> plt.Axes:
+    def global_sasa_dist(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, medians: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of SASA for each conformation within the ensembles.
 
         Parameters
         ----------
-        showmeans : bool, optional
+        bins : int, optional
+            The number of bins for the histogram. Default is 50.
+        hist_range: Tuple, optional
+            A tuple with a min and max value for the histogram. Default is None,
+            which corresponds to using the min a max value across all data.
+        violin_plot : bool, optional
+            If True, a violin plot is visualized. Default is True.
+        means : bool, optional
             If True, it will show the mean. Default is True.
-        showmedians : bool, optional
+        medians : bool, optional
             If True, it will show the median. Default is True.
         save : bool, optional
             If True, the plot will be saved in the data directory. Default is False.
@@ -572,22 +697,47 @@ class Visualization:
 
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
-            return []
+            return
 
-        fig, ax = plt.subplots(1, 1 )
-        positions = []
-        dist_list = []
-        for ens in self.analysis.ensembles:
-            positions.append(ens.code)
-            sasa = mdtraj.shrake_rupley(ens.trajectory)
-            total_sasa = sasa.sum(axis=1)
-            dist_list.append(total_sasa)
-        ax.violinplot(dist_list, showmeans=showmeans, showmedians=showmedians  )
+        ensembles = self.analysis.ensembles
 
-        ax.set_xticks(ticks= [y + 1 for y in range(len(positions))])
-        ax.set_xticklabels(positions, rotation = 45.0, ha = "center")
-        ax.set_title('SASA distribution over the ensembles')
-        ax.set_ylabel('SASA (nm)^2')
+        # Calculate features.
+        hist_data = []
+        labels = []
+
+        for ensemble in ensembles:
+            sasa_i = mdtraj.shrake_rupley(ensemble.trajectory)
+            total_sasa_i = sasa_i.sum(axis=1)
+            hist_data.append(total_sasa_i)
+            labels.append(ensemble.code)
+
+        # Plot.
+        fig, ax = plt.subplots()
+        axis_label = r"SASA (nm$^2$)"
+        title = "SASA distribution over the ensembles"
+
+        if violin_plot:
+            plot_violins(
+                ax=ax,
+                data=hist_data,
+                labels=labels,
+                means=means,
+                median=medians,
+                title=title,
+                xlabel=axis_label
+            )
+        else:
+            plot_histogram(
+                ax=ax,
+                data=hist_data,
+                labels=labels,
+                bins=bins,
+                range=hist_range,
+                title=title,
+                xlabel=axis_label
+            )
+
+
         self.figures["plot_global_sasa"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + self.analysis.ens_codes[0]))
@@ -621,7 +771,7 @@ class Visualization:
             print(f"Pearson coeff for {ensemble.code} = {round(p[0][1], 3)}")
         
         ax.set_ylabel("Asphericity")
-        ax.set_xlabel("Rg [nm]")
+        ax.set_xlabel(rg_axis_label)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         self.figures["plot_rg_vs_asphericity"] = fig
         if save:
@@ -659,51 +809,13 @@ class Visualization:
             print(f"Pearson coeff for {ensemble.code} = {round(p[0][1], 3)}")
 
         ax.set_ylabel("Prolateness")
-        ax.set_xlabel("Rg [nm]")
+        ax.set_xlabel(rg_axis_label)
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
         self.figures["plot_rg_vs_prolateness"] = fig
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Prolateness' + analysis.ens_codes[0]))
-        
-        return ax
-
-
-    def alpha_angle_dihedral_dist(self, bins: int = 50, save: bool = False) -> plt.Axes:
-        """
-        Plot the distribution of dihedral angles between four consecutive Cα beads.
-
-        Parameters
-        ----------
-        bins : int, optional
-            Number of bins for the histogram. Default is 50.
-        save : bool, optional
-            If True, the plot will be saved in the data directory. Default is False.
-
-        Returns
-        -------
-        plt.Axes
-            The Axes object containing the plot.
-        """
-
-        analysis = self.analysis
-        
-        # Create a new figure object
-        fig, ax = plt.subplots()
-
-        for ensemble in analysis.ensembles:
-            four_cons_indices_ca = create_consecutive_indices_matrix(ensemble.trajectory.topology.select(ensemble.atom_selector) )
-            ens_dh_ca = mdtraj.compute_dihedrals(ensemble.trajectory, four_cons_indices_ca).ravel()
-            ax.hist(ens_dh_ca, bins=bins, histtype="step", density=True, label=ensemble.code)
-
-        ax.set_title("The distribution of dihedral angles between four consecutive Cα beads.")
-        ax.legend()
-
-        self.figures["plot_alpha_angle_dihedral"] = fig
-
-        if save:
-            fig.savefig(os.path.join(self.plot_dir, 'alpha_angle_dihedral' + analysis.ens_codes[0]))
         
         return ax
 
@@ -779,14 +891,39 @@ class Visualization:
             rg_dict[ensemble.code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
 
-    def rg_comp_dist(self, n_bins: int = 50, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
+    #
+    # TODO: implement a: single hist plot, multiple hist plots, violin plots.
+    #
+
+    def rg_comp_dist(
+            self,
+            bins: int = 50,
+            hist_range: Tuple = None,  # TODO.
+            multiple_hist_ax: bool = False,
+            violin_plot: bool = False,  # TODO.
+            median: bool = False,
+            means: bool = False,
+            dpi: int = 96,
+            save: bool = False
+        ) -> List[plt.Axes]:
         """
         Plot the distribution of the radius of gyration (Rg) within each ensemble.
 
         Parameters
         ----------
-        n_bins : int, optional
+        bins : int, optional
             The number of bins for the histogram. Default is 50.
+        hist_range : Tuple, optional
+            A tuple with a min and max value for the histogram. Default is None,
+            which corresponds to using the min a max value across all data.
+        multiple_hist_ax: bool, optional
+            If True, it will plot each histogram in a different axis.
+        violin_plot : bool, optional
+            If True, a violin plot is visualized. Default is True.
+        median : bool, optional
+            If True, median is showing in the violin plot. Default is False.
+        means : bool, optional
+            If True, mean is showing in the violin plot. Default is False.
         dpi : int, optional
             The DPI (dots per inch) of the output figure. Default is 96.
         save : bool, optional
@@ -806,39 +943,80 @@ class Visualization:
         on each histogram.
         """
 
+
+        # Calculate features.
         rg_data_dict = self._get_rg_data_dict()
-        concatenated_rg_data = np.concatenate(list(rg_data_dict.values())) 
-        min_value = np.floor(np.min(concatenated_rg_data)) #calculating min and max Rg to automate the range
-        max_value = np.ceil(np.max(concatenated_rg_data))
-        h_args = {"histtype": "step", "density": True}
+        hist_data = list(rg_data_dict.values())
+        labels = list(rg_data_dict.keys())
         n_systems = len(rg_data_dict)
-        
-        bins = np.linspace(min_value, max_value, n_bins + 1)
-        fig, ax = plt.subplots(1, n_systems, figsize=(3 * n_systems, 3), dpi=dpi)
-        
-        # Ensure ax is always a list
-        if not isinstance(ax, np.ndarray):
-            ax = [ax]
 
-        for i, (name_i, rg_i) in enumerate(rg_data_dict.items()):
-            ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
-            ax[i].set_title(name_i)
-            if i == 0:
-                ax[i].set_ylabel("Density")
-            ax[i].set_xlabel("Rg [nm]")
-            mean_rg = np.mean(rg_i)
-            median_rg = np.median(rg_i)
+        # Plot.
+        if not violin_plot and multiple_hist_ax:
+            # One axis for each histogram.
+            fig, ax = plt.subplots(
+                1, n_systems,
+                figsize=(3 * n_systems, 3),
+                dpi=dpi
+            )
+        else:
+            # Only one axis for all histograms.
+            fig, ax = plt.subplots(dpi=dpi)
 
-            mean_line = ax[i].axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
-            median_line = ax[i].axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
+        axis_label = rg_axis_label
+        title = "Radius of gyration"
 
-        
-        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
-        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
-        fig.legend(handles=[mean_legend, median_legend], loc='upper right')
+        if violin_plot:
+            plot_violins(
+                ax=ax,
+                data=hist_data,
+                labels=labels,
+                means=means,
+                median=median,
+                title=title,
+                xlabel=axis_label
+            )
+        else:
+            if not multiple_hist_ax:
+                plot_histogram(
+                    ax=ax,
+                    data=hist_data,
+                    labels=labels,
+                    bins=bins,
+                    range=hist_range,
+                    title=title,
+                    xlabel=axis_label
+                )
+            else:
+                _bins = _get_hist_bins(
+                    data=hist_data, bins=bins, range=hist_range
+                )
+                h_args = {"histtype": "step", "density": True}
+                # Ensure ax is always a list
+                if not isinstance(ax, np.ndarray):
+                    ax = [ax]
 
-        plt.tight_layout()
-        plt.show()
+                for i, (name_i, rg_i) in enumerate(rg_data_dict.items()):
+                    ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
+                    ax[i].set_title(name_i)
+                    if i == 0:
+                        ax[i].set_ylabel("Density")
+                    ax[i].set_xlabel(axis_label)
+                    legend_handles = []
+                    if means:
+                        mean_rg = np.mean(rg_i)
+                        mean_line = ax[i].axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                    if median:
+                        median_rg = np.median(rg_i)
+                        median_line = ax[i].axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+                if legend_handles:
+                    fig.legend(handles=legend_handles, loc='upper right')
+
+                plt.tight_layout()
+                plt.show()
 
         self.figures['trajectories_plot_rg_comparison'] = fig
         if save:
@@ -1105,7 +1283,7 @@ class Visualization:
         return axes
         
 
-    def end_to_end_dist(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
+    def end_to_end_dist(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
 
@@ -1113,6 +1291,9 @@ class Visualization:
         ----------
         bins : int, optional
             The number of bins for the histogram. Default is 50.
+        hist_range: Tuple, optional
+            A tuple with a min and max value for the histogram. Default is None,
+            which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
         means : bool, optional
@@ -1130,28 +1311,44 @@ class Visualization:
         """
 
         ensembles = self.analysis.ensembles
-        dist_list = []
-        positions = []
-        
+
+        # Calculate features.
+        hist_data = []
+        labels = []
+
+        for ensemble in ensembles:
+            ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
+            hist_data_i = mdtraj.compute_distances(
+                ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]
+            ).ravel()
+            hist_data.append(hist_data_i)
+            labels.append(ensemble.code)
+
+        # Plot.
         fig, ax = plt.subplots()
+        axis_label = "End-to-End distance [nm]"
+        title = "End-to-End distances distribution"
 
         if violin_plot:
-            for ensemble in ensembles:
-                ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
-                positions.append(ensemble.code)
-                dist_list.append(mdtraj.compute_distances(ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]).ravel())
-            ax.violinplot(dist_list, showmeans=means, showmedians=median)
-            ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
-            ax.set_xticklabels(labels=positions, rotation=45.0, ha="center")
-            ax.set_ylabel("End-to-End distance [nm]")
-            ax.set_title("End-to-End distances distribution")
+            plot_violins(
+                ax=ax,
+                data=hist_data,
+                labels=labels,
+                means=means,
+                median=median,
+                title=title,
+                xlabel=axis_label
+            )
         else:
-            for ensemble in ensembles:
-                ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
-                ax.hist(mdtraj.compute_distances(ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]).ravel(),
-                        label=ensemble.code, bins=bins, edgecolor='black', density=True)
-            ax.set_title("End-to-End distances distribution")
-            ax.legend()
+            plot_histogram(
+                ax=ax,
+                data=hist_data,
+                labels=labels,
+                bins=bins,
+                range=hist_range,
+                title=title,
+                xlabel=axis_label
+            )
 
         self.figures['end_to_end_distances_plot'] = fig
         if save:
@@ -1160,7 +1357,7 @@ class Visualization:
         return ax
 
 
-    def asphericity_dist(self, bins: int = 50, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
+    def asphericity_dist(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot asphericity distribution in each ensemble.
         Asphericity is calculated based on the gyration tensor.
@@ -1169,6 +1366,9 @@ class Visualization:
         ----------
         bins : int, optional
             The number of bins for the histogram. Default is 50.
+        hist_range: Tuple, optional
+            A tuple with a min and max value for the histogram. Default is None,
+            which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
         means : bool, optional
@@ -1186,28 +1386,42 @@ class Visualization:
         """
 
         ensembles = self.analysis.ensembles
+
+        # Calculate features.
         asph_list = []
-        positions = []
-        
-        # Create a new figure object
+        labels = []
+        for ensemble in ensembles:
+            asphericity = calculate_asphericity(
+                mdtraj.compute_gyration_tensor(ensemble.trajectory)
+            )
+            asph_list.append(asphericity)
+            labels.append(ensemble.code)
+
+        # Create a new figure object.
         fig, ax = plt.subplots()
+        axis_label = "Asphericity"
+        title = "Asphericity distribution"
 
         if violin_plot:
-            for ensemble in ensembles:
-                asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
-                asph_list.append(asphericity)
-                positions.append(ensemble.code)
-            ax.violinplot(asph_list, showmeans=means, showmedians=median)
-            ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
-            ax.set_xticklabels(labels=positions, rotation=45.0, ha="center")
-            ax.set_ylabel("Asphericity")
-            ax.set_title("Asphericity distribution")
+            plot_violins(
+                ax=ax,
+                data=asph_list,
+                labels=labels,
+                means=means,
+                median=median,
+                title=title,
+                xlabel=axis_label
+            )
         else:
-            for ensemble in ensembles:
-                asphericity = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
-                ax.hist(asphericity, label=ensemble.code, bins=bins, edgecolor='black', density=True)
-            ax.set_title("Asphericity distribution")
-            ax.legend()
+            plot_histogram(
+                ax=ax,
+                data=asph_list,
+                labels=labels,
+                bins=bins,
+                range=hist_range,
+                title=title,
+                xlabel=axis_label
+            )
 
         self.figures['plot_asphericity_dist'] = fig
         if save:
@@ -1215,7 +1429,7 @@ class Visualization:
 
         return ax
 
-    def prolateness_dist(self, bins: int = 50, violin_plot: bool = True, median: bool = False, mean: bool = False, save: bool = False) -> plt.Axes:
+    def prolateness_dist(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, median: bool = False, means: bool = False, save: bool = False) -> plt.Axes:
         """
         Plot prolateness distribution in each ensemble.
         Prolateness is calculated based on the gyration tensor.
@@ -1224,11 +1438,14 @@ class Visualization:
         ----------
         bins : int, optional
             The number of bins for the histogram. Default is 50.
+        hist_range : Tuple, optional
+            A tuple with a min and max value for the histogram. Default is None,
+            which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
         median : bool, optional
             If True, median is showing in the violin plot. Default is False.
-        mean : bool, optional
+        means : bool, optional
             If True, mean is showing in the violin plot. Default is False.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
@@ -1240,28 +1457,42 @@ class Visualization:
         """
 
         ensembles = self.analysis.ensembles
+
+        # Calculate features.
         prolat_list = []
-        positions = []
+        labels = []
+        for ensemble in ensembles:
+            prolat = calculate_prolateness(
+                mdtraj.compute_gyration_tensor(ensemble.trajectory)
+            )
+            prolat_list.append(prolat)
+            labels.append(ensemble.code)
 
         # Create a new figure object
         fig, ax = plt.subplots()
+        axis_label = "Prolateness"
+        title = "Prolateness distribution"
 
         if violin_plot:
-            for ensemble in ensembles:
-                prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
-                prolat_list.append(prolat)
-                positions.append(ensemble.code)
-            ax.violinplot(prolat_list, showmeans=mean, showmedians=median)
-            ax.set_xticks(ticks=[y + 1 for y in range(len(positions))])
-            ax.set_xticklabels(labels=positions, rotation=45.0, ha="center")
-            ax.set_ylabel("Prolateness")
-            ax.set_title("Prolateness distribution")
+            plot_violins(
+                ax=ax,
+                data=prolat_list,
+                labels=labels,
+                means=means,
+                median=median,
+                title=title,
+                xlabel=axis_label
+            )
         else:
-            for ensemble in ensembles:
-                prolat = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
-                ax.hist(prolat, label=ensemble.code, bins=bins, edgecolor='black', density=True)
-            ax.set_title("Prolateness distribution")
-            ax.legend()
+            plot_histogram(
+                ax=ax,
+                data=prolat_list,
+                labels=labels,
+                bins=bins,
+                range=hist_range,
+                title=title,
+                xlabel=axis_label
+            )
 
         self.figures['plot_prolateness_dist'] = fig
         if save:
@@ -1290,13 +1521,26 @@ class Visualization:
         ensembles = self.analysis.ensembles
 
         fig, ax = plt.subplots()
-
+        data = []
+        labels = []
         for ensemble in ensembles:
-            ax.hist(featurize_a_angle(ensemble.trajectory, get_names=False, atom_selector=ensemble.atom_selector).ravel(),
-                    bins=bins, histtype="step", density=False, label=ensemble.code)
+            data_i = featurize_a_angle(
+                ensemble.trajectory,
+                get_names=False,
+                atom_selector=ensemble.atom_selector
+            ).ravel()
+            data.append(data_i)
+            labels.append(ensemble.code)
 
-        ax.set_title("Distribution of alpha angles")
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        plot_histogram(
+            ax=ax,
+            data=data,
+            labels=labels,
+            bins=bins,
+            range=(-np.pi, np.pi),
+            title="Distribution of alpha angles",
+            xlabel="angle [rad]"
+        )
 
         self.figures['plot_alpha_angles_dist'] = fig
         if save:

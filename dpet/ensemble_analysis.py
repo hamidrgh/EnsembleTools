@@ -203,6 +203,10 @@ class EnsembleAnalysis:
             elif ensemble.database == 'atlas':
                 new_ensembles = self._download_from_atlas(ensemble)
                 new_ensembles_mapping[ensemble.code] = new_ensembles
+            elif ensemble.database is None:
+                pass
+            else:
+                raise KeyError(f"Unknown database: {ensemble.database}")
 
         # Update self.ensembles using the mapping
         updated_ensembles = []
