@@ -135,23 +135,23 @@
 <span id="dpet-dimensionality-reduction-module"></span><h2>dpet.dimensionality_reduction module<a class="headerlink" href="#module-dpet.dimensionality_reduction" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="dpet.dimensionality_reduction.DimenFixReduction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">DimenFixReduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_n_clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">range(1,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/dimensionality_reduction.html#DimenFixReduction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.dimensionality_reduction.DimenFixReduction" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">DimenFixReduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_n_clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">range(1,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/dimensionality_reduction.html#DimenFixReduction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.dimensionality_reduction.DimenFixReduction" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dpet.dimensionality_reduction.DimensionalityReduction" title="dpet.dimensionality_reduction.DimensionalityReduction"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalityReduction</span></code></a></p>
 <p>Class for performing dimensionality reduction using DimenFix algorithm.</p>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>range_n_clusters<span class="classifier">list[int], optional</span></dt><dd><p>Range of cluster values. Default is range(1, 10, 1).</p>
+<dt>range_n_clusters<span class="classifier">List[int], optional</span></dt><dd><p>Range of cluster values. Default is range(1, 10, 1).</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.dimensionality_reduction.DimenFixReduction.cluster">
-<span class="sig-name descname"><span class="pre">cluster</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/dpet/dimensionality_reduction.html#DimenFixReduction.cluster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.dimensionality_reduction.DimenFixReduction.cluster" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">cluster</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/dimensionality_reduction.html#DimenFixReduction.cluster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.dimensionality_reduction.DimenFixReduction.cluster" title="Link to this definition"></a></dt>
 <dd><p>Perform clustering using KMeans algorithm for each number of clusters in the specified range.</p>
 <section id="returns">
 <h4>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>list</dt><dd><p>A list of tuples containing the number of clusters and the corresponding silhouette score
+<dt>List[Tuple]</dt><dd><p>A list of tuples containing the number of clusters and the corresponding silhouette score
 for each clustering result.</p>
 </dd>
 </dl>
@@ -578,13 +578,13 @@ for each clustering result.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="dpet.dimensionality_reduction.TSNEReduction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">TSNEReduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perplexity_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">range(2,</span> <span class="pre">10,</span> <span class="pre">2)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'euclidean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circular</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_n_clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">range(2,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/dimensionality_reduction.html#TSNEReduction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.dimensionality_reduction.TSNEReduction" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.dimensionality_reduction.</span></span><span class="sig-name descname"><span class="pre">TSNEReduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perplexity_vals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">range(2,</span> <span class="pre">10,</span> <span class="pre">2)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'euclidean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circular</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_n_clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">range(2,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/dimensionality_reduction.html#TSNEReduction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.dimensionality_reduction.TSNEReduction" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dpet.dimensionality_reduction.DimensionalityReduction" title="dpet.dimensionality_reduction.DimensionalityReduction"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalityReduction</span></code></a></p>
 <p>Class for performing dimensionality reduction using t-SNE algorithm.</p>
 <section id="id45">
 <h3>Parameters<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>perplexity_vals<span class="classifier">list[float], optional</span></dt><dd><p>List of perplexity values. Default is range(2, 10, 2).</p>
+<dt>perplexity_vals<span class="classifier">List[float], optional</span></dt><dd><p>List of perplexity values. Default is range(2, 10, 2).</p>
 </dd>
 <dt>metric<span class="classifier">str, optional</span></dt><dd><p>Metric to use. Default is “euclidean”.</p>
 </dd>
@@ -594,7 +594,7 @@ for each clustering result.</p>
 </dd>
 <dt>learning_rate<span class="classifier">float, optional</span></dt><dd><p>Learning rate. Default is 100.0.</p>
 </dd>
-<dt>range_n_clusters<span class="classifier">list[int], optional</span></dt><dd><p>Range of cluster values. Default is range(2, 10, 1).</p>
+<dt>range_n_clusters<span class="classifier">List[int], optional</span></dt><dd><p>Range of cluster values. Default is range(2, 10, 1).</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -695,17 +695,17 @@ t-SNE features, and the KMeans clustering model for the best combination.</p>
 </dd>
 <dt>metric<span class="classifier">str, optional</span></dt><dd><p>The metric to use for distance calculation. Default is ‘euclidean’.</p>
 </dd>
-<dt>range_n_clusters<span class="classifier">range or list, optional</span></dt><dd><p>Range of cluster values to consider for silhouette scoring. Default is range(2, 10, 1).</p>
+<dt>range_n_clusters<span class="classifier">range or List, optional</span></dt><dd><p>Range of cluster values to consider for silhouette scoring. Default is range(2, 10, 1).</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.dimensionality_reduction.UMAPReduction.cluster">
-<span class="sig-name descname"><span class="pre">cluster</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/dpet/dimensionality_reduction.html#UMAPReduction.cluster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.dimensionality_reduction.UMAPReduction.cluster" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">cluster</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/dimensionality_reduction.html#UMAPReduction.cluster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.dimensionality_reduction.UMAPReduction.cluster" title="Link to this definition"></a></dt>
 <dd><p>Perform clustering using KMeans algorithm for each number of clusters in the specified range.</p>
 <section id="id56">
 <h4>Returns<a class="headerlink" href="#id56" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>list</dt><dd><p>A list of tuples containing the number of clusters and the corresponding silhouette score
+<dt>List[Tuple]</dt><dd><p>A list of tuples containing the number of clusters and the corresponding silhouette score
 for each clustering result.</p>
 </dd>
 </dl>
@@ -805,7 +805,7 @@ cosine values for the N angles.</p>
 <span id="dpet-ensemble-analysis-module"></span><h2>dpet.ensemble_analysis module<a class="headerlink" href="#module-dpet.ensemble_analysis" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.ensemble_analysis.</span></span><span class="sig-name descname"><span class="pre">EnsembleAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensembles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.ensemble_analysis.</span></span><span class="sig-name descname"><span class="pre">EnsembleAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensembles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Data analysis pipeline for ensemble data.</p>
 <p>Initializes with a list of ensemble objects and a directory path
@@ -813,7 +813,7 @@ for storing data.</p>
 <section id="id65">
 <h3>Parameters<a class="headerlink" href="#id65" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>ensembles<span class="classifier">list[Ensemble])</span></dt><dd><p>List of ensembles.</p>
+<dt>ensembles<span class="classifier">List[Ensemble])</span></dt><dd><p>List of ensembles.</p>
 </dd>
 <dt>output_dir<span class="classifier">str</span></dt><dd><p>Directory path for storing data.</p>
 </dd>
@@ -833,7 +833,7 @@ for storing data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">
-<span class="sig-name descname"><span class="pre">execute_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dim_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.execute_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">execute_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dim_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.execute_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
 <dt>Execute the data analysis pipeline end-to-end. The pipeline includes:</dt><dd><ol class="arabic simple">
 <li><p>Download from database (optional)</p></li>
@@ -847,11 +847,11 @@ for storing data.</p>
 <section id="id67">
 <h4>Parameters<a class="headerlink" href="#id67" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>featurization_params: dict</dt><dd><p>Parameters for feature extraction. The only required parameter is “featurization”,
+<dt>featurization_params: Dict</dt><dd><p>Parameters for feature extraction. The only required parameter is “featurization”,
 which can be “phi_psi”, “ca_dist”, “a_angle”, “tr_omega” or “tr_phi”. 
 Other method-specific parameters are optional.</p>
 </dd>
-<dt>reduce_dim_params: dict</dt><dd><p>Parameters for dimensionality reduction. The only required parameter is “method”,
+<dt>reduce_dim_params: Dict</dt><dd><p>Parameters for dimensionality reduction. The only required parameter is “method”,
 which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 </dd>
 <dt>subsample_size: int, optional</dt><dd><p>Optional parameter that specifies the trajectory subsample size. Default is None.</p>
@@ -914,7 +914,7 @@ which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.get_features">
-<span class="sig-name descname"><span class="pre">get_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.get_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.get_features" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.get_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.get_features" title="Link to this definition"></a></dt>
 <dd><p>Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.</p>
 <section id="id72">
 <h4>Parameters:<a class="headerlink" href="#id72" title="Link to this heading"></a></h4>
@@ -924,6 +924,8 @@ which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 <dt>min_sep<span class="classifier">int, optional</span></dt><dd><p>Minimum separation distance for “ca_dist”, “tr_omega”, and “tr_phi” methods. Default is 2.</p>
 </dd>
 <dt>max_sep<span class="classifier">int, optional</span></dt><dd><p>Maximum separation distance for “ca_dist”, “tr_omega”, and “tr_phi” methods. Default is None.</p>
+</dd>
+<dt>normalize<span class="classifier">bool, optional</span></dt><dd><p>Whether to normalize the extracted features. Normalization is only supported when featurization is “ca_dist”. Default is False.</p>
 </dd>
 </dl>
 </section>
@@ -987,14 +989,14 @@ trajectory.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">
-<span class="sig-name descname"><span class="pre">reduce_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.reduce_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">reduce_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.reduce_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features" title="Link to this definition"></a></dt>
 <dd><p>Perform dimensionality reduction on the extracted features.</p>
 <section id="id77">
 <h4>Parameters<a class="headerlink" href="#id77" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>method<span class="classifier">str</span></dt><dd><p>Choose between “pca”, “tsne”, “dimenfix”, “mds”, and “kpca”.</p>
 </dd>
-<dt>fit_on<span class="classifier">list[str], optional</span></dt><dd><p>if method is “pca” or “kpca”, specifies on which ensembles the models should be fit. 
+<dt>fit_on<span class="classifier">List[str], optional</span></dt><dd><p>if method is “pca” or “kpca”, specifies on which ensembles the models should be fit. 
 The model will then be used to transform all ensembles.</p>
 </dd>
 </dl>
@@ -1017,7 +1019,7 @@ The model will then be used to transform all ensembles.</p>
 <li><dl class="simple">
 <dt>tsne:</dt><dd><ul>
 <li><dl class="simple">
-<dt>perplexity_vals<span class="classifier">list[float], optional</span></dt><dd><p>List of perplexity values. Default is range(2, 10, 2).</p>
+<dt>perplexity_vals<span class="classifier">List[float], optional</span></dt><dd><p>List of perplexity values. Default is range(2, 10, 2).</p>
 </dd>
 </dl>
 </li>
@@ -1042,7 +1044,7 @@ The model will then be used to transform all ensembles.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>range_n_clusters<span class="classifier">list[int], optional</span></dt><dd><p>Range of cluster values. Default is range(2, 10, 1).</p>
+<dt>range_n_clusters<span class="classifier">List[int], optional</span></dt><dd><p>Range of cluster values. Default is range(2, 10, 1).</p>
 </dd>
 </dl>
 </li>
@@ -1053,7 +1055,7 @@ The model will then be used to transform all ensembles.</p>
 <li><dl class="simple">
 <dt>dimenfix:</dt><dd><ul>
 <li><dl class="simple">
-<dt>range_n_clusters<span class="classifier">list[int], optional</span></dt><dd><p>Range of cluster values. Default is range(1, 10, 1).</p>
+<dt>range_n_clusters<span class="classifier">List[int], optional</span></dt><dd><p>Range of cluster values. Default is range(1, 10, 1).</p>
 </dd>
 </dl>
 </li>
@@ -1114,13 +1116,13 @@ The model will then be used to transform all ensembles.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.rg">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.rg" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.rg" title="Link to this definition"></a></dt>
 <dd><p>Calculates Rg for each conformation in the loaded ensembles.
 The returned values are in Angstrom.</p>
 <section id="id79">
 <h4>Returns<a class="headerlink" href="#id79" title="Link to this heading"></a></h4>
 <dl class="simple">
-<dt>list[float]</dt><dd><p>A list of Rg values for each conformation in the loaded ensembles, in Angstrom.</p>
+<dt>List[float]</dt><dd><p>A list of Rg values for each conformation in the loaded ensembles, in Angstrom.</p>
 </dd>
 </dl>
 </section>
@@ -1672,13 +1674,11 @@ in nanometers and the y-axis represents the density of distances.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_correlation">
-<span class="sig-name descname"><span class="pre">pca_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_residues</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sel_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_correlation" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">pca_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sel_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_correlation" title="Link to this definition"></a></dt>
 <dd><p>Plot the correlation between residues based on PCA weights.</p>
 <section id="id125">
 <h3>Parameters<a class="headerlink" href="#id125" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>num_residues<span class="classifier">int</span></dt><dd><p>The total number of residues in the system.</p>
-</dd>
 <dt>sel_dims<span class="classifier">List[int]</span></dt><dd><p>A list of indices specifying the PCA dimensions to include in the plot.</p>
 </dd>
 <dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>

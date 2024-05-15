@@ -95,12 +95,12 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    ensembles : list[Ensemble])</span>
+<span class="sd">    ensembles : List[Ensemble])</span>
 <span class="sd">        List of ensembles.</span>
 <span class="sd">    output_dir : str</span>
 <span class="sd">        Directory path for storing data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensembles</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="n">Ensemble</span><span class="p">],</span> <span class="n">output_dir</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensembles</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Ensemble</span><span class="p">],</span> <span class="n">output_dir</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
@@ -376,8 +376,7 @@
     <span class="k">def</span> <span class="nf">_normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">feature_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Features from ensembles have different sizes. Cannot normalize data.&quot;</span><span class="p">)</span>
-            <span class="k">return</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: Features from ensembles have different sizes. Cannot normalize data.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
         <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -389,14 +388,14 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_rg</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">trajectory</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">rg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates Rg for each conformation in the loaded ensembles.</span>
 <span class="sd">        The returned values are in Angstrom.  </span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list[float]</span>
+<span class="sd">        List[float]</span>
 <span class="sd">            A list of Rg values for each conformation in the loaded ensembles, in Angstrom.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rg_values_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -405,7 +404,7 @@
             <span class="n">rg_values_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_calculate_rg_for_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">))</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rg_values_list</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_get_concat_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_concat_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fit_on</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fit_on</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot fit on ensembles that were not provided as input.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">fit_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -417,7 +416,7 @@
 
 <div class="viewcode-block" id="EnsembleAnalysis.reduce_features">
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">[docs]</a>
-    <span class="k">def</span> <span class="nf">reduce_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">reduce_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform dimensionality reduction on the extracted features.</span>
 
@@ -426,7 +425,7 @@
 <span class="sd">        method : str</span>
 <span class="sd">            Choose between &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot;, and &quot;kpca&quot;.</span>
 
-<span class="sd">        fit_on : list[str], optional</span>
+<span class="sd">        fit_on : List[str], optional</span>
 <span class="sd">            if method is &quot;pca&quot; or &quot;kpca&quot;, specifies on which ensembles the models should be fit. </span>
 <span class="sd">            The model will then be used to transform all ensembles.</span>
 
@@ -439,7 +438,7 @@
 <span class="sd">                Number of components to keep. Default is 10.</span>
 
 <span class="sd">        - tsne:</span>
-<span class="sd">            - perplexity_vals : list[float], optional</span>
+<span class="sd">            - perplexity_vals : List[float], optional</span>
 <span class="sd">                List of perplexity values. Default is range(2, 10, 2).</span>
 <span class="sd">            - metric : str, optional</span>
 <span class="sd">                Metric to use. Default is &quot;euclidean&quot;. </span>
@@ -449,11 +448,11 @@
 <span class="sd">                Number of dimensions of the embedded space. Default is 2.</span>
 <span class="sd">            - learning_rate : float, optional</span>
 <span class="sd">                Learning rate. Default is 100.0.</span>
-<span class="sd">            - range_n_clusters : list[int], optional</span>
+<span class="sd">            - range_n_clusters : List[int], optional</span>
 <span class="sd">                Range of cluster values. Default is range(2, 10, 1).</span>
 
 <span class="sd">        - dimenfix:</span>
-<span class="sd">            - range_n_clusters : list[int], optional</span>
+<span class="sd">            - range_n_clusters : List[int], optional</span>
 <span class="sd">                Range of cluster values. Default is range(1, 10, 1).</span>
 
 <span class="sd">        - mds:</span>
@@ -481,10 +480,11 @@
 <span class="sd">            - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check if all ensemble features have the same size</span>
+        <span class="c1"># Check if all ensemble features have the same size</span>
         <span class="n">feature_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Features from ensembles have different sizes. Cannot concatenate.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Features from ensembles have different sizes. Cannot concatenate.&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span> <span class="o">=</span> <span class="n">DimensionalityReductionFactory</span><span class="o">.</span><span class="n">get_reducer</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">=</span> <span class="n">method</span>
@@ -502,7 +502,7 @@
 
 <div class="viewcode-block" id="EnsembleAnalysis.execute_pipeline">
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">[docs]</a>
-    <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute the data analysis pipeline end-to-end. The pipeline includes:</span>
 <span class="sd">            1. Download from database (optional)</span>
@@ -513,11 +513,11 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        featurization_params: dict</span>
+<span class="sd">        featurization_params: Dict</span>
 <span class="sd">            Parameters for feature extraction. The only required parameter is &quot;featurization&quot;,</span>
 <span class="sd">            which can be &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot; or &quot;tr_phi&quot;. </span>
 <span class="sd">            Other method-specific parameters are optional.</span>
-<span class="sd">        reduce_dim_params: dict</span>
+<span class="sd">        reduce_dim_params: Dict</span>
 <span class="sd">            Parameters for dimensionality reduction. The only required parameter is &quot;method&quot;,</span>
 <span class="sd">            which can be &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; or &quot;kpca&quot;.</span>
 <span class="sd">        subsample_size: int, optional</span>
@@ -532,7 +532,7 @@
 
 <div class="viewcode-block" id="EnsembleAnalysis.get_features">
 <a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.get_features">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.</span>
 
@@ -547,6 +547,9 @@
 <span class="sd">        max_sep : int, optional</span>
 <span class="sd">            Maximum separation distance for &quot;ca_dist&quot;, &quot;tr_omega&quot;, and &quot;tr_phi&quot; methods. Default is None.</span>
 
+<span class="sd">        normalize : bool, optional</span>
+<span class="sd">            Whether to normalize the extracted features. Normalization is only supported when featurization is &quot;ca_dist&quot;. Default is False.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">        --------</span>
 <span class="sd">        Dict[str, np.ndarray]</span>
@@ -556,10 +559,24 @@
         <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists_coarse_grained</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
         
+        <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">featurization</span> <span class="o">!=</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Normalization is only supported when featurization is &#39;ca_dist&#39;.&quot;</span><span class="p">)</span>
+        
         <span class="n">features_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
-            <span class="n">features</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="o">=</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span> <span class="n">min_sep</span><span class="o">=</span><span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="o">=</span><span class="n">max_sep</span><span class="p">)</span>
             <span class="n">features_dict</span><span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span>
+            
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">feature_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">features_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: Features from ensembles have different sizes. Cannot normalize data.&quot;</span><span class="p">)</span>
+            <span class="n">concat_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">features_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">std</span> <span class="o">=</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">features_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">features_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
+        
         <span class="k">return</span> <span class="n">features_dict</span></div>
 </div>
 
