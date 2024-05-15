@@ -70,6 +70,7 @@ class Ensemble():
                 f" exists: {self.data_path}"
             )
         elif self.data_path.endswith('.pdb'):
+            self._get_chains_from_pdb()
             print(f"Generating trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path)
             traj_dcd = os.path.join(data_dir, f'{self.code}.dcd')
@@ -77,6 +78,7 @@ class Ensemble():
             self.trajectory.save(traj_dcd)
             self.trajectory[0].save(traj_top)
             print(f"Generated trajectory saved to {data_dir}.")
+            self._select_chain()
         elif self.data_path.endswith(('.dcd', '.xtc')) and os.path.exists(self.top_path):
             print(f"Loading trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path, top=(self.top_path))
@@ -100,8 +102,6 @@ class Ensemble():
         self.original_trajectory = self.trajectory
         # Check if a coarse-grained model was loaded
         self._check_coarse_grained()
-        # Select a single chain if multiple chains were loaded
-        self._select_chain()
         # Select residues
         self._select_residues()
             
@@ -232,6 +232,7 @@ class Ensemble():
         """
         self.features = (self.features - mean) / std
 
+    """
     def _select_chain(self):
         topology = self.trajectory.topology
 
@@ -261,6 +262,24 @@ class Ensemble():
         chain_A_indices = topology.select(f"chainid {self.chain_id}")
         self.trajectory = self.trajectory.atom_slice(chain_A_indices)
 
+    """
+    
+    def _select_chain(self):
+
+        if self.trajectory.topology.n_chains == 1:
+            return
+        
+        chain_id_to_index = {chain_id: index for index, chain_id in enumerate(self.chain_ids)}
+
+        if self.chain_id not in chain_id_to_index:
+            raise ValueError(f"Chain ID '{self.chain_id}' is not present in the ensemble.")
+
+        chain_index = chain_id_to_index[self.chain_id]
+
+        chain_indices = self.trajectory.topology.select(f"chainid {chain_index}")
+        self.trajectory = self.trajectory.atom_slice(chain_indices)
+        print(f"Chain {self.chain_id} selected from ensemble {self.code}.")
+
     def _validate_residue_range(self):
         """
         Validate the residue range to ensure it's within the valid range of residues in the trajectory.
@@ -289,3 +308,17 @@ class Ensemble():
         atom_indices = self.trajectory.topology.select(f'residue >= {start_residue} and residue <= {end_residue}')
         self.trajectory = self.trajectory.atom_slice(atom_indices)
         print(f"Selected residues from ensemble {self.code}")
+
+    def _get_chains_from_pdb(self):
+        with open(self.data_path, 'r') as f:
+            lines = f.readlines()
+
+        self.chain_ids = []  # Use a list to preserve the order
+
+        for line in lines:
+            if line.startswith('ATOM'):
+                chain_id = line[21]
+                if chain_id not in self.chain_ids:
+                    self.chain_ids.append(chain_id)
+
+        print(f"{self.code} chain ids: {self.chain_ids}")
