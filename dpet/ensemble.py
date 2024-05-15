@@ -29,18 +29,23 @@ class Ensemble():
     chain_id : int, optional
         MDtraj chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.
 
+    residue_range : Tuple, optional
+        A tuple indicating the start and end of the residue range (inclusive), using 1-based indexing. Default is None.
+
     Notes
     -----
     - If the database is 'atlas', the ensemble code should be provided as a PDB ID with a chain identifier separated by an underscore. Example: '3a1g_B'.
     - If the database is 'ped', the ensemble code should be in the PED ID format, which consists of a string starting with 'PED' followed by a numeric identifier, and 'e' followed by another numeric identifier. Example: 'PED00423e001'.
     - 'chain_id' is always assigned in order to the actual chains. For example, chains A, C, D would have 'chain_id' 0, 1, 2 respectively.
+    - The `residue_range` parameter uses 1-based indexing, meaning the first residue is indexed as 1.
     """
-    def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None, chain_id: int = None) -> None:
+    def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None, chain_id: int = None, residue_range: Tuple = None) -> None:
         self.code = code
         self.data_path = data_path
         self.top_path = top_path
         self.database = database
         self.chain_id = chain_id
+        self.residue_range = residue_range
     
     def load_trajectory(self, data_dir: str):  
         """
@@ -97,6 +102,8 @@ class Ensemble():
         self._check_coarse_grained()
         # Select a single chain if multiple chains were loaded
         self._select_chain()
+        # Select residues
+        self._select_residues()
             
     def _check_coarse_grained(self):
         topology = self.trajectory.topology
@@ -253,3 +260,32 @@ class Ensemble():
 
         chain_A_indices = topology.select(f"chainid {self.chain_id}")
         self.trajectory = self.trajectory.atom_slice(chain_A_indices)
+
+    def _validate_residue_range(self):
+        """
+        Validate the residue range to ensure it's within the valid range of residues in the trajectory.
+        """
+        if self.residue_range is None:
+            return
+        start_residue, end_residue = self.residue_range
+
+        total_residues = self.trajectory.topology.n_residues
+
+        if not (1 <= start_residue <= total_residues):
+            raise ValueError(f"Start residue {start_residue} is out of range. Must be between 1 and {total_residues}.")
+        if not (1 <= end_residue <= total_residues):
+            raise ValueError(f"End residue {end_residue} is out of range. Must be between 1 and {total_residues}.")
+        if start_residue > end_residue:
+            raise ValueError(f"Start residue {start_residue} must be less than or equal to end residue {end_residue}.")
+
+    def _select_residues(self):
+        """
+        Modify self.trajectory to only include residues within self.residue_range.
+        """
+        if self.residue_range is None:
+            return
+        self._validate_residue_range()
+        start_residue, end_residue = self.residue_range
+        atom_indices = self.trajectory.topology.select(f'residue >= {start_residue} and residue <= {end_residue}')
+        self.trajectory = self.trajectory.atom_slice(atom_indices)
+        print(f"Selected residues from ensemble {self.code}")
