@@ -31,8 +31,10 @@ class Ensemble():
     
     def load_trajectory(self, data_dir: str):  
         if not os.path.exists(self.data_path):
-            print(f"Data file or directory for ensemble {self.code} doesn't exist.")
-            return
+            raise FileNotFoundError(
+                f"Data file or directory for ensemble {self.code} doesn't"
+                f" exists: {self.data_path}"
+            )
         elif self.data_path.endswith('.pdb'):
             print(f"Generating trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path)
@@ -41,7 +43,7 @@ class Ensemble():
             self.trajectory.save(traj_dcd)
             self.trajectory[0].save(traj_top)
             print(f"Generated trajectory saved to {data_dir}.")
-        elif (self.data_path.endswith('.dcd') or self.data_path.endswith('.xtc')) and os.path.exists(self.top_path):
+        elif self.data_path.endswith(('.dcd', '.xtc')) and os.path.exists(self.top_path):
             print(f"Loading trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path, top=(self.top_path))
         elif os.path.isdir(self.data_path):
