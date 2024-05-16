@@ -668,7 +668,7 @@ class Visualization:
 
         return ax
 
-    def global_sasa_dist(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, medians: bool = True, save: bool = False) -> plt.Axes:
+    def ensemble_sasa(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, medians: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of SASA for each conformation within the ensembles.
 
@@ -736,7 +736,6 @@ class Visualization:
                 title=title,
                 xlabel=axis_label
             )
-
 
         self.figures["plot_global_sasa"] = fig
         if save:
@@ -895,7 +894,7 @@ class Visualization:
     # TODO: implement a: single hist plot, multiple hist plots, violin plots.
     #
 
-    def rg_comp_dist(
+    def radius_of_gyration(
             self,
             bins: int = 50,
             hist_range: Tuple = None,  # TODO.
@@ -1045,7 +1044,7 @@ class Visualization:
             contact_ens_dict[ensemble.code] = get_contact_map(distance_matrix_ens_dict[ensemble.code])
         return contact_ens_dict
 
-    def average_dmap_comp(self, 
+    def average_distance_maps(self, 
                             ticks_fontsize: int = 14,
                             cbar_fontsize: int = 14,
                             title_fontsize: int = 14,
@@ -1283,7 +1282,7 @@ class Visualization:
         return axes
         
 
-    def end_to_end_dist(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
+    def end_to_end_distances(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
 
@@ -1357,7 +1356,7 @@ class Visualization:
         return ax
 
 
-    def asphericity_dist(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
+    def asphericity(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
         """
         Plot asphericity distribution in each ensemble.
         Asphericity is calculated based on the gyration tensor.
@@ -1429,7 +1428,7 @@ class Visualization:
 
         return ax
 
-    def prolateness_dist(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, median: bool = False, means: bool = False, save: bool = False) -> plt.Axes:
+    def prolateness(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, median: bool = False, means: bool = False, save: bool = False) -> plt.Axes:
         """
         Plot prolateness distribution in each ensemble.
         Prolateness is calculated based on the gyration tensor.
@@ -1501,7 +1500,7 @@ class Visualization:
         return ax
 
 
-    def alpha_angles_dist(self, bins: int = 50, save: bool = False) -> plt.Axes:
+    def alpha_angles(self, bins: int = 50, save: bool = False) -> plt.Axes:
         """
         Plot the distribution of alpha angles.
 
@@ -1549,7 +1548,7 @@ class Visualization:
         return ax
 
 
-    def contact_prob_map(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues') -> List[List[plt.Axes]]:
+    def contact_prob_maps(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues') -> List[List[plt.Axes]]:
         from matplotlib.colors import LogNorm
         """
         Plot the contact probability map based on the threshold.
@@ -1632,7 +1631,7 @@ class Visualization:
                         pair_ids.append([id_i, id_j])
         return pair_ids
     
-    def ramachandran(self, two_d_hist: bool = True, linespaces: Tuple = (-180, 180, 80), save: bool = False) -> Union[List[plt.Axes], plt.Axes]:
+    def ramachandran_plots(self, two_d_hist: bool = True, linespaces: Tuple = (-180, 180, 80), save: bool = False) -> Union[List[plt.Axes], plt.Axes]:
         """
         Ramachandran plot. If two_d_hist=True it returns a 2D histogram 
         for each ensemble. If two_d_hist=False it returns a simple scatter plot 
@@ -1812,7 +1811,7 @@ class Visualization:
         
         return axes
 
-    def local_sasa_dist(self, figsize: Tuple = (15,5), pointer: List[int] = None, save: bool = False) -> plt.Axes:
+    def per_residue_mean_sasa(self, figsize: Tuple = (15,5), pointer: List[int] = None, save: bool = False) -> plt.Axes:
         """
         Plot the average solvent-accessible surface area (SASA) for each residue among all conformations in an ensemble.
 
@@ -1865,7 +1864,7 @@ class Visualization:
 
         return ax
 
-    def ca_com_dist(self, min_sep: int = 2, max_sep: Union[int, None] = None, get_names: bool = True, inverse: bool = False, figsize: Tuple[int, int] = (6, 2.5), save: bool = False) -> List[List[plt.Axes]]:
+    def ca_com_distances(self, min_sep: int = 2, max_sep: Union[int, None] = None, get_names: bool = True, inverse: bool = False, figsize: Tuple[int, int] = (6, 2.5), save: bool = False) -> List[List[plt.Axes]]:
         """
         Plot the distance maps comparing the center of mass (COM) and alpha-carbon (CA) distances within each ensemble.
 
