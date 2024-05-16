@@ -73,12 +73,21 @@ class Ensemble():
             self._get_chains_from_pdb()
             print(f"Generating trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path)
-            traj_dcd = os.path.join(data_dir, f'{self.code}.dcd')
-            traj_top = os.path.join(data_dir, f'{self.code}.top.pdb')
+
+            chain_selected = self._select_chain()
+
+            if chain_selected:
+                traj_suffix = f'_{self.chain_id.upper()}'
+            else:
+                traj_suffix = ''
+
+            traj_dcd = os.path.join(data_dir, f'{self.code}{traj_suffix}.dcd')
+            traj_top = os.path.join(data_dir, f'{self.code}{traj_suffix}.top.pdb')
+            
             self.trajectory.save(traj_dcd)
             self.trajectory[0].save(traj_top)
+            
             print(f"Generated trajectory saved to {data_dir}.")
-            self._select_chain()
         elif self.data_path.endswith(('.dcd', '.xtc')) and os.path.exists(self.top_path):
             print(f"Loading trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path, top=(self.top_path))
@@ -98,6 +107,10 @@ class Ensemble():
         else:
             print(f'Unsupported file format for data file: {self.data_path}')
             return
+        
+        if self.trajectory.topology.n_chains > 1:
+            raise ValueError(f"Multiple chains found for ensemble {self.code}. "
+                             "Chain selection is only supported for PDB files.")
         # Save the trajectory for sampling
         self.original_trajectory = self.trajectory
         # Check if a coarse-grained model was loaded
@@ -231,54 +244,36 @@ class Ensemble():
         This method normalizes the ensemble's features using the provided mean and standard deviation.
         """
         self.features = (self.features - mean) / std
-
-    """
-    def _select_chain(self):
-        topology = self.trajectory.topology
-
-        if topology.n_chains == 1:
-            return
-
-        # Get all unique chain IDs from the topology
-        chain_ids = set(chain.index for chain in topology.chains)
-
-        while True:
-            if self.chain_id is None:
-                print(f"Ensemble {self.code} has multiple chains. Enter the chain ID you want to select. Available chain IDs:", chain_ids)
-                sys.stdout.flush()  # Flush the output buffer
-                self.chain_id = input("Enter the chain ID you want to select: ")
-
-            try:
-                chain_id_input = int(self.chain_id)
-                if chain_id_input not in chain_ids:
-                    print("Invalid chain ID. Please select from the available options.")
-                    self.chain_id = None
-                else:
-                    break
-            except ValueError:
-                print("Invalid input. Please enter a valid chain ID.")
-                self.chain_id = None  # Reset chain_id to None to prompt again for input
-
-        chain_A_indices = topology.select(f"chainid {self.chain_id}")
-        self.trajectory = self.trajectory.atom_slice(chain_A_indices)
-
-    """
     
-    def _select_chain(self):
+    def _select_chain(self) -> bool:
+        """
+        Select a specific chain from the trajectory based on the chain_id.
 
+        Returns
+        -------
+        bool
+            True if a chain was selected, False otherwise.
+        """
         if self.trajectory.topology.n_chains == 1:
-            return
-        
-        chain_id_to_index = {chain_id: index for index, chain_id in enumerate(self.chain_ids)}
+            return False
 
-        if self.chain_id not in chain_id_to_index:
+        chain_id_to_index = {chain_id.upper(): index for index, chain_id in enumerate(self.chain_ids)}
+
+        if self.chain_id is None:
+            raise ValueError(f"Multiple chains found in the ensemble {self.code}. Please specify a chain_id.")
+
+        chain_id_upper = self.chain_id.upper()
+
+        if chain_id_upper not in chain_id_to_index:
             raise ValueError(f"Chain ID '{self.chain_id}' is not present in the ensemble.")
 
-        chain_index = chain_id_to_index[self.chain_id]
+        chain_index = chain_id_to_index[chain_id_upper]
 
         chain_indices = self.trajectory.topology.select(f"chainid {chain_index}")
         self.trajectory = self.trajectory.atom_slice(chain_indices)
-        print(f"Chain {self.chain_id} selected from ensemble {self.code}.")
+        print(f"Chain {chain_id_upper} selected from ensemble {self.code}.")
+
+        return True
 
     def _validate_residue_range(self):
         """
