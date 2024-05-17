@@ -6,6 +6,7 @@ import numpy as np
 
 from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi, featurize_tr_angle
 from dpet.featurization.distances import featurize_ca_dist
+from dpet.featurization.glob import compute_asphericity, compute_end_to_end_distances, compute_ensemble_sasa, compute_prolateness
 
 
 class Ensemble():
@@ -146,25 +147,60 @@ class Ensemble():
             topology=self.original_trajectory.topology)
         print(f"{sample_size} conformations sampled from {self.code} trajectory.")
         
-    def extract_features(self, featurization: str, min_sep: int, max_sep: int):
+    def extract_features(self, featurization: str, min_sep: int = None, max_sep: int = None):
         """
         Extract features from the trajectory using the specified featurization method.
 
         Parameters
         ----------
         featurization : str
-            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega', 'tr_phi', 'rg'.
-        min_sep : int
-            The minimum sequence separation for angle calculations.
-        max_sep : int
-            The maximum sequence separation for angle calculations.
+            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega' and 'tr_phi'.
+        min_sep : int, optional
+            The minimum sequence separation for angle calculations. Required for certain featurization methods.
+        max_sep : int, optional
+            The maximum sequence separation for angle calculations. Required for certain featurization methods.
 
         Notes
         -----
         This method extracts features from the trajectory using the specified featurization method and updates the ensemble's features attribute.
         """
         print(f"Performing feature extraction for Ensemble: {self.code}.")
-        self.features, self.names = self.get_features(featurization, min_sep, max_sep, get_names=True)
+
+        if featurization == "ca_dist":
+            features, names = featurize_ca_dist(
+                traj=self.trajectory, 
+                get_names=True,
+                atom_selector=self.atom_selector,
+                min_sep=min_sep,
+                max_sep=max_sep)
+        elif featurization == "phi_psi":
+            features, names = featurize_phi_psi(
+                traj=self.trajectory, 
+                get_names=True)
+        elif featurization == "a_angle":
+            features, names = featurize_a_angle(
+                traj=self.trajectory, 
+                get_names=True, 
+                atom_selector=self.atom_selector)
+        elif featurization == "tr_omega":
+            features, names = featurize_tr_angle(
+                traj=self.trajectory,
+                type="omega",
+                get_names=True,
+                min_sep=min_sep,
+                max_sep=max_sep)
+        elif featurization == "tr_phi":
+            features, names = featurize_tr_angle(
+                traj=self.trajectory,
+                type="phi",
+                get_names=True,
+                min_sep=min_sep,
+                max_sep=max_sep)
+        else:
+            raise NotImplementedError("Unsupported feature extraction method.")
+
+        self.features = features
+        self.names = names
         print("Transformed ensemble shape:", self.features.shape)
 
     def get_features(self, featurization: str, min_sep: int, max_sep: int, get_names: bool = False) -> Union[Tuple[Sequence, Sequence], Tuple[Sequence, None]]:
@@ -174,7 +210,7 @@ class Ensemble():
         Parameters
         ----------
         featurization : str
-            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega', 'tr_phi'.
+            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega' and 'tr_phi'.
         min_sep : int
             The minimum sequence separation for angle calculations.
         max_sep : int
@@ -223,6 +259,16 @@ class Ensemble():
                 get_names=get_names,
                 min_sep=min_sep,
                 max_sep=max_sep)
+        elif featurization == "rg":
+            return mdtraj.compute_rg(self.trajectory)
+        elif featurization == "prolateness":
+            return compute_prolateness(self.trajectory)
+        elif featurization == "asphericity":
+            return compute_asphericity(self.trajectory)
+        elif featurization == "sasa":
+            return compute_ensemble_sasa(self.trajectory)
+        elif featurization == "end_to_end":
+            return compute_end_to_end_distances(self.trajectory, self.atom_selector)
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
         

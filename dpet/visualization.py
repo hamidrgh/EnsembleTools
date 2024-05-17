@@ -13,6 +13,7 @@ from dpet.featurization.distances import *
 from dpet.ensemble_analysis import EnsembleAnalysis
 from dpet.featurization.angles import featurize_a_angle
 from dpet.data.coord import *
+from dpet.featurization.glob import compute_asphericity, compute_prolateness
 
 PLOT_DIR = "plots"
 rg_axis_label = r"$R_g$ [nm]"
@@ -238,8 +239,10 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method != "tsne":
-            print("Analysis is only valid for t-SNE dimensionality reduction.")
-            return []
+            raise ValueError("Analysis is only valid for t-SNE dimensionality reduction.")
+        
+        if color_by not in ("rg", "prolateness", "asphericity", "sasa", "end_to_end"):
+            raise ValueError(f"Method {color_by} not supported.")
 
         bestclust = analysis.reducer.best_kmeans.labels_
         fig, ax = plt.subplots(1, 4, figsize=(14, 4))
@@ -258,45 +261,10 @@ class Visualization:
         scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=10, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
         ax[1].set_title('Scatter plot (clustering labels)')
 
-        #---------------------------------------------#
-        # Scatter plot different labels
-        if color_by == "rg":
-            rg = []
-            for ensemble in analysis.ensembles:
-                rg.extend(mdtraj.compute_rg(ensemble.trajectory))
-            colors = rg
-        elif color_by == "prolateness":
-            prolateness = []
-            for ensemble in analysis.ensembles:
-                prolateness.extend(calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory)))
-            colors = prolateness
-        elif color_by == "asphericity":
-            asphericity = []
-            for ensemble in analysis.ensembles:
-                asphericity.extend(calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory)))
-            colors = asphericity
-        elif color_by == "sasa":
-            sasa = []
-            for ensemble in analysis.ensembles:
-                sasa_i = mdtraj.shrake_rupley(ensemble.trajectory)
-                total_sasa_i = sasa_i.sum(axis=1)
-                sasa.append(total_sasa_i)
-            colors = sasa
-        elif color_by == "end_to_end":
-            distances = []
-            for ensemble in analysis.ensembles:
-                ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
-                dist = mdtraj.compute_distances(
-                    ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]
-                ).ravel()
-                distances.append(dist)
-            colors = distances
-        else:
-            raise NotImplementedError(f"{color_by} is not supported.")
+        colors = list(analysis.get_features(color_by).values())
         rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=10, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=ax[2])
         ax[2].set_title(f'Scatter plot ({color_by} labels)')
-        #---------------------------------------------#
 
         # KDE plot
         kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])
@@ -319,7 +287,7 @@ class Visualization:
 
         return ax
 
-    def dimenfix_scatter(self, save: bool = False) -> List[plt.Axes]:
+    def dimenfix_scatter(self, color_by: str = "rg", save: bool = False) -> List[plt.Axes]:
         """
         Plot the complete results for dimenfix method. 
 
@@ -341,8 +309,10 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method != "dimenfix":
-            print("Analysis is only valid for dimenfix dimensionality reduction.")
-            return []
+            raise ValueError("Analysis is only valid for dimenfix dimensionality reduction.")
+        
+        if color_by not in ("rg", "prolateness", "asphericity", "sasa", "end_to_end"):
+            raise ValueError(f"Method {color_by} not supported.")
 
         fig, ax = plt.subplots(1, 3, figsize=(14, 4))
 
@@ -355,10 +325,11 @@ class Visualization:
         scatter_labeled = ax[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
         ax[0].set_title('Scatter plot (original labels)')
 
-        # Scatter plot with Rg labels
-        rg_labeled = ax[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=analysis.rg, s=10, alpha=0.5)
+        # Scatter plot with different labels
+        colors = list(analysis.get_features(color_by).values())
+        rg_labeled = ax[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=ax[2])
-        ax[2].set_title('Scatter plot (Rg labels)')
+        ax[2].set_title(f'Scatter plot ({color_by} labels)')
 
         # Scatter plot with clustering labels
         best_k = max(analysis.reducer.sil_scores, key=lambda x: x[1])[0]
@@ -805,7 +776,7 @@ class Visualization:
         
         for ensemble in analysis.ensembles:
             x = mdtraj.compute_rg(ensemble.trajectory)
-            y = calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory))
+            y = compute_asphericity(ensemble.trajectory)
             p = np.corrcoef(x, y)
             ax.scatter(x, y, s=4, label=ensemble.code)
             print(f"Pearson coeff for {ensemble.code} = {round(p[0][1], 3)}")
@@ -843,7 +814,7 @@ class Visualization:
 
         for ensemble in analysis.ensembles:
             x = mdtraj.compute_rg(ensemble.trajectory)
-            y = calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory))
+            y = compute_prolateness(ensemble.trajectory)
             p = np.corrcoef(x, y)
             ax.scatter(x, y, s=4, label=ensemble.code)
             print(f"Pearson coeff for {ensemble.code} = {round(p[0][1], 3)}")
@@ -1431,9 +1402,7 @@ class Visualization:
         asph_list = []
         labels = []
         for ensemble in ensembles:
-            asphericity = calculate_asphericity(
-                mdtraj.compute_gyration_tensor(ensemble.trajectory)
-            )
+            asphericity = compute_asphericity(ensemble.trajectory)
             asph_list.append(asphericity)
             labels.append(ensemble.code)
 
@@ -1502,9 +1471,7 @@ class Visualization:
         prolat_list = []
         labels = []
         for ensemble in ensembles:
-            prolat = calculate_prolateness(
-                mdtraj.compute_gyration_tensor(ensemble.trajectory)
-            )
+            prolat = compute_prolateness(ensemble.trajectory)
             prolat_list.append(prolat)
             labels.append(ensemble.code)
 
