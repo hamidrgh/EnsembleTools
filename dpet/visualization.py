@@ -244,23 +244,24 @@ class Visualization:
         bestclust = analysis.reducer.best_kmeans.labels_
         fig, ax = plt.subplots(1, 4, figsize=(14, 4))
 
-        # scatter original labels
-        label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
-        point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
+        # Create a consistent colormap for the original labels
+        unique_labels = np.unique(analysis.all_labels)
+        label_colors = {label: plt.cm.tab20(i / len(unique_labels)) for i, label in enumerate(unique_labels)}
+        point_colors = [label_colors[label] for label in analysis.all_labels]
+
+        # Scatter plot with original labels
         scatter_labeled = ax[0].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=point_colors, s=10, alpha=0.5)
+        ax[0].set_title('Scatter plot (original labels)')
 
-        # scatter Rg labels 
-        rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=[rg for rg in analysis.rg], s=10, alpha=0.5) 
-        cbar = plt.colorbar(rg_labeled, ax=ax[2])
-
-        # scatter cluster labels
+        # Scatter plot with clustering labels
         cmap = cm.get_cmap('jet', analysis.reducer.bestK)
         scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=10, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
+        ax[1].set_title('Scatter plot (clustering labels)')
 
-        # manage legend
-        legend_labels = list(label_colors.keys())
-        legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='lower left')
+        # Scatter plot with Rg labels
+        rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=analysis.rg, s=10, alpha=0.5)
+        cbar = plt.colorbar(rg_labeled, ax=ax[2])
+        ax[2].set_title('Scatter plot (Rg labels)')
 
         # KDE plot
         kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])
@@ -268,16 +269,18 @@ class Visualization:
                         min(analysis.reducer.best_tsne[:, 1]):max(analysis.reducer.best_tsne[:, 1]):100j]
         zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
         ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, cmap='Blues')
-
-        ax[0].set_title('Scatter plot (original labels)')
-        ax[1].set_title('Scatter plot (clustering labels)')
-        ax[2].set_title('Scatter plot (Rg labels)')
         ax[3].set_title('Density Plot')
 
+        # Manage legend
+        legend_labels = list(label_colors.keys())
+        legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
+
+        plt.tight_layout()
         self.figures["tsne_scatter_plot"] = fig
-        
+
         if save:
-            plt.savefig(self.plot_dir  +'/tsnep'+str(int(analysis.reducer.bestP))+'_kmeans'+str(int(analysis.reducer.bestK))+'_scatter.png', dpi=800)
+            plt.savefig(self.plot_dir  + '/tsnep' + str(int(analysis.reducer.bestP)) + '_kmeans' + str(int(analysis.reducer.bestK)) + '_scatter.png', dpi=800)
 
         return ax
 
@@ -308,34 +311,37 @@ class Visualization:
 
         fig, ax = plt.subplots(1, 3, figsize=(14, 4))
 
-        # scatter original labels
-        label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
-        point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
-        scatter_labeled = ax[0].scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
+        # Create a consistent colormap for the original labels
+        unique_labels = np.unique(analysis.all_labels)
+        label_colors = {label: plt.cm.tab20(i / len(unique_labels)) for i, label in enumerate(unique_labels)}
+        point_colors = [label_colors[label] for label in analysis.all_labels]
 
-        # scatter Rg labels
-        rg_labeled = ax[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=[rg for rg in analysis.rg], s=10, alpha=0.5) 
-        cbar = plt.colorbar(rg_labeled, ax=ax[2])
-
-        # scatter cluster label
-        kmeans = KMeans(n_clusters=max(analysis.reducer.sil_scores, key=lambda x: x[1])[0], random_state=42)
-        labels = kmeans.fit_predict(analysis.transformed_data)
-        scatter = ax[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
-
+        # Scatter plot with original labels
+        scatter_labeled = ax[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
         ax[0].set_title('Scatter plot (original labels)')
-        ax[1].set_title('Scatter plot (clustering labels)')
+
+        # Scatter plot with Rg labels
+        rg_labeled = ax[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=analysis.rg, s=10, alpha=0.5)
+        cbar = plt.colorbar(rg_labeled, ax=ax[2])
         ax[2].set_title('Scatter plot (Rg labels)')
 
-        # manage legends
+        # Scatter plot with clustering labels
+        best_k = max(analysis.reducer.sil_scores, key=lambda x: x[1])[0]
+        kmeans = KMeans(n_clusters=best_k, random_state=42)
+        labels = kmeans.fit_predict(analysis.transformed_data)
+        scatter_cluster = ax[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
+        ax[1].set_title('Scatter plot (clustering labels)')
+
+        # Manage legend for original labels
         legend_labels = list(label_colors.keys())
-        legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='lower left')
+        legend_handles = [Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
         self.figures["dimenfix_scatter"] = fig
 
         if save:
             plt.savefig(self.plot_dir + '/dimenfix_scatter.png', dpi=800)
-        
+
         return ax
 
 
@@ -553,7 +559,7 @@ class Visualization:
         return ax
 
 
-    def pca_correlation(self, sel_dims: List[int], save: bool = False) -> List[plt.Axes]:
+    def pca_residue_correlation(self, sel_dims: List[int], save: bool = False) -> List[plt.Axes]:
         """
         Plot the correlation between residues based on PCA weights.
 
@@ -1124,7 +1130,7 @@ class Visualization:
 
         return axes
 
-    def contact_map_comp(self, 
+    def contact_probability_maps(self, 
                         title: str,
                         ticks_fontsize: int = 14,
                         cbar_fontsize: int = 14,
@@ -1215,7 +1221,7 @@ class Visualization:
         
         return axes
 
-    def distance_multiple_dist(self, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
+    def distance_densities(self, dpi: int = 96, save: bool = False) -> List[plt.Axes]:
         """
         Plot the distribution of distances for multiple proteins.
 
