@@ -174,7 +174,7 @@ class Ensemble():
         Parameters
         ----------
         featurization : str
-            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega', 'tr_phi', 'rg'.
+            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega', 'tr_phi'.
         min_sep : int
             The minimum sequence separation for angle calculations.
         max_sep : int
@@ -223,8 +223,6 @@ class Ensemble():
                 get_names=get_names,
                 min_sep=min_sep,
                 max_sep=max_sep)
-        elif featurization == "rg":
-            return mdtraj.compute_rg(self.trajectory), None if get_names else mdtraj.compute_rg(self.trajectory)
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
         

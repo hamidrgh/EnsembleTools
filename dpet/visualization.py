@@ -212,7 +212,7 @@ class Visualization:
 
         return axes
 
-    def tsne_scatter(self, save: bool = False) -> List[plt.Axes]:
+    def tsne_scatter(self, color_by: str = "rg", save: bool = False) -> List[plt.Axes]:
         """
         Plot the results of t-SNE analysis. 
 
@@ -258,10 +258,45 @@ class Visualization:
         scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=10, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
         ax[1].set_title('Scatter plot (clustering labels)')
 
-        # Scatter plot with Rg labels
-        rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=analysis.rg, s=10, alpha=0.5)
+        #---------------------------------------------#
+        # Scatter plot different labels
+        if color_by == "rg":
+            rg = []
+            for ensemble in analysis.ensembles:
+                rg.extend(mdtraj.compute_rg(ensemble.trajectory))
+            colors = rg
+        elif color_by == "prolateness":
+            prolateness = []
+            for ensemble in analysis.ensembles:
+                prolateness.extend(calculate_prolateness(mdtraj.compute_gyration_tensor(ensemble.trajectory)))
+            colors = prolateness
+        elif color_by == "asphericity":
+            asphericity = []
+            for ensemble in analysis.ensembles:
+                asphericity.extend(calculate_asphericity(mdtraj.compute_gyration_tensor(ensemble.trajectory)))
+            colors = asphericity
+        elif color_by == "sasa":
+            sasa = []
+            for ensemble in analysis.ensembles:
+                sasa_i = mdtraj.shrake_rupley(ensemble.trajectory)
+                total_sasa_i = sasa_i.sum(axis=1)
+                sasa.append(total_sasa_i)
+            colors = sasa
+        elif color_by == "end_to_end":
+            distances = []
+            for ensemble in analysis.ensembles:
+                ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
+                dist = mdtraj.compute_distances(
+                    ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]
+                ).ravel()
+                distances.append(dist)
+            colors = distances
+        else:
+            raise NotImplementedError(f"{color_by} is not supported.")
+        rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=10, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=ax[2])
-        ax[2].set_title('Scatter plot (Rg labels)')
+        ax[2].set_title(f'Scatter plot ({color_by} labels)')
+        #---------------------------------------------#
 
         # KDE plot
         kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])

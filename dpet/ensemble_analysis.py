@@ -438,7 +438,7 @@ class EnsembleAnalysis:
         Parameters:
         -----------
         featurization : str
-            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist", "a_angle" and "rg".
+            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist" and "a_angle".
 
         min_sep : int, optional
             Minimum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is 2.
