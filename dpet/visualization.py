@@ -213,7 +213,7 @@ class Visualization:
 
         return axes
 
-    def tsne_scatter(self, color_by: str = "rg", save: bool = False) -> List[plt.Axes]:
+    def tsne_scatter(self, color_by: str = "rg", kde_by_ensemble: bool = False, save: bool = False) -> List[plt.Axes]:
         """
         Plot the results of t-SNE analysis. 
 
@@ -225,13 +225,16 @@ class Visualization:
         color_by: str, optional
             The feature extraction method used for coloring points in the scatter plot. Options are "rg", "prolateness", "asphericity", "sasa", and "end_to_end". Default is "rg".
         
+        kde_by_ensemble: bool, optional
+            If True, the KDE plot will be generated for each ensemble separately. If False, a single KDE plot will be generated for the concatenated ensembles. Default is False.
+        
         save: bool, optional
-            If True the plot will be saved in the data directory. Default is False.
+            If True, the plot will be saved in the data directory. Default is False.
 
         Returns
         -------
         List[plt.Axes]
-            List containing Axes objects for the scatter plot of original labels, clustering labels, Rg labels, and the KDE density plot, respectively.
+            List containing Axes objects for the scatter plot of original labels, clustering labels, feature-colored labels, and the KDE density plot, respectively.
 
         Notes
         ------
@@ -247,8 +250,8 @@ class Visualization:
             raise ValueError(f"Method {color_by} not supported.")
 
         bestclust = analysis.reducer.best_kmeans.labels_
-        fig, ax = plt.subplots(1, 4, figsize=(14, 4))
-
+        fig, ax = plt.subplots(1, 4, figsize=(18, 4))
+        
         # Create a consistent colormap for the original labels
         unique_labels = np.unique(analysis.all_labels)
         label_colors = {label: plt.cm.tab20(i / len(unique_labels)) for i, label in enumerate(unique_labels)}
@@ -268,19 +271,31 @@ class Visualization:
             feature_values.extend(values)
         colors = np.array(feature_values)
 
-        rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=10, alpha=0.5)
-        cbar = plt.colorbar(rg_labeled, ax=ax[2])
+        feature_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=10, alpha=0.5)
+        cbar = plt.colorbar(feature_labeled, ax=ax[2])
         ax[2].set_title(f'Scatter plot ({color_by} labels)')
 
-        # KDE plot
-        kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])
-        xi, yi = np.mgrid[min(analysis.reducer.best_tsne[:, 0]):max(analysis.reducer.best_tsne[:, 0]):100j,
-                        min(analysis.reducer.best_tsne[:, 1]):max(analysis.reducer.best_tsne[:, 1]):100j]
-        zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
-        ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, cmap='Blues')
-        ax[3].set_title('Density Plot')
+        if kde_by_ensemble:
+            # KDE plot for each ensemble
+            for label in unique_labels:
+                ensemble_data = analysis.reducer.best_tsne[np.array(analysis.all_labels) == label]
+                kde = gaussian_kde([ensemble_data[:, 0], ensemble_data[:, 1]])
+                xi, yi = np.mgrid[min(ensemble_data[:, 0]):max(ensemble_data[:, 0]):100j,
+                                min(ensemble_data[:, 1]):max(ensemble_data[:, 1]):100j]
+                zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
+                ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, alpha=0.5, label=f'Ensemble {label}', colors=[label_colors[label]])
+            ax[3].set_title('Density Plot (Ensemble-wise)')
+            ax[3].legend(title='Ensemble', loc='upper right')
+        else:
+            # Single KDE plot for concatenated ensembles
+            kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])
+            xi, yi = np.mgrid[min(analysis.reducer.best_tsne[:, 0]):max(analysis.reducer.best_tsne[:, 0]):100j,
+                            min(analysis.reducer.best_tsne[:, 1]):max(analysis.reducer.best_tsne[:, 1]):100j]
+            zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
+            ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, cmap='Blues')
+            ax[3].set_title('Density Plot')
 
-        # Manage legend
+        # Manage legend for the original labels
         legend_labels = list(label_colors.keys())
         legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
@@ -289,7 +304,7 @@ class Visualization:
         self.figures["tsne_scatter_plot"] = fig
 
         if save:
-            plt.savefig(self.plot_dir  + '/tsnep' + str(int(analysis.reducer.bestP)) + '_kmeans' + str(int(analysis.reducer.bestK)) + '_scatter.png', dpi=800)
+            plt.savefig(self.plot_dir + f'/tsnep{int(analysis.reducer.bestP)}_kmeans{int(analysis.reducer.bestK)}_scatter.png', dpi=800)
 
         return ax
 
