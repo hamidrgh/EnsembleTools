@@ -63,7 +63,11 @@ class Ensemble():
         It supports loading from various file formats such as PDB, DCD, and XTC.
         If the data path points to a directory, it searches for PDB files within the directory 
         and generates a trajectory from them.
-        Additional processing steps include checking for coarse-grained models and selecting a single chain if multiple chains were loaded.
+        If the data path points to a single PDB file, it loads that file and generates a trajectory.
+        If the data path points to a DCD or XTC file along with a corresponding topology file (TOP), 
+        it loads both files to construct the trajectory.
+        Additional processing steps include checking for coarse-grained models, selecting a single chain 
+        (if applicable), and selecting residues of interest based on certain criteria.
         """
         if not os.path.exists(self.data_path):
             raise FileNotFoundError(
@@ -203,27 +207,23 @@ class Ensemble():
         self.names = names
         print("Transformed ensemble shape:", self.features.shape)
 
-    def get_features(self, featurization: str, min_sep: int, max_sep: int, get_names: bool = False) -> Union[Tuple[Sequence, Sequence], Tuple[Sequence, None]]:
+    def get_features(self, featurization: str, min_sep: int, max_sep: int) -> Sequence:
         """
         Get features from the trajectory using the specified featurization method.
 
         Parameters
         ----------
         featurization : str
-            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega' and 'tr_phi'.
+            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega', 'tr_phi', 'rg', 'prolateness', 'asphericity', 'sasa', 'end_to_end'.
         min_sep : int
             The minimum sequence separation for angle calculations.
         max_sep : int
             The maximum sequence separation for angle calculations.
-        get_names : bool, optional
-            Whether to return feature names along with features. Default is False.
-
+        
         Returns
         -------
         features : Sequence
             The extracted features.
-        names : Sequence or None
-            If `get_names` is True, returns a sequence of feature names corresponding to the extracted features. Otherwise, returns None.
 
         Notes
         -----
@@ -232,31 +232,31 @@ class Ensemble():
         if featurization == "ca_dist":
             return featurize_ca_dist(
                 traj=self.trajectory, 
-                get_names=get_names,
+                get_names=False,
                 atom_selector=self.atom_selector,
                 min_sep=min_sep,
                 max_sep=max_sep)
         elif featurization == "phi_psi":
             return featurize_phi_psi(
                 traj=self.trajectory, 
-                get_names=get_names)
+                get_names=False)
         elif featurization == "a_angle":
             return featurize_a_angle(
                 traj=self.trajectory, 
-                get_names=get_names, 
+                get_names=False, 
                 atom_selector=self.atom_selector)
         elif featurization == "tr_omega":
             return featurize_tr_angle(
                 traj=self.trajectory,
                 type="omega",
-                get_names=get_names,
+                get_names=False,
                 min_sep=min_sep,
                 max_sep=max_sep)
         elif featurization == "tr_phi":
             return featurize_tr_angle(
                 traj=self.trajectory,
                 type="phi",
-                get_names=get_names,
+                get_names=False,
                 min_sep=min_sep,
                 max_sep=max_sep)
         elif featurization == "rg":
@@ -349,6 +349,9 @@ class Ensemble():
         print(f"Selected residues from ensemble {self.code}")
 
     def _get_chains_from_pdb(self):
+        """
+        Extracts unique chain IDs from a PDB file.
+        """
         with open(self.data_path, 'r') as f:
             lines = f.readlines()
 

@@ -217,12 +217,14 @@ class Visualization:
         """
         Plot the results of t-SNE analysis. 
 
-        Three scatter plots will be generated based on original, clustering, and Rg labels. 
-        One KDE density plot will also be generated to show the most populated areas in 
-        the reduced dimension.   
+        Three scatter plots will be generated based on original, clustering, and feature-colored points. 
+        One KDE density plot will also be generated to show the most populated areas in the reduced dimension.   
 
         Parameters
         ----------
+        color_by: str, optional
+            The feature extraction method used for coloring points in the scatter plot. Options are "rg", "prolateness", "asphericity", "sasa", and "end_to_end". Default is "rg".
+        
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
 
@@ -265,7 +267,7 @@ class Visualization:
         for values in analysis.get_features(color_by).values():
             feature_values.extend(values)
         colors = np.array(feature_values)
-        
+
         rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=10, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=ax[2])
         ax[2].set_title(f'Scatter plot ({color_by} labels)')
@@ -297,6 +299,9 @@ class Visualization:
 
         Parameters
         -----------
+        color_by: str, optional
+            The feature extraction method used for coloring points in the scatter plot. Options are "rg", "prolateness", "asphericity", "sasa", and "end_to_end". Default is "rg".
+
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
 
@@ -365,6 +370,9 @@ class Visualization:
 
         Parameters
         ----------
+        color_by: str, optional
+            The feature extraction method used for coloring points in the scatter plot. Options are "rg", "prolateness", "asphericity", "sasa", and "end_to_end". Default is "rg".
+        
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
 

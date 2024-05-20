@@ -1,6 +1,6 @@
 from pathlib import Path
 import re
-from typing import Dict, List
+from typing import Dict, List, Optional
 import zipfile
 from dpet.data.api_client import APIClient
 from dpet.ensemble import Ensemble
@@ -225,7 +225,7 @@ class EnsembleAnalysis:
             ensemble.random_sample_trajectory(sample_size)
         return self.trajectories
 
-    def extract_features(self, featurization: str, normalize: bool = False, min_sep: int = 2, max_sep: int = None) -> Dict[str, np.ndarray]:
+    def extract_features(self, featurization: str, normalize: bool = False, min_sep: int = 2, max_sep: Optional[int] = None) -> Dict[str, np.ndarray]:
         """
         Extract the selected feature.
 
@@ -237,7 +237,7 @@ class EnsembleAnalysis:
         normalize : bool, optional
             Whether to normalize the data. Only applicable to the "ca_dist" method. Default is False.
 
-        min_sep : int, optional
+        min_sep : int or None, optional
             Minimum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is 2.
 
         max_sep : int, optional
@@ -308,7 +308,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         method : str
-            Choose between "pca", "tsne", "dimenfix", "mds", and "kpca".
+            Choose between "pca", "tsne", "dimenfix", "mds", "kpca" and "umap".
 
         fit_on : List[str], optional
             if method is "pca" or "kpca", specifies on which ensembles the models should be fit. 
@@ -363,6 +363,7 @@ class EnsembleAnalysis:
             - DimenFix: https://github.com/visml/neo_force_scheme/tree/0.0.3
             - MDS: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html
             - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html
+            - UMAP: https://umap-learn.readthedocs.io/en/latest/
         """
         # Check if all ensemble features have the same size
         # Check if all ensemble features have the same size
@@ -411,20 +412,20 @@ class EnsembleAnalysis:
         self.extract_features(**featurization_params)
         self.reduce_features(**reduce_dim_params)
 
-    def get_features(self, featurization: str, min_sep: int = 2, max_sep: int = None, normalize: bool = False) -> Dict[str, np.ndarray]:
+    def get_features(self, featurization: str, min_sep: int = 2, max_sep: Optional[int] = None, normalize: bool = False) -> Dict[str, np.ndarray]:
         """
         Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.
 
         Parameters:
         -----------
         featurization : str
-            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist" and "a_angle".
+            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist", "a_angle", "rg", "prolateness", "asphericity", "sasa", and "end_to_end".
 
         min_sep : int, optional
-            Minimum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is 2.
+            Minimum sequence separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is 2.
 
-        max_sep : int, optional
-            Maximum separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is None.
+        max_sep : int or None, optional
+            Maximum sequence separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is None.
 
         normalize : bool, optional
             Whether to normalize the extracted features. Normalization is only supported when featurization is "ca_dist". Default is False.
@@ -434,6 +435,13 @@ class EnsembleAnalysis:
         Dict[str, np.ndarray]
             A dictionary containing the extracted features for each ensemble, where the keys are ensemble IDs and the 
             values are NumPy arrays containing the features.
+
+        Raises:
+        -------
+        ValueError:
+            If featurization is not supported, or if normalization is requested for a featurization method other than "ca_dist".
+            If normalization is requested and features from ensembles have different sizes.
+            If coarse-grained models are used with featurization methods that require atomistic detail.
         """
         if featurization in ("phi_psi", "tr_omega", "tr_phi") and self.exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
