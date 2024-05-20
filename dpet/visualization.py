@@ -261,7 +261,11 @@ class Visualization:
         scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=10, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
         ax[1].set_title('Scatter plot (clustering labels)')
 
-        colors = list(analysis.get_features(color_by).values())
+        feature_values = []
+        for values in analysis.get_features(color_by).values():
+            feature_values.extend(values)
+        colors = np.array(feature_values)
+        
         rg_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=10, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=ax[2])
         ax[2].set_title(f'Scatter plot ({color_by} labels)')
@@ -326,7 +330,11 @@ class Visualization:
         ax[0].set_title('Scatter plot (original labels)')
 
         # Scatter plot with different labels
-        colors = list(analysis.get_features(color_by).values())
+        feature_values = []
+        for values in analysis.get_features(color_by).values():
+            feature_values.extend(values)
+        colors = np.array(feature_values)
+        
         rg_labeled = ax[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=ax[2])
         ax[2].set_title(f'Scatter plot ({color_by} labels)')
@@ -351,7 +359,7 @@ class Visualization:
         return ax
 
 
-    def umap_scatter(self, save: bool = False) -> plt.Axes:
+    def umap_scatter(self, color_by: str = "rg", save: bool = False) -> List[plt.Axes]:
         """
         Generate a scatter plot of the transformed data using UMAP.
 
@@ -362,8 +370,8 @@ class Visualization:
 
         Returns
         -------
-        plt.Axes
-            The Axes object for the scatter plot.
+        List[plt.Axes]
+            The Axes objects for the scatter plot.
 
         Notes
         -----
@@ -371,22 +379,41 @@ class Visualization:
         """
 
         analysis = self.analysis
+
+        if analysis.reduce_dim_method != "umap":
+            raise ValueError("Analysis is only valid for UMAP dimensionality reduction.")
+        
+        if color_by not in ("rg", "prolateness", "asphericity", "sasa", "end_to_end"):
+            raise ValueError(f"Method {color_by} not supported.")
+        
         fig, ax = plt.subplots(1, 2, figsize=(14, 4))
 
-        label_colors = {label: "#{:06x}".format(random.randint(0, 0xFFFFFF)) for label in analysis.ens_codes}
-        point_colors = list(map(lambda label: label_colors[label], analysis.all_labels))
-        scatter_labeled = ax[0].scatter(analysis.transformed_data[:,0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
+        # Create a consistent colormap for the original labels
+        unique_labels = np.unique(analysis.all_labels)
+        label_colors = {label: plt.cm.tab20(i / len(unique_labels)) for i, label in enumerate(unique_labels)}
+        point_colors = [label_colors[label] for label in analysis.all_labels]
 
-        rg_labeled = ax[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=[rg for rg in analysis.rg], s=10, alpha=0.5) 
-        cbar = plt.colorbar(rg_labeled, ax=ax[1])
-
+        # Scatter plot with original labels
+        scatter_labeled = ax[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
         ax[0].set_title('Scatter plot (original labels)')
-        ax[1].set_title('Scatter plot (Rg labels)')
 
+        # Concatenate feature values from all ensembles
+        feature_values = []
+        for values in analysis.get_features(color_by).values():
+            feature_values.extend(values)
+        colors = np.array(feature_values)
+
+        # Scatter plot with feature-based labels
+        rg_labeled = ax[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
+        cbar = plt.colorbar(rg_labeled, ax=ax[1])
+        ax[1].set_title(f'Scatter plot ({color_by} labels)')
+
+        # Manage legend
         legend_labels = list(label_colors.keys())
-        legend_handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='lower left')
+        legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
+        plt.tight_layout()
         self.figures["umap_scatter"] = fig
 
         if save:

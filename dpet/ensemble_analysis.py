@@ -291,26 +291,6 @@ class EnsembleAnalysis:
         for ensemble in self.ensembles:
             ensemble.normalize_features(mean, std)
 
-    def _calculate_rg_for_trajectory(self, trajectory:mdtraj.Trajectory):
-        return [mdtraj.compute_rg(frame) for frame in trajectory]
-
-    @property
-    def rg(self) -> List[float]:
-        """
-        Calculates Rg for each conformation in the loaded ensembles.
-        The returned values are in Angstrom.  
-
-        Returns
-        -------
-        List[float]
-            A list of Rg values for each conformation in the loaded ensembles, in Angstrom.
-        """
-        rg_values_list = []
-        for ensemble in self.ensembles:
-            traj = ensemble.trajectory
-            rg_values_list.extend(self._calculate_rg_for_trajectory(traj))
-        return [item[0] * 10 for item in rg_values_list]
-
     def _get_concat_features(self, fit_on: List[str]=None):
         if fit_on and any(f not in self.ens_codes for f in fit_on):
             raise ValueError("Cannot fit on ensembles that were not provided as input.")
