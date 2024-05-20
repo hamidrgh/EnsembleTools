@@ -2,6 +2,8 @@ from pathlib import Path
 import re
 from typing import Dict, List, Optional
 import zipfile
+
+import pandas as pd
 from dpet.data.api_client import APIClient
 from dpet.ensemble import Ensemble
 from dpet.data.extract_tar_gz import extract_tar_gz
@@ -465,3 +467,55 @@ class EnsembleAnalysis:
                 features_dict[key] = (features - mean) / std
         
         return features_dict
+    
+    def get_features_summary_dataframe(self, selected_features: List[str] = ["rg", "asphericity", "prolateness", "sasa", "end_to_end"]) -> pd.DataFrame:
+        """
+        Create a summary DataFrame for each ensemble.
+
+        The DataFrame includes the ensemble code and the average and standard deviation for each feature.
+
+        Parameters
+        ----------
+        selected_features : List[str], optional
+            List of feature extraction methods to be used for summarizing the ensembles.
+            Default is ["rg", "asphericity", "prolateness", "sasa", "end_to_end"].
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing the summary statistics (average and std) for each feature in each ensemble.
+        
+        Raises
+        ------
+        ValueError
+            If any feature in the selected_features is not a supported feature extraction method.
+        """
+        supported_features = {"rg", "asphericity", "prolateness", "sasa", "end_to_end"}
+
+        # Validate the selected_features
+        invalid_features = [feature for feature in selected_features if feature not in supported_features]
+        if invalid_features:
+            raise ValueError(f"Unsupported feature extraction methods: {', '.join(invalid_features)}")
+
+        summary_data = []
+
+        for ensemble in self.ensembles:
+            ensemble_code = ensemble.code
+            summary_row = [ensemble_code]
+            
+            for feature in selected_features:
+                features = ensemble.get_features(featurization=feature)
+                features_array = np.array(features)
+                feature_mean = features_array.mean()
+                feature_std = features_array.std()
+                summary_row.extend([feature_mean, feature_std])
+            
+            summary_data.append(summary_row)
+
+        columns = ['ensemble_code']
+        for feature in selected_features:
+            columns.extend([f"{feature}_mean", f"{feature}_std"])
+
+        summary_df = pd.DataFrame(summary_data, columns=columns)
+        
+        return summary_df

@@ -207,7 +207,7 @@ class Ensemble():
         self.names = names
         print("Transformed ensemble shape:", self.features.shape)
 
-    def get_features(self, featurization: str, min_sep: int, max_sep: int) -> Sequence:
+    def get_features(self, featurization: str, min_sep: int = 2, max_sep: int = None) -> Sequence:
         """
         Get features from the trajectory using the specified featurization method.
 
