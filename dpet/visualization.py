@@ -730,7 +730,14 @@ class Visualization:
 
         return ax
 
-    def ensemble_sasa(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, medians: bool = True, save: bool = False) -> plt.Axes:
+    def ensemble_sasa(self, 
+                      bins: int = 50, 
+                      hist_range: Tuple = None, 
+                      violin_plot: bool = True, 
+                      means: bool = True, 
+                      medians: bool = True, 
+                      save: bool = False, 
+                      ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
         Plot the distribution of SASA for each conformation within the ensembles.
 
@@ -749,12 +756,13 @@ class Visualization:
             If True, it will show the median. Default is True.
         save : bool, optional
             If True, the plot will be saved in the data directory. Default is False.
+        ax : Union[None, plt.Axes], optional
+            The matplotlib Axes object on which to plot. If None, a new Axes object will be created. Default is None.
 
         Returns
         -------
         plt.Axes
             The Axes object containing the plot.
-
         """
 
         if self.analysis.exists_coarse_grained():
@@ -774,7 +782,11 @@ class Visualization:
             labels.append(ensemble.code)
 
         # Plot.
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig = ax.figure
+
         axis_label = r"SASA (nm$^2$)"
         title = "SASA distribution over the ensembles"
 
@@ -801,10 +813,11 @@ class Visualization:
 
         self.figures["plot_global_sasa"] = fig
         if save:
-            plt.savefig(os.path.join(self.plot_dir,'Global_SASA_dist' + self.analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir, 'Global_SASA_dist' + self.analysis.ens_codes[0]))
+
         return ax
 
-    def rg_vs_asphericity(self, save: bool = False) -> plt.Axes:
+    def rg_vs_asphericity(self, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot the Rg versus Asphericity and get the pearson correlation coefficient to evaluate 
         the correlation between Rg and Asphericity.
@@ -813,6 +826,8 @@ class Visualization:
         ----------
         save: bool, optional
             If True, the plot will be saved in the data directory. Default is False.
+        ax: plt.Axes, optional
+            The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
         -------
@@ -822,7 +837,10 @@ class Visualization:
 
         analysis = self.analysis
         
-        fig, ax = plt.subplots()  # Create a new figure
+        if ax is None:
+            fig, ax = plt.subplots()  # Create a new figure if ax is not provided
+        else:
+            fig = ax.figure  # Use the figure associated with the provided ax
         
         for ensemble in analysis.ensembles:
             x = mdtraj.compute_rg(ensemble.trajectory)
@@ -832,16 +850,17 @@ class Visualization:
             print(f"Pearson coeff for {ensemble.code} = {round(p[0][1], 3)}")
         
         ax.set_ylabel("Asphericity")
-        ax.set_xlabel(rg_axis_label)
+        ax.set_xlabel("Radius of Gyration (Rg) [nm]")
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        
         self.figures["plot_rg_vs_asphericity"] = fig
+        
         if save:
-            fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Asphericity' + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Asphericity_' + analysis.ens_codes[0]))
         
         return ax
-    
   
-    def rg_vs_prolateness(self, save: bool = False) -> plt.Axes:
+    def rg_vs_prolateness(self, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot the Rg versus Prolateness and get the Pearson correlation coefficient to evaluate 
         the correlation between Rg and Prolateness. 
@@ -850,6 +869,8 @@ class Visualization:
         ----------
         save: bool, optional
             If True, the plot will be saved in the data directory. Default is False.
+        ax: plt.Axes, optional
+            The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
         -------
@@ -859,8 +880,10 @@ class Visualization:
 
         analysis = self.analysis
         
-        # Create a new figure object
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig, ax = plt.subplots()  # Create a new figure if ax is not provided
+        else:
+            fig = ax.figure  # Use the figure associated with the provided ax
 
         for ensemble in analysis.ensembles:
             x = mdtraj.compute_rg(ensemble.trajectory)
@@ -870,16 +893,15 @@ class Visualization:
             print(f"Pearson coeff for {ensemble.code} = {round(p[0][1], 3)}")
 
         ax.set_ylabel("Prolateness")
-        ax.set_xlabel(rg_axis_label)
+        ax.set_xlabel("Radius of Gyration (Rg) [nm]")
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
         self.figures["plot_rg_vs_prolateness"] = fig
 
         if save:
-            fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Prolateness' + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Prolateness_' + analysis.ens_codes[0]))
         
         return ax
-
 
     def _get_protein_dssp_data_dict(self):
         ensembles = self.analysis.ensembles
@@ -888,7 +910,7 @@ class Visualization:
             dssp_data_dict[ensemble.code] = mdtraj.compute_dssp(ensemble.trajectory)
         return dssp_data_dict
     
-    def relative_helix_content(self, save: bool = False) -> plt.Axes:
+    def relative_helix_content(self, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot the relative helix content in each ensemble for each residue. 
 
@@ -896,6 +918,8 @@ class Visualization:
         ----------
         save : bool, optional
             If True, the plot will be saved in the data directory. Default is False.
+        ax : plt.Axes, optional
+            The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
         -------
@@ -908,7 +932,12 @@ class Visualization:
             return
         
         protein_dssp_data_dict = self._get_protein_dssp_data_dict()
-        fig, ax = plt.subplots(figsize=(10, 5))
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(10, 5))
+        else:
+            fig = ax.figure
+
         bottom = np.zeros(max(data.shape[1] for data in protein_dssp_data_dict.values()))
         max_length = len(bottom)
 
@@ -937,14 +966,13 @@ class Visualization:
         ax.set_ylabel('Relative Content of H (Helix)')
         ax.set_title('Relative Content of H in Each Residue in the ensembles')
         ax.legend(bbox_to_anchor=(1.04,0), loc="lower left")
-        plt.show()
 
         self.figures["plot_relative_helix_content"] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'relative_helix_' + self.analysis.ens_codes[0]))
         
         return ax
-    
+
     def _get_rg_data_dict(self):
         ensembles = self.analysis.ensembles
         rg_dict = {}
@@ -959,14 +987,15 @@ class Visualization:
     def radius_of_gyration(
             self,
             bins: int = 50,
-            hist_range: Tuple = None,  # TODO.
+            hist_range: Tuple = None,
             multiple_hist_ax: bool = False,
-            violin_plot: bool = False,  # TODO.
+            violin_plot: bool = False,
             median: bool = False,
             means: bool = False,
             dpi: int = 96,
-            save: bool = False
-        ) -> List[plt.Axes]:
+            save: bool = False,
+            ax: Union[None, plt.Axes, np.ndarray] = None
+    ) -> List[plt.Axes]:
         """
         Plot the distribution of the radius of gyration (Rg) within each ensemble.
 
@@ -989,6 +1018,8 @@ class Visualization:
             The DPI (dots per inch) of the output figure. Default is 96.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : Union[None, plt.Axes, np.ndarray], optional
+            The axes on which to plot. If None, new axes will be created. Default is None.
 
         Returns
         -------
@@ -1003,7 +1034,6 @@ class Visualization:
         displayed as histograms. Additionally, dashed lines representing the mean and median Rg values are overlaid
         on each histogram.
         """
-
 
         # Calculate features.
         rg_data_dict = self._get_rg_data_dict()
@@ -1021,7 +1051,10 @@ class Visualization:
             )
         else:
             # Only one axis for all histograms.
-            fig, ax = plt.subplots(dpi=dpi)
+            if ax is None:
+                fig, ax = plt.subplots(dpi=dpi)
+            else:
+                fig = ax.figure
 
         axis_label = rg_axis_label
         title = "Radius of gyration"
@@ -1085,6 +1118,11 @@ class Visualization:
 
         return ax
 
+        self.figures['trajectories_plot_rg_comparison'] = fig
+        if save:
+            fig.savefig(os.path.join(self.plot_dir, 'rg_comparison_' + self.analysis.ens_codes[0]))
+
+        return ax
 
     def _get_distance_matrix_ens_dict(self):
         ensembles = self.analysis.ensembles
@@ -1344,7 +1382,7 @@ class Visualization:
         return axes
         
 
-    def end_to_end_distances(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
+    def end_to_end_distances(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
 
@@ -1363,12 +1401,13 @@ class Visualization:
             If True, medians are shown in the violin plot. Default is True.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : plt.Axes, optional
+            The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
         -------
         plt.Axes
             The Axes object containing the plot.
-
         """
 
         ensembles = self.analysis.ensembles
@@ -1386,7 +1425,11 @@ class Visualization:
             labels.append(ensemble.code)
 
         # Plot.
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig = ax.figure
+
         axis_label = "End-to-End distance [nm]"
         title = "End-to-End distances distribution"
 
@@ -1417,8 +1460,7 @@ class Visualization:
 
         return ax
 
-
-    def asphericity(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False) -> plt.Axes:
+    def asphericity(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot asphericity distribution in each ensemble.
         Asphericity is calculated based on the gyration tensor.
@@ -1438,12 +1480,13 @@ class Visualization:
             If True, medians are shown in the violin plot. Default is True.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : plt.Axes, optional
+            The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
         -------
         plt.Axes
             The Axes object containing the plot.
-
         """
 
         ensembles = self.analysis.ensembles
@@ -1456,8 +1499,12 @@ class Visualization:
             asph_list.append(asphericity)
             labels.append(ensemble.code)
 
-        # Create a new figure object.
-        fig, ax = plt.subplots()
+        # Plot.
+        if ax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig = ax.figure
+
         axis_label = "Asphericity"
         title = "Asphericity distribution"
 
@@ -1488,7 +1535,7 @@ class Visualization:
 
         return ax
 
-    def prolateness(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, median: bool = False, means: bool = False, save: bool = False) -> plt.Axes:
+    def prolateness(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, median: bool = False, means: bool = False, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot prolateness distribution in each ensemble.
         Prolateness is calculated based on the gyration tensor.
@@ -1508,6 +1555,8 @@ class Visualization:
             If True, mean is showing in the violin plot. Default is False.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : plt.Axes, optional
+            The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
         -------
@@ -1525,8 +1574,12 @@ class Visualization:
             prolat_list.append(prolat)
             labels.append(ensemble.code)
 
-        # Create a new figure object
-        fig, ax = plt.subplots()
+        # Plot.
+        if ax is None:
+            fig, ax = plt.subplots()  # Create a new figure if ax is not provided
+        else:
+            fig = ax.figure  # Use the figure associated with the provided ax
+
         axis_label = "Prolateness"
         title = "Prolateness distribution"
 
@@ -1557,8 +1610,7 @@ class Visualization:
 
         return ax
 
-
-    def alpha_angles(self, bins: int = 50, save: bool = False) -> plt.Axes:
+    def alpha_angles(self, bins: int = 50, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot the distribution of alpha angles.
 
@@ -1568,6 +1620,8 @@ class Visualization:
             The number of bins for the histogram. Default is 50.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : plt.Axes, optional
+            The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
         -------
@@ -1577,7 +1631,11 @@ class Visualization:
 
         ensembles = self.analysis.ensembles
 
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig = ax.figure
+
         data = []
         labels = []
         for ensemble in ensembles:
@@ -1602,9 +1660,8 @@ class Visualization:
         self.figures['plot_alpha_angles_dist'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'alpha_dist_' + self.analysis.ens_codes[0]))
-        
-        return ax
 
+        return ax
 
     def contact_prob_maps(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues') -> List[List[plt.Axes]]:
         from matplotlib.colors import LogNorm
@@ -1758,9 +1815,10 @@ class Visualization:
         return axes
 
     def ss_flexibility_parameter(self, 
-                             pointer: List[int] = None, 
-                             figsize: Tuple[int, int] = (15, 5), 
-                             save: bool = False) -> plt.Axes:
+                                pointer: List[int] = None, 
+                                figsize: Tuple[int, int] = (15, 5), 
+                                save: bool = False,
+                                ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
         Generate a plot of the site-specific flexibility parameter.
         
@@ -1777,6 +1835,8 @@ class Visualization:
             The size of the figure. Default is (15, 5).
         save : bool, optional
             If True, save the plot as an image file. Default is False.
+        ax : Union[None, plt.Axes], optional
+            The matplotlib Axes object on which to plot. If None, a new Axes object will be created. Default is None.
             
         Returns
         -------
@@ -1791,34 +1851,35 @@ class Visualization:
         features_dict = self.analysis.get_features(featurization='phi_psi')
         
         f = ss_measure_disorder(features_dict)
-        fig, axes = plt.subplots(1,1, figsize=figsize)
         
+        if ax is None:
+            fig, ax = plt.subplots(1, 1, figsize=figsize)
+        else:
+            fig = ax.figure
+
         for key, values in f.items():
-            x = np.array([i+1 for i in range(len(values))])
-            axes.plot(x, values, marker='o', linestyle='-', label=key)
+            x = np.arange(1, len(values) + 1)
+            ax.plot(x, values, marker='o', linestyle='-', label=key)
         
-        axes.set_xticks([i for i in x if i == 1 or i % 5 == 0])
-        axes.set_xlabel("Residue Index")
-        axes.set_ylabel("Site-specific flexibility parameter")
-        axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.set_xticks([i for i in x if i == 1 or i % 5 == 0])
+        ax.set_xlabel("Residue Index")
+        ax.set_ylabel("Site-specific flexibility parameter")
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
         
         if pointer is not None:
             for res in pointer:
-                axes.axvline(x=res, c='blue', linestyle='--', alpha=0.3, linewidth=1)
+                ax.axvline(x=res, color='blue', linestyle='--', alpha=0.3, linewidth=1)
         
-        plt.show()
-
-        self.figures['plot_ss_flexibility_parameter'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'ss_flexibility_' + self.analysis.ens_codes[0]))  
 
-        return axes
+        return ax
 
     def ss_order_parameter(self, 
-                            pointer: list = None , 
-                            figsize: Tuple = (15,5), 
-                            save: bool = False) -> plt.Axes: 
-        
+                        pointer: List[int] = None, 
+                        figsize: Tuple[int, int] = (15, 5), 
+                        save: bool = False, 
+                        ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
         Generate a plot of the site-specific order parameter.
         
@@ -1827,60 +1888,70 @@ class Visualization:
         
         Parameters
         ----------
-        pointer: list, optional
+        pointer: List[int], optional
             A list of desired residues. Vertical dashed lines will be added to point to these residues. Default is None.
-        figsize:tuple, optional
-            The size of the figure. Default is (15,5).
+        figsize: Tuple[int, int], optional
+            The size of the figure. Default is (15, 5).
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : Union[None, plt.Axes], optional
+            The matplotlib Axes object on which to plot. If None, a new Axes object will be created. Default is None.
             
         Returns
         -------
         plt.Axes
             The matplotlib Axes object containing the plot.
         """
-    
+        
         ensembles = self.analysis.ensembles
         dict_ca_xyz = {}
         for ensemble in ensembles:
-            ca_index= ensemble.trajectory.topology.select(ensemble.atom_selector)
-            dict_ca_xyz[ensemble.code] = ensemble.trajectory.xyz[:,ca_index,:]
+            ca_index = ensemble.trajectory.topology.select(ensemble.atom_selector)
+            dict_ca_xyz[ensemble.code] = ensemble.trajectory.xyz[:, ca_index, :]
 
         dict_order_parameter = site_specific_order_parameter(dict_ca_xyz)
-        fig, axes = plt.subplots(1,1, figsize=figsize)
-        keys = list(dict_order_parameter.keys())
+        
+        if ax is None:
+            fig, ax = plt.subplots(1, 1, figsize=figsize)
+        else:
+            fig = ax.figure
 
         for key, values in dict_order_parameter.items():
-            x = np.array([i+1 for i in range(len(values))])
-            axes.scatter(x, values, label= key, alpha= 0.5)
-        axes.set_xticks([i for i in x if  i==1 or i%5 == 0])
-        axes.set_xlabel("Residue Index")
-        axes.set_ylabel("Site-specific order parameter")
-        axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            x = np.arange(1, len(values) + 1)
+            ax.scatter(x, values, label=key, alpha=0.5)
+        
+        ax.set_xticks([i for i in x if i == 1 or i % 5 == 0])
+        ax.set_xlabel("Residue Index")
+        ax.set_ylabel("Site-specific order parameter")
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        
         if pointer is not None:
             for res in pointer:
-                axes.axvline(x=res, c='blue', linestyle='--', alpha=0.3, linewidth=1)
-            
-        plt.show()
-
-        self.figures['plot_ss_order_parameter'] = fig
+                ax.axvline(x=res, color='blue', linestyle='--', alpha=0.3, linewidth=1)
+        
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'ss_order_' + self.analysis.ens_codes[0]))  
         
-        return axes
+        return ax
 
-    def per_residue_mean_sasa(self, figsize: Tuple = (15,5), pointer: List[int] = None, save: bool = False) -> plt.Axes:
+    def per_residue_mean_sasa(self, 
+                            figsize: Tuple[int, int] = (15, 5), 
+                            pointer: List[int] = None, 
+                            save: bool = False, 
+                            ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
         Plot the average solvent-accessible surface area (SASA) for each residue among all conformations in an ensemble.
 
         Parameters
         ----------
-        figsize: Tuple, optional
+        figsize: Tuple[int, int], optional
             Tuple specifying the size of the figure. Default is (15, 5).
         pointer: List[int], optional
             List of desired residues to highlight with vertical dashed lines. Default is None.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : Union[None, plt.Axes], optional
+            The matplotlib Axes object on which to plot. If None, a new Axes object will be created. Default is None.
 
         Returns
         -------
@@ -1891,7 +1962,11 @@ class Visualization:
 
         analysis = self.analysis
 
-        fig, ax = plt.subplots(1,1,figsize=figsize)
+        if ax is None:
+            fig, ax = plt.subplots(1, 1, figsize=figsize)
+        else:
+            fig = ax.figure
+
         colors = ['b', 'g', 'r', 'c', 'm']
         for i, ens in enumerate(analysis.ensembles):
 
@@ -1899,22 +1974,19 @@ class Visualization:
             sasa_mean = np.mean(res_based_sasa, axis=0)
             sasa_std = np.std(res_based_sasa, axis=0)        
 
-            ax.plot(np.arange(1, len(sasa_mean)+1), sasa_mean, '-o', color=colors[i % len(colors)], label= ens.code)
-            ax.fill_between(np.arange(1,len(sasa_mean)+1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])
+            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean, '-o', color=colors[i % len(colors)], label=ens.code)
+            ax.fill_between(np.arange(1, len(sasa_mean) + 1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])
 
-        ax.set_xticks([i for i in np.arange(1,len(sasa_mean)+1) if  i==1 or i%5 == 0])
+        ax.set_xticks([i for i in np.arange(1, len(sasa_mean) + 1) if i == 1 or i % 5 == 0])
         ax.set_xlabel('Residue Index')
         ax.set_ylabel('Mean SASA')
         ax.set_title('Mean SASA for Each Residue in Ensembles')
         ax.legend()
         ax.grid(True)
+        
         if pointer is not None:
             for res in pointer:
-                ax.axvline(x=res, c='blue', linestyle='--', alpha=0.3, linewidth=1)
-            
-
-        plt.tight_layout()
-        plt.show()
+                ax.axvline(x=res, color='blue', linestyle='--', alpha=0.3, linewidth=1)
 
         self.figures['plot_local_sasa'] = fig
         if save:
