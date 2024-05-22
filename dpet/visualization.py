@@ -259,7 +259,7 @@ class Visualization:
 
         return ax
 
-    def dimenfix_scatter(self, color_by: str = "rg", save: bool = False) -> List[plt.Axes]:
+    def dimenfix_scatter(self, color_by: str = "rg", save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Plot the complete results for dimenfix method. 
 
@@ -269,12 +269,15 @@ class Visualization:
             The feature extraction method used for coloring points in the scatter plot. Options are "rg", "prolateness", "asphericity", "sasa", and "end_to_end". Default is "rg".
 
         save: bool, optional
-            If True the plot will be saved in the data directory. Default is False.
+            If True, the plot will be saved in the data directory. Default is False.
+
+        ax : Union[None, List[plt.Axes]], optional
+            A list of Axes objects to plot on. Default is None, which creates new axes.
 
         Returns
         --------
         List[plt.Axes]
-            List containing Axes objects for the scatter plot of original labels, clustering labels, and Rg labels, respectively.
+            List containing Axes objects for the scatter plot of original labels, clustering labels, and feature-colored labels, respectively.
 
         Notes
         ------
@@ -289,7 +292,13 @@ class Visualization:
         if color_by not in ("rg", "prolateness", "asphericity", "sasa", "end_to_end"):
             raise ValueError(f"Method {color_by} not supported.")
 
-        fig, ax = plt.subplots(1, 3, figsize=(14, 4))
+        if ax is None:
+            fig, ax = plt.subplots(1, 3, figsize=(14, 4))
+            axes = ax.flatten()  # Ensure axes is a 1D array
+        else:
+            ax_array = np.array(ax).flatten()
+            axes = ax_array  # If ax is provided, flatten it to 1D
+            fig = axes[0].figure
 
         # Create a consistent colormap for the original labels
         unique_labels = np.unique(analysis.all_labels)
@@ -297,8 +306,8 @@ class Visualization:
         point_colors = [label_colors[label] for label in analysis.all_labels]
 
         # Scatter plot with original labels
-        scatter_labeled = ax[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
-        ax[0].set_title('Scatter plot (original labels)')
+        scatter_labeled = axes[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
+        axes[0].set_title('Scatter plot (original labels)')
 
         # Scatter plot with different labels
         feature_values = []
@@ -306,16 +315,16 @@ class Visualization:
             feature_values.extend(values)
         colors = np.array(feature_values)
         
-        rg_labeled = ax[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
-        cbar = plt.colorbar(rg_labeled, ax=ax[2])
-        ax[2].set_title(f'Scatter plot ({color_by} labels)')
+        rg_labeled = axes[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
+        cbar = plt.colorbar(rg_labeled, ax=axes[2])
+        axes[2].set_title(f'Scatter plot ({color_by} labels)')
 
         # Scatter plot with clustering labels
         best_k = max(analysis.reducer.sil_scores, key=lambda x: x[1])[0]
         kmeans = KMeans(n_clusters=best_k, random_state=42)
         labels = kmeans.fit_predict(analysis.transformed_data)
-        scatter_cluster = ax[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
-        ax[1].set_title('Scatter plot (clustering labels)')
+        scatter_cluster = axes[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
+        axes[1].set_title('Scatter plot (clustering labels)')
 
         # Manage legend for original labels
         legend_labels = list(label_colors.keys())
@@ -327,10 +336,9 @@ class Visualization:
         if save:
             plt.savefig(self.plot_dir + '/dimenfix_scatter.png', dpi=800)
 
-        return ax
+        return axes
 
-
-    def umap_scatter(self, color_by: str = "rg", save: bool = False) -> List[plt.Axes]:
+    def umap_scatter(self, color_by: str = "rg", save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Generate a scatter plot of the transformed data using UMAP.
 
@@ -341,6 +349,9 @@ class Visualization:
         
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+
+        ax : Union[None, List[plt.Axes]], optional
+            A list of Axes objects to plot on. Default is None, which creates new axes.
 
         Returns
         -------
@@ -360,7 +371,12 @@ class Visualization:
         if color_by not in ("rg", "prolateness", "asphericity", "sasa", "end_to_end"):
             raise ValueError(f"Method {color_by} not supported.")
         
-        fig, ax = plt.subplots(1, 2, figsize=(14, 4))
+        if ax is None:
+            fig, ax = plt.subplots(1, 2, figsize=(14, 4))
+            axes = ax.flatten()  # Ensure axes is a 1D array
+        else:
+            axes = np.array(ax).flatten()  # Flatten the provided axes
+            fig = axes[0].figure
 
         # Create a consistent colormap for the original labels
         unique_labels = np.unique(analysis.all_labels)
@@ -368,8 +384,8 @@ class Visualization:
         point_colors = [label_colors[label] for label in analysis.all_labels]
 
         # Scatter plot with original labels
-        scatter_labeled = ax[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
-        ax[0].set_title('Scatter plot (original labels)')
+        scatter_labeled = axes[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
+        axes[0].set_title('Scatter plot (original labels)')
 
         # Concatenate feature values from all ensembles
         feature_values = []
@@ -378,9 +394,9 @@ class Visualization:
         colors = np.array(feature_values)
 
         # Scatter plot with feature-based labels
-        rg_labeled = ax[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
-        cbar = plt.colorbar(rg_labeled, ax=ax[1])
-        ax[1].set_title(f'Scatter plot ({color_by} labels)')
+        rg_labeled = axes[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
+        cbar = plt.colorbar(rg_labeled, ax=axes[1])
+        axes[1].set_title(f'Scatter plot ({color_by} labels)')
 
         # Manage legend
         legend_labels = list(label_colors.keys())
@@ -393,7 +409,7 @@ class Visualization:
         if save:
             plt.savefig(self.plot_dir + '/umap_scatter.png', dpi=800)
 
-        return ax
+        return axes
 
     def pca_cumulative_explained_variance(self, save: bool = False) -> plt.Axes:
         """
