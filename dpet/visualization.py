@@ -411,7 +411,7 @@ class Visualization:
 
         return axes
 
-    def pca_cumulative_explained_variance(self, save: bool = False) -> plt.Axes:
+    def pca_cumulative_explained_variance(self, save: bool = False, ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
         Plot the cumulative variance. Only applicable when the
         dimensionality reduction method is "pca".
@@ -420,6 +420,9 @@ class Visualization:
         ----------
         save: bool, optional
             If True, the plot will be saved in the data directory. Default is False.
+
+        ax: Union[None, plt.Axes], optional
+            An Axes object to plot on. Default is None, which creates a new axes.
 
         Returns
         -------
@@ -430,10 +433,14 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method != "pca":
-                print("Analysis is only valid for pca dimensionality reduction.")
-                return
+            print("Analysis is only valid for pca dimensionality reduction.")
+            return
         
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig = ax.figure
+
         ax.plot(np.cumsum(analysis.reduce_dim_model.explained_variance_ratio_) * 100)
         ax.set_xlabel("PCA dimension")
         ax.set_ylabel("Cumulative explained variance %")
@@ -453,7 +460,7 @@ class Visualization:
         ax.set_xlabel(f"{reduce_dim_method} dim {dim_x+1}")
         ax.set_ylabel(f"{reduce_dim_method} dim {dim_y+1}")
 
-    def pca_2d_landscapes(self, save: bool = False) -> List[plt.Axes]:
+    def pca_2d_landscapes(self, save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Plot 2D landscapes when the dimensionality reduction method is "pca" or "kpca".
 
@@ -461,6 +468,9 @@ class Visualization:
         ----------
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
+
+        ax: Union[None, List[plt.Axes]], optional
+            A list of Axes objects to plot on. Default is None, which creates new axes.
 
         Returns
         -------
@@ -470,46 +480,53 @@ class Visualization:
         
         analysis = self.analysis
 
-        if analysis.reduce_dim_method not in ("pca","kpca"):
-                print("Analysis is only valid for pca dimensionality reduction.")
-                return
+        if analysis.reduce_dim_method not in ("pca", "kpca"):
+            print("Analysis is only valid for pca or kpca dimensionality reduction.")
+            return
 
-        # 2d scatters.
+        # 2D scatter plot settings
         dim_x = 0
         dim_y = 1
         marker = "."
-        legend_kwargs = {"loc": 'upper right',
-                        "bbox_to_anchor": (1.1, 1.1),
-                        "fontsize": 8}
+        legend_kwargs = {"loc": 'upper right', "bbox_to_anchor": (1.1, 1.1), "fontsize": 8}
 
-        # Plot all ensembles at the same time.
-        fig, ax = plt.subplots(len(analysis.ens_codes)+1, figsize=(4, 4*len(analysis.ens_codes)), dpi=120)
-        ax[0].set_title("all")
+        num_ensembles = len(analysis.ens_codes)
+        
+        if ax is None:
+            fig, axes = plt.subplots(num_ensembles + 1, figsize=(4, 4 * (num_ensembles + 1)), dpi=120)
+        else:
+            if not isinstance(ax, (list, np.ndarray)):
+                ax = [ax]
+            axes = np.array(ax).flatten()
+            fig = axes[0].figure
+
+        # Plot all ensembles at the same time
+        axes[0].set_title("all")
         for ensemble in analysis.ensembles:
-            ax[0].scatter(ensemble.reduce_dim_data[:,dim_x],
-                        ensemble.reduce_dim_data[:,dim_y],
-                        label=ensemble.code, marker=marker)
-        ax[0].legend(**legend_kwargs)
-        self._set_labels(ax[0], "pca", dim_x, dim_y)
+            axes[0].scatter(ensemble.reduce_dim_data[:, dim_x],
+                            ensemble.reduce_dim_data[:, dim_y],
+                            label=ensemble.code, marker=marker)
+        axes[0].legend(**legend_kwargs)
+        self._set_labels(axes[0], "pca", dim_x, dim_y)
 
         # Concatenate all reduced dimensionality data from the dictionary
         all_data = analysis.transformed_data
 
-        # Plot each ensembles.
+        # Plot each ensemble individually
         for i, ensemble in enumerate(analysis.ensembles):
-            ax[i+1].set_title(ensemble.code)
+            axes[i + 1].set_title(ensemble.code)
             # Plot all data in gray
-            ax[i+1].scatter(all_data[:, dim_x],
-                            all_data[:, dim_y],
-                            label="all", color="gray", alpha=0.25,
-                            marker=marker)
+            axes[i + 1].scatter(all_data[:, dim_x],
+                                all_data[:, dim_y],
+                                label="all", color="gray", alpha=0.25,
+                                marker=marker)
             # Plot ensemble data in color
-            ax[i+1].scatter(ensemble.reduce_dim_data[:,dim_x],
-                            ensemble.reduce_dim_data[:,dim_y],
-                            label=ensemble.code, c=f"C{i}",
-                            marker=marker)
-            ax[i+1].legend(**legend_kwargs)
-            self._set_labels(ax[i+1], "pca", dim_x, dim_y)
+            axes[i + 1].scatter(ensemble.reduce_dim_data[:, dim_x],
+                                ensemble.reduce_dim_data[:, dim_y],
+                                label=ensemble.code, c=f"C{i}",
+                                marker=marker)
+            axes[i + 1].legend(**legend_kwargs)
+            self._set_labels(axes[i + 1], "pca", dim_x, dim_y)
 
         plt.tight_layout()
 
@@ -517,9 +534,9 @@ class Visualization:
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_2d_landscapes_' + analysis.featurization + analysis.ens_codes[0]))
 
-        return ax
+        return axes
 
-    def pca_1d_histograms(self, save: bool = False) -> List[plt.Axes]:
+    def pca_1d_histograms(self, save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Plot 1D histogram when the dimensionality reduction method is "pca" or "kpca".
 
@@ -527,6 +544,9 @@ class Visualization:
         ----------
         save: bool, optional
             If True the plot will be saved in the data directory. Default is False.
+
+        ax: Union[None, List[plt.Axes]], optional
+            A list of Axes objects to plot on. Default is None, which creates new axes.
 
         Returns
         -------
@@ -537,52 +557,52 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca"):
-                print("Analysis is only valid for pca and kpca dimensionality reduction.")
-                return
-        
+            print("Analysis is only valid for pca and kpca dimensionality reduction.")
+            return
+
         n_bins = 30
-
-        dpi = 120
-        fig, ax = plt.subplots(len(analysis.ens_codes), 1, figsize=(4, 2*len(analysis.ens_codes)), dpi=dpi)
         k = 0
-        bins = np.linspace(analysis.transformed_data[:,k].min(),
-                        analysis.transformed_data[:,k].max(),
+        bins = np.linspace(analysis.transformed_data[:, k].min(),
+                        analysis.transformed_data[:, k].max(),
                         n_bins)
-        
-        # Ensure ax is always a list
-        if not isinstance(ax, np.ndarray):
-            ax = [ax]
 
+        if ax is None:
+            fig, axes = plt.subplots(len(analysis.ens_codes), 1, figsize=(4, 2 * len(analysis.ens_codes)), dpi=120)
+        else:
+            if not isinstance(ax, (list, np.ndarray)):
+                ax = [ax]
+            axes = np.array(ax).flatten()
+            fig = axes[0].figure
+
+        # Plot histograms for each ensemble
         for i, ensemble in enumerate(analysis.ensembles):
-            ax[i].hist(ensemble.reduce_dim_data[:,k],
-                    label=ensemble.code,
-                    bins=bins,
-                    density=True,
-                    color=f"C{i}",
-                    histtype="step")
-            ax[i].hist(analysis.transformed_data[:,k],
-                    label="all",
-                    bins=bins,
-                    density=True,
-                    color="gray",
-                    alpha=0.25,
-                    histtype="step")
-            ax[i].legend(loc='upper right',
+            axes[i].hist(ensemble.reduce_dim_data[:, k],
+                        label=ensemble.code,
+                        bins=bins,
+                        density=True,
+                        color=f"C{i}",
+                        histtype="step")
+            axes[i].hist(analysis.transformed_data[:, k],
+                        label="all",
+                        bins=bins,
+                        density=True,
+                        color="gray",
+                        alpha=0.25,
+                        histtype="step")
+            axes[i].legend(loc='upper right',
                         bbox_to_anchor=(1.1, 1.1),
-                        fontsize=8
-                        )
-            ax[i].set_xlabel(f"Dim {k+1}")
-            ax[i].set_ylabel("Density")
+                        fontsize=8)
+            axes[i].set_xlabel(f"Dim {k+1}")
+            axes[i].set_ylabel("Density")
 
         plt.tight_layout()
         self.figures["pca_plot_1d_histograms"] = fig
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
-        
-        return ax
 
+        return axes
 
-    def pca_residue_correlation(self, sel_dims: List[int], save: bool = False) -> List[plt.Axes]:
+    def pca_residue_correlation(self, sel_dims: List[int], save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Plot the correlation between residues based on PCA weights.
 
@@ -592,6 +612,8 @@ class Visualization:
             A list of indices specifying the PCA dimensions to include in the plot.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : Union[None, List[plt.Axes]], optional
+            A list of Axes objects to plot on. Default is None, which creates new axes.
 
         Returns
         -------
@@ -605,22 +627,26 @@ class Visualization:
         the PCA weights.
 
         The analysis is only valid on PCA and kernel PCA dimensionality reduction with 'ca_dist' feature extraction.
-
         """
 
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca") or analysis.featurization != "ca_dist":
-                print("Analysis is only valid for pca and kpca dimensionality reduction with ca_dist feature extraction.")
-                return
+            print("Analysis is only valid for pca and kpca dimensionality reduction with ca_dist feature extraction.")
+            return
         
         cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
-        norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted
-                                            # when analyzing other systems via PCA!
+        norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted when analyzing other systems via PCA!
         dpi = 120
 
         fig_r = 0.8
-        fig, ax = plt.subplots(1, 3, dpi=dpi, figsize=(15*fig_r, 4*fig_r))
+        if ax is None:
+            fig, axes = plt.subplots(1, 3, dpi=dpi, figsize=(15*fig_r, 4*fig_r))
+        else:
+            if not isinstance(ax, (list, np.ndarray)):
+                ax = [ax]
+            axes = np.array(ax).flatten()
+            fig = axes[0].figure
 
         # Get the number of residues from one of the trajectories
         num_residues = next(iter(analysis.trajectories.values())).topology.n_residues
@@ -633,12 +659,12 @@ class Visualization:
                 # Note: this should be patched for proteins with resSeq values not starting from 1!
                 matrix[int(r1[3:])-1, int(r2[3:])-1] = analysis.reduce_dim_model.components_[sel_dim,i]
                 matrix[int(r2[3:])-1, int(r1[3:])-1] = analysis.reduce_dim_model.components_[sel_dim,i]
-            im = ax[k].imshow(matrix, cmap=cmap, norm=norm)  # RdBu, PiYG
-            ax[k].set_xlabel("Residue j")
-            ax[k].set_ylabel("Residue i")
-            ax[k].set_title(r"Weight of $d_{ij}$" + f" for PCA dim {sel_dim+1}")
+            im = axes[k].imshow(matrix, cmap=cmap, norm=norm)  # RdBu, PiYG
+            axes[k].set_xlabel("Residue j")
+            axes[k].set_ylabel("Residue i")
+            axes[k].set_title(r"Weight of $d_{ij}$" + f" for PCA dim {sel_dim+1}")
             cbar = fig.colorbar(
-                im, ax=ax[k],
+                im, ax=axes[k],
                 label="PCA weight"
             )
         plt.tight_layout()
@@ -646,56 +672,59 @@ class Visualization:
         if save:
             plt.savefig(os.path.join(self.plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
 
-        return ax
+        return axes
 
-
-    def pca_rg_correlation(self, save: bool = False) -> List[plt.Axes]:
+    def pca_rg_correlation(self, save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Examine and plot the correlation between PC dimension 1 and the amount of Rg.
-        Typically high correlation can be detected here. 
+        Typically high correlation can be detected here.
 
         Parameters
         ----------
         save : bool, optional
             If True, the plot will be saved in the data directory. Default is False.
 
+        ax: Union[None, List[plt.Axes]], optional
+            A list of Axes objects to plot on. Default is None, which creates new axes.
+
         Returns
         -------
         List[plt.Axes]
             A list of plt.Axes objects representing the subplots created.
-
         """
-        
+
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca"):
-                print("Analysis is only valid for pca and kpca dimensionality reduction.")
-                return
-        
-        dpi = 120
-        fig, ax = plt.subplots(len(analysis.ens_codes), 1, figsize=(3, 3*len(analysis.ens_codes)), dpi=dpi)
+            print("Analysis is only valid for pca and kpca dimensionality reduction.")
+            return
+
         pca_dim = 0
 
-        # Ensure ax is always a list
-        if not isinstance(ax, np.ndarray):
-            ax = [ax]
+        if ax is None:
+            fig, axes = plt.subplots(len(analysis.ens_codes), 1, figsize=(3, 3 * len(analysis.ens_codes)), dpi=120)
+        else:
+            if not isinstance(ax, (list, np.ndarray)):
+                ax = [ax]
+            axes = np.array(ax).flatten()
+            fig = axes[0].figure
 
+        # Plot the correlation for each ensemble
         for i, ensemble in enumerate(analysis.ensembles):
             rg_i = mdtraj.compute_rg(ensemble.trajectory)
-            ax[i].scatter(ensemble.reduce_dim_data[:,pca_dim],
-                    rg_i, label=ensemble.code,
-                    color=f"C{i}"
-            )
-            ax[i].legend(fontsize=8)
-            ax[i].set_xlabel(f"Dim {pca_dim+1}")
-            ax[i].set_ylabel(rg_axis_label)
+            axes[i].scatter(ensemble.reduce_dim_data[:, pca_dim],
+                            rg_i, label=ensemble.code,
+                            color=f"C{i}")
+            axes[i].legend(fontsize=8)
+            axes[i].set_xlabel(f"Dim {pca_dim + 1}")
+            axes[i].set_ylabel("Rg")
 
         plt.tight_layout()
         self.figures["pca_rg_correlation"] = fig
         if save:
-            plt.savefig(os.path.join(self.plot_dir,'PCA_RG' + analysis.ens_codes[0]))
+            plt.savefig(os.path.join(self.plot_dir, 'PCA_RG' + analysis.ens_codes[0]))
 
-        return ax
+        return axes
 
     def ensemble_sasa(self, 
                       bins: int = 50, 
