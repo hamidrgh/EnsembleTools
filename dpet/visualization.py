@@ -213,7 +213,13 @@ class Visualization:
 
         return axes
 
-    def tsne_scatter(self, color_by: str = "rg", kde_by_ensemble: bool = False, save: bool = False) -> List[plt.Axes]:
+    def tsne_scatter(
+            self,
+            color_by: str = "rg",
+            kde_by_ensemble: bool = False,
+            save: bool = False,
+            ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
+    ) -> List[plt.Axes]:
         """
         Plot the results of t-SNE analysis. 
 
@@ -230,6 +236,9 @@ class Visualization:
         
         save: bool, optional
             If True, the plot will be saved in the data directory. Default is False.
+        
+        ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]], optional
+            The axes on which to plot. If None, new axes will be created. Default is None.
 
         Returns
         -------
@@ -250,8 +259,15 @@ class Visualization:
             raise ValueError(f"Method {color_by} not supported.")
 
         bestclust = analysis.reducer.best_kmeans.labels_
-        fig, ax = plt.subplots(1, 4, figsize=(18, 4))
         
+        if ax is None:
+            fig, ax = plt.subplots(1, 4, figsize=(18, 4))
+        else:
+            if not isinstance(ax, (list, np.ndarray)):
+                ax = [ax]
+            ax = np.array(ax).flatten()
+            fig = ax[0].figure
+            
         # Create a consistent colormap for the original labels
         unique_labels = np.unique(analysis.all_labels)
         label_colors = {label: plt.cm.tab20(i / len(unique_labels)) for i, label in enumerate(unique_labels)}
@@ -1054,9 +1070,6 @@ class Visualization:
                 if not isinstance(ax, (list, np.ndarray)):
                     ax = [ax]
                 ax = np.array(ax).flatten()
-                # Check if the number of provided axes matches the number of systems
-                if len(ax) != n_systems:
-                    raise ValueError(f"Expected {n_systems} axes, but got {len(ax)}.")
                 fig = ax[0].figure
         else:
             # Only one axis for all histograms.
@@ -1151,7 +1164,7 @@ class Visualization:
                             dpi: int = 96,
                             use_ylabel: bool = True,
                             save: bool = False,
-                            ax: Union[None, List[List[plt.Axes]], List[plt.Axes]] = None) -> List[List[plt.Axes]]:
+                            ax: Union[None, List[List[plt.Axes]], List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Plot the average distance maps for selected ensembles.
         
@@ -1174,14 +1187,13 @@ class Visualization:
 
         Returns
         -------
-        List[List[plt.Axes]]
-            Returns a 2D list of Axes objects representing the subplot grid.
+        List[plt.Axes]
+            Returns a 1D list of Axes objects representing the subplot grid.
 
         Notes
         -----
         This method plots the average distance maps for selected ensembles, where each distance map
         represents the average pairwise distances between residues in a protein structure.
-
         """
 
         ens_dict = self._get_distance_matrix_ens_dict()
@@ -1191,18 +1203,14 @@ class Visualization:
 
         if ax is None:
             fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
-            axes = axes.reshape((rows, cols))  # Ensure axes is a 2D array
+            axes = axes.flatten()  # Ensure axes is a 1D array
         else:
-            ax_array = np.array(ax)
-            if len(ax_array.flatten()) != num_proteins:
-                raise ValueError(f"{num_proteins} axes need to be provided.")
-            axes = ax_array.reshape((rows, cols))  # If ax is 1D, reshape it to 2D
-            fig = axes[0, 0].figure
+            ax_array = np.array(ax).flatten()
+            axes = ax_array  # If ax is provided, flatten it to 1D
+            fig = axes[0].figure
 
         for i, (protein_name, ens_data) in enumerate(ens_dict.items()):
-            row = i // cols
-            col = i % cols
-            ax = axes[row, col] if axes.ndim == 2 else axes[i]
+            ax = axes[i]
             
             avg_dmap = np.mean(ens_data, axis=0)
             
@@ -1223,7 +1231,7 @@ class Visualization:
         
         # Remove any empty subplots
         for i in range(num_proteins, rows * cols):
-            fig.delaxes(axes.flatten()[i])
+            fig.delaxes(axes[i])
 
         self.figures['plot_average_dmap_comparison'] = fig
         if save:
@@ -1718,8 +1726,6 @@ class Visualization:
             axes = axes.flatten()
         else:
             ax_array = np.array(ax)
-            if len(ax_array.flatten()) != num_proteins:
-                raise ValueError(f"{num_proteins} axes need to be provided.")
             axes = ax_array.flatten()
             fig = axes[0].figure
 
