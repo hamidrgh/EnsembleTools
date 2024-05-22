@@ -2015,7 +2015,14 @@ class Visualization:
 
         return ax
 
-    def ca_com_distances(self, min_sep: int = 2, max_sep: Union[int, None] = None, get_names: bool = True, inverse: bool = False, figsize: Tuple[int, int] = (6, 2.5), save: bool = False) -> List[List[plt.Axes]]:
+    def ca_com_distances(self, 
+                         min_sep: int = 2, 
+                         max_sep: Union[int, None] = None, 
+                         get_names: bool = True, 
+                         inverse: bool = False,
+                         save: bool = False,
+                         ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
+                        ) -> List[List[plt.Axes]]:
         """
         Plot the distance maps comparing the center of mass (COM) and alpha-carbon (CA) distances within each ensemble.
 
@@ -2049,11 +2056,17 @@ class Visualization:
         if self.analysis.exists_coarse_grained():
             print("This analysis is not possible with coarse-grained models.")
             return []
+        
+        num_proteins = len(self.analysis.ensembles)
+        
+        if ax is None:
+            fig, axes = plt.subplots(2, num_proteins, figsize=(10, 4 * num_proteins))
+        else:
+            ax_array = np.array(ax)
+            axes = ax_array.reshape(2, num_proteins)
+            fig = axes[0, 0].figure
 
-        axes = []
-
-        analysis = self.analysis
-        for ens in analysis.ensembles:
+        for i, ens in enumerate(self.analysis.ensembles):
             traj = ens.trajectory
             feat, names = featurize_com_dist(traj=traj, min_sep=min_sep,max_sep=max_sep,inverse=inverse ,get_names=get_names)  # Compute (N, *) feature arrays.
             print(f"# Ensemble: {ens.code}")
@@ -2065,25 +2078,20 @@ class Visualization:
             ca_dmap_mean = ca_dmap.mean(axis=0)
 
             print("distance matrix:", com_dmap_mean.shape)
-            fig, ax = plt.subplots(1, 2, figsize=figsize)
+            #fig, ax = plt.subplots(1, 2, figsize=figsize)
             fig.suptitle(ens.code)
-            im0 = ax[0].imshow(ca_dmap_mean)
-            ax[0].set_title("CA")
-            im1 = ax[1].imshow(com_dmap_mean)
-            ax[1].set_title("COM")
-            cbar = fig.colorbar(im0, ax=ax[0], shrink=0.8)
+            im0 = axes[i, 0].imshow(ca_dmap_mean)
+            axes[i, 0].set_title("CA")
+            im1 = axes[i, 1].imshow(com_dmap_mean)
+            axes[i, 1].set_title("COM")
+            cbar = fig.colorbar(im0, ax=axes[i, 0], shrink=0.8)
             cbar.set_label("distance [nm]")
-            cbar = fig.colorbar(im1, ax=ax[1], shrink=0.8)
+            cbar = fig.colorbar(im1, ax=axes[i, 1], shrink=0.8)
             cbar.set_label("distance [nm]")
-
-            plt.tight_layout()
-            plt.show()
 
             self.figures['plot_dist_ca_com'] = fig
             if save:
                 fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + ens.code))  
-
-            axes.append([ax[0], ax[1]])
 
         return axes
     
