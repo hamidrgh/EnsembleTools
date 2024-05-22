@@ -1377,12 +1377,14 @@ class Visualization:
         return axes
         
 
-    def end_to_end_distances(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
+    def end_to_end_distances(self, rg_norm: bool = False, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
 
         Parameters
         ----------
+        rg_norm: bool, optional
+            Normalize end-to-end distances on the average radius of gyration.
         bins : int, optional
             The number of bins for the histogram. Default is 50.
         hist_range: Tuple, optional
@@ -1416,6 +1418,9 @@ class Visualization:
             hist_data_i = mdtraj.compute_distances(
                 ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]
             ).ravel()
+            if rg_norm:
+                rg_i = mdtraj.compute_rg(ensemble.trajectory).mean()
+                hist_data_i = hist_data_i / rg_i
             hist_data.append(hist_data_i)
             labels.append(ensemble.code)
 
@@ -1425,8 +1430,12 @@ class Visualization:
         else:
             fig = ax.figure
 
-        axis_label = "End-to-End distance [nm]"
-        title = "End-to-End distances distribution"
+        if not rg_norm:
+            axis_label = "End-to-End distance [nm]"
+            title = "End-to-End distances distribution"
+        else:
+            axis_label = r"End-to-End distance over $\langle$R$_g$$\rangle$"
+            title = r"End-to-End distance over $\langle$R$_g$$\rangle$ distribution"
 
         if violin_plot:
             plot_violins(

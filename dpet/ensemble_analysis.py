@@ -11,6 +11,7 @@ import os
 import mdtraj
 import numpy as np
 from dpet.dimensionality_reduction import DimensionalityReductionFactory
+from dpet.featurization.ensemble_level import ensemble_features
 
 class EnsembleAnalysis:
     """
@@ -421,7 +422,7 @@ class EnsembleAnalysis:
         Parameters:
         -----------
         featurization : str
-            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist", "a_angle", "rg", "prolateness", "asphericity", "sasa", and "end_to_end".
+            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist", "a_angle", "rg", "prolateness", "asphericity", "sasa", "end_to_end" and "flory_exponent".
 
         min_sep : int, optional
             Minimum sequence separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is 2.
@@ -454,7 +455,10 @@ class EnsembleAnalysis:
         features_dict = {}
         for ensemble in self.ensembles:
             features = ensemble.get_features(featurization=featurization, min_sep=min_sep, max_sep=max_sep)
-            features_dict[ensemble.code] = features
+            if featurization != "flory_exponent":
+                features_dict[ensemble.code] = features
+            else:
+                features_dict[ensemble.code] = features[0]
             
         if normalize:
             feature_sizes = set(features.shape[1] for features in features_dict.values())
@@ -468,17 +472,20 @@ class EnsembleAnalysis:
         
         return features_dict
     
-    def get_features_summary_dataframe(self, selected_features: List[str] = ["rg", "asphericity", "prolateness", "sasa", "end_to_end"]) -> pd.DataFrame:
+    def get_features_summary_dataframe(self, selected_features: List[str] = ["rg", "asphericity", "prolateness", "sasa", "end_to_end", "flory_exponent"], show_variability: bool = True) -> pd.DataFrame:
         """
         Create a summary DataFrame for each ensemble.
 
-        The DataFrame includes the ensemble code and the average and standard deviation for each feature.
+        The DataFrame includes the ensemble code and the average for each feature.
 
         Parameters
         ----------
         selected_features : List[str], optional
             List of feature extraction methods to be used for summarizing the ensembles.
-            Default is ["rg", "asphericity", "prolateness", "sasa", "end_to_end"].
+            Default is ["rg", "asphericity", "prolateness", "sasa", "end_to_end", "flory_exponent"].
+        show_variability: bool, optional
+            If True, include a column  a measurment of variability for each
+            feature (e.g.: standard deviation or error).
 
         Returns
         -------
@@ -490,7 +497,7 @@ class EnsembleAnalysis:
         ValueError
             If any feature in the selected_features is not a supported feature extraction method.
         """
-        supported_features = {"rg", "asphericity", "prolateness", "sasa", "end_to_end"}
+        supported_features = {"rg", "asphericity", "prolateness", "sasa", "end_to_end", "ee_on_rg", "flory_exponent"}
 
         # Validate the selected_features
         invalid_features = [feature for feature in selected_features if feature not in supported_features]
@@ -501,21 +508,34 @@ class EnsembleAnalysis:
 
         for ensemble in self.ensembles:
             ensemble_code = ensemble.code
-            summary_row = [ensemble_code]
+            summary_row = [
+                ensemble_code,
+                ensemble.trajectory.n_residues,
+                len(ensemble.trajectory)
+            ]
             
             for feature in selected_features:
                 features = ensemble.get_features(featurization=feature)
-                features_array = np.array(features)
-                feature_mean = features_array.mean()
-                feature_std = features_array.std()
-                summary_row.extend([feature_mean, feature_std])
+                if feature not in ensemble_features:
+                    features_array = np.array(features)
+                    feature_mean = features_array.mean()
+                    feature_std = features_array.std()
+                    summary_row.extend([feature_mean, feature_std])
+                else:
+                    summary_row.extend([features[0], features[1]])
             
             summary_data.append(summary_row)
 
-        columns = ['ensemble_code']
+        columns = ['ensemble_code', 'n_residues', 'n_conformers']
         for feature in selected_features:
-            columns.extend([f"{feature}_mean", f"{feature}_std"])
+            if feature not in ensemble_features:
+                columns.extend([f"{feature}_mean", f"{feature}_std"])
+            else:
+                columns.extend([feature, f"{feature}_err"])
 
         summary_df = pd.DataFrame(summary_data, columns=columns)
+        if not show_variability:
+            summary_df = summary_df[[c for c in summary_df.columns \
+                                     if not c.endswith(("_std", "_err"))]]
         
         return summary_df
