@@ -994,8 +994,8 @@ class Visualization:
             means: bool = False,
             dpi: int = 96,
             save: bool = False,
-            ax: Union[None, plt.Axes, np.ndarray] = None
-    ) -> List[plt.Axes]:
+            ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
+        ) -> Union[plt.Axes, List[plt.Axes]]:
         """
         Plot the distribution of the radius of gyration (Rg) within each ensemble.
 
@@ -1005,32 +1005,32 @@ class Visualization:
             The number of bins for the histogram. Default is 50.
         hist_range : Tuple, optional
             A tuple with a min and max value for the histogram. Default is None,
-            which corresponds to using the min a max value across all data.
+            which corresponds to using the min and max value across all data.
         multiple_hist_ax: bool, optional
             If True, it will plot each histogram in a different axis.
         violin_plot : bool, optional
-            If True, a violin plot is visualized. Default is True.
+            If True, a violin plot is visualized. Default is False.
         median : bool, optional
-            If True, median is showing in the violin plot. Default is False.
+            If True, median is shown in the plot. Default is False.
         means : bool, optional
-            If True, mean is showing in the violin plot. Default is False.
+            If True, mean is shown in the plot. Default is False.
         dpi : int, optional
             The DPI (dots per inch) of the output figure. Default is 96.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
-        ax : Union[None, plt.Axes, np.ndarray], optional
+        ax : Union[None, plt.Axes, np.ndarray, List[plt.Axes]], optional
             The axes on which to plot. If None, new axes will be created. Default is None.
 
         Returns
         -------
-        List[plt.Axes]
-            Returns a list of Axes objects containing the histogram plots.
+        Union[plt.Axes, List[plt.Axes]]
+            Returns a single Axes object or a list of Axes objects containing the plot(s).
 
         Notes
         -----
         This method plots the distribution of the radius of gyration (Rg) within each ensemble in the analysis.
 
-        The Rg values are binned according to the specified number of bins (`n_bins`) and range (`bins_range`) and 
+        The Rg values are binned according to the specified number of bins (`bins`) and range (`hist_range`) and 
         displayed as histograms. Additionally, dashed lines representing the mean and median Rg values are overlaid
         on each histogram.
         """
@@ -1044,11 +1044,20 @@ class Visualization:
         # Plot.
         if not violin_plot and multiple_hist_ax:
             # One axis for each histogram.
-            fig, ax = plt.subplots(
-                1, n_systems,
-                figsize=(3 * n_systems, 3),
-                dpi=dpi
-            )
+            if ax is None:
+                fig, ax = plt.subplots(
+                    1, n_systems,
+                    figsize=(3 * n_systems, 3),
+                    dpi=dpi
+                )
+            else:
+                if not isinstance(ax, (list, np.ndarray)):
+                    ax = [ax]
+                ax = np.array(ax).flatten()
+                # Check if the number of provided axes matches the number of systems
+                if len(ax) != n_systems:
+                    raise ValueError(f"Expected {n_systems} axes, but got {len(ax)}.")
+                fig = ax[0].figure
         else:
             # Only one axis for all histograms.
             if ax is None:
@@ -1056,8 +1065,8 @@ class Visualization:
             else:
                 fig = ax.figure
 
-        axis_label = rg_axis_label
-        title = "Radius of gyration"
+        axis_label = "Radius of Gyration (Rg)"
+        title = "Radius of Gyration"
 
         if violin_plot:
             plot_violins(
@@ -1085,12 +1094,12 @@ class Visualization:
                     data=hist_data, bins=bins, range=hist_range
                 )
                 h_args = {"histtype": "step", "density": True}
-                # Ensure ax is always a list
-                if not isinstance(ax, np.ndarray):
-                    ax = [ax]
+
+                if isinstance(ax, np.ndarray):
+                    ax = ax.flatten()
 
                 for i, (name_i, rg_i) in enumerate(rg_data_dict.items()):
-                    ax[i].hist(rg_i, bins=bins, label=name_i, **h_args)
+                    ax[i].hist(rg_i, bins=_bins, label=name_i, **h_args)
                     ax[i].set_title(name_i)
                     if i == 0:
                         ax[i].set_ylabel("Density")
@@ -1106,17 +1115,8 @@ class Visualization:
                         median_line = ax[i].axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
                         median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
                         legend_handles.append(median_legend)
-                if legend_handles:
-                    fig.legend(handles=legend_handles, loc='upper right')
-
-                plt.tight_layout()
-                plt.show()
-
-        self.figures['trajectories_plot_rg_comparison'] = fig
-        if save:
-            fig.savefig(os.path.join(self.plot_dir, 'rg_comparison_' + self.analysis.ens_codes[0]))
-
-        return ax
+                    if legend_handles:
+                        ax[i].legend(handles=legend_handles, loc='upper right')
 
         self.figures['trajectories_plot_rg_comparison'] = fig
         if save:
@@ -1150,7 +1150,8 @@ class Visualization:
                             title_fontsize: int = 14,
                             dpi: int = 96,
                             use_ylabel: bool = True,
-                            save: bool = False) -> List[List[plt.Axes]]:
+                            save: bool = False,
+                            ax: Union[None, List[List[plt.Axes]], List[plt.Axes]] = None) -> List[List[plt.Axes]]:
         """
         Plot the average distance maps for selected ensembles.
         
@@ -1168,6 +1169,8 @@ class Visualization:
             If True, y-axis labels are displayed on the subplots. Default is True.
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : Union[None, List[List[plt.Axes]], List[plt.Axes]], optional
+            A list or 2D list of Axes objects to plot on. Default is None, which creates new axes.
 
         Returns
         -------
@@ -1184,18 +1187,25 @@ class Visualization:
         ens_dict = self._get_distance_matrix_ens_dict()
         num_proteins = len(ens_dict)
         cols = 2  # Number of columns for subplots
-        rows = num_proteins
-        fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
-        axes = axes.reshape((rows, cols))  # Reshape axes to ensure it's 2D
-        
+        rows = (num_proteins + cols - 1) // cols  # Calculate number of rows needed
+
+        if ax is None:
+            fig, axes = plt.subplots(rows, cols, figsize=(8 * cols, 6 * rows), dpi=dpi)
+            axes = axes.reshape((rows, cols))  # Ensure axes is a 2D array
+        else:
+            ax_array = np.array(ax)
+            if len(ax_array.flatten()) != num_proteins:
+                raise ValueError(f"{num_proteins} axes need to be provided.")
+            axes = ax_array.reshape((rows, cols))  # If ax is 1D, reshape it to 2D
+            fig = axes[0, 0].figure
+
         for i, (protein_name, ens_data) in enumerate(ens_dict.items()):
             row = i // cols
             col = i % cols
-            ax = axes[row, col]# if num_proteins > 1 else axes[0]
+            ax = axes[row, col] if axes.ndim == 2 else axes[i]
             
             avg_dmap = np.mean(ens_data, axis=0)
             
-           
             tril_ids = np.tril_indices(avg_dmap.shape[0], 0)
             avg_dmap[tril_ids] = np.nan
             
@@ -1209,14 +1219,11 @@ class Visualization:
             cbar.set_label(r"Average $d_{ij}$ [nm]", fontsize=cbar_fontsize)
             cbar.ax.tick_params(labelsize=cbar_fontsize)
 
-            im.set_clim(0, np.ceil(np.nanmax(avg_dmap.flatten()))) # find the maximum distance and round it to the next integer to manage the auto range
+            im.set_clim(0, np.ceil(np.nanmax(avg_dmap.flatten())))  # Find the maximum distance and round it to the next integer to manage the auto range
         
         # Remove any empty subplots
         for i in range(num_proteins, rows * cols):
             fig.delaxes(axes.flatten()[i])
-
-        plt.tight_layout()
-        plt.show()
 
         self.figures['plot_average_dmap_comparison'] = fig
         if save:
@@ -1663,7 +1670,15 @@ class Visualization:
 
         return ax
 
-    def contact_prob_maps(self ,norm=True, min_sep=2,max_sep=None ,threshold: float = 0.8, dpi: int = 96, save: bool = False, cmap_color='Blues') -> List[List[plt.Axes]]:
+    def contact_prob_maps(self,
+                        norm=True, 
+                        min_sep=2,
+                        max_sep=None,
+                        threshold: float = 0.8,
+                        dpi: int = 96, 
+                        save: bool = False, 
+                        cmap_color='Blues',
+                        ax: Union[None, List[plt.Axes], np.ndarray] = None) -> Union[List[plt.Axes], np.ndarray]:
         from matplotlib.colors import LogNorm
         """
         Plot the contact probability map based on the threshold.
@@ -1687,21 +1702,30 @@ class Visualization:
 
         Returns
         -------
-        List[List[plt.Axes]]
-            Returns a 2D list of Axes objects representing the subplot grid.
-
+        Union[List[plt.Axes], np.ndarray]
+            Returns a list or array of Axes objects representing the subplot grid.
         """
 
         ensembles = self.analysis.ensembles
         num_proteins = len(ensembles)
-        num_cols = 2  # Number of columns for subplots
-        num_rows = (num_proteins + num_cols - 1) // num_cols  # Calculate the number of rows needed
+        num_cols = 2
+        num_rows = (num_proteins + num_cols - 1) // num_cols
 
-        fig, axes = plt.subplots(num_rows, num_cols, figsize=(8 * num_cols, 6 * num_rows), dpi=dpi)
         cmap = cm.get_cmap(cmap_color)
-        axes = axes.reshape((num_rows, num_cols))
+        
+        if ax is None:
+            fig, axes = plt.subplots(num_rows, num_cols, figsize=(8 * num_cols, 6 * num_rows), dpi=dpi)
+            axes = axes.flatten()
+        else:
+            ax_array = np.array(ax)
+            if len(ax_array.flatten()) != num_proteins:
+                raise ValueError(f"{num_proteins} axes need to be provided.")
+            axes = ax_array.flatten()
+            fig = axes[0].figure
 
-        for ensemble, ax in zip(ensembles, fig.axes):
+        for i, ensemble in enumerate(ensembles):
+            ax = axes[i]
+            
             if ensemble.coarse_grained:
                 matrix_p_map = contact_probability_map(ensemble.trajectory, scheme='closest', contact=self._pair_ids(min_sep=min_sep, max_sep=max_sep), threshold=threshold)
             else:
@@ -1719,10 +1743,7 @@ class Visualization:
 
         # Remove any empty subplots
         for i in range(num_proteins, num_rows * num_cols):
-            fig.delaxes(axes.flatten()[i])
-
-        plt.tight_layout()
-        plt.show()
+            fig.delaxes(axes[i])
 
         self.figures['plot_contact_prob'] = fig
         if save:
