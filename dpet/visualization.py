@@ -2061,12 +2061,14 @@ class Visualization:
         
         if ax is None:
             fig, axes = plt.subplots(2, num_proteins, figsize=(10, 4 * num_proteins))
+            axes = axes.flatten()
         else:
             ax_array = np.array(ax)
-            axes = ax_array.reshape(2, num_proteins)
-            fig = axes[0, 0].figure
+            axes = ax_array.flatten()
+            fig = axes[0].figure
 
         for i, ens in enumerate(self.analysis.ensembles):
+            idx = i * 2
             traj = ens.trajectory
             feat, names = featurize_com_dist(traj=traj, min_sep=min_sep,max_sep=max_sep,inverse=inverse ,get_names=get_names)  # Compute (N, *) feature arrays.
             print(f"# Ensemble: {ens.code}")
@@ -2078,15 +2080,14 @@ class Visualization:
             ca_dmap_mean = ca_dmap.mean(axis=0)
 
             print("distance matrix:", com_dmap_mean.shape)
-            #fig, ax = plt.subplots(1, 2, figsize=figsize)
-            fig.suptitle(ens.code)
-            im0 = axes[i, 0].imshow(ca_dmap_mean)
-            axes[i, 0].set_title("CA")
-            im1 = axes[i, 1].imshow(com_dmap_mean)
-            axes[i, 1].set_title("COM")
-            cbar = fig.colorbar(im0, ax=axes[i, 0], shrink=0.8)
+            
+            im0 = axes[idx].imshow(ca_dmap_mean)
+            axes[idx].set_title(f"{ens.code} CA")
+            im1 = axes[idx + 1].imshow(com_dmap_mean)
+            axes[idx + 1].set_title(f"{ens.code} COM")
+            cbar = fig.colorbar(im0, ax=axes[idx], shrink=0.8)
             cbar.set_label("distance [nm]")
-            cbar = fig.colorbar(im1, ax=axes[i, 1], shrink=0.8)
+            cbar = fig.colorbar(im1, ax=axes[idx + 1], shrink=0.8)
             cbar.set_label("distance [nm]")
 
             self.figures['plot_dist_ca_com'] = fig
