@@ -1767,7 +1767,13 @@ class Visualization:
                         pair_ids.append([id_i, id_j])
         return pair_ids
     
-    def ramachandran_plots(self, two_d_hist: bool = True, linespaces: Tuple = (-180, 180, 80), save: bool = False) -> Union[List[plt.Axes], plt.Axes]:
+    def ramachandran_plots(
+            self,
+            two_d_hist: bool = True,
+            linespaces: Tuple = (-180, 180, 80),
+            save: bool = False,
+            ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
+    ) -> Union[List[plt.Axes], plt.Axes]:
         """
         Ramachandran plot. If two_d_hist=True it returns a 2D histogram 
         for each ensemble. If two_d_hist=False it returns a simple scatter plot 
@@ -1781,6 +1787,8 @@ class Visualization:
             You can customize the bins for 2D histogram. Default is (-180, 180, 80).
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
+        ax : Union[None, plt.Axes, np.ndarray, List[plt.Axes]], optional
+            The axes on which to plot. If None, new axes will be created. Default is None.
 
         Returns
         -------
@@ -1796,44 +1804,50 @@ class Visualization:
         
         ensembles = self.analysis.ensembles
         if two_d_hist:
-            fig, axes = plt.subplots(1, len(ensembles), figsize=(5*len(ensembles), 5))
-            # Ensure axes is always a list
-            if not isinstance(axes, np.ndarray):
-                axes = [axes]
+            if ax is None:
+                fig, ax = plt.subplots(1, len(ensembles), figsize=(5 * len(ensembles), 5))
+            else:
+                if not isinstance(ax, (list, np.ndarray)):
+                    ax = [ax]
+                ax = np.array(ax).flatten()
+                fig = ax[0].figure
+            # Ensure ax is always a list
+            if not isinstance(ax, np.ndarray):
+                ax = [ax]
             rama_linspace = np.linspace(linespaces[0], linespaces[1], linespaces[2])
-            for ens, ax in zip(ensembles, axes):
+            for ens, axis in zip(ensembles, ax):
                 phi_flat = np.degrees(mdtraj.compute_phi(ens.trajectory)[1]).ravel()
                 psi_flat = np.degrees(mdtraj.compute_psi(ens.trajectory)[1]).ravel()
-                hist = ax.hist2d(
-                phi_flat,
-                psi_flat,
-                cmap="viridis",
-                bins=(rama_linspace, rama_linspace), 
-                norm=colors.LogNorm(),
-                density=True)
+                hist = axis.hist2d(
+                    phi_flat,
+                    psi_flat,
+                    cmap="viridis",
+                    bins=(rama_linspace, rama_linspace), 
+                    norm=colors.LogNorm(),
+                    density=True
+                )
 
-                ax.set_title(f'Ramachandran Plot for cluster {ens.code}')
-                ax.set_xlabel('Phi (ϕ) Angle (degrees)')
-                ax.set_ylabel('Psi (ψ) Angle (degrees)')
-
-            plt.tight_layout()
-            plt.show()
+                axis.set_title(f'Ramachandran Plot for cluster {ens.code}')
+                axis.set_xlabel('Phi (ϕ) Angle (degrees)')
+                axis.set_ylabel('Psi (ψ) Angle (degrees)')
         else:
-            fig,axes = plt.subplots(1,1)
+            if ax is None:
+                fig, ax = plt.subplots(1, 1)
+            else:
+                fig = ax.figure
             for ens in ensembles:
                 phi = np.degrees(mdtraj.compute_phi(ens.trajectory)[1])
                 psi = np.degrees(mdtraj.compute_psi(ens.trajectory)[1])
-                plt.scatter(phi, psi, s=1, label= ens.code)
-            axes.set_xlabel('Phi (ϕ) Angle (degrees)')
-            axes.set_ylabel('Psi (ψ) Angle (degrees)')
-            plt.legend(bbox_to_anchor=(1.04,0), loc = "lower left")
-            plt.show()
+                ax.scatter(phi, psi, s=1, label=ens.code)
+            ax.set_xlabel('Phi (ϕ) Angle (degrees)')
+            ax.set_ylabel('Psi (ψ) Angle (degrees)')
+            ax.legend(bbox_to_anchor=(1.04, 0), loc="lower left")
 
         self.figures['plot_ramachandran_plot'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'ramachandran_' + self.analysis.ens_codes[0]))  
 
-        return axes
+        return ax
 
     def ss_flexibility_parameter(self, 
                                 pointer: List[int] = None, 
