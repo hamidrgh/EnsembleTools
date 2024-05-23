@@ -12,6 +12,8 @@ import mdtraj
 import numpy as np
 from dpet.dimensionality_reduction import DimensionalityReductionFactory
 from dpet.featurization.ensemble_level import ensemble_features
+from dpet.data.comparison import *
+import itertools
 
 class EnsembleAnalysis:
     """
@@ -539,3 +541,31 @@ class EnsembleAnalysis:
                                      if not c.endswith(("_std", "_err"))]]
         
         return summary_df
+    
+    def similarity_score(self, score_type: str = None, based_on: str = None):
+        
+        if score_type == None:
+            raise ValueError("The type of similarity score should be selected between 'kl' and 'js' ")
+        if based_on == None:
+            raise ValueError("The similarity could be calculated based 'alpha_angles' or 'distance_map' ")
+        
+        keys = list(self.trajectories.keys())
+        n = len(keys)
+        similarity_matrix = np.zeros((n, n))
+
+        pairs_ensemble_to_compare = list(itertools.combinations(enumerate(self.trajectories.items()),2))
+        for (i, (key1, traj1)), (j, (key2, traj2)) in pairs_ensemble_to_compare:
+            if based_on == 'distance_map':
+                score = score_akld_d(traj1, traj2, method=score_type)[0]
+                # print(f'similarity score between {pair[0][0]},{pair[1][0]} = ',score_akld_d(pair[0][1], pair[1][1], method=score_type)[0])
+            elif based_on == 'alpha_angles':
+                score = score_akld_t(traj1, traj2, method=score_type)[0]
+                # print(f'similarity score between {pair[0][0]},{pair[1][0]} = ',score_akld_t(pair[0][1], pair[1][1], method=score_type)[0])
+            similarity_matrix[i, j] = score
+            similarity_matrix[j, i] = score
+        
+        np.fill_diagonal(similarity_matrix, 0)
+
+        return similarity_matrix, keys
+                
+

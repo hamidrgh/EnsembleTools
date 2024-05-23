@@ -2105,6 +2105,63 @@ class Visualization:
 
         return axes
     
+    def similarity_matrix(self, score_type: str = None, based_on: str = None, figsize = (10, 8), cmap = 'viridis', interpolation = 'nearest') -> plt.Axes:
+        
+        """
+        Generates and visualizes the pairwise similarity matrix for the trajectories.
+
+        This function computes the similarity matrix using the specified score type and basis
+        (either 'distance_map' or 'alpha_angles'). It then visualizes the matrix using a heatmap.
+
+        Parameters:
+        -----------
+        score_type : str, optional
+        The type of similarity score to use. Should be either 'kl' for Kullback-Leibler Divergence
+        or 'js' for Jensen-Shannon Divergence. This parameter is required.
+        based_on : str, optional
+        The basis for calculating the similarity score. Should be either 'distance_map' or 'alpha_angles'.
+        This parameter is required.
+        figsize : tuple, optional
+        The size of the figure for the heatmap. Default is (10, 8).
+        cmap : str, optional
+        The colormap to use for the heatmap. Default is 'viridis'.
+        interpolation : str, optional
+        The interpolation method to use for displaying the heatmap. Default is 'nearest'.
+
+        Returns:
+        --------
+        plt.Axes
+        The Axes object with the similarity matrix heatmap.
+
+        Raises:
+        -------
+        ValueError
+        If either `score_type` or `based_on` is not specified or is invalid.
+    
+        Notes:
+        ------
+        The similarity matrix is annotated with the similarity scores, and the axes are labeled with
+        the trajectory labels.
+
+        """
+        similarity_matrix , labels = self.analysis.similarity_score(score_type=score_type, based_on=based_on)
+        fig, ax = plt.subplots(figsize=figsize)
+        cax = ax.imshow(similarity_matrix, cmap=cmap, interpolation=interpolation)
+        fig.colorbar(cax)
+        ax.set_title(f'Pairwise Similarity Matrix using {score_type} method based on {based_on}')
+        ax.set_xticks(np.arange(len(labels)))
+        ax.set_yticks(np.arange(len(labels)))
+        ax.set_xticklabels(labels, rotation=45)
+        ax.set_yticklabels(labels)
+    
+
+        for i in range(len(labels)):
+            for j in range(len(labels)):
+                ax.text(j, i, f"{similarity_matrix[i, j]:.2f}", ha='center', va='center', color='w')
+
+        plt.show()
+        return ax
+    
     #----------------------------------------------------------------------
     #------------- Functions for generating PDF reports -------------------
     #----------------------------------------------------------------------
