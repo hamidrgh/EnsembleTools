@@ -7,6 +7,7 @@ import numpy as np
 from dpet.featurization.angles import featurize_a_angle, featurize_phi_psi, featurize_tr_angle
 from dpet.featurization.distances import featurize_ca_dist
 from dpet.featurization.glob import compute_asphericity, compute_end_to_end_distances, compute_ensemble_sasa, compute_prolateness
+from dpet.featurization.ensemble_level import calc_flory_scaling_exponent
 
 
 class Ensemble():
@@ -268,6 +269,12 @@ class Ensemble():
             return compute_ensemble_sasa(self.trajectory)
         elif featurization == "end_to_end":
             return compute_end_to_end_distances(self.trajectory, self.atom_selector)
+        elif featurization == "ee_on_rg":
+            ee = compute_end_to_end_distances(self.trajectory, self.atom_selector)
+            rg = mdtraj.compute_rg(self.trajectory).mean()
+            return ee/rg
+        elif featurization == "flory_exponent":
+            return calc_flory_scaling_exponent(self.trajectory)
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
         
