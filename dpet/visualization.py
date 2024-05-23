@@ -1834,7 +1834,7 @@ class Visualization:
                          inverse: bool = False,
                          save: bool = False,
                          ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
-                        ) -> List[List[plt.Axes]]:
+                        ) -> List[plt.Axes]:
         """
         Plot the distance maps comparing the center of mass (COM) and alpha-carbon (CA) distances within each ensemble.
 
@@ -1855,8 +1855,8 @@ class Visualization:
 
         Returns:
         --------
-        List[List[plt.Axes]]
-            A list of lists, each containing two Axes objects corresponding to the plots for CA and COM distances.
+        List[plt.Axes]
+            A list containing Axes objects corresponding to the plots for CA and COM distances.
 
         Notes:
         ------
