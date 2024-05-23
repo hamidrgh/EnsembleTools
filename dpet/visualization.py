@@ -433,8 +433,7 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method != "pca":
-            print("Analysis is only valid for pca dimensionality reduction.")
-            return
+            raise ValueError("Analysis is only valid for pca dimensionality reduction.")
         
         if ax is None:
             fig, ax = plt.subplots()
@@ -481,8 +480,7 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca"):
-            print("Analysis is only valid for pca or kpca dimensionality reduction.")
-            return
+            raise ValueError("Analysis is only valid for pca or kpca dimensionality reduction.")
 
         # 2D scatter plot settings
         dim_x = 0
@@ -557,8 +555,7 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca"):
-            print("Analysis is only valid for pca and kpca dimensionality reduction.")
-            return
+            raise ValueError("Analysis is only valid for pca and kpca dimensionality reduction.")
 
         n_bins = 30
         k = 0
@@ -631,9 +628,8 @@ class Visualization:
 
         analysis = self.analysis
 
-        if analysis.reduce_dim_method not in ("pca", "kpca") or analysis.featurization != "ca_dist":
-            print("Analysis is only valid for pca and kpca dimensionality reduction with ca_dist feature extraction.")
-            return
+        if analysis.reduce_dim_method != "pca" or analysis.featurization != "ca_dist":
+            raise ValueError("Analysis is only valid for pca dimensionality reduction with ca_dist feature extraction.")
         
         cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
         norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted when analyzing other systems via PCA!
@@ -696,8 +692,7 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca"):
-            print("Analysis is only valid for pca and kpca dimensionality reduction.")
-            return
+            raise ValueError("Analysis is only valid for pca and kpca dimensionality reduction.")
 
         pca_dim = 0
 
@@ -762,8 +757,7 @@ class Visualization:
         """
 
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
+            raise ValueError("This analysis is not possible with coarse-grained models.")
 
         ensembles = self.analysis.ensembles
 
@@ -924,8 +918,7 @@ class Visualization:
         """
 
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
+            raise ValueError("This analysis is not possible with coarse-grained models.")
         
         protein_dssp_data_dict = self._get_protein_dssp_data_dict()
 
@@ -975,10 +968,6 @@ class Visualization:
         for ensemble in ensembles:
             rg_dict[ensemble.code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
-
-    #
-    # TODO: implement a: single hist plot, multiple hist plots, violin plots.
-    #
 
     def radius_of_gyration(
             self,
@@ -1627,8 +1616,7 @@ class Visualization:
         """
 
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
+            raise ValueError("This analysis is not possible with coarse-grained models.")
         
         ensembles = self.analysis.ensembles
         if two_d_hist:
@@ -1708,8 +1696,7 @@ class Visualization:
         """
         
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
+            raise ValueError("This analysis is not possible with coarse-grained models.")
         
         features_dict = self.analysis.get_features(featurization='phi_psi')
         
@@ -1896,8 +1883,7 @@ class Visualization:
         """
 
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return []
+            raise ValueError("This analysis is not possible with coarse-grained models.")
         
         num_proteins = len(self.analysis.ensembles)
         

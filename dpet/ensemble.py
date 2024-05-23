@@ -47,7 +47,7 @@ class Ensemble():
         self.database = database
         self.chain_id = chain_id
         self.residue_range = residue_range
-    
+
     def load_trajectory(self, data_dir: str):  
         """
         Load a trajectory for the ensemble.
@@ -71,8 +71,7 @@ class Ensemble():
         """
         if not os.path.exists(self.data_path):
             raise FileNotFoundError(
-                f"Data file or directory for ensemble {self.code} doesn't"
-                f" exists: {self.data_path}"
+                f"Data file or directory for ensemble {self.code} doesn't exist: {self.data_path}"
             )
         elif self.data_path.endswith('.pdb'):
             self._get_chains_from_pdb()
@@ -95,7 +94,7 @@ class Ensemble():
             print(f"Generated trajectory saved to {data_dir}.")
         elif self.data_path.endswith(('.dcd', '.xtc')) and os.path.exists(self.top_path):
             print(f"Loading trajectory for {self.code}...")
-            self.trajectory = mdtraj.load(self.data_path, top=(self.top_path))
+            self.trajectory = mdtraj.load(self.data_path, top=self.top_path)
         elif os.path.isdir(self.data_path):
             files_in_dir = [f for f in os.listdir(self.data_path) if f.endswith('.pdb')]
             if files_in_dir:
@@ -108,21 +107,21 @@ class Ensemble():
                 self.trajectory[0].save(traj_top)
                 print(f"Generated trajectory saved to {data_dir}.")
             else:
-                print(f"No PDB files found in directory: {self.data_path}")
+                raise FileNotFoundError(f"No PDB files found in directory: {self.data_path}")
         else:
-            print(f'Unsupported file format for data file: {self.data_path}')
-            return
-        
+            raise ValueError(f"Unsupported file format for data file: {self.data_path}")
+
         if self.trajectory.topology.n_chains > 1:
             raise ValueError(f"Multiple chains found for ensemble {self.code}. "
                              "Chain selection is only supported for PDB files.")
+        
         # Save the trajectory for sampling
         self.original_trajectory = self.trajectory
         # Check if a coarse-grained model was loaded
         self._check_coarse_grained()
         # Select residues
         self._select_residues()
-            
+        
     def _check_coarse_grained(self):
         topology = self.trajectory.topology
         atoms = topology.atoms
