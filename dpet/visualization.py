@@ -1,8 +1,6 @@
 import os
-import random
 from typing import List, Tuple, Union
 import numpy as np
-import matplotlib
 from matplotlib.lines import Line2D
 from matplotlib import cm, colors, pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -16,7 +14,6 @@ from dpet.data.coord import *
 from dpet.featurization.glob import compute_asphericity, compute_prolateness
 
 PLOT_DIR = "plots"
-rg_axis_label = r"$R_g$ [nm]"
 
 def plot_histogram(
         ax: plt.Axes,
@@ -250,10 +247,10 @@ class Visualization:
         legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
-        plt.tight_layout()
+        fig.tight_layout()
 
         if save:
-            plt.savefig(self.plot_dir + f'/tsnep{int(analysis.reducer.bestP)}_kmeans{int(analysis.reducer.bestK)}_scatter.png', dpi=800)
+            fig.savefig(self.plot_dir + f'/tsnep{int(analysis.reducer.bestP)}_kmeans{int(analysis.reducer.bestK)}_scatter.png', dpi=800)
 
         return ax
 
@@ -330,7 +327,7 @@ class Visualization:
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
         if save:
-            plt.savefig(self.plot_dir + '/dimenfix_scatter.png', dpi=800)
+            fig.savefig(self.plot_dir + '/dimenfix_scatter.png', dpi=800)
 
         return axes
 
@@ -399,10 +396,10 @@ class Visualization:
         legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
-        plt.tight_layout()
+        fig.tight_layout()
 
         if save:
-            plt.savefig(self.plot_dir + '/umap_scatter.png', dpi=800)
+            fig.savefig(self.plot_dir + '/umap_scatter.png', dpi=800)
 
         return axes
 
@@ -444,7 +441,7 @@ class Visualization:
         ax.text(0.5, 0.9, f"First three: {first_three_variance:.2f}%", transform=ax.transAxes, ha='center')
 
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
 
         return ax
 
@@ -519,10 +516,10 @@ class Visualization:
             axes[i + 1].legend(**legend_kwargs)
             self._set_labels(axes[i + 1], "pca", dim_x, dim_y)
 
-        plt.tight_layout()
+        fig.tight_layout()
 
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_2d_landscapes_' + analysis.featurization + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_2d_landscapes_' + analysis.featurization + analysis.ens_codes[0]))
 
         return axes
 
@@ -584,9 +581,9 @@ class Visualization:
             axes[i].set_xlabel(f"Dim {k+1}")
             axes[i].set_ylabel("Density")
 
-        plt.tight_layout()
+        fig.tight_layout()
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
 
         return axes
 
@@ -654,9 +651,9 @@ class Visualization:
                 im, ax=axes[k],
                 label="PCA weight"
             )
-        plt.tight_layout()
+        fig.tight_layout()
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
 
         return axes
 
@@ -704,9 +701,9 @@ class Visualization:
             axes[i].set_xlabel(f"Dim {pca_dim + 1}")
             axes[i].set_ylabel("Rg")
 
-        plt.tight_layout()
+        fig.tight_layout()
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_RG' + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_RG' + analysis.ens_codes[0]))
 
         return axes
 
@@ -791,7 +788,7 @@ class Visualization:
             )
 
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'Global_SASA_dist' + self.analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'Global_SASA_dist' + self.analysis.ens_codes[0]))
 
         return ax
 
@@ -1083,6 +1080,8 @@ class Visualization:
                     if legend_handles:
                         ax[i].legend(handles=legend_handles, loc='upper right')
 
+                    fig.tight_layout()
+
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'rg_comparison_' + self.analysis.ens_codes[0]))
 
@@ -1183,6 +1182,8 @@ class Visualization:
         # Remove any empty subplots
         for i in range(num_proteins, rows * cols):
             fig.delaxes(axes[i])
+
+        fig.tight_layout()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'avg_dmap_' + self.analysis.ens_codes[0]))
@@ -1547,6 +1548,8 @@ class Visualization:
         # Remove any empty subplots
         for i in range(num_proteins, num_rows * num_cols):
             fig.delaxes(axes[i])
+        
+        fig.tight_layout()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'contact_prob_' + self.analysis.ens_codes[0]))
@@ -1631,6 +1634,7 @@ class Visualization:
                 axis.set_title(f'Ramachandran Plot for cluster {ens.code}')
                 axis.set_xlabel('Phi (ϕ) Angle (degrees)')
                 axis.set_ylabel('Psi (ψ) Angle (degrees)')
+            fig.tight_layout()
         else:
             if ax is None:
                 fig, ax = plt.subplots(1, 1)
@@ -1900,6 +1904,8 @@ class Visualization:
             cbar.set_label("distance [nm]")
             cbar = fig.colorbar(im1, ax=axes[idx + 1], shrink=0.8)
             cbar.set_label("distance [nm]")
+
+            fig.tight_layout()
 
             if save:
                 fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + ens.code))  
