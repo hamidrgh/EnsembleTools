@@ -1894,7 +1894,7 @@ class Visualization:
         ax.set_xticks([i for i in x if i == 1 or i % 5 == 0])
         ax.set_xlabel("Residue Index")
         ax.set_ylabel("Site-specific flexibility parameter")
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.legend()
         
         if pointer is not None:
             for res in pointer:
@@ -1948,12 +1948,12 @@ class Visualization:
 
         for key, values in dict_order_parameter.items():
             x = np.arange(1, len(values) + 1)
-            ax.scatter(x, values, label=key, alpha=0.5)
+            ax.plot(x, values, label=key, marker= 'o', linestyle='-')
         
         ax.set_xticks([i for i in x if i == 1 or i % 5 == 0])
         ax.set_xlabel("Residue Index")
         ax.set_ylabel("Site-specific order parameter")
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.legend()
         
         if pointer is not None:
             for res in pointer:
@@ -1997,22 +1997,25 @@ class Visualization:
         else:
             fig = ax.figure
 
-        colors = ['b', 'g', 'r', 'c', 'm']
+        
         for i, ens in enumerate(analysis.ensembles):
-
+            color = next(ax._get_lines.prop_cycler)['color']
             res_based_sasa = mdtraj.shrake_rupley(ens.trajectory, mode='residue')
             sasa_mean = np.mean(res_based_sasa, axis=0)
             sasa_std = np.std(res_based_sasa, axis=0)        
 
-            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean, '-o', color=colors[i % len(colors)], label=ens.code)
-            ax.fill_between(np.arange(1, len(sasa_mean) + 1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])
+            
+            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean, '-o', color=color , label=ens.code)
+            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean + sasa_std, '--', color=color, alpha=0.5)
+            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean - sasa_std, '--', color=color, alpha=0.5)
+            
 
         ax.set_xticks([i for i in np.arange(1, len(sasa_mean) + 1) if i == 1 or i % 5 == 0])
         ax.set_xlabel('Residue Index')
         ax.set_ylabel('Mean SASA')
         ax.set_title('Mean SASA for Each Residue in Ensembles')
         ax.legend()
-        ax.grid(True)
+        # ax.grid(True)
         
         if pointer is not None:
             for res in pointer:
