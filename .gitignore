@@ -1,3 +1,16 @@
 # .gitignore
 /ensemble_files/
 __pycache__/
+
+# Ignore build directories
+build/
+dist/
+
+# Ignore egg-info directory
+*.egg-info/
+
+# Ignore any files generated during the build process
+*.egg
+*.egg-info
+*.tar.gz
+*.whl
