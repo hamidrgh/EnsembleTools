@@ -201,7 +201,9 @@ class Visualization:
             
         # Create a consistent colormap for the original labels
         unique_labels = np.unique(analysis.all_labels)
-        label_colors = {label: plt.cm.tab20(i / len(unique_labels)) for i, label in enumerate(unique_labels)}
+        cmap = cm.get_cmap('plasma')
+        colors = cmap(np.linspace(0, 1, len(unique_labels)))
+        label_colors = {label: color for label, color in zip(unique_labels, colors)}
         point_colors = [label_colors[label] for label in analysis.all_labels]
 
         # Scatter plot with original labels
@@ -346,7 +348,9 @@ class Visualization:
 
         # Create a consistent colormap for the original labels
         unique_labels = np.unique(analysis.all_labels)
-        label_colors = {label: plt.cm.tab20(i / len(unique_labels)) for i, label in enumerate(unique_labels)}
+        cmap = cm.get_cmap('plasma')
+        colors = cmap(np.linspace(0, 1, len(unique_labels)))
+        label_colors = {label: color for label, color in zip(unique_labels, colors)}
         point_colors = [label_colors[label] for label in analysis.all_labels]
 
         # Scatter plot with original labels
