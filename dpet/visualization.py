@@ -1,8 +1,6 @@
 import os
-import random
 from typing import List, Tuple, Union
 import numpy as np
-import matplotlib
 from matplotlib.lines import Line2D
 from matplotlib import cm, colors, pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -16,7 +14,6 @@ from dpet.data.coord import *
 from dpet.featurization.glob import compute_asphericity, compute_prolateness
 
 PLOT_DIR = "plots"
-rg_axis_label = r"$R_g$ [nm]"
 
 def plot_histogram(
         ax: plt.Axes,
@@ -146,7 +143,6 @@ class Visualization:
         self.analysis = analysis
         self.plot_dir = os.path.join(self.analysis.output_dir, PLOT_DIR)
         os.makedirs(self.plot_dir, exist_ok=True)
-        self.figures = {}
 
     def tsne_scatter(
             self,
@@ -251,11 +247,10 @@ class Visualization:
         legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
-        plt.tight_layout()
-        self.figures["tsne_scatter_plot"] = fig
+        fig.tight_layout()
 
         if save:
-            plt.savefig(self.plot_dir + f'/tsnep{int(analysis.reducer.bestP)}_kmeans{int(analysis.reducer.bestK)}_scatter.png', dpi=800)
+            fig.savefig(self.plot_dir + f'/tsnep{int(analysis.reducer.bestP)}_kmeans{int(analysis.reducer.bestK)}_scatter.png', dpi=800)
 
         return ax
 
@@ -331,10 +326,8 @@ class Visualization:
         legend_handles = [Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
-        self.figures["dimenfix_scatter"] = fig
-
         if save:
-            plt.savefig(self.plot_dir + '/dimenfix_scatter.png', dpi=800)
+            fig.savefig(self.plot_dir + '/dimenfix_scatter.png', dpi=800)
 
         return axes
 
@@ -403,11 +396,10 @@ class Visualization:
         legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
-        plt.tight_layout()
-        self.figures["umap_scatter"] = fig
+        fig.tight_layout()
 
         if save:
-            plt.savefig(self.plot_dir + '/umap_scatter.png', dpi=800)
+            fig.savefig(self.plot_dir + '/umap_scatter.png', dpi=800)
 
         return axes
 
@@ -433,8 +425,7 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method != "pca":
-            print("Analysis is only valid for pca dimensionality reduction.")
-            return
+            raise ValueError("Analysis is only valid for pca dimensionality reduction.")
         
         if ax is None:
             fig, ax = plt.subplots()
@@ -449,10 +440,8 @@ class Visualization:
         first_three_variance = analysis.reduce_dim_model.explained_variance_ratio_[0:3].sum() * 100
         ax.text(0.5, 0.9, f"First three: {first_three_variance:.2f}%", transform=ax.transAxes, ha='center')
 
-        self.figures["pca_cumulative_explained_variance"] = fig
-
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_variance' + analysis.featurization + analysis.ens_codes[0]))
 
         return ax
 
@@ -481,8 +470,7 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca"):
-            print("Analysis is only valid for pca or kpca dimensionality reduction.")
-            return
+            raise ValueError("Analysis is only valid for pca or kpca dimensionality reduction.")
 
         # 2D scatter plot settings
         dim_x = 0
@@ -528,11 +516,10 @@ class Visualization:
             axes[i + 1].legend(**legend_kwargs)
             self._set_labels(axes[i + 1], "pca", dim_x, dim_y)
 
-        plt.tight_layout()
+        fig.tight_layout()
 
-        self.figures["pca_plot_2d_landscapes"] = fig
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_2d_landscapes_' + analysis.featurization + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_2d_landscapes_' + analysis.featurization + analysis.ens_codes[0]))
 
         return axes
 
@@ -557,8 +544,7 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca"):
-            print("Analysis is only valid for pca and kpca dimensionality reduction.")
-            return
+            raise ValueError("Analysis is only valid for pca and kpca dimensionality reduction.")
 
         n_bins = 30
         k = 0
@@ -595,10 +581,9 @@ class Visualization:
             axes[i].set_xlabel(f"Dim {k+1}")
             axes[i].set_ylabel("Density")
 
-        plt.tight_layout()
-        self.figures["pca_plot_1d_histograms"] = fig
+        fig.tight_layout()
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_hist' + analysis.featurization + analysis.ens_codes[0]))
 
         return axes
 
@@ -631,9 +616,8 @@ class Visualization:
 
         analysis = self.analysis
 
-        if analysis.reduce_dim_method not in ("pca", "kpca") or analysis.featurization != "ca_dist":
-            print("Analysis is only valid for pca and kpca dimensionality reduction with ca_dist feature extraction.")
-            return
+        if analysis.reduce_dim_method != "pca" or analysis.featurization != "ca_dist":
+            raise ValueError("Analysis is only valid for pca dimensionality reduction with ca_dist feature extraction.")
         
         cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
         norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted when analyzing other systems via PCA!
@@ -667,10 +651,9 @@ class Visualization:
                 im, ax=axes[k],
                 label="PCA weight"
             )
-        plt.tight_layout()
-        self.figures["pca_correlation_plot"] = fig
+        fig.tight_layout()
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_correlation' + analysis.featurization + analysis.ens_codes[0]))
 
         return axes
 
@@ -696,8 +679,7 @@ class Visualization:
         analysis = self.analysis
 
         if analysis.reduce_dim_method not in ("pca", "kpca"):
-            print("Analysis is only valid for pca and kpca dimensionality reduction.")
-            return
+            raise ValueError("Analysis is only valid for pca and kpca dimensionality reduction.")
 
         pca_dim = 0
 
@@ -719,10 +701,9 @@ class Visualization:
             axes[i].set_xlabel(f"Dim {pca_dim + 1}")
             axes[i].set_ylabel("Rg")
 
-        plt.tight_layout()
-        self.figures["pca_rg_correlation"] = fig
+        fig.tight_layout()
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'PCA_RG' + analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'PCA_RG' + analysis.ens_codes[0]))
 
         return axes
 
@@ -762,8 +743,7 @@ class Visualization:
         """
 
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
+            raise ValueError("This analysis is not possible with coarse-grained models.")
 
         ensembles = self.analysis.ensembles
 
@@ -807,9 +787,8 @@ class Visualization:
                 xlabel=axis_label
             )
 
-        self.figures["plot_global_sasa"] = fig
         if save:
-            plt.savefig(os.path.join(self.plot_dir, 'Global_SASA_dist' + self.analysis.ens_codes[0]))
+            fig.savefig(os.path.join(self.plot_dir, 'Global_SASA_dist' + self.analysis.ens_codes[0]))
 
         return ax
 
@@ -848,8 +827,6 @@ class Visualization:
         ax.set_ylabel("Asphericity")
         ax.set_xlabel("Radius of Gyration (Rg) [nm]")
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        
-        self.figures["plot_rg_vs_asphericity"] = fig
         
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Asphericity_' + analysis.ens_codes[0]))
@@ -892,8 +869,6 @@ class Visualization:
         ax.set_xlabel("Radius of Gyration (Rg) [nm]")
         ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 
-        self.figures["plot_rg_vs_prolateness"] = fig
-
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Prolateness_' + analysis.ens_codes[0]))
         
@@ -924,8 +899,7 @@ class Visualization:
         """
 
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
+            raise ValueError("This analysis is not possible with coarse-grained models.")
         
         protein_dssp_data_dict = self._get_protein_dssp_data_dict()
 
@@ -963,7 +937,6 @@ class Visualization:
         ax.set_title('Relative Content of H in Each Residue in the ensembles')
         ax.legend(bbox_to_anchor=(1.04,0), loc="lower left")
 
-        self.figures["plot_relative_helix_content"] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'relative_helix_' + self.analysis.ens_codes[0]))
         
@@ -975,10 +948,6 @@ class Visualization:
         for ensemble in ensembles:
             rg_dict[ensemble.code] = mdtraj.compute_rg(ensemble.trajectory)
         return rg_dict
-
-    #
-    # TODO: implement a: single hist plot, multiple hist plots, violin plots.
-    #
 
     def radius_of_gyration(
             self,
@@ -1111,7 +1080,8 @@ class Visualization:
                     if legend_handles:
                         ax[i].legend(handles=legend_handles, loc='upper right')
 
-        self.figures['trajectories_plot_rg_comparison'] = fig
+                    fig.tight_layout()
+
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'rg_comparison_' + self.analysis.ens_codes[0]))
 
@@ -1213,18 +1183,21 @@ class Visualization:
         for i in range(num_proteins, rows * cols):
             fig.delaxes(axes[i])
 
-        self.figures['plot_average_dmap_comparison'] = fig
+        fig.tight_layout()
+
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'avg_dmap_' + self.analysis.ens_codes[0]))
 
         return axes    
 
-    def end_to_end_distances(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
+    def end_to_end_distances(self, rg_norm: bool = False, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
 
         Parameters
         ----------
+        rg_norm: bool, optional
+            Normalize end-to-end distances on the average radius of gyration.
         bins : int, optional
             The number of bins for the histogram. Default is 50.
         hist_range: Tuple, optional
@@ -1258,6 +1231,9 @@ class Visualization:
             hist_data_i = mdtraj.compute_distances(
                 ensemble.trajectory, [[ca_indices[0], ca_indices[-1]]]
             ).ravel()
+            if rg_norm:
+                rg_i = mdtraj.compute_rg(ensemble.trajectory).mean()
+                hist_data_i = hist_data_i / rg_i
             hist_data.append(hist_data_i)
             labels.append(ensemble.code)
 
@@ -1267,8 +1243,12 @@ class Visualization:
         else:
             fig = ax.figure
 
-        axis_label = "End-to-End distance [nm]"
-        title = "End-to-End distances distribution"
+        if not rg_norm:
+            axis_label = "End-to-End distance [nm]"
+            title = "End-to-End distances distribution"
+        else:
+            axis_label = r"End-to-End distance over $\langle$R$_g$$\rangle$"
+            title = r"End-to-End distance over $\langle$R$_g$$\rangle$ distribution"
 
         if violin_plot:
             plot_violins(
@@ -1291,7 +1271,6 @@ class Visualization:
                 xlabel=axis_label
             )
 
-        self.figures['end_to_end_distances_plot'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'e2e_distances_' + self.analysis.ens_codes[0]))
 
@@ -1366,7 +1345,6 @@ class Visualization:
                 xlabel=axis_label
             )
 
-        self.figures['plot_asphericity_dist'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'asphericity_dist_' + self.analysis.ens_codes[0]))
 
@@ -1441,7 +1419,6 @@ class Visualization:
                 xlabel=axis_label
             )
 
-        self.figures['plot_prolateness_dist'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'prolateness_dist_' + self.analysis.ens_codes[0]))
 
@@ -1494,7 +1471,6 @@ class Visualization:
             xlabel="angle [rad]"
         )
 
-        self.figures['plot_alpha_angles_dist'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'alpha_dist_' + self.analysis.ens_codes[0]))
 
@@ -1572,8 +1548,9 @@ class Visualization:
         # Remove any empty subplots
         for i in range(num_proteins, num_rows * num_cols):
             fig.delaxes(axes[i])
+        
+        fig.tight_layout()
 
-        self.figures['plot_contact_prob'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'contact_prob_' + self.analysis.ens_codes[0]))
 
@@ -1627,8 +1604,7 @@ class Visualization:
         """
 
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
+            raise ValueError("This analysis is not possible with coarse-grained models.")
         
         ensembles = self.analysis.ensembles
         if two_d_hist:
@@ -1658,6 +1634,7 @@ class Visualization:
                 axis.set_title(f'Ramachandran Plot for cluster {ens.code}')
                 axis.set_xlabel('Phi (ϕ) Angle (degrees)')
                 axis.set_ylabel('Psi (ψ) Angle (degrees)')
+            fig.tight_layout()
         else:
             if ax is None:
                 fig, ax = plt.subplots(1, 1)
@@ -1671,7 +1648,6 @@ class Visualization:
             ax.set_ylabel('Psi (ψ) Angle (degrees)')
             ax.legend(bbox_to_anchor=(1.04, 0), loc="lower left")
 
-        self.figures['plot_ramachandran_plot'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'ramachandran_' + self.analysis.ens_codes[0]))  
 
@@ -1708,8 +1684,7 @@ class Visualization:
         """
         
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return
+            raise ValueError("This analysis is not possible with coarse-grained models.")
         
         features_dict = self.analysis.get_features(featurization='phi_psi')
         
@@ -1851,7 +1826,6 @@ class Visualization:
             for res in pointer:
                 ax.axvline(x=res, color='blue', linestyle='--', alpha=0.3, linewidth=1)
 
-        self.figures['plot_local_sasa'] = fig
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'local_sasa_' + self.analysis.ens_codes[0]))  
 
@@ -1864,7 +1838,7 @@ class Visualization:
                          inverse: bool = False,
                          save: bool = False,
                          ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
-                        ) -> List[List[plt.Axes]]:
+                        ) -> List[plt.Axes]:
         """
         Plot the distance maps comparing the center of mass (COM) and alpha-carbon (CA) distances within each ensemble.
 
@@ -1885,8 +1859,8 @@ class Visualization:
 
         Returns:
         --------
-        List[List[plt.Axes]]
-            A list of lists, each containing two Axes objects corresponding to the plots for CA and COM distances.
+        List[plt.Axes]
+            A list containing Axes objects corresponding to the plots for CA and COM distances.
 
         Notes:
         ------
@@ -1896,8 +1870,7 @@ class Visualization:
         """
 
         if self.analysis.exists_coarse_grained():
-            print("This analysis is not possible with coarse-grained models.")
-            return []
+            raise ValueError("This analysis is not possible with coarse-grained models.")
         
         num_proteins = len(self.analysis.ensembles)
         
@@ -1932,85 +1905,10 @@ class Visualization:
             cbar = fig.colorbar(im1, ax=axes[idx + 1], shrink=0.8)
             cbar.set_label("distance [nm]")
 
-            self.figures['plot_dist_ca_com'] = fig
+            fig.tight_layout()
+
             if save:
                 fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + ens.code))  
 
         return axes
     
-    #----------------------------------------------------------------------
-    #------------- Functions for generating PDF reports -------------------
-    #----------------------------------------------------------------------
-
-    def _generate_tsne_report(self):
-        analysis = self.analysis
-        pdf_file_path = os.path.join(self.plot_dir, 'tsne.pdf')
-        with PdfPages(pdf_file_path) as pdf:
-            if analysis.featurization == "phi_psi":
-                self.tsne_ramachandran_density(save=False)
-                pdf.savefig()
-                plt.close()
-
-            self.tsne_scatter(save=False)
-            pdf.savefig()
-            plt.close()
-        
-        print(f"Plots saved to {pdf_file_path}")
-
-    def _generate_dimenfix_report(self):
-        pdf_file_path = os.path.join(self.plot_dir, 'dimenfix.pdf')
-        with PdfPages(pdf_file_path) as pdf:
-            self.dimenfix_scatter()
-            pdf.savefig()
-            plt.close()
-
-        print(f"Plots saved to {pdf_file_path}")
-
-    def _generate_pca_report(self):
-        pdf_file_path = os.path.join(self.plot_dir, 'pca.pdf')
-        with PdfPages(pdf_file_path) as pdf:
-        
-            self. pca_cumulative_explained_variance()
-            pdf.savefig()
-            plt.close()
-
-            self.pca_2d_landscapes()
-            pdf.savefig()
-            plt.close()
-
-            self.pca_1d_histograms()
-            pdf.savefig()
-            plt.close()
-
-            self.pca_rg_correlation()
-            pdf.savefig()
-            plt.close()
-
-        print(f"Plots saved to {pdf_file_path}")
-
-    def generate_custom_report(self):
-
-        """
-        Generate pdf report with all plots that were explicitly called during the session.
-        """
-
-        analysis = self.analysis
-        pdf_file_path = os.path.join(self.plot_dir, 'custom_report.pdf')
-        with PdfPages(pdf_file_path) as pdf:
-            for fig in self.figures.values():
-                pdf.savefig(fig)
-                plt.close()
-        print(f"Plots saved to {pdf_file_path}")
-
-    def generate_report(self):
-
-        """
-        Generate pdf report with all plots relevant to the conducted analysis.
-        """
-
-        if self.analysis.reduce_dim_method == "tsne":
-            self._generate_tsne_report()
-        if self.analysis.reduce_dim_method == "dimenfix":
-            self._generate_dimenfix_report()
-        if self.analysis.reduce_dim_method == "pca":
-            self._generate_pca_report()

@@ -11,6 +11,7 @@ import os
 import mdtraj
 import numpy as np
 from dpet.dimensionality_reduction import DimensionalityReductionFactory
+from dpet.featurization.ensemble_level import ensemble_features
 
 class EnsembleAnalysis:
     """
@@ -85,15 +86,14 @@ class EnsembleAnalysis:
     def __del__(self):
         if hasattr(self, 'api_client'):
             self.api_client.close_session()
-    
+
     def _download_from_ped(self, ensemble: Ensemble):
         ped_pattern = r'^(PED\d{5})(e\d{3})$'
 
         code = ensemble.code
         match = re.match(ped_pattern, code)
         if not match:
-            print(f"Entry {code} does not match the PED ID pattern and will be skipped.")
-            return
+            raise ValueError(f"Entry {code} does not match the PED ID pattern.")
         
         ped_id = match.group(1)
         ensemble_id = match.group(2)
@@ -109,10 +109,14 @@ class EnsembleAnalysis:
             headers = {'accept': '*/*'}
 
             response = self.api_client.perform_get_request(url, headers=headers)
-            if response:
-                # Download and save the response content to a file
-                self.api_client.download_response_content(response, tar_gz_file)
-                print(f"Downloaded file {tar_gz_filename} from PED.")
+            if response is None:
+                raise ConnectionError(f"Failed to connect to PED server for entry {code}.")
+            if response.status_code != 200:
+                raise ConnectionError(f"Failed to download entry {code} from PED. HTTP status code: {response.status_code}")
+            
+            # Download and save the response content to a file
+            self.api_client.download_response_content(response, tar_gz_file)
+            print(f"Downloaded file {tar_gz_filename} from PED.")
         else:
             print(f"Ensemble {code} already downloaded. Skipping.")
 
@@ -124,13 +128,12 @@ class EnsembleAnalysis:
             print(f"File {pdb_filename} already exists. Skipping extraction.")
         
         ensemble.data_path = pdb_file
-    
+
     def _download_from_atlas(self, ensemble: Ensemble):
         pdb_pattern = r'^\d\w{3}_[A-Z]$'
         code = ensemble.code
         if not re.match(pdb_pattern, code):
-            print(f"Entry {code} does not match the PDB ID pattern and will be skipped.")
-            return []
+            raise ValueError(f"Entry {code} does not match the PDB ID pattern.")
 
         zip_filename = f'{code}.zip'
         zip_file = os.path.join(self.output_dir, zip_filename)
@@ -141,33 +144,42 @@ class EnsembleAnalysis:
             headers = {'accept': '*/*'}
 
             response = self.api_client.perform_get_request(url, headers=headers)
-            if not response:
-                return
+            if response is None:
+                raise ConnectionError(f"Failed to connect to Atlas server for entry {code}.")
+            if response.status_code != 200:
+                raise ConnectionError(f"Failed to download entry {code} from Atlas. HTTP status code: {response.status_code}")
+            
             # Download and save the response content to a file
             self.api_client.download_response_content(response, zip_file)
             print(f"Downloaded file {zip_filename} from Atlas.")
         else:
             print("File already exists. Skipping download.")
 
-        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-            # Map reps to original ensemble code
-            zip_contents = zip_ref.namelist()
-            new_ensembles = []
-            for fname in zip_contents:
-                if fname.endswith('.xtc'):
-                    new_code = fname.split('.')[0]
-                    data_path = os.path.join(self.output_dir, fname)
-                    top_path = os.path.join(self.output_dir, f"{code}.pdb")
-                    ensemble = Ensemble(code=new_code, data_path=data_path, top_path=top_path)
-                    new_ensembles.append(ensemble)
-            # Unzip
-            zip_ref.extractall(self.output_dir)
-            print(f"Extracted file {zip_file}.")
+        try:
+            with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                # Map reps to original ensemble code
+                zip_contents = zip_ref.namelist()
+                new_ensembles = []
+                for fname in zip_contents:
+                    if fname.endswith('.xtc'):
+                        new_code = fname.split('.')[0]
+                        data_path = os.path.join(self.output_dir, fname)
+                        top_path = os.path.join(self.output_dir, f"{code}.pdb")
+                        ensemble = Ensemble(code=new_code, data_path=data_path, top_path=top_path)
+                        new_ensembles.append(ensemble)
+                # Unzip
+                zip_ref.extractall(self.output_dir)
+                print(f"Extracted file {zip_file}.")
 
-            # Remove unused files.
-            for unused_path in self.output_dir.glob("*.tpr"):
-                os.remove(unused_path)
-            os.remove(os.path.join(self.output_dir, "README.txt"))
+                # Remove unused files.
+                for unused_path in self.output_dir.glob("*.tpr"):
+                    os.remove(unused_path)
+                readme_path = os.path.join(self.output_dir, "README.txt")
+                if os.path.exists(readme_path):
+                    os.remove(readme_path)
+
+        except zipfile.BadZipFile:
+            raise zipfile.BadZipFile(f"Failed to unzip file {zip_file}. The file may be corrupted.")
 
         return new_ensembles
 
@@ -421,7 +433,7 @@ class EnsembleAnalysis:
         Parameters:
         -----------
         featurization : str
-            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist", "a_angle", "rg", "prolateness", "asphericity", "sasa", and "end_to_end".
+            The type of featurization to be applied. Supported options are "phi_psi", "tr_omega", "tr_phi", "ca_dist", "a_angle", "rg", "prolateness", "asphericity", "sasa", "end_to_end" and "flory_exponent".
 
         min_sep : int, optional
             Minimum sequence separation distance for "ca_dist", "tr_omega", and "tr_phi" methods. Default is 2.
@@ -454,7 +466,10 @@ class EnsembleAnalysis:
         features_dict = {}
         for ensemble in self.ensembles:
             features = ensemble.get_features(featurization=featurization, min_sep=min_sep, max_sep=max_sep)
-            features_dict[ensemble.code] = features
+            if featurization != "flory_exponent":
+                features_dict[ensemble.code] = features
+            else:
+                features_dict[ensemble.code] = features[0]
             
         if normalize:
             feature_sizes = set(features.shape[1] for features in features_dict.values())
@@ -468,17 +483,20 @@ class EnsembleAnalysis:
         
         return features_dict
     
-    def get_features_summary_dataframe(self, selected_features: List[str] = ["rg", "asphericity", "prolateness", "sasa", "end_to_end"]) -> pd.DataFrame:
+    def get_features_summary_dataframe(self, selected_features: List[str] = ["rg", "asphericity", "prolateness", "sasa", "end_to_end", "flory_exponent"], show_variability: bool = True) -> pd.DataFrame:
         """
         Create a summary DataFrame for each ensemble.
 
-        The DataFrame includes the ensemble code and the average and standard deviation for each feature.
+        The DataFrame includes the ensemble code and the average for each feature.
 
         Parameters
         ----------
         selected_features : List[str], optional
             List of feature extraction methods to be used for summarizing the ensembles.
-            Default is ["rg", "asphericity", "prolateness", "sasa", "end_to_end"].
+            Default is ["rg", "asphericity", "prolateness", "sasa", "end_to_end", "flory_exponent"].
+        show_variability: bool, optional
+            If True, include a column  a measurment of variability for each
+            feature (e.g.: standard deviation or error).
 
         Returns
         -------
@@ -490,7 +508,7 @@ class EnsembleAnalysis:
         ValueError
             If any feature in the selected_features is not a supported feature extraction method.
         """
-        supported_features = {"rg", "asphericity", "prolateness", "sasa", "end_to_end"}
+        supported_features = {"rg", "asphericity", "prolateness", "sasa", "end_to_end", "ee_on_rg", "flory_exponent"}
 
         # Validate the selected_features
         invalid_features = [feature for feature in selected_features if feature not in supported_features]
@@ -501,21 +519,34 @@ class EnsembleAnalysis:
 
         for ensemble in self.ensembles:
             ensemble_code = ensemble.code
-            summary_row = [ensemble_code]
+            summary_row = [
+                ensemble_code,
+                ensemble.trajectory.n_residues,
+                len(ensemble.trajectory)
+            ]
             
             for feature in selected_features:
                 features = ensemble.get_features(featurization=feature)
-                features_array = np.array(features)
-                feature_mean = features_array.mean()
-                feature_std = features_array.std()
-                summary_row.extend([feature_mean, feature_std])
+                if feature not in ensemble_features:
+                    features_array = np.array(features)
+                    feature_mean = features_array.mean()
+                    feature_std = features_array.std()
+                    summary_row.extend([feature_mean, feature_std])
+                else:
+                    summary_row.extend([features[0], features[1]])
             
             summary_data.append(summary_row)
 
-        columns = ['ensemble_code']
+        columns = ['ensemble_code', 'n_residues', 'n_conformers']
         for feature in selected_features:
-            columns.extend([f"{feature}_mean", f"{feature}_std"])
+            if feature not in ensemble_features:
+                columns.extend([f"{feature}_mean", f"{feature}_std"])
+            else:
+                columns.extend([feature, f"{feature}_err"])
 
         summary_df = pd.DataFrame(summary_data, columns=columns)
+        if not show_variability:
+            summary_df = summary_df[[c for c in summary_df.columns \
+                                     if not c.endswith(("_std", "_err"))]]
         
         return summary_df

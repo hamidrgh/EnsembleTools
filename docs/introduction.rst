@@ -90,54 +90,51 @@ As in the previous example, the transformed ensemble data can be visualised with
     visualization.dimenfix_scatter()
 
 .. image:: images/dimenfix_scatter.png
-
+    
 Plot Example
 ------------
-
-In this example, analysis is performed on the same ensembles from Atlas, extracting Cα-Cα distances as features and
-transforming them using PCA, which is fit only on replicate n°1 (3a1g_B_prod_R1_fit).
+In this example, we perform analysis on ensembles from PED by displaying several plots on the same figure. 
+If axes are not passed as a parameter to the plot functions, they will be displayed as separate plots.
 
 .. code-block:: python
 
-    ensembles = [
-        Ensemble('3a1g_B', database='atlas')
+    # Define the ensemble codes with their respective data paths and topology files
+    ens_codes = [
+        Ensemble('PED00424e001', data_path='path/to/trajectory/file', top_path='path/to/topology/file'),
+        Ensemble('PED00423e001', data_path='path/to/trajectory/file', top_path='path/to/topology/file')
     ]
+
+    # Specify the directory where the data is stored
     output_dir = 'path/to/output/directory'
 
-    analysis = EnsembleAnalysis(ensembles = ensembles, output_dir = output_dir)
-    analysis.execute_pipeline(
-        featurization_params={'featurization':'ca_dist'}, 
-        reduce_dim_params={'method':'pca','fit_on':["3a1g_B_prod_R1_fit"]}
-        subsample_size=200)
+    # Create an instance of EnsembleAnalysis with the specified ensembles and data directory
+    analysis = EnsembleAnalysis(ens_codes, output_dir)
 
-There is an option to automatically generate a PDF report containing all plots relevant to the conducted analysis.
-The report is saved in the output directory.
+    # Load the trajectories for the ensembles
+    analysis.load_trajectories()
 
-.. code-block:: python
+    # Create an instance of the Visualization class, passing in the analysis object
+    vis = Visualization(analysis=analysis)
 
-    visualization = Visualization(analysis)
-    visualization.generate_report()
+    # Create a figure and a 2x2 grid of subplots for visualization
+    fig, ax = plt.subplots(2, 2, figsize=(10, 8))
 
-Alternatively, different plots can be called explicitly, optionally setting save to True to save the plots as PNGs in the output directory.
+    # Plot the end-to-end distances on the first subplot (top-left) using a histogram
+    vis.end_to_end_distances(ax=ax[0, 0], violin_plot=False)
 
-.. code-block:: python
+    # Plot the asphericity on the second subplot (top-right)
+    vis.asphericity(ax=ax[0, 1])
 
-    visualization.pca_plot_2d_landscapes(save=True)
+    # Plot the average distance maps on the bottom two subplots
+    vis.average_distance_maps(ax=ax[1])
 
-.. image:: images/PCA_RG3a1g_B_prod_R1_fit.png
+    # Display the figure with all subplots
+    fig.show()
 
-.. code-block:: python
+This code snippet demonstrates how to load trajectories for multiple ensembles and visualize different structural properties on a single figure. 
 
-    visualization.pca_plot_1d_histograms(save=True)
-
-.. image:: images/PCA_histca_dist3a1g_B_prod_R1_fit.png
-
-All plots called in one session get stored in a dictionary in the Vizualization class. 
-Calling the following function outputs all of them into a PDF report.
-
-.. code-block:: python
-
-    visualization.generate_custom_report()
+.. image:: images/analysis_visualization_example.png
+   :alt: Visualization of end-to-end distances, asphericity, and average distance maps
 
 Coarse-Grained Models
 ---------------------
@@ -145,18 +142,27 @@ Coarse-Grained models are supported, however they are incompatible with some fun
 
 Ensemble Files with Multiple Chains
 -----------------------------------
-When dealing with ensemble files that contain multiple chains, it is possible to specify which one to analyse.
-In the context of MDtraj trajectories, chain identifiers are represented as numerical indexes (e.g., 0, 1, 2, etc.) and are assigned sequentially. 
-For example, chains A, C, and D will be assigned chain indexes 0, 1, and 2, respectively.
+
+When dealing with PDB ensemble files that contain multiple chains, it is necessary to specify which chain to analyze when instantiating an `Ensemble` object.
+Example usage:
 
 .. code-block:: python
 
+    # Define the ensemble with a specified chain ID
     ensembles = [
-        Ensemble('PED00014e001', database='ped', chain_id=1),
+        Ensemble('PED00014e001', database='ped', chain_id='C'),
     ]
+
+    # Specify the directory where the data is stored
     output_dir = 'path/to/output/directory'
 
-    analysis = EnsembleAnalysis(ensembles = ensembles, output_dir = output_dir)
+    # Create an instance of EnsembleAnalysis with the specified ensembles and output directory
+    analysis = EnsembleAnalysis(ensembles=ensembles, output_dir=output_dir)
+
+    # Load the trajectories for the ensembles
     analysis.load_trajectories()
 
-If not specified, the program will prompt the user to select one chain per ensemble for analysis.
+Notes:
+    - The `chain_id` parameter should be specified as the chain identifier (e.g., 'A', 'B', 'C').
+    - If multiple chains are present and `chain_id` is not specified, an error will be raised.
+    - This feature is currently only supported for PDB files.
