@@ -1703,7 +1703,7 @@ class Visualization:
         ax.set_xticks([i for i in x if i == 1 or i % 5 == 0])
         ax.set_xlabel("Residue Index")
         ax.set_ylabel("Site-specific flexibility parameter")
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.legend()
         
         if pointer is not None:
             for res in pointer:
@@ -1757,12 +1757,12 @@ class Visualization:
 
         for key, values in dict_order_parameter.items():
             x = np.arange(1, len(values) + 1)
-            ax.scatter(x, values, label=key, alpha=0.5)
+            ax.plot(x, values, label=key, marker= 'o', linestyle='-')
         
         ax.set_xticks([i for i in x if i == 1 or i % 5 == 0])
         ax.set_xlabel("Residue Index")
         ax.set_ylabel("Site-specific order parameter")
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.legend()
         
         if pointer is not None:
             for res in pointer:
@@ -1806,22 +1806,24 @@ class Visualization:
         else:
             fig = ax.figure
 
-        colors = ['b', 'g', 'r', 'c', 'm']
+        
         for i, ens in enumerate(analysis.ensembles):
-
+            color = next(ax._get_lines.prop_cycler)['color']
             res_based_sasa = mdtraj.shrake_rupley(ens.trajectory, mode='residue')
             sasa_mean = np.mean(res_based_sasa, axis=0)
             sasa_std = np.std(res_based_sasa, axis=0)        
 
-            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean, '-o', color=colors[i % len(colors)], label=ens.code)
-            ax.fill_between(np.arange(1, len(sasa_mean) + 1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])
+            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean, '-o', color=color, label=ens.code)
+            # ax.fill_between(np.arange(1, len(sasa_mean) + 1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])
+            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean + sasa_std, '--', color=color, alpha=0.5)
+            ax.plot(np.arange(1, len(sasa_mean) + 1), sasa_mean - sasa_std, '--', color=color, alpha=0.5)
 
         ax.set_xticks([i for i in np.arange(1, len(sasa_mean) + 1) if i == 1 or i % 5 == 0])
         ax.set_xlabel('Residue Index')
         ax.set_ylabel('Mean SASA')
         ax.set_title('Mean SASA for Each Residue in Ensembles')
         ax.legend()
-        ax.grid(True)
+        # ax.grid(True)
         
         if pointer is not None:
             for res in pointer:
@@ -1913,3 +1915,60 @@ class Visualization:
 
         return axes
     
+    
+    def similarity_matrix(self, score_type: str = None, based_on: str = None, figsize = (10, 8), cmap = 'viridis', interpolation = 'nearest') -> plt.Axes:
+        
+        """
+        Generates and visualizes the pairwise similarity matrix for the trajectories.
+
+        This function computes the similarity matrix using the specified score type and basis
+        (either 'distance_map' or 'alpha_angles'). It then visualizes the matrix using a heatmap.
+
+        Parameters:
+        -----------
+        score_type : str, optional
+        The type of similarity score to use. Should be either 'kl' for Kullback-Leibler Divergence
+        or 'js' for Jensen-Shannon Divergence. This parameter is required.
+        based_on : str, optional
+        The basis for calculating the similarity score. Should be either 'distance_map' or 'alpha_angles'.
+        This parameter is required.
+        figsize : tuple, optional
+        The size of the figure for the heatmap. Default is (10, 8).
+        cmap : str, optional
+        The colormap to use for the heatmap. Default is 'viridis'.
+        interpolation : str, optional
+        The interpolation method to use for displaying the heatmap. Default is 'nearest'.
+
+        Returns:
+        --------
+        plt.Axes
+        The Axes object with the similarity matrix heatmap.
+
+        Raises:
+        -------
+        ValueError
+        If either `score_type` or `based_on` is not specified or is invalid.
+    
+        Notes:
+        ------
+        The similarity matrix is annotated with the similarity scores, and the axes are labeled with
+        the trajectory labels.
+
+        """
+        similarity_matrix , labels = self.analysis.similarity_score(score_type=score_type, based_on=based_on)
+        fig, ax = plt.subplots(figsize=figsize)
+        cax = ax.imshow(similarity_matrix, cmap=cmap, interpolation=interpolation)
+        fig.colorbar(cax)
+        ax.set_title(f'Pairwise Similarity Matrix using {score_type} method based on {based_on}')
+        ax.set_xticks(np.arange(len(labels)))
+        ax.set_yticks(np.arange(len(labels)))
+        ax.set_xticklabels(labels, rotation=45)
+        ax.set_yticklabels(labels)
+    
+
+        for i in range(len(labels)):
+            for j in range(len(labels)):
+                ax.text(j, i, f"{similarity_matrix[i, j]:.2f}", ha='center', va='center', color='w')
+
+        plt.show()
+        return ax
