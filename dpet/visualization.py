@@ -144,7 +144,7 @@ class Visualization:
         self.plot_dir = os.path.join(self.analysis.output_dir, PLOT_DIR)
         os.makedirs(self.plot_dir, exist_ok=True)
 
-    def tsne_scatter(
+    def _tsne_scatter(
             self,
             color_by: str = "rg",
             kde_by_ensemble: bool = False,
@@ -253,10 +253,59 @@ class Visualization:
             fig.savefig(self.plot_dir + f'/tsnep{int(analysis.reducer.bestP)}_kmeans{int(analysis.reducer.bestK)}_scatter.png', dpi=800)
 
         return ax
-
-    def dimenfix_scatter(self, color_by: str = "rg", save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
+    
+    def dimensionality_reduction_scatter(self,
+                                         color_by: str = "rg", 
+                                         save: bool = False, 
+                                         ax: Union[None, List[plt.Axes]] = None,
+                                         kde_by_ensemble: bool = False) -> List[plt.Axes]:
         """
-        Plot the complete results for dimenfix method. 
+        Plot the results of dimensionality reduction using the method specified in the analysis.
+
+        Parameters
+        ----------
+        color_by : str, optional
+            The feature extraction method used for coloring points in the scatter plot. 
+            Options are "rg", "prolateness", "asphericity", "sasa", and "end_to_end". Default is "rg".
+
+        save : bool, optional
+            If True, the plot will be saved in the data directory. Default is False.
+
+        ax : Union[None, List[plt.Axes]], optional
+            A list of Axes objects to plot on. Default is None, which creates new axes.
+
+        kde_by_ensemble : bool, optional
+            If True, the KDE plot will be generated for each ensemble separately. 
+            If False, a single KDE plot will be generated for the concatenated ensembles. Default is False.
+
+        Returns
+        -------
+        List[plt.Axes]
+            List containing Axes objects for the scatter plot of original labels, clustering labels, and feature-colored labels, respectively.
+
+        Raises
+        ------
+        NotImplementedError
+            If the dimensionality reduction method specified in the analysis is not supported.
+
+        """
+
+        method = self.analysis.reduce_dim_method
+        if method in ("dimenfix", "umap"):
+            self._dimenfix_umap_scatter(color_by=color_by, save=save, ax=ax, kde_by_ensemble=kde_by_ensemble)
+        elif method == "tsne":
+            self._tsne_scatter(color_by=color_by, kde_by_ensemble=kde_by_ensemble, save=save, ax=ax)
+        else:
+            raise NotImplementedError(f"Scatter plot for method '{method}' is not implemented. Please select between 'tsne', 'dimenfix', and 'umap'.")
+
+    def _dimenfix_umap_scatter(self, 
+                         color_by: str = "rg", 
+                         save: bool = False, 
+                         ax: Union[None, List[plt.Axes]] = None,
+                         kde_by_ensemble: bool = False,
+                         ) -> List[plt.Axes]:
+        """
+        Plot the complete results for dimenfix and umap methods. 
 
         Parameters
         -----------
@@ -268,27 +317,27 @@ class Visualization:
 
         ax : Union[None, List[plt.Axes]], optional
             A list of Axes objects to plot on. Default is None, which creates new axes.
+        
+        kde_by_ensemble: bool, optional
+            If True, the KDE plot will be generated for each ensemble separately. If False, a single KDE plot will be generated for the concatenated ensembles. Default is False.
 
         Returns
         --------
         List[plt.Axes]
             List containing Axes objects for the scatter plot of original labels, clustering labels, and feature-colored labels, respectively.
 
-        Notes
-        ------
-        This analysis is only valid for dimenfix dimensionality reduction.
         """
 
         analysis = self.analysis
 
-        if analysis.reduce_dim_method != "dimenfix":
+        if analysis.reduce_dim_method not in ("dimenfix", "umap"):
             raise ValueError("Analysis is only valid for dimenfix dimensionality reduction.")
         
         if color_by not in ("rg", "prolateness", "asphericity", "sasa", "end_to_end"):
             raise ValueError(f"Method {color_by} not supported.")
 
         if ax is None:
-            fig, ax = plt.subplots(1, 3, figsize=(14, 4))
+            fig, ax = plt.subplots(1, 4, figsize=(18, 4))
             axes = ax.flatten()  # Ensure axes is a 1D array
         else:
             ax_array = np.array(ax).flatten()
@@ -326,80 +375,28 @@ class Visualization:
         legend_handles = [Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
         fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
 
-        if save:
-            fig.savefig(self.plot_dir + '/dimenfix_scatter.png', dpi=800)
-
-        return axes
-
-    def umap_scatter(self, color_by: str = "rg", save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
-        """
-        Generate a scatter plot of the transformed data using UMAP.
-
-        Parameters
-        ----------
-        color_by: str, optional
-            The feature extraction method used for coloring points in the scatter plot. Options are "rg", "prolateness", "asphericity", "sasa", and "end_to_end". Default is "rg".
-        
-        save : bool, optional
-            If True, the plot will be saved as an image file. Default is False.
-
-        ax : Union[None, List[plt.Axes]], optional
-            A list of Axes objects to plot on. Default is None, which creates new axes.
-
-        Returns
-        -------
-        List[plt.Axes]
-            The Axes objects for the scatter plot.
-
-        Notes
-        -----
-        This method creates a scatter plot of the transformed data using UMAP.
-        """
-
-        analysis = self.analysis
-
-        if analysis.reduce_dim_method != "umap":
-            raise ValueError("Analysis is only valid for UMAP dimensionality reduction.")
-        
-        if color_by not in ("rg", "prolateness", "asphericity", "sasa", "end_to_end"):
-            raise ValueError(f"Method {color_by} not supported.")
-        
-        if ax is None:
-            fig, ax = plt.subplots(1, 2, figsize=(14, 4))
-            axes = ax.flatten()  # Ensure axes is a 1D array
+        if kde_by_ensemble:
+            # KDE plot for each ensemble
+            for label in unique_labels:
+                ensemble_data = analysis.transformed_data[np.array(analysis.all_labels) == label]
+                kde = gaussian_kde([ensemble_data[:, 0], ensemble_data[:, 1]])
+                xi, yi = np.mgrid[min(ensemble_data[:, 0]):max(ensemble_data[:, 0]):100j,
+                                min(ensemble_data[:, 1]):max(ensemble_data[:, 1]):100j]
+                zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
+                ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, alpha=0.5, label=f'Ensemble {label}', colors=[label_colors[label]])
+            ax[3].set_title('Density Plot (Ensemble-wise)')
+            ax[3].legend(title='Ensemble', loc='upper right')
         else:
-            axes = np.array(ax).flatten()  # Flatten the provided axes
-            fig = axes[0].figure
-
-        # Create a consistent colormap for the original labels
-        unique_labels = np.unique(analysis.all_labels)
-        label_colors = {label: plt.cm.tab20(i / len(unique_labels)) for i, label in enumerate(unique_labels)}
-        point_colors = [label_colors[label] for label in analysis.all_labels]
-
-        # Scatter plot with original labels
-        scatter_labeled = axes[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
-        axes[0].set_title('Scatter plot (original labels)')
-
-        # Concatenate feature values from all ensembles
-        feature_values = []
-        for values in analysis.get_features(color_by).values():
-            feature_values.extend(values)
-        colors = np.array(feature_values)
-
-        # Scatter plot with feature-based labels
-        rg_labeled = axes[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
-        cbar = plt.colorbar(rg_labeled, ax=axes[1])
-        axes[1].set_title(f'Scatter plot ({color_by} labels)')
-
-        # Manage legend
-        legend_labels = list(label_colors.keys())
-        legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
-
-        fig.tight_layout()
+            # Single KDE plot for concatenated ensembles
+            kde = gaussian_kde([analysis.transformed_data[:, 0], analysis.transformed_data[:, 1]])
+            xi, yi = np.mgrid[min(analysis.transformed_data[:, 0]):max(analysis.transformed_data[:, 0]):100j,
+                            min(analysis.transformed_data[:, 1]):max(analysis.transformed_data[:, 1]):100j]
+            zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
+            ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, cmap='Blues')
+            ax[3].set_title('Density Plot')
 
         if save:
-            fig.savefig(self.plot_dir + '/umap_scatter.png', dpi=800)
+            fig.savefig(self.plot_dir + f'/{analysis.reduce_dim_method}_scatter.png', dpi=800)
 
         return axes
 
