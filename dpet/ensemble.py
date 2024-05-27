@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Sequence, Tuple, Union
+from typing import List, Sequence, Tuple, Union
 import mdtraj
 import numpy as np
 
@@ -75,11 +75,13 @@ class Ensemble():
                 f"Data file or directory for ensemble {self.code} doesn't exist: {self.data_path}"
             )
         elif self.data_path.endswith('.pdb'):
-            self._get_chains_from_pdb()
+            chain_ids = self.get_chains_from_pdb()
+            print(f"{self.code} chain ids: {chain_ids}")
+            
             print(f"Generating trajectory for {self.code}...")
             self.trajectory = mdtraj.load(self.data_path)
 
-            chain_selected = self._select_chain()
+            chain_selected = self._select_chain(chain_ids)
 
             if chain_selected:
                 traj_suffix = f'_{self.chain_id.upper()}'
@@ -295,9 +297,14 @@ class Ensemble():
         """
         self.features = (self.features - mean) / std
     
-    def _select_chain(self) -> bool:
+    def _select_chain(self, chain_ids: List[str]) -> bool:
         """
         Select a specific chain from the trajectory based on the chain_id.
+
+        Parameters
+        ----------
+        chain_ids: List[str]
+            A list of chain IDs available in the trajectory.
 
         Returns
         -------
@@ -307,7 +314,7 @@ class Ensemble():
         if self.trajectory.topology.n_chains == 1:
             return False
 
-        chain_id_to_index = {chain_id.upper(): index for index, chain_id in enumerate(self.chain_ids)}
+        chain_id_to_index = {chain_id.upper(): index for index, chain_id in enumerate(chain_ids)}
 
         if self.chain_id is None:
             raise ValueError(f"Multiple chains found in the ensemble {self.code}. Please specify a chain_id.")
@@ -354,19 +361,32 @@ class Ensemble():
         self.trajectory = self.trajectory.atom_slice(atom_indices)
         print(f"Selected residues from ensemble {self.code}")
 
-    def _get_chains_from_pdb(self):
+    def get_chains_from_pdb(self):
         """
         Extracts unique chain IDs from a PDB file.
+        
+        Raises
+        ------
+        FileNotFoundError
+            If the specified PDB file does not exist.
+        ValueError
+            If the specified file is not a PDB file.
         """
+        if not os.path.exists(self.data_path):
+            raise FileNotFoundError(f"The file {self.data_path} does not exist.")
+        
+        if not self.data_path.endswith('.pdb'):
+            raise ValueError(f"The file {self.data_path} is not a PDB file.")
+        
         with open(self.data_path, 'r') as f:
             lines = f.readlines()
 
-        self.chain_ids = []  # Use a list to preserve the order
+        chain_ids = []  # Use a list to preserve the order
 
         for line in lines:
             if line.startswith('ATOM'):
                 chain_id = line[21]
-                if chain_id not in self.chain_ids:
-                    self.chain_ids.append(chain_id)
+                if chain_id not in chain_ids:
+                    chain_ids.append(chain_id)
 
-        print(f"{self.code} chain ids: {self.chain_ids}")
+        return chain_ids

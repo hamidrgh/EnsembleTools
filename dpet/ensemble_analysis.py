@@ -129,8 +129,23 @@ class EnsembleAnalysis:
             print(f"Extracted file {pdb_filename}.")
         else:
             print(f"File {pdb_filename} already exists. Skipping extraction.")
-        
-        ensemble.data_path = pdb_file
+
+        # Set the data path to the downloaded file
+        # If the trajectory is already generated it will be used instead of the pdb file
+        ensemble.data_path = pdb_file      
+        chain_ids = ensemble.get_chains_from_pdb()
+        if len(chain_ids) > 1 and ensemble.chain_id is not None and ensemble.chain_id in chain_ids:
+            traj_suffix = f'_{ensemble.chain_id.upper()}'
+        else:
+            traj_suffix = ''
+
+        traj_dcd = os.path.join(self.output_dir, f'{ensemble.code}{traj_suffix}.dcd')
+        traj_top = os.path.join(self.output_dir, f'{ensemble.code}{traj_suffix}.top.pdb')
+
+        if os.path.exists(traj_dcd) and os.path.exists(traj_top):
+            print(f'Trajectory file already exists for ensemble {code}.')
+            ensemble.data_path = traj_dcd
+            ensemble.top_path = traj_top
 
     def _download_from_atlas(self, ensemble: Ensemble):
         pdb_pattern = r'^\d\w{3}_[A-Z]$'
