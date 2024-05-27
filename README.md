@@ -13,8 +13,8 @@ With IDPensembleTools, you can:
 
 - Extract and visualize **global features** of structural ensembles such as (`Rg`, `Asphericity`, `Prolateness`, `End to end distance`,...)
 - Extract and visualize **local features** of structural ensembles sucha as ( `intera-atomic distances`, `phi-psi angles` , `alpha-helix content`, ...)
-- Performing dimensionality reduction methods (`PCA`, `UMAP`, `t-SNE`) on different extracted features of structural ensemble
-- Comparing structural ensembles of disordered proteins using different similarity scores such as Kullback-Leibler (KL) and Jensen-Shannon (JS) divergence methods and visualize similarity matrix
+- Performing **dimensionality reduction** methods (`PCA`, `UMAP`, `t-SNE`) on different extracted features of structural ensemble
+- **Comparing** structural ensembles of disordered proteins using different similarity scores such as Kullback-Leibler (KL) and Jensen-Shannon (JS) divergence methods and visualize similarity matrix
   
 For details, you can check our user-centric documentation , **put the link to the documentation**, is generated from our repository using Sphinx. 
 
