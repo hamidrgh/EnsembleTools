@@ -1,4 +1,5 @@
 # IDPensembleTools : an open-source library for analysis of conformational ensembles of disordered proteiens 
+![Pipline Example](/pipline_example.jpeg)
 
 ## Overview
 IDPensembleTools is a python package by which you can load and analyze multiple conformational ensembles in different formats such as (`pdb`, `xtc`,`dcd`,...)
