@@ -28,8 +28,8 @@ class Ensemble():
     database : str, optional
         The database from which to download the ensemble. Options are 'ped' and 'atlas'. Default is None.
         
-    chain_id : int, optional
-        MDtraj chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.
+    chain_id : str, optional
+        Chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.
 
     residue_range : Tuple, optional
         A tuple indicating the start and end of the residue range (inclusive), using 1-based indexing. Default is None.
@@ -38,10 +38,9 @@ class Ensemble():
     -----
     - If the database is 'atlas', the ensemble code should be provided as a PDB ID with a chain identifier separated by an underscore. Example: '3a1g_B'.
     - If the database is 'ped', the ensemble code should be in the PED ID format, which consists of a string starting with 'PED' followed by a numeric identifier, and 'e' followed by another numeric identifier. Example: 'PED00423e001'.
-    - 'chain_id' is always assigned in order to the actual chains. For example, chains A, C, D would have 'chain_id' 0, 1, 2 respectively.
     - The `residue_range` parameter uses 1-based indexing, meaning the first residue is indexed as 1.
     """
-    def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None, chain_id: int = None, residue_range: Tuple = None) -> None:
+    def __init__(self, code: str, data_path: str = None, top_path: str = None, database: str = None, chain_id: str = None, residue_range: Tuple = None) -> None:
         self.code = code
         self.data_path = data_path
         self.top_path = top_path
@@ -317,7 +316,7 @@ class Ensemble():
         chain_id_to_index = {chain_id.upper(): index for index, chain_id in enumerate(chain_ids)}
 
         if self.chain_id is None:
-            raise ValueError(f"Multiple chains found in the ensemble {self.code}. Please specify a chain_id.")
+            raise ValueError(f"Multiple chains found in the ensemble {self.code}. Please specify a chain_id from {chain_ids}.")
 
         chain_id_upper = self.chain_id.upper()
 
