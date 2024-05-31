@@ -359,6 +359,9 @@ class Ensemble():
         atom_indices = self.trajectory.topology.select(f'residue >= {start_residue} and residue <= {end_residue}')
         self.trajectory = self.trajectory.atom_slice(atom_indices)
         print(f"Selected residues from ensemble {self.code}")
+    
+    def get_num_residues(self):
+        return self.trajectory.topology.n_residues
 
     def get_chains_from_pdb(self):
         """

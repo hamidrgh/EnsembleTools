@@ -130,6 +130,89 @@ def plot_violins(
     ax.set_title(title)
     return ax
 
+def plot_comparison_matrix(
+        ax: plt.Axes,
+        scores: np.ndarray,
+        codes: List[str],
+        std: bool = False,
+        cmap: str = "viridis_r",
+        title: str = "New Comparison",
+        cbar_label: str = "score",
+        textcolors: Union[str, tuple] = ("black", "white")
+    ):
+    """
+    Plot a matrix with all vs all comparison scores as a heatmap.
+
+    Parameters
+    ----------
+    ax: plt.Axes
+        Axes object where the heatmap should be created.
+    scores: np.ndarray
+        NumPy array with shape (M, M, B) containing the comparison scores for M
+        ensembles and B bootstrap iterations. See the documentation for the
+        output of `EnsembleAnalysis.comparison_scores` for more information.
+    codes: List[str]
+        List of strings with the codes of the ensembles.
+    std: bool, optional
+        Show the standard deviation of the comparison scores over B bootstrap
+        iterations for each of each score in the M x M matrix. Only takes effect
+        if B >= 2. Default is `False`.
+    cmap: str, optional
+        Matplotlib colormap name to use in the heatmap.
+    title: str, optional
+        Title of the heatmap.
+    cbar_label: str, optional
+        Label of the colorbar.
+    textcolors: Union[str, tuple], optional
+        Color of the text for each cell of the heatmap, specified as a string.
+        By providing a tuple with two elements, the two colors will be applied
+        to cells with color intensity above/below a certain threshold, so that
+        ligher text can be plotted in darker cells and darker text can be
+        plotted in lighter cells.
+
+    Returns
+    -------
+    ax: plt.Axes
+        The same updated Axes object from the input.
+    
+    Notes
+    -----
+    The comparison matrix is annotated with the scores, and the axes are labeled
+    with the ensemble labels.
+
+    """
+    scores_mean = scores.mean(axis=2)
+    if scores.shape[2] > 1 and std:
+        # More than 1 bootstrap iteration, can calculate std.
+        scores_err = scores.std(axis=2)
+    else:
+        # One or less bootstrap iterations.
+        scores_err = None
+
+    ax.set_title(title)
+    im = ax.imshow(scores_mean, cmap=cmap)
+    plt.colorbar(im, label=cbar_label)
+    ax.set_xticks(np.arange(len(codes)))
+    ax.set_yticks(np.arange(len(codes)))
+    ax.set_xticklabels(codes, rotation=45)
+    ax.set_yticklabels(codes)
+
+    threshold = 0.75
+    for i in range(len(codes)):
+        for j in range(len(codes)):
+            if isinstance(textcolors, str):
+                color_ij = textcolors
+            else:
+                color_ij = textcolors[int(im.norm(scores_mean[i, j]) > threshold)]
+            kw = {"color": color_ij}
+            if scores_err is not None:
+                label_ij = f"{scores_mean[i, j]:.3f} ± {scores_err[i, j]:.3f}"
+            else:
+                label_ij = f"{scores_mean[i, j]:.3f}"
+            text = im.axes.text(j, i, label_ij, ha="center", va="center", **kw)
+
+    return ax
+
 
 class Visualization:
     """
@@ -1916,59 +1999,117 @@ class Visualization:
         return axes
     
     
-    def similarity_matrix(self, score_type: str = None, based_on: str = None, figsize = (10, 8), cmap = 'viridis', interpolation = 'nearest') -> plt.Axes:
-        
+    def comparison_matrix(self,
+            score: str,
+            feature: str,
+            featurization_params: dict = {},
+            bootstrap_iters: int = 3,
+            bootstrap_frac: float = 1.0,
+            bootstrap_replace: bool = True,
+            bins: Union[int, str] = 50,
+            random_seed: int = None,
+            verbose: bool = False,
+            ax: Union[None, plt.Axes] = None,
+            figsize: Tuple[int] = (6.00, 5.0),
+            dpi: int = 100,
+            std: bool = False,
+            cmap: str = "viridis_r",
+            title: str = None,
+            cbar_label: str = None,
+            textcolors: Union[str, tuple] = ("black", "white")
+        ) -> dict:
         """
-        Generates and visualizes the pairwise similarity matrix for the trajectories.
-
-        This function computes the similarity matrix using the specified score type and basis
-        (either 'distance_map' or 'alpha_angles'). It then visualizes the matrix using a heatmap.
+        Generates and visualizes the pairwise comparison matrix for the ensembles.
+        This function computes the comparison matrix using the specified score
+        type and feature. It then visualizes the matrix using a heatmap.
 
         Parameters:
         -----------
-        score_type : str, optional
-        The type of similarity score to use. Should be either 'kl' for Kullback-Leibler Divergence
-        or 'js' for Jensen-Shannon Divergence. This parameter is required.
-        based_on : str, optional
-        The basis for calculating the similarity score. Should be either 'distance_map' or 'alpha_angles'.
-        This parameter is required.
-        figsize : tuple, optional
-        The size of the figure for the heatmap. Default is (10, 8).
-        cmap : str, optional
-        The colormap to use for the heatmap. Default is 'viridis'.
-        interpolation : str, optional
-        The interpolation method to use for displaying the heatmap. Default is 'nearest'.
+        score, feature, featurization_params, bootstrap_iters, bootstrap_frac,
+        bootstrap_replace, bins, random_seed, verbose:
+            See the documentation of `EnsembleAnalysis.comparison_scores` for
+            more information about these arguments.
+        ax: Union[None, plt.Axes], optional
+            Axes object where to plot the comparison heatmap. If `None` (the
+            default value) is provided, a new Figure will be created.
+        figsize: Tuple[int], optional
+            The size of the figure for the heatmap. Default is (6.00, 5.0). Only
+            takes effect if `ax` is not `None`.
+        dpi: int, optional
+            DPIs of the figure for the heatmap. Default is 100. Only takes
+            effect if `ax` is not `None`.
+        std, cmap, title, cbar_label, textcolors:
+            See the documentation of `dpet.visualization.plot_comparison_matrix`
+            for more information about these arguments.
 
         Returns:
         --------
-        plt.Axes
-        The Axes object with the similarity matrix heatmap.
+        results: dict
+            A dictionary containing the following keys:
+                `ax`: the Axes object with the comparison matrix heatmap.
+                `scores`: comparison matrix. See `EnsembleAnalysis.comparison_scores`
+                    for more information.
+                `codes`: codes of the ensembles that were compared.
+                `fig`: Figure object, only returned when a new figure is created
+                    inside this function.
 
-        Raises:
-        -------
-        ValueError
-        If either `score_type` or `based_on` is not specified or is invalid.
-    
         Notes:
         ------
-        The similarity matrix is annotated with the similarity scores, and the axes are labeled with
-        the trajectory labels.
+        The comparison matrix is annotated with the scores, and the axes are
+        labeled with the ensemble labels.
 
         """
-        similarity_matrix , labels = self.analysis.similarity_score(score_type=score_type, based_on=based_on)
-        fig, ax = plt.subplots(figsize=figsize)
-        cax = ax.imshow(similarity_matrix, cmap=cmap, interpolation=interpolation)
-        fig.colorbar(cax)
-        ax.set_title(f'Pairwise Similarity Matrix using {score_type} method based on {based_on}')
-        ax.set_xticks(np.arange(len(labels)))
-        ax.set_yticks(np.arange(len(labels)))
-        ax.set_xticklabels(labels, rotation=45)
-        ax.set_yticklabels(labels)
-    
 
-        for i in range(len(labels)):
-            for j in range(len(labels)):
-                ax.text(j, i, f"{similarity_matrix[i, j]:.2f}", ha='center', va='center', color='w')
+        ### Score divergences.
+        scores, codes = self.analysis.comparison_scores(
+            score=score,
+            feature=feature,
+            featurization_params=featurization_params,
+            bootstrap_iters=bootstrap_iters,
+            bootstrap_frac=bootstrap_frac,
+            bootstrap_replace=bootstrap_replace,
+            bins=bins,
+            random_seed=random_seed,
+            verbose=verbose
+        )
 
-        plt.show()
-        return ax
+        ### Setup the plot.
+        # Axes.
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+        else:
+            fig = None
+        # Title.
+        if title is None:
+            if score == "emd":
+                title = f"{score.upper()} based on {feature}"
+            elif score == "jsd":
+                if feature == "ca_dist":
+                    title = "aJSD_d"
+                elif feature == "alpha_angle":
+                    title = "aJSD_t"
+                else:
+                    title = f"{score.upper()} based on {feature}"
+            else:
+                raise ValueError(score)
+        # Colorbar label.
+        if cbar_label is None:
+            cbar_label = f"{score.upper()} score"
+
+        ### Actually plots.
+        plot_comparison_matrix(
+            ax=ax,
+            scores=scores,
+            codes=codes,
+            std=std,
+            cmap=cmap,
+            title=title,
+            cbar_label=cbar_label,
+            textcolors=textcolors
+        )
+
+        ### Return results.
+        results = {"ax": ax, "scores": scores, "codes": codes}
+        if fig is not None:
+            results["fig"] = fig
+        return results
