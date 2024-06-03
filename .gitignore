@@ -5,6 +5,7 @@ __pycache__/
 # Ignore build directories
 build/
 dist/
+outputdir/
 
 # Ignore egg-info directory
 *.egg-info/
