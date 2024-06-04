@@ -16,7 +16,8 @@ Welcome to the IDPET documentation!
    :caption: Contents:
 
    
-   introduction
+   overview
+   installation
    demo
    dm
    ensemble_analysis
