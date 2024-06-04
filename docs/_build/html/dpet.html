@@ -77,6 +77,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-dpet.visualization">dpet.visualization module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#dpet.visualization.Visualization"><code class="docutils literal notranslate"><span class="pre">Visualization</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dpet.visualization.plot_comparison_matrix"><code class="docutils literal notranslate"><span class="pre">plot_comparison_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dpet.visualization.plot_histogram"><code class="docutils literal notranslate"><span class="pre">plot_histogram()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dpet.visualization.plot_violins"><code class="docutils literal notranslate"><span class="pre">plot_violins()</span></code></a></li>
 </ul>
@@ -86,6 +87,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo</a></li>
 </ul>
 
         </div>
@@ -820,12 +822,85 @@ for storing data.</p>
 <dt>output_dir<span class="classifier">str</span></dt><dd><p>Directory path for storing data.</p>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores">
+<span class="sig-name descname"><span class="pre">comparison_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_iters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.comparison_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores" title="Link to this definition"></a></dt>
+<dd><p>Compare all pair of ensembles using divergence/distance scores.
+Implemented scores are approximate average Jensen–Shannon divergence
+(JSD) [<a class="reference external" href="https://doi.org/10.1371/journal.pcbi.1012144">https://doi.org/10.1371/journal.pcbi.1012144</a>], and approximate
+Earth Mover’s Distance (EMD) [<a class="reference external" href="https://doi.org/10.1038/s41467-023-36443-x">https://doi.org/10.1038/s41467-023-36443-x</a>]
+over several kinds of molecular features. The lower these scores are,
+the higher the similarity between the probability distribution of the
+features of the ensembles.</p>
+<section id="id66">
+<h4>Parameters<a class="headerlink" href="#id66" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>score: str</dt><dd><p>Type of score used to compare ensembles. Choices: <cite>jsd</cite> (average
+Jensen–Shannon divergence) and <cite>emd</cite> (Earth Mover’s Distance).</p>
+</dd>
+<dt>feature: str</dt><dd><p>Type of feature to analyze. Choices: <cite>ca_dist</cite> for all sets of Ca-Ca
+distances between non-neighboring residues and <cite>alpha_angle</cite> for 
+all torsion angles between four consecutive Ca atoms in a chain.</p>
+</dd>
+<dt>featurization_params: dict, optional</dt><dd><p>Optional dictionary to customize the featurization process for the
+above features.</p>
+</dd>
+<dt>bootstrap_iters: int, optional</dt><dd><p>Number of bootstrap iterations. If the value is &gt; 1, each pair of
+ensembles will be compared <cite>bootstrap_iters</cite> times by randomly
+selecting (bootstrapping) conformations from it. For small protein
+structural ensembles (less than 500-1,000 conformations) comparison
+scores in DPED are not robust estimators of divergence/distance. By
+performing bootstrapping, you can have an idea of how the size of
+your ensembles impacts the comparison. Specifically, you should
+look at auto-comparisons: each ensemble will be compared with itself
+by bootstrapping different subsamples. The scores obtained by these
+auto-comparisons give an estimate of the “uncertainty” related to
+sample size: for large ensembles, the auto-comparison scores (on the
+diagonal of the matrix) should tend to 0. For smaller ensembles you
+will get increasingly higher values. Use values &gt;= 5 especially when
+comparing small ensembles. When comparing large ensembles (more than
+10,000 conformations) you can avoid bootstrapping.</p>
+</dd>
+<dt>bootstrap_frac: float, optional</dt><dd><p>Fraction of the total conformations to sample when bootstrapping.
+Default value is 1.0, which results in bootstrap samples with the
+same number of conformations of the original ensemble.</p>
+</dd>
+<dt>bootstrap_replace: bool, optional</dt><dd><p>If <cite>True</cite>, bootstrap will sample with replacement. Default is <cite>True</cite>.</p>
+</dd>
+<dt>bins: Union[int, str], optional</dt><dd><p>Number of bins or bin assignment rule for JSD comparisons. See the
+documentation of <cite>dpet.data.comparison.get_num_comparison_bins</cite> for
+more information.</p>
+</dd>
+<dt>random_seed: int, optional</dt><dd><p>Random seed used when performing bootstrapping.</p>
+</dd>
+<dt>verbose: bool, optional</dt><dd><p>If <cite>True</cite>, some information about the comparisons will be printed to
+stdout.</p>
+</dd>
+</dl>
+</section>
+<section id="id67">
+<h4>Returns<a class="headerlink" href="#id67" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>results: Tuple[np.ndarray, List[str]]</dt><dd><dl class="simple">
+<dt>A tuple containing:</dt><dd><p><cite>score_matrix</cite>: a (M, M, B) NumPy array storing the comparison
+scores, where M is the number of ensembles being compared and B
+is the number of bootstrap iterations (B will be 1 if
+bootstrapping was not performed).
+<cite>codes</cite>: a list of M strings, containing the codes of the
+ensembles that were compared.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.ens_codes">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ens_codes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.ens_codes" title="Link to this definition"></a></dt>
 <dd><p>Get the ensemble codes.</p>
-<section id="id66">
-<h4>Returns<a class="headerlink" href="#id66" title="Link to this heading"></a></h4>
+<section id="id68">
+<h4>Returns<a class="headerlink" href="#id68" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>List[str]</dt><dd><p>A list of ensemble codes.</p>
 </dd>
@@ -846,8 +921,8 @@ for storing data.</p>
 </ol>
 </dd>
 </dl>
-<section id="id67">
-<h4>Parameters<a class="headerlink" href="#id67" title="Link to this heading"></a></h4>
+<section id="id69">
+<h4>Parameters<a class="headerlink" href="#id69" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>featurization_params: Dict</dt><dd><p>Parameters for feature extraction. The only required parameter is “featurization”,
 which can be “phi_psi”, “ca_dist”, “a_angle”, “tr_omega” or “tr_phi”. 
@@ -866,8 +941,8 @@ which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained">
 <span class="sig-name descname"><span class="pre">exists_coarse_grained</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.exists_coarse_grained"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained" title="Link to this definition"></a></dt>
 <dd><p>Check if at least one of the loaded ensembles is coarse-grained after loading trajectories.</p>
-<section id="id68">
-<h4>Returns<a class="headerlink" href="#id68" title="Link to this heading"></a></h4>
+<section id="id70">
+<h4>Returns<a class="headerlink" href="#id70" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>bool</dt><dd><p>True if at least one ensemble is coarse-grained, False otherwise.</p>
 </dd>
@@ -879,8 +954,8 @@ which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.extract_features">
 <span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.extract_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.extract_features" title="Link to this definition"></a></dt>
 <dd><p>Extract the selected feature.</p>
-<section id="id69">
-<h4>Parameters<a class="headerlink" href="#id69" title="Link to this heading"></a></h4>
+<section id="id71">
+<h4>Parameters<a class="headerlink" href="#id71" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>featurization<span class="classifier">str</span></dt><dd><p>Choose between “phi_psi”, “ca_dist”, “a_angle”, “tr_omega”, and “tr_phi”.</p>
 </dd>
@@ -892,8 +967,8 @@ which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 </dd>
 </dl>
 </section>
-<section id="id70">
-<h4>Returns<a class="headerlink" href="#id70" title="Link to this heading"></a></h4>
+<section id="id72">
+<h4>Returns<a class="headerlink" href="#id72" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Dict[str, np.ndarray]</dt><dd><p>A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</p>
 </dd>
@@ -905,8 +980,8 @@ which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.features">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">features</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.features" title="Link to this definition"></a></dt>
 <dd><p>Get the features associated with each ensemble.</p>
-<section id="id71">
-<h4>Returns<a class="headerlink" href="#id71" title="Link to this heading"></a></h4>
+<section id="id73">
+<h4>Returns<a class="headerlink" href="#id73" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Dict[str, np.ndarray]</dt><dd><p>A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</p>
 </dd>
@@ -918,8 +993,8 @@ which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.get_features">
 <span class="sig-name descname"><span class="pre">get_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.get_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.get_features" title="Link to this definition"></a></dt>
 <dd><p>Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.</p>
-<section id="id72">
-<h4>Parameters:<a class="headerlink" href="#id72" title="Link to this heading"></a></h4>
+<section id="id74">
+<h4>Parameters:<a class="headerlink" href="#id74" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>featurization<span class="classifier">str</span></dt><dd><p>The type of featurization to be applied. Supported options are “phi_psi”, “tr_omega”, “tr_phi”, “ca_dist”, “a_angle”, “rg”, “prolateness”, “asphericity”, “sasa”, “end_to_end” and “flory_exponent”.</p>
 </dd>
@@ -931,8 +1006,8 @@ which can be “pca”, “tsne”, “dimenfix”, “mds” or “kpca”.</p>
 </dd>
 </dl>
 </section>
-<section id="id73">
-<h4>Returns:<a class="headerlink" href="#id73" title="Link to this heading"></a></h4>
+<section id="id75">
+<h4>Returns:<a class="headerlink" href="#id75" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Dict[str, np.ndarray]</dt><dd><p>A dictionary containing the extracted features for each ensemble, where the keys are ensemble IDs and the 
 values are NumPy arrays containing the features.</p>
@@ -955,8 +1030,8 @@ If coarse-grained models are used with featurization methods that require atomis
 <span class="sig-name descname"><span class="pre">get_features_summary_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['rg',</span> <span class="pre">'asphericity',</span> <span class="pre">'prolateness',</span> <span class="pre">'sasa',</span> <span class="pre">'end_to_end',</span> <span class="pre">'flory_exponent']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_variability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.get_features_summary_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.get_features_summary_dataframe" title="Link to this definition"></a></dt>
 <dd><p>Create a summary DataFrame for each ensemble.</p>
 <p>The DataFrame includes the ensemble code and the average for each feature.</p>
-<section id="id74">
-<h4>Parameters<a class="headerlink" href="#id74" title="Link to this heading"></a></h4>
+<section id="id76">
+<h4>Parameters<a class="headerlink" href="#id76" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>selected_features<span class="classifier">List[str], optional</span></dt><dd><p>List of feature extraction methods to be used for summarizing the ensembles.
 Default is [“rg”, “asphericity”, “prolateness”, “sasa”, “end_to_end”, “flory_exponent”].</p>
@@ -966,15 +1041,15 @@ feature (e.g.: standard deviation or error).</p>
 </dd>
 </dl>
 </section>
-<section id="id75">
-<h4>Returns<a class="headerlink" href="#id75" title="Link to this heading"></a></h4>
+<section id="id77">
+<h4>Returns<a class="headerlink" href="#id77" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>pd.DataFrame</dt><dd><p>DataFrame containing the summary statistics (average and std) for each feature in each ensemble.</p>
 </dd>
 </dl>
 </section>
-<section id="id76">
-<h4>Raises<a class="headerlink" href="#id76" title="Link to this heading"></a></h4>
+<section id="id78">
+<h4>Raises<a class="headerlink" href="#id78" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>ValueError</dt><dd><p>If any feature in the selected_features is not a supported feature extraction method.</p>
 </dd>
@@ -989,8 +1064,8 @@ feature (e.g.: standard deviation or error).</p>
 <p>This method iterates over each ensemble in the <cite>ensembles</cite> list and downloads
 data files if they are not already available. 
 Trajectories are then loaded for each ensemble.</p>
-<section id="id77">
-<h4>Returns<a class="headerlink" href="#id77" title="Link to this heading"></a></h4>
+<section id="id79">
+<h4>Returns<a class="headerlink" href="#id79" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Dict[str, mdtraj.Trajectory]</dt><dd><p>A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.</p>
 </dd>
@@ -1008,8 +1083,8 @@ where trajectory files will be saved or extracted.</p>
 <span class="sig-name descname"><span class="pre">random_sample_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.random_sample_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories" title="Link to this definition"></a></dt>
 <dd><p>Sample a defined random number of conformations from the ensemble 
 trajectory.</p>
-<section id="id78">
-<h4>Parameters<a class="headerlink" href="#id78" title="Link to this heading"></a></h4>
+<section id="id80">
+<h4>Parameters<a class="headerlink" href="#id80" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>sample_size: int</dt><dd><p>Number of conformations sampled from the ensemble.</p>
 </dd>
@@ -1021,8 +1096,8 @@ trajectory.</p>
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.reduce_dim_data">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reduce_dim_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.reduce_dim_data" title="Link to this definition"></a></dt>
 <dd><p>Get the transformed data associated with each ensemble.</p>
-<section id="id79">
-<h4>Returns<a class="headerlink" href="#id79" title="Link to this heading"></a></h4>
+<section id="id81">
+<h4>Returns<a class="headerlink" href="#id81" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Dict[str, np.ndarray]</dt><dd><p>A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</p>
 </dd>
@@ -1034,8 +1109,8 @@ trajectory.</p>
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">
 <span class="sig-name descname"><span class="pre">reduce_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/dpet/ensemble_analysis.html#EnsembleAnalysis.reduce_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features" title="Link to this definition"></a></dt>
 <dd><p>Perform dimensionality reduction on the extracted features.</p>
-<section id="id80">
-<h4>Parameters<a class="headerlink" href="#id80" title="Link to this heading"></a></h4>
+<section id="id82">
+<h4>Parameters<a class="headerlink" href="#id82" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>method<span class="classifier">str</span></dt><dd><p>Choose between “pca”, “tsne”, “dimenfix”, “mds”, “kpca” and “umap”.</p>
 </dd>
@@ -1140,8 +1215,8 @@ The model will then be used to transform all ensembles.</p>
 </li>
 </ul>
 </section>
-<section id="id81">
-<h4>Returns<a class="headerlink" href="#id81" title="Link to this heading"></a></h4>
+<section id="id83">
+<h4>Returns<a class="headerlink" href="#id83" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>np.ndarray</dt><dd><p>Returns the transformed data.</p>
 </dd>
@@ -1162,8 +1237,8 @@ The model will then be used to transform all ensembles.</p>
 <dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.trajectories">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trajectories</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.trajectories" title="Link to this definition"></a></dt>
 <dd><p>Get the trajectories associated with each ensemble.</p>
-<section id="id82">
-<h4>Returns<a class="headerlink" href="#id82" title="Link to this heading"></a></h4>
+<section id="id84">
+<h4>Returns<a class="headerlink" href="#id84" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>Dict[str, mdtraj.Trajectory]</dt><dd><p>A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.</p>
 </dd>
@@ -1179,11 +1254,11 @@ The model will then be used to transform all ensembles.</p>
 <span id="dpet-ensemble-module"></span><h2>dpet.ensemble module<a class="headerlink" href="#module-dpet.ensemble" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="dpet.ensemble.Ensemble">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.ensemble.</span></span><span class="sig-name descname"><span class="pre">Ensemble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.ensemble.</span></span><span class="sig-name descname"><span class="pre">Ensemble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residue_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represents a molecular dynamics ensemble.</p>
-<section id="id83">
-<h3>Parameters<a class="headerlink" href="#id83" title="Link to this heading"></a></h3>
+<section id="id85">
+<h3>Parameters<a class="headerlink" href="#id85" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>code<span class="classifier">str</span></dt><dd><p>The code identifier of the ensemble.</p>
 </dd>
@@ -1193,26 +1268,25 @@ The model will then be used to transform all ensembles.</p>
 </dd>
 <dt>database<span class="classifier">str, optional</span></dt><dd><p>The database from which to download the ensemble. Options are ‘ped’ and ‘atlas’. Default is None.</p>
 </dd>
-<dt>chain_id<span class="classifier">int, optional</span></dt><dd><p>MDtraj chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.</p>
+<dt>chain_id<span class="classifier">str, optional</span></dt><dd><p>Chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.</p>
 </dd>
 <dt>residue_range<span class="classifier">Tuple, optional</span></dt><dd><p>A tuple indicating the start and end of the residue range (inclusive), using 1-based indexing. Default is None.</p>
 </dd>
 </dl>
 </section>
-<section id="id84">
-<h3>Notes<a class="headerlink" href="#id84" title="Link to this heading"></a></h3>
+<section id="id86">
+<h3>Notes<a class="headerlink" href="#id86" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>If the database is ‘atlas’, the ensemble code should be provided as a PDB ID with a chain identifier separated by an underscore. Example: ‘3a1g_B’.</p></li>
 <li><p>If the database is ‘ped’, the ensemble code should be in the PED ID format, which consists of a string starting with ‘PED’ followed by a numeric identifier, and ‘e’ followed by another numeric identifier. Example: ‘PED00423e001’.</p></li>
-<li><p>‘chain_id’ is always assigned in order to the actual chains. For example, chains A, C, D would have ‘chain_id’ 0, 1, 2 respectively.</p></li>
 <li><p>The <cite>residue_range</cite> parameter uses 1-based indexing, meaning the first residue is indexed as 1.</p></li>
 </ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble.Ensemble.extract_features">
 <span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble.extract_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble.extract_features" title="Link to this definition"></a></dt>
 <dd><p>Extract features from the trajectory using the specified featurization method.</p>
-<section id="id85">
-<h4>Parameters<a class="headerlink" href="#id85" title="Link to this heading"></a></h4>
+<section id="id87">
+<h4>Parameters<a class="headerlink" href="#id87" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>featurization<span class="classifier">str</span></dt><dd><p>The method to use for feature extraction. Supported options: ‘ca_dist’, ‘phi_psi’, ‘a_angle’, ‘tr_omega’ and ‘tr_phi’.</p>
 </dd>
@@ -1222,9 +1296,24 @@ The model will then be used to transform all ensembles.</p>
 </dd>
 </dl>
 </section>
-<section id="id86">
-<h4>Notes<a class="headerlink" href="#id86" title="Link to this heading"></a></h4>
+<section id="id88">
+<h4>Notes<a class="headerlink" href="#id88" title="Link to this heading"></a></h4>
 <p>This method extracts features from the trajectory using the specified featurization method and updates the ensemble’s features attribute.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble.Ensemble.get_chains_from_pdb">
+<span class="sig-name descname"><span class="pre">get_chains_from_pdb</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble.get_chains_from_pdb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble.get_chains_from_pdb" title="Link to this definition"></a></dt>
+<dd><p>Extracts unique chain IDs from a PDB file.</p>
+<section id="id89">
+<h4>Raises<a class="headerlink" href="#id89" title="Link to this heading"></a></h4>
+<dl class="simple">
+<dt>FileNotFoundError</dt><dd><p>If the specified PDB file does not exist.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If the specified file is not a PDB file.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 
@@ -1232,8 +1321,8 @@ The model will then be used to transform all ensembles.</p>
 <dt class="sig sig-object py" id="dpet.ensemble.Ensemble.get_features">
 <span class="sig-name descname"><span class="pre">get_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span></span></span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble.get_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble.get_features" title="Link to this definition"></a></dt>
 <dd><p>Get features from the trajectory using the specified featurization method.</p>
-<section id="id87">
-<h4>Parameters<a class="headerlink" href="#id87" title="Link to this heading"></a></h4>
+<section id="id90">
+<h4>Parameters<a class="headerlink" href="#id90" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>featurization<span class="classifier">str</span></dt><dd><p>The method to use for feature extraction. Supported options: ‘ca_dist’, ‘phi_psi’, ‘a_angle’, ‘tr_omega’, ‘tr_phi’, ‘rg’, ‘prolateness’, ‘asphericity’, ‘sasa’, ‘end_to_end’.</p>
 </dd>
@@ -1243,32 +1332,37 @@ The model will then be used to transform all ensembles.</p>
 </dd>
 </dl>
 </section>
-<section id="id88">
-<h4>Returns<a class="headerlink" href="#id88" title="Link to this heading"></a></h4>
+<section id="id91">
+<h4>Returns<a class="headerlink" href="#id91" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>features<span class="classifier">Sequence</span></dt><dd><p>The extracted features.</p>
 </dd>
 </dl>
 </section>
-<section id="id89">
-<h4>Notes<a class="headerlink" href="#id89" title="Link to this heading"></a></h4>
+<section id="id92">
+<h4>Notes<a class="headerlink" href="#id92" title="Link to this heading"></a></h4>
 <p>This method extracts features from the trajectory using the specified featurization method.</p>
 </section>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble.Ensemble.get_num_residues">
+<span class="sig-name descname"><span class="pre">get_num_residues</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble.get_num_residues"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble.get_num_residues" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="dpet.ensemble.Ensemble.load_trajectory">
 <span class="sig-name descname"><span class="pre">load_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble.load_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble.load_trajectory" title="Link to this definition"></a></dt>
 <dd><p>Load a trajectory for the ensemble.</p>
-<section id="id90">
-<h4>Parameters<a class="headerlink" href="#id90" title="Link to this heading"></a></h4>
+<section id="id93">
+<h4>Parameters<a class="headerlink" href="#id93" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>data_dir<span class="classifier">str</span></dt><dd><p>The directory where the trajectory data is located or where generated trajectory files will be saved.</p>
 </dd>
 </dl>
 </section>
-<section id="id91">
-<h4>Notes<a class="headerlink" href="#id91" title="Link to this heading"></a></h4>
+<section id="id94">
+<h4>Notes<a class="headerlink" href="#id94" title="Link to this heading"></a></h4>
 <p>This method loads a trajectory for the ensemble based on the specified data path. 
 It supports loading from various file formats such as PDB, DCD, and XTC.
 If the data path points to a directory, it searches for PDB files within the directory 
@@ -1285,8 +1379,8 @@ Additional processing steps include checking for coarse-grained models, selectin
 <dt class="sig sig-object py" id="dpet.ensemble.Ensemble.normalize_features">
 <span class="sig-name descname"><span class="pre">normalize_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble.normalize_features"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble.normalize_features" title="Link to this definition"></a></dt>
 <dd><p>Normalize the extracted features using the provided mean and standard deviation.</p>
-<section id="id92">
-<h4>Parameters<a class="headerlink" href="#id92" title="Link to this heading"></a></h4>
+<section id="id95">
+<h4>Parameters<a class="headerlink" href="#id95" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>mean<span class="classifier">float</span></dt><dd><p>The mean value used for normalization.</p>
 </dd>
@@ -1294,8 +1388,8 @@ Additional processing steps include checking for coarse-grained models, selectin
 </dd>
 </dl>
 </section>
-<section id="id93">
-<h4>Notes<a class="headerlink" href="#id93" title="Link to this heading"></a></h4>
+<section id="id96">
+<h4>Notes<a class="headerlink" href="#id96" title="Link to this heading"></a></h4>
 <p>This method normalizes the ensemble’s features using the provided mean and standard deviation.</p>
 </section>
 </dd></dl>
@@ -1304,15 +1398,15 @@ Additional processing steps include checking for coarse-grained models, selectin
 <dt class="sig sig-object py" id="dpet.ensemble.Ensemble.random_sample_trajectory">
 <span class="sig-name descname"><span class="pre">random_sample_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/ensemble.html#Ensemble.random_sample_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.ensemble.Ensemble.random_sample_trajectory" title="Link to this definition"></a></dt>
 <dd><p>Randomly sample frames from the original trajectory.</p>
-<section id="id94">
-<h4>Parameters<a class="headerlink" href="#id94" title="Link to this heading"></a></h4>
+<section id="id97">
+<h4>Parameters<a class="headerlink" href="#id97" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>sample_size<span class="classifier">int</span></dt><dd><p>The number of frames to sample from the original trajectory.</p>
 </dd>
 </dl>
 </section>
-<section id="id95">
-<h4>Notes<a class="headerlink" href="#id95" title="Link to this heading"></a></h4>
+<section id="id98">
+<h4>Notes<a class="headerlink" href="#id98" title="Link to this heading"></a></h4>
 <p>This method samples frames randomly from the original trajectory and updates the ensemble’s trajectory attribute.</p>
 </section>
 </dd></dl>
@@ -1336,8 +1430,8 @@ Additional processing steps include checking for coarse-grained models, selectin
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.alpha_angles">
 <span class="sig-name descname"><span class="pre">alpha_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.alpha_angles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.alpha_angles" title="Link to this definition"></a></dt>
 <dd><p>Plot the distribution of alpha angles.</p>
-<section id="id96">
-<h3>Parameters<a class="headerlink" href="#id96" title="Link to this heading"></a></h3>
+<section id="id99">
+<h3>Parameters<a class="headerlink" href="#id99" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bins<span class="classifier">int</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
 </dd>
@@ -1347,8 +1441,8 @@ Additional processing steps include checking for coarse-grained models, selectin
 </dd>
 </dl>
 </section>
-<section id="id97">
-<h3>Returns<a class="headerlink" href="#id97" title="Link to this heading"></a></h3>
+<section id="id100">
+<h3>Returns<a class="headerlink" href="#id100" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object containing the plot.</p>
 </dd>
@@ -1361,8 +1455,8 @@ Additional processing steps include checking for coarse-grained models, selectin
 <span class="sig-name descname"><span class="pre">asphericity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.asphericity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.asphericity" title="Link to this definition"></a></dt>
 <dd><p>Plot asphericity distribution in each ensemble.
 Asphericity is calculated based on the gyration tensor.</p>
-<section id="id98">
-<h3>Parameters<a class="headerlink" href="#id98" title="Link to this heading"></a></h3>
+<section id="id101">
+<h3>Parameters<a class="headerlink" href="#id101" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bins<span class="classifier">int, optional</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
 </dd>
@@ -1381,8 +1475,8 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id99">
-<h3>Returns<a class="headerlink" href="#id99" title="Link to this heading"></a></h3>
+<section id="id102">
+<h3>Returns<a class="headerlink" href="#id102" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object containing the plot.</p>
 </dd>
@@ -1394,8 +1488,8 @@ which corresponds to using the min a max value across all data.</p>
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.average_distance_maps">
 <span class="sig-name descname"><span class="pre">average_distance_maps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ticks_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.average_distance_maps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.average_distance_maps" title="Link to this definition"></a></dt>
 <dd><p>Plot the average distance maps for selected ensembles.</p>
-<section id="id100">
-<h3>Parameters<a class="headerlink" href="#id100" title="Link to this heading"></a></h3>
+<section id="id103">
+<h3>Parameters<a class="headerlink" href="#id103" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ticks_fontsize<span class="classifier">int, optional</span></dt><dd><p>Font size for tick labels on the plot axes. Default is 14.</p>
 </dd>
@@ -1413,15 +1507,15 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id101">
-<h3>Returns<a class="headerlink" href="#id101" title="Link to this heading"></a></h3>
+<section id="id104">
+<h3>Returns<a class="headerlink" href="#id104" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>List[plt.Axes]</dt><dd><p>Returns a 1D list of Axes objects representing the subplot grid.</p>
 </dd>
 </dl>
 </section>
-<section id="id102">
-<h3>Notes<a class="headerlink" href="#id102" title="Link to this heading"></a></h3>
+<section id="id105">
+<h3>Notes<a class="headerlink" href="#id105" title="Link to this heading"></a></h3>
 <p>This method plots the average distance maps for selected ensembles, where each distance map
 represents the average pairwise distances between residues in a protein structure.</p>
 </section>
@@ -1431,8 +1525,8 @@ represents the average pairwise distances between residues in a protein structur
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.ca_com_distances">
 <span class="sig-name descname"><span class="pre">ca_com_distances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.ca_com_distances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.ca_com_distances" title="Link to this definition"></a></dt>
 <dd><p>Plot the distance maps comparing the center of mass (COM) and alpha-carbon (CA) distances within each ensemble.</p>
-<section id="id103">
-<h3>Parameters:<a class="headerlink" href="#id103" title="Link to this heading"></a></h3>
+<section id="id106">
+<h3>Parameters:<a class="headerlink" href="#id106" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>min_sep<span class="classifier">int, optional</span></dt><dd><p>Minimum separation distance between atoms to consider. Default is 2.</p>
 </dd>
@@ -1448,18 +1542,73 @@ represents the average pairwise distances between residues in a protein structur
 </dd>
 </dl>
 </section>
-<section id="id104">
-<h3>Returns:<a class="headerlink" href="#id104" title="Link to this heading"></a></h3>
+<section id="id107">
+<h3>Returns:<a class="headerlink" href="#id107" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>List[plt.Axes]</dt><dd><p>A list containing Axes objects corresponding to the plots for CA and COM distances.</p>
 </dd>
 </dl>
 </section>
-<section id="id105">
-<h3>Notes:<a class="headerlink" href="#id105" title="Link to this heading"></a></h3>
+<section id="id108">
+<h3>Notes:<a class="headerlink" href="#id108" title="Link to this heading"></a></h3>
 <p>This method plots the average distance maps for the center of mass (COM) and alpha-carbon (CA) distances
 within each ensemble. It computes the distance matrices for COM and CA atoms and then calculates their
 mean values to generate the distance maps. The plots include color bars indicating the distance range.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.comparison_matrix">
+<span class="sig-name descname"><span class="pre">comparison_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_iters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Axes</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(6.0,</span> <span class="pre">5.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'viridis_r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">textcolors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('black',</span> <span class="pre">'white')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.comparison_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.comparison_matrix" title="Link to this definition"></a></dt>
+<dd><p>Generates and visualizes the pairwise comparison matrix for the ensembles.
+This function computes the comparison matrix using the specified score
+type and feature. It then visualizes the matrix using a heatmap.</p>
+<section id="id109">
+<h3>Parameters:<a class="headerlink" href="#id109" title="Link to this heading"></a></h3>
+<p>score, feature, featurization_params, bootstrap_iters, bootstrap_frac,
+bootstrap_replace, bins, random_seed, verbose:</p>
+<blockquote>
+<div><p>See the documentation of <cite>EnsembleAnalysis.comparison_scores</cite> for
+more information about these arguments.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ax: Union[None, plt.Axes], optional</dt><dd><p>Axes object where to plot the comparison heatmap. If <cite>None</cite> (the
+default value) is provided, a new Figure will be created.</p>
+</dd>
+<dt>figsize: Tuple[int], optional</dt><dd><p>The size of the figure for the heatmap. Default is (6.00, 5.0). Only
+takes effect if <cite>ax</cite> is not <cite>None</cite>.</p>
+</dd>
+<dt>dpi: int, optional</dt><dd><p>DPIs of the figure for the heatmap. Default is 100. Only takes
+effect if <cite>ax</cite> is not <cite>None</cite>.</p>
+</dd>
+<dt>std, cmap, title, cbar_label, textcolors:</dt><dd><p>See the documentation of <cite>dpet.visualization.plot_comparison_matrix</cite>
+for more information about these arguments.</p>
+</dd>
+</dl>
+</section>
+<section id="id110">
+<h3>Returns:<a class="headerlink" href="#id110" title="Link to this heading"></a></h3>
+<dl>
+<dt>results: dict</dt><dd><dl>
+<dt>A dictionary containing the following keys:</dt><dd><p><cite>ax</cite>: the Axes object with the comparison matrix heatmap.
+<cite>scores</cite>: comparison matrix. See <cite>EnsembleAnalysis.comparison_scores</cite></p>
+<blockquote>
+<div><p>for more information.</p>
+</div></blockquote>
+<p><cite>codes</cite>: codes of the ensembles that were compared.
+<cite>fig</cite>: Figure object, only returned when a new figure is created</p>
+<blockquote>
+<div><p>inside this function.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="id111">
+<h3>Notes:<a class="headerlink" href="#id111" title="Link to this heading"></a></h3>
+<p>The comparison matrix is annotated with the scores, and the axes are
+labeled with the ensemble labels.</p>
 </section>
 </dd></dl>
 
@@ -1469,30 +1618,37 @@ mean values to generate the distance maps. The plots include color bars indicati
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.dimenfix_scatter">
-<span class="sig-name descname"><span class="pre">dimenfix_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_by</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.dimenfix_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.dimenfix_scatter" title="Link to this definition"></a></dt>
-<dd><p>Plot the complete results for dimenfix method.</p>
-<section id="id106">
-<h3>Parameters<a class="headerlink" href="#id106" title="Link to this heading"></a></h3>
+<dt class="sig sig-object py" id="dpet.visualization.Visualization.dimensionality_reduction_scatter">
+<span class="sig-name descname"><span class="pre">dimensionality_reduction_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_by</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kde_by_ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.dimensionality_reduction_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.dimensionality_reduction_scatter" title="Link to this definition"></a></dt>
+<dd><p>Plot the results of dimensionality reduction using the method specified in the analysis.</p>
+<section id="id112">
+<h3>Parameters<a class="headerlink" href="#id112" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>color_by: str, optional</dt><dd><p>The feature extraction method used for coloring points in the scatter plot. Options are “rg”, “prolateness”, “asphericity”, “sasa”, and “end_to_end”. Default is “rg”.</p>
+<dt>color_by<span class="classifier">str, optional</span></dt><dd><p>The feature extraction method used for coloring points in the scatter plot. 
+Options are “rg”, “prolateness”, “asphericity”, “sasa”, and “end_to_end”. Default is “rg”.</p>
 </dd>
-<dt>save: bool, optional</dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
+<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
 </dd>
 <dt>ax<span class="classifier">Union[None, List[plt.Axes]], optional</span></dt><dd><p>A list of Axes objects to plot on. Default is None, which creates new axes.</p>
 </dd>
+<dt>kde_by_ensemble<span class="classifier">bool, optional</span></dt><dd><p>If True, the KDE plot will be generated for each ensemble separately. 
+If False, a single KDE plot will be generated for the concatenated ensembles. Default is False.</p>
+</dd>
 </dl>
 </section>
-<section id="id107">
-<h3>Returns<a class="headerlink" href="#id107" title="Link to this heading"></a></h3>
+<section id="id113">
+<h3>Returns<a class="headerlink" href="#id113" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>List[plt.Axes]</dt><dd><p>List containing Axes objects for the scatter plot of original labels, clustering labels, and feature-colored labels, respectively.</p>
 </dd>
 </dl>
 </section>
-<section id="id108">
-<h3>Notes<a class="headerlink" href="#id108" title="Link to this heading"></a></h3>
-<p>This analysis is only valid for dimenfix dimensionality reduction.</p>
+<section id="id114">
+<h3>Raises<a class="headerlink" href="#id114" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>NotImplementedError</dt><dd><p>If the dimensionality reduction method specified in the analysis is not supported.</p>
+</dd>
+</dl>
 </section>
 </dd></dl>
 
@@ -1500,8 +1656,8 @@ mean values to generate the distance maps. The plots include color bars indicati
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.end_to_end_distances">
 <span class="sig-name descname"><span class="pre">end_to_end_distances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rg_norm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.end_to_end_distances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.end_to_end_distances" title="Link to this definition"></a></dt>
 <dd><p>Plot end-to-end distance distributions.</p>
-<section id="id109">
-<h3>Parameters<a class="headerlink" href="#id109" title="Link to this heading"></a></h3>
+<section id="id115">
+<h3>Parameters<a class="headerlink" href="#id115" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>rg_norm: bool, optional</dt><dd><p>Normalize end-to-end distances on the average radius of gyration.</p>
 </dd>
@@ -1522,8 +1678,8 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id110">
-<h3>Returns<a class="headerlink" href="#id110" title="Link to this heading"></a></h3>
+<section id="id116">
+<h3>Returns<a class="headerlink" href="#id116" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object containing the plot.</p>
 </dd>
@@ -1535,8 +1691,8 @@ which corresponds to using the min a max value across all data.</p>
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.ensemble_sasa">
 <span class="sig-name descname"><span class="pre">ensemble_sasa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">medians</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Axes</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.ensemble_sasa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.ensemble_sasa" title="Link to this definition"></a></dt>
 <dd><p>Plot the distribution of SASA for each conformation within the ensembles.</p>
-<section id="id111">
-<h3>Parameters<a class="headerlink" href="#id111" title="Link to this heading"></a></h3>
+<section id="id117">
+<h3>Parameters<a class="headerlink" href="#id117" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bins<span class="classifier">int, optional</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
 </dd>
@@ -1555,8 +1711,8 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id112">
-<h3>Returns<a class="headerlink" href="#id112" title="Link to this heading"></a></h3>
+<section id="id118">
+<h3>Returns<a class="headerlink" href="#id118" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object containing the plot.</p>
 </dd>
@@ -1568,8 +1724,8 @@ which corresponds to using the min a max value across all data.</p>
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_1d_histograms">
 <span class="sig-name descname"><span class="pre">pca_1d_histograms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_1d_histograms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_1d_histograms" title="Link to this definition"></a></dt>
 <dd><p>Plot 1D histogram when the dimensionality reduction method is “pca” or “kpca”.</p>
-<section id="id113">
-<h3>Parameters<a class="headerlink" href="#id113" title="Link to this heading"></a></h3>
+<section id="id119">
+<h3>Parameters<a class="headerlink" href="#id119" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -1577,8 +1733,8 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id114">
-<h3>Returns<a class="headerlink" href="#id114" title="Link to this heading"></a></h3>
+<section id="id120">
+<h3>Returns<a class="headerlink" href="#id120" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>List[plt.Axes]</dt><dd><p>A list of plt.Axes objects representing the subplots created.</p>
 </dd>
@@ -1590,8 +1746,8 @@ which corresponds to using the min a max value across all data.</p>
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_2d_landscapes">
 <span class="sig-name descname"><span class="pre">pca_2d_landscapes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_2d_landscapes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_2d_landscapes" title="Link to this definition"></a></dt>
 <dd><p>Plot 2D landscapes when the dimensionality reduction method is “pca” or “kpca”.</p>
-<section id="id115">
-<h3>Parameters<a class="headerlink" href="#id115" title="Link to this heading"></a></h3>
+<section id="id121">
+<h3>Parameters<a class="headerlink" href="#id121" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -1599,8 +1755,8 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id116">
-<h3>Returns<a class="headerlink" href="#id116" title="Link to this heading"></a></h3>
+<section id="id122">
+<h3>Returns<a class="headerlink" href="#id122" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>List[plt.Axes]</dt><dd><p>A list of plt.Axes objects representing the subplots created.</p>
 </dd>
@@ -1613,8 +1769,8 @@ which corresponds to using the min a max value across all data.</p>
 <span class="sig-name descname"><span class="pre">pca_cumulative_explained_variance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Axes</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_cumulative_explained_variance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_cumulative_explained_variance" title="Link to this definition"></a></dt>
 <dd><p>Plot the cumulative variance. Only applicable when the
 dimensionality reduction method is “pca”.</p>
-<section id="id117">
-<h3>Parameters<a class="headerlink" href="#id117" title="Link to this heading"></a></h3>
+<section id="id123">
+<h3>Parameters<a class="headerlink" href="#id123" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -1622,8 +1778,8 @@ dimensionality reduction method is “pca”.</p>
 </dd>
 </dl>
 </section>
-<section id="id118">
-<h3>Returns<a class="headerlink" href="#id118" title="Link to this heading"></a></h3>
+<section id="id124">
+<h3>Returns<a class="headerlink" href="#id124" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object for the cumulative explained variance plot.</p>
 </dd>
@@ -1635,8 +1791,8 @@ dimensionality reduction method is “pca”.</p>
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.pca_residue_correlation">
 <span class="sig-name descname"><span class="pre">pca_residue_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sel_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_residue_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_residue_correlation" title="Link to this definition"></a></dt>
 <dd><p>Plot the correlation between residues based on PCA weights.</p>
-<section id="id119">
-<h3>Parameters<a class="headerlink" href="#id119" title="Link to this heading"></a></h3>
+<section id="id125">
+<h3>Parameters<a class="headerlink" href="#id125" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>sel_dims<span class="classifier">List[int]</span></dt><dd><p>A list of indices specifying the PCA dimensions to include in the plot.</p>
 </dd>
@@ -1646,15 +1802,15 @@ dimensionality reduction method is “pca”.</p>
 </dd>
 </dl>
 </section>
-<section id="id120">
-<h3>Returns<a class="headerlink" href="#id120" title="Link to this heading"></a></h3>
+<section id="id126">
+<h3>Returns<a class="headerlink" href="#id126" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>List[plt.Axes]</dt><dd><p>A list of plt.Axes objects representing the subplots created.</p>
 </dd>
 </dl>
 </section>
-<section id="id121">
-<h3>Notes<a class="headerlink" href="#id121" title="Link to this heading"></a></h3>
+<section id="id127">
+<h3>Notes<a class="headerlink" href="#id127" title="Link to this heading"></a></h3>
 <p>This method generates a correlation plot showing the weights of pairwise residue distances
 for selected PCA dimensions. The plot visualizes the correlation between residues based on
 the PCA weights.</p>
@@ -1667,8 +1823,8 @@ the PCA weights.</p>
 <span class="sig-name descname"><span class="pre">pca_rg_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.pca_rg_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.pca_rg_correlation" title="Link to this definition"></a></dt>
 <dd><p>Examine and plot the correlation between PC dimension 1 and the amount of Rg.
 Typically high correlation can be detected here.</p>
-<section id="id122">
-<h3>Parameters<a class="headerlink" href="#id122" title="Link to this heading"></a></h3>
+<section id="id128">
+<h3>Parameters<a class="headerlink" href="#id128" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -1676,8 +1832,8 @@ Typically high correlation can be detected here.</p>
 </dd>
 </dl>
 </section>
-<section id="id123">
-<h3>Returns<a class="headerlink" href="#id123" title="Link to this heading"></a></h3>
+<section id="id129">
+<h3>Returns<a class="headerlink" href="#id129" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>List[plt.Axes]</dt><dd><p>A list of plt.Axes objects representing the subplots created.</p>
 </dd>
@@ -1689,8 +1845,8 @@ Typically high correlation can be detected here.</p>
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.per_residue_mean_sasa">
 <span class="sig-name descname"><span class="pre">per_residue_mean_sasa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(15,</span> <span class="pre">5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Axes</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.per_residue_mean_sasa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.per_residue_mean_sasa" title="Link to this definition"></a></dt>
 <dd><p>Plot the average solvent-accessible surface area (SASA) for each residue among all conformations in an ensemble.</p>
-<section id="id124">
-<h3>Parameters<a class="headerlink" href="#id124" title="Link to this heading"></a></h3>
+<section id="id130">
+<h3>Parameters<a class="headerlink" href="#id130" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>figsize: Tuple[int, int], optional</dt><dd><p>Tuple specifying the size of the figure. Default is (15, 5).</p>
 </dd>
@@ -1702,8 +1858,8 @@ Typically high correlation can be detected here.</p>
 </dd>
 </dl>
 </section>
-<section id="id125">
-<h3>Returns<a class="headerlink" href="#id125" title="Link to this heading"></a></h3>
+<section id="id131">
+<h3>Returns<a class="headerlink" href="#id131" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>Axes object containing the plot.</p>
 </dd>
@@ -1716,8 +1872,8 @@ Typically high correlation can be detected here.</p>
 <span class="sig-name descname"><span class="pre">prolateness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.prolateness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.prolateness" title="Link to this definition"></a></dt>
 <dd><p>Plot prolateness distribution in each ensemble.
 Prolateness is calculated based on the gyration tensor.</p>
-<section id="id126">
-<h3>Parameters<a class="headerlink" href="#id126" title="Link to this heading"></a></h3>
+<section id="id132">
+<h3>Parameters<a class="headerlink" href="#id132" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bins<span class="classifier">int, optional</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
 </dd>
@@ -1736,8 +1892,8 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id127">
-<h3>Returns<a class="headerlink" href="#id127" title="Link to this heading"></a></h3>
+<section id="id133">
+<h3>Returns<a class="headerlink" href="#id133" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object containing the plot.</p>
 </dd>
@@ -1749,8 +1905,8 @@ which corresponds to using the min a max value across all data.</p>
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.radius_of_gyration">
 <span class="sig-name descname"><span class="pre">radius_of_gyration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_hist_ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">violin_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.radius_of_gyration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.radius_of_gyration" title="Link to this definition"></a></dt>
 <dd><p>Plot the distribution of the radius of gyration (Rg) within each ensemble.</p>
-<section id="id128">
-<h3>Parameters<a class="headerlink" href="#id128" title="Link to this heading"></a></h3>
+<section id="id134">
+<h3>Parameters<a class="headerlink" href="#id134" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>bins<span class="classifier">int, optional</span></dt><dd><p>The number of bins for the histogram. Default is 50.</p>
 </dd>
@@ -1773,15 +1929,15 @@ which corresponds to using the min and max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id129">
-<h3>Returns<a class="headerlink" href="#id129" title="Link to this heading"></a></h3>
+<section id="id135">
+<h3>Returns<a class="headerlink" href="#id135" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>Union[plt.Axes, List[plt.Axes]]</dt><dd><p>Returns a single Axes object or a list of Axes objects containing the plot(s).</p>
 </dd>
 </dl>
 </section>
-<section id="id130">
-<h3>Notes<a class="headerlink" href="#id130" title="Link to this heading"></a></h3>
+<section id="id136">
+<h3>Notes<a class="headerlink" href="#id136" title="Link to this heading"></a></h3>
 <p>This method plots the distribution of the radius of gyration (Rg) within each ensemble in the analysis.</p>
 <p>The Rg values are binned according to the specified number of bins (<cite>bins</cite>) and range (<cite>hist_range</cite>) and 
 displayed as histograms. Additionally, dashed lines representing the mean and median Rg values are overlaid
@@ -1795,8 +1951,8 @@ on each histogram.</p>
 <dd><p>Ramachandran plot. If two_d_hist=True it returns a 2D histogram 
 for each ensemble. If two_d_hist=False it returns a simple scatter plot 
 for all ensembles in one plot.</p>
-<section id="id131">
-<h3>Parameters<a class="headerlink" href="#id131" title="Link to this heading"></a></h3>
+<section id="id137">
+<h3>Parameters<a class="headerlink" href="#id137" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>two_d_hist<span class="classifier">bool, optional</span></dt><dd><p>If True, it returns a 2D histogram for each ensemble. Default is True.</p>
 </dd>
@@ -1808,8 +1964,8 @@ for all ensembles in one plot.</p>
 </dd>
 </dl>
 </section>
-<section id="id132">
-<h3>Returns<a class="headerlink" href="#id132" title="Link to this heading"></a></h3>
+<section id="id138">
+<h3>Returns<a class="headerlink" href="#id138" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>Union[List[plt.Axes], plt.Axes]</dt><dd><p>If two_d_hist=True, returns a list of Axes objects representing the subplot grid for each ensemble. 
 If two_d_hist=False, returns a single Axes object representing the scatter plot for all ensembles.</p>
@@ -1822,8 +1978,8 @@ If two_d_hist=False, returns a single Axes object representing the scatter plot 
 <dt class="sig sig-object py" id="dpet.visualization.Visualization.relative_helix_content">
 <span class="sig-name descname"><span class="pre">relative_helix_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.relative_helix_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.relative_helix_content" title="Link to this definition"></a></dt>
 <dd><p>Plot the relative helix content in each ensemble for each residue.</p>
-<section id="id133">
-<h3>Parameters<a class="headerlink" href="#id133" title="Link to this heading"></a></h3>
+<section id="id139">
+<h3>Parameters<a class="headerlink" href="#id139" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -1831,8 +1987,8 @@ If two_d_hist=False, returns a single Axes object representing the scatter plot 
 </dd>
 </dl>
 </section>
-<section id="id134">
-<h3>Returns<a class="headerlink" href="#id134" title="Link to this heading"></a></h3>
+<section id="id140">
+<h3>Returns<a class="headerlink" href="#id140" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object containing the plot.</p>
 </dd>
@@ -1845,8 +2001,8 @@ If two_d_hist=False, returns a single Axes object representing the scatter plot 
 <span class="sig-name descname"><span class="pre">rg_vs_asphericity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.rg_vs_asphericity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.rg_vs_asphericity" title="Link to this definition"></a></dt>
 <dd><p>Plot the Rg versus Asphericity and get the pearson correlation coefficient to evaluate 
 the correlation between Rg and Asphericity.</p>
-<section id="id135">
-<h3>Parameters<a class="headerlink" href="#id135" title="Link to this heading"></a></h3>
+<section id="id141">
+<h3>Parameters<a class="headerlink" href="#id141" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -1854,8 +2010,8 @@ the correlation between Rg and Asphericity.</p>
 </dd>
 </dl>
 </section>
-<section id="id136">
-<h3>Returns<a class="headerlink" href="#id136" title="Link to this heading"></a></h3>
+<section id="id142">
+<h3>Returns<a class="headerlink" href="#id142" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object containing the plot.</p>
 </dd>
@@ -1868,8 +2024,8 @@ the correlation between Rg and Asphericity.</p>
 <span class="sig-name descname"><span class="pre">rg_vs_prolateness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Axes</span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.rg_vs_prolateness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.rg_vs_prolateness" title="Link to this definition"></a></dt>
 <dd><p>Plot the Rg versus Prolateness and get the Pearson correlation coefficient to evaluate 
 the correlation between Rg and Prolateness.</p>
-<section id="id137">
-<h3>Parameters<a class="headerlink" href="#id137" title="Link to this heading"></a></h3>
+<section id="id143">
+<h3>Parameters<a class="headerlink" href="#id143" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>save: bool, optional</dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
 </dd>
@@ -1877,8 +2033,8 @@ the correlation between Rg and Prolateness.</p>
 </dd>
 </dl>
 </section>
-<section id="id138">
-<h3>Returns<a class="headerlink" href="#id138" title="Link to this heading"></a></h3>
+<section id="id144">
+<h3>Returns<a class="headerlink" href="#id144" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The Axes object containing the plot.</p>
 </dd>
@@ -1894,8 +2050,8 @@ the correlation between Rg and Prolateness.</p>
 the circular variance of the Ramachandran angles φ and ψ for each residue in the ensemble.
 The score ranges from 0 for identical dihedral angles for all conformers at the residue i to 1 for a 
 uniform distribution of dihedral angles at the residue i.</p>
-<section id="id139">
-<h3>Parameters<a class="headerlink" href="#id139" title="Link to this heading"></a></h3>
+<section id="id145">
+<h3>Parameters<a class="headerlink" href="#id145" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>pointer: List[int], optional</dt><dd><p>A list of desired residues. Vertical dashed lines will be added to point to these residues. Default is None.</p>
 </dd>
@@ -1907,8 +2063,8 @@ uniform distribution of dihedral angles at the residue i.</p>
 </dd>
 </dl>
 </section>
-<section id="id140">
-<h3>Returns<a class="headerlink" href="#id140" title="Link to this heading"></a></h3>
+<section id="id146">
+<h3>Returns<a class="headerlink" href="#id146" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The matplotlib Axes object containing the plot.</p>
 </dd>
@@ -1922,8 +2078,8 @@ uniform distribution of dihedral angles at the residue i.</p>
 <dd><p>Generate a plot of the site-specific order parameter.</p>
 <p>This plot shows the site-specific order parameter, which abstracts from local chain flexibility.
 The parameter is still site-specific, as orientation correlations in IDRs and IDPs decrease with increasing sequence distance.</p>
-<section id="id141">
-<h3>Parameters<a class="headerlink" href="#id141" title="Link to this heading"></a></h3>
+<section id="id147">
+<h3>Parameters<a class="headerlink" href="#id147" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>pointer: List[int], optional</dt><dd><p>A list of desired residues. Vertical dashed lines will be added to point to these residues. Default is None.</p>
 </dd>
@@ -1935,8 +2091,8 @@ The parameter is still site-specific, as orientation correlations in IDRs and ID
 </dd>
 </dl>
 </section>
-<section id="id142">
-<h3>Returns<a class="headerlink" href="#id142" title="Link to this heading"></a></h3>
+<section id="id148">
+<h3>Returns<a class="headerlink" href="#id148" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>The matplotlib Axes object containing the plot.</p>
 </dd>
@@ -1944,74 +2100,61 @@ The parameter is still site-specific, as orientation correlations in IDRs and ID
 </section>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.tsne_scatter">
-<span class="sig-name descname"><span class="pre">tsne_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_by</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kde_by_ensemble</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.tsne_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.tsne_scatter" title="Link to this definition"></a></dt>
-<dd><p>Plot the results of t-SNE analysis.</p>
-<p>Three scatter plots will be generated based on original, clustering, and feature-colored points. 
-One KDE density plot will also be generated to show the most populated areas in the reduced dimension.</p>
-<section id="id143">
-<h3>Parameters<a class="headerlink" href="#id143" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>color_by: str, optional</dt><dd><p>The feature extraction method used for coloring points in the scatter plot. Options are “rg”, “prolateness”, “asphericity”, “sasa”, and “end_to_end”. Default is “rg”.</p>
-</dd>
-<dt>kde_by_ensemble: bool, optional</dt><dd><p>If True, the KDE plot will be generated for each ensemble separately. If False, a single KDE plot will be generated for the concatenated ensembles. Default is False.</p>
-</dd>
-<dt>save: bool, optional</dt><dd><p>If True, the plot will be saved in the data directory. Default is False.</p>
-</dd>
-<dt>ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]], optional</dt><dd><p>The axes on which to plot. If None, new axes will be created. Default is None.</p>
-</dd>
-</dl>
-</section>
-<section id="id144">
-<h3>Returns<a class="headerlink" href="#id144" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>List[plt.Axes]</dt><dd><p>List containing Axes objects for the scatter plot of original labels, clustering labels, feature-colored labels, and the KDE density plot, respectively.</p>
-</dd>
-</dl>
-</section>
-<section id="id145">
-<h3>Notes<a class="headerlink" href="#id145" title="Link to this heading"></a></h3>
-<p>This analysis is only valid for t-SNE dimensionality reduction.</p>
-</section>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="dpet.visualization.Visualization.umap_scatter">
-<span class="sig-name descname"><span class="pre">umap_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_by</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/visualization.html#Visualization.umap_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.Visualization.umap_scatter" title="Link to this definition"></a></dt>
-<dd><p>Generate a scatter plot of the transformed data using UMAP.</p>
-<section id="id146">
-<h3>Parameters<a class="headerlink" href="#id146" title="Link to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.visualization.plot_comparison_matrix">
+<span class="sig-prename descclassname"><span class="pre">dpet.visualization.</span></span><span class="sig-name descname"><span class="pre">plot_comparison_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'viridis_r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'New</span> <span class="pre">Comparison'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'score'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">textcolors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('black',</span> <span class="pre">'white')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#plot_comparison_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.plot_comparison_matrix" title="Link to this definition"></a></dt>
+<dd><p>Plot a matrix with all vs all comparison scores as a heatmap.</p>
+<section id="id149">
+<h3>Parameters<a class="headerlink" href="#id149" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>color_by: str, optional</dt><dd><p>The feature extraction method used for coloring points in the scatter plot. Options are “rg”, “prolateness”, “asphericity”, “sasa”, and “end_to_end”. Default is “rg”.</p>
+<dt>ax: plt.Axes</dt><dd><p>Axes object where the heatmap should be created.</p>
 </dd>
-<dt>save<span class="classifier">bool, optional</span></dt><dd><p>If True, the plot will be saved as an image file. Default is False.</p>
+<dt>scores: np.ndarray</dt><dd><p>NumPy array with shape (M, M, B) containing the comparison scores for M
+ensembles and B bootstrap iterations. See the documentation for the
+output of <cite>EnsembleAnalysis.comparison_scores</cite> for more information.</p>
 </dd>
-<dt>ax<span class="classifier">Union[None, List[plt.Axes]], optional</span></dt><dd><p>A list of Axes objects to plot on. Default is None, which creates new axes.</p>
+<dt>codes: List[str]</dt><dd><p>List of strings with the codes of the ensembles.</p>
+</dd>
+<dt>std: bool, optional</dt><dd><p>Show the standard deviation of the comparison scores over B bootstrap
+iterations for each of each score in the M x M matrix. Only takes effect
+if B &gt;= 2. Default is <cite>False</cite>.</p>
+</dd>
+<dt>cmap: str, optional</dt><dd><p>Matplotlib colormap name to use in the heatmap.</p>
+</dd>
+<dt>title: str, optional</dt><dd><p>Title of the heatmap.</p>
+</dd>
+<dt>cbar_label: str, optional</dt><dd><p>Label of the colorbar.</p>
+</dd>
+<dt>textcolors: Union[str, tuple], optional</dt><dd><p>Color of the text for each cell of the heatmap, specified as a string.
+By providing a tuple with two elements, the two colors will be applied
+to cells with color intensity above/below a certain threshold, so that
+ligher text can be plotted in darker cells and darker text can be
+plotted in lighter cells.</p>
 </dd>
 </dl>
 </section>
-<section id="id147">
-<h3>Returns<a class="headerlink" href="#id147" title="Link to this heading"></a></h3>
+<section id="id150">
+<h3>Returns<a class="headerlink" href="#id150" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>List[plt.Axes]</dt><dd><p>The Axes objects for the scatter plot.</p>
+<dt>ax: plt.Axes</dt><dd><p>The same updated Axes object from the input.</p>
 </dd>
 </dl>
 </section>
-<section id="id148">
-<h3>Notes<a class="headerlink" href="#id148" title="Link to this heading"></a></h3>
-<p>This method creates a scatter plot of the transformed data using UMAP.</p>
+<section id="id151">
+<h3>Notes<a class="headerlink" href="#id151" title="Link to this heading"></a></h3>
+<p>The comparison matrix is annotated with the scores, and the axes are labeled
+with the ensemble labels.</p>
 </section>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dpet.visualization.plot_histogram">
 <span class="sig-prename descclassname"><span class="pre">dpet.visualization.</span></span><span class="sig-name descname"><span class="pre">plot_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Histogram'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Density'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#plot_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.plot_histogram" title="Link to this definition"></a></dt>
 <dd><p>Plot an histogram for different features.</p>
-<section id="id149">
-<h3>Parameters<a class="headerlink" href="#id149" title="Link to this heading"></a></h3>
+<section id="id152">
+<h3>Parameters<a class="headerlink" href="#id152" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ax: plt.Axes</dt><dd><p>Matplotlib axis object where the histograms will be for plotted.</p>
 </dd>
@@ -2032,8 +2175,8 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id150">
-<h3>Returns<a class="headerlink" href="#id150" title="Link to this heading"></a></h3>
+<section id="id153">
+<h3>Returns<a class="headerlink" href="#id153" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>Axis objects for the histogram plot of original labels.</p>
 </dd>
@@ -2045,8 +2188,8 @@ which corresponds to using the min a max value across all data.</p>
 <dt class="sig sig-object py" id="dpet.visualization.plot_violins">
 <span class="sig-prename descclassname"><span class="pre">dpet.visualization.</span></span><span class="sig-name descname"><span class="pre">plot_violins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">means</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">median</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Histogram'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'x'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dpet/visualization.html#plot_violins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.visualization.plot_violins" title="Link to this definition"></a></dt>
 <dd><p>Make a violin plot.</p>
-<section id="id151">
-<h3>Parameters<a class="headerlink" href="#id151" title="Link to this heading"></a></h3>
+<section id="id154">
+<h3>Parameters<a class="headerlink" href="#id154" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>ax: plt.Axes</dt><dd><p>Matplotlib axis object where the histograms will be for plotted.</p>
 </dd>
@@ -2064,8 +2207,8 @@ which corresponds to using the min a max value across all data.</p>
 </dd>
 </dl>
 </section>
-<section id="id152">
-<h3>Returns<a class="headerlink" href="#id152" title="Link to this heading"></a></h3>
+<section id="id155">
+<h3>Returns<a class="headerlink" href="#id155" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>plt.Axes</dt><dd><p>Axis objects for the histogram plot of original labels.</p>
 </dd>

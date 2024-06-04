@@ -45,6 +45,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">EnsembleTools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo.html">Demo</a></li>
 </ul>
 
         </div>
@@ -74,7 +75,7 @@
   <h1>Source code for dpet.ensemble</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">mdtraj</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -104,8 +105,8 @@
 <span class="sd">    database : str, optional</span>
 <span class="sd">        The database from which to download the ensemble. Options are &#39;ped&#39; and &#39;atlas&#39;. Default is None.</span>
 <span class="sd">        </span>
-<span class="sd">    chain_id : int, optional</span>
-<span class="sd">        MDtraj chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.</span>
+<span class="sd">    chain_id : str, optional</span>
+<span class="sd">        Chain identifier used to select a single chain to analyze in case multiple chains are loaded. Default is None.</span>
 
 <span class="sd">    residue_range : Tuple, optional</span>
 <span class="sd">        A tuple indicating the start and end of the residue range (inclusive), using 1-based indexing. Default is None.</span>
@@ -114,10 +115,9 @@
 <span class="sd">    -----</span>
 <span class="sd">    - If the database is &#39;atlas&#39;, the ensemble code should be provided as a PDB ID with a chain identifier separated by an underscore. Example: &#39;3a1g_B&#39;.</span>
 <span class="sd">    - If the database is &#39;ped&#39;, the ensemble code should be in the PED ID format, which consists of a string starting with &#39;PED&#39; followed by a numeric identifier, and &#39;e&#39; followed by another numeric identifier. Example: &#39;PED00423e001&#39;.</span>
-<span class="sd">    - &#39;chain_id&#39; is always assigned in order to the actual chains. For example, chains A, C, D would have &#39;chain_id&#39; 0, 1, 2 respectively.</span>
 <span class="sd">    - The `residue_range` parameter uses 1-based indexing, meaning the first residue is indexed as 1.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">top_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">residue_range</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">top_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">residue_range</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">top_path</span> <span class="o">=</span> <span class="n">top_path</span>
@@ -153,11 +153,13 @@
                 <span class="sa">f</span><span class="s2">&quot;Data file or directory for ensemble </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2"> doesn&#39;t exist: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdb&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_get_chains_from_pdb</span><span class="p">()</span>
+            <span class="n">chain_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_chains_from_pdb</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2"> chain ids: </span><span class="si">{</span><span class="n">chain_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating trajectory for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">)</span>
 
-            <span class="n">chain_selected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_chain</span><span class="p">()</span>
+            <span class="n">chain_selected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_chain</span><span class="p">(</span><span class="n">chain_ids</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">chain_selected</span><span class="p">:</span>
                 <span class="n">traj_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -386,9 +388,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span></div>
 
     
-    <span class="k">def</span> <span class="nf">_select_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_select_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Select a specific chain from the trajectory based on the chain_id.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chain_ids: List[str]</span>
+<span class="sd">            A list of chain IDs available in the trajectory.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -398,10 +405,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_chains</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="n">chain_id_to_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">chain_id</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">chain_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_ids</span><span class="p">)}</span>
+        <span class="n">chain_id_to_index</span> <span class="o">=</span> <span class="p">{</span><span class="n">chain_id</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">chain_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chain_ids</span><span class="p">)}</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiple chains found in the ensemble </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">. Please specify a chain_id.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multiple chains found in the ensemble </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">. Please specify a chain_id from </span><span class="si">{</span><span class="n">chain_ids</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="n">chain_id_upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_id</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
@@ -444,23 +451,45 @@
         <span class="n">atom_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;residue &gt;= </span><span class="si">{</span><span class="n">start_residue</span><span class="si">}</span><span class="s1"> and residue &lt;= </span><span class="si">{</span><span class="n">end_residue</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">atom_slice</span><span class="p">(</span><span class="n">atom_indices</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected residues from ensemble </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="Ensemble.get_num_residues">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble.Ensemble.get_num_residues">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_num_residues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_residues</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_chains_from_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Ensemble.get_chains_from_pdb">
+<a class="viewcode-back" href="../../dpet.html#dpet.ensemble.Ensemble.get_chains_from_pdb">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_chains_from_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extracts unique chain IDs from a PDB file.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        FileNotFoundError</span>
+<span class="sd">            If the specified PDB file does not exist.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the specified file is not a PDB file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdb&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="si">}</span><span class="s2"> is not a PDB file.&quot;</span><span class="p">)</span>
+        
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">chain_ids</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Use a list to preserve the order</span>
+        <span class="n">chain_ids</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Use a list to preserve the order</span>
 
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ATOM&#39;</span><span class="p">):</span>
                 <span class="n">chain_id</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">21</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">chain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_ids</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">chain_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">chain_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chain_ids</span><span class="p">:</span>
+                    <span class="n">chain_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_id</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="s2"> chain ids: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">chain_ids</span></div>
+</div>
 
 </pre></div>
 

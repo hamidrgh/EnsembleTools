@@ -51,6 +51,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo</a></li>
 </ul>
 
         </div>
@@ -150,6 +151,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="dpet.html#module-dpet.ensemble_analysis">dpet.ensemble_analysis module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dpet.html#dpet.ensemble_analysis.EnsembleAnalysis"><code class="docutils literal notranslate"><span class="pre">EnsembleAnalysis</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores"><code class="docutils literal notranslate"><span class="pre">EnsembleAnalysis.comparison_scores()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.ens_codes"><code class="docutils literal notranslate"><span class="pre">EnsembleAnalysis.ens_codes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline"><code class="docutils literal notranslate"><span class="pre">EnsembleAnalysis.execute_pipeline()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained"><code class="docutils literal notranslate"><span class="pre">EnsembleAnalysis.exists_coarse_grained()</span></code></a></li>
@@ -169,7 +171,9 @@
 <li class="toctree-l2"><a class="reference internal" href="dpet.html#module-dpet.ensemble">dpet.ensemble module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dpet.html#dpet.ensemble.Ensemble"><code class="docutils literal notranslate"><span class="pre">Ensemble</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble.Ensemble.extract_features"><code class="docutils literal notranslate"><span class="pre">Ensemble.extract_features()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble.Ensemble.get_chains_from_pdb"><code class="docutils literal notranslate"><span class="pre">Ensemble.get_chains_from_pdb()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble.Ensemble.get_features"><code class="docutils literal notranslate"><span class="pre">Ensemble.get_features()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble.Ensemble.get_num_residues"><code class="docutils literal notranslate"><span class="pre">Ensemble.get_num_residues()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble.Ensemble.load_trajectory"><code class="docutils literal notranslate"><span class="pre">Ensemble.load_trajectory()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble.Ensemble.normalize_features"><code class="docutils literal notranslate"><span class="pre">Ensemble.normalize_features()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.ensemble.Ensemble.random_sample_trajectory"><code class="docutils literal notranslate"><span class="pre">Ensemble.random_sample_trajectory()</span></code></a></li>
@@ -183,8 +187,9 @@
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.asphericity"><code class="docutils literal notranslate"><span class="pre">Visualization.asphericity()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.average_distance_maps"><code class="docutils literal notranslate"><span class="pre">Visualization.average_distance_maps()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.ca_com_distances"><code class="docutils literal notranslate"><span class="pre">Visualization.ca_com_distances()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.comparison_matrix"><code class="docutils literal notranslate"><span class="pre">Visualization.comparison_matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.contact_prob_maps"><code class="docutils literal notranslate"><span class="pre">Visualization.contact_prob_maps()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.dimenfix_scatter"><code class="docutils literal notranslate"><span class="pre">Visualization.dimenfix_scatter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.dimensionality_reduction_scatter"><code class="docutils literal notranslate"><span class="pre">Visualization.dimensionality_reduction_scatter()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.end_to_end_distances"><code class="docutils literal notranslate"><span class="pre">Visualization.end_to_end_distances()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.ensemble_sasa"><code class="docutils literal notranslate"><span class="pre">Visualization.ensemble_sasa()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.pca_1d_histograms"><code class="docutils literal notranslate"><span class="pre">Visualization.pca_1d_histograms()</span></code></a></li>
@@ -201,10 +206,9 @@
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.rg_vs_prolateness"><code class="docutils literal notranslate"><span class="pre">Visualization.rg_vs_prolateness()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.ss_flexibility_parameter"><code class="docutils literal notranslate"><span class="pre">Visualization.ss_flexibility_parameter()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.ss_order_parameter"><code class="docutils literal notranslate"><span class="pre">Visualization.ss_order_parameter()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.tsne_scatter"><code class="docutils literal notranslate"><span class="pre">Visualization.tsne_scatter()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dpet.html#dpet.visualization.Visualization.umap_scatter"><code class="docutils literal notranslate"><span class="pre">Visualization.umap_scatter()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="dpet.html#dpet.visualization.plot_comparison_matrix"><code class="docutils literal notranslate"><span class="pre">plot_comparison_matrix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dpet.html#dpet.visualization.plot_histogram"><code class="docutils literal notranslate"><span class="pre">plot_histogram()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="dpet.html#dpet.visualization.plot_violins"><code class="docutils literal notranslate"><span class="pre">plot_violins()</span></code></a></li>
 </ul>

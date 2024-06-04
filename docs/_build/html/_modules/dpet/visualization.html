@@ -45,6 +45,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">EnsembleTools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo.html">Demo</a></li>
 </ul>
 
         </div>
@@ -210,6 +211,92 @@
     <span class="k">return</span> <span class="n">ax</span></div>
 
 
+<div class="viewcode-block" id="plot_comparison_matrix">
+<a class="viewcode-back" href="../../dpet.html#dpet.visualization.plot_comparison_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_comparison_matrix</span><span class="p">(</span>
+        <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">codes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">std</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;New Comparison&quot;</span><span class="p">,</span>
+        <span class="n">cbar_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;score&quot;</span><span class="p">,</span>
+        <span class="n">textcolors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot a matrix with all vs all comparison scores as a heatmap.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ax: plt.Axes</span>
+<span class="sd">        Axes object where the heatmap should be created.</span>
+<span class="sd">    scores: np.ndarray</span>
+<span class="sd">        NumPy array with shape (M, M, B) containing the comparison scores for M</span>
+<span class="sd">        ensembles and B bootstrap iterations. See the documentation for the</span>
+<span class="sd">        output of `EnsembleAnalysis.comparison_scores` for more information.</span>
+<span class="sd">    codes: List[str]</span>
+<span class="sd">        List of strings with the codes of the ensembles.</span>
+<span class="sd">    std: bool, optional</span>
+<span class="sd">        Show the standard deviation of the comparison scores over B bootstrap</span>
+<span class="sd">        iterations for each of each score in the M x M matrix. Only takes effect</span>
+<span class="sd">        if B &gt;= 2. Default is `False`.</span>
+<span class="sd">    cmap: str, optional</span>
+<span class="sd">        Matplotlib colormap name to use in the heatmap.</span>
+<span class="sd">    title: str, optional</span>
+<span class="sd">        Title of the heatmap.</span>
+<span class="sd">    cbar_label: str, optional</span>
+<span class="sd">        Label of the colorbar.</span>
+<span class="sd">    textcolors: Union[str, tuple], optional</span>
+<span class="sd">        Color of the text for each cell of the heatmap, specified as a string.</span>
+<span class="sd">        By providing a tuple with two elements, the two colors will be applied</span>
+<span class="sd">        to cells with color intensity above/below a certain threshold, so that</span>
+<span class="sd">        ligher text can be plotted in darker cells and darker text can be</span>
+<span class="sd">        plotted in lighter cells.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ax: plt.Axes</span>
+<span class="sd">        The same updated Axes object from the input.</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The comparison matrix is annotated with the scores, and the axes are labeled</span>
+<span class="sd">    with the ensemble labels.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scores_mean</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scores</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">std</span><span class="p">:</span>
+        <span class="c1"># More than 1 bootstrap iteration, can calculate std.</span>
+        <span class="n">scores_err</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># One or less bootstrap iterations.</span>
+        <span class="n">scores_err</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">scores_mean</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">cbar_label</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">codes</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span>
+
+    <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.75</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">textcolors</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">color_ij</span> <span class="o">=</span> <span class="n">textcolors</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">color_ij</span> <span class="o">=</span> <span class="n">textcolors</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">scores_mean</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)]</span>
+            <span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color_ij</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">scores_err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">label_ij</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scores_mean</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">scores_err</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">label_ij</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scores_mean</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">label_ij</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
 
 <div class="viewcode-block" id="Visualization">
 <a class="viewcode-back" href="../../dpet.html#dpet.visualization.Visualization">[docs]</a>
@@ -226,9 +313,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">plot_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">PLOT_DIR</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Visualization.tsne_scatter">
-<a class="viewcode-back" href="../../dpet.html#dpet.visualization.Visualization.tsne_scatter">[docs]</a>
-    <span class="k">def</span> <span class="nf">tsne_scatter</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_tsne_scatter</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rg&quot;</span><span class="p">,</span>
             <span class="n">kde_by_ensemble</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -285,7 +370,9 @@
             
         <span class="c1"># Create a consistent colormap for the original labels</span>
         <span class="n">unique_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">all_labels</span><span class="p">)</span>
-        <span class="n">label_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">tab20</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">)}</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;plasma&#39;</span><span class="p">)</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">)))</span>
+        <span class="n">label_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">color</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">,</span> <span class="n">colors</span><span class="p">)}</span>
         <span class="n">point_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">label_colors</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">analysis</span><span class="o">.</span><span class="n">all_labels</span><span class="p">]</span>
 
         <span class="c1"># Scatter plot with original labels</span>
@@ -336,14 +423,63 @@
         <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
             <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_dir</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;/tsnep</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">bestP</span><span class="p">)</span><span class="si">}</span><span class="s1">_kmeans</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">bestK</span><span class="p">)</span><span class="si">}</span><span class="s1">_scatter.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">ax</span></div>
-
-
-<div class="viewcode-block" id="Visualization.dimenfix_scatter">
-<a class="viewcode-back" href="../../dpet.html#dpet.visualization.Visualization.dimenfix_scatter">[docs]</a>
-    <span class="k">def</span> <span class="nf">dimenfix_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">ax</span>
+    
+<div class="viewcode-block" id="Visualization.dimensionality_reduction_scatter">
+<a class="viewcode-back" href="../../dpet.html#dpet.visualization.Visualization.dimensionality_reduction_scatter">[docs]</a>
+    <span class="k">def</span> <span class="nf">dimensionality_reduction_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                         <span class="n">color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rg&quot;</span><span class="p">,</span> 
+                                         <span class="n">save</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                                         <span class="n">ax</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                         <span class="n">kde_by_ensemble</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Plot the complete results for dimenfix method. </span>
+<span class="sd">        Plot the results of dimensionality reduction using the method specified in the analysis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        color_by : str, optional</span>
+<span class="sd">            The feature extraction method used for coloring points in the scatter plot. </span>
+<span class="sd">            Options are &quot;rg&quot;, &quot;prolateness&quot;, &quot;asphericity&quot;, &quot;sasa&quot;, and &quot;end_to_end&quot;. Default is &quot;rg&quot;.</span>
+
+<span class="sd">        save : bool, optional</span>
+<span class="sd">            If True, the plot will be saved in the data directory. Default is False.</span>
+
+<span class="sd">        ax : Union[None, List[plt.Axes]], optional</span>
+<span class="sd">            A list of Axes objects to plot on. Default is None, which creates new axes.</span>
+
+<span class="sd">        kde_by_ensemble : bool, optional</span>
+<span class="sd">            If True, the KDE plot will be generated for each ensemble separately. </span>
+<span class="sd">            If False, a single KDE plot will be generated for the concatenated ensembles. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[plt.Axes]</span>
+<span class="sd">            List containing Axes objects for the scatter plot of original labels, clustering labels, and feature-colored labels, respectively.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">            If the dimensionality reduction method specified in the analysis is not supported.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">reduce_dim_method</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dimenfix&quot;</span><span class="p">,</span> <span class="s2">&quot;umap&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dimenfix_umap_scatter</span><span class="p">(</span><span class="n">color_by</span><span class="o">=</span><span class="n">color_by</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="n">save</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">kde_by_ensemble</span><span class="o">=</span><span class="n">kde_by_ensemble</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;tsne&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tsne_scatter</span><span class="p">(</span><span class="n">color_by</span><span class="o">=</span><span class="n">color_by</span><span class="p">,</span> <span class="n">kde_by_ensemble</span><span class="o">=</span><span class="n">kde_by_ensemble</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="n">save</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scatter plot for method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not implemented. Please select between &#39;tsne&#39;, &#39;dimenfix&#39;, and &#39;umap&#39;.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_dimenfix_umap_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                         <span class="n">color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rg&quot;</span><span class="p">,</span> 
+                         <span class="n">save</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                         <span class="n">ax</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">kde_by_ensemble</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the complete results for dimenfix and umap methods. </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        -----------</span>
@@ -355,27 +491,27 @@
 
 <span class="sd">        ax : Union[None, List[plt.Axes]], optional</span>
 <span class="sd">            A list of Axes objects to plot on. Default is None, which creates new axes.</span>
+<span class="sd">        </span>
+<span class="sd">        kde_by_ensemble: bool, optional</span>
+<span class="sd">            If True, the KDE plot will be generated for each ensemble separately. If False, a single KDE plot will be generated for the concatenated ensembles. Default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        --------</span>
 <span class="sd">        List[plt.Axes]</span>
 <span class="sd">            List containing Axes objects for the scatter plot of original labels, clustering labels, and feature-colored labels, respectively.</span>
 
-<span class="sd">        Notes</span>
-<span class="sd">        ------</span>
-<span class="sd">        This analysis is only valid for dimenfix dimensionality reduction.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">analysis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span>
 
-        <span class="k">if</span> <span class="n">analysis</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">!=</span> <span class="s2">&quot;dimenfix&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">analysis</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;dimenfix&quot;</span><span class="p">,</span> <span class="s2">&quot;umap&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Analysis is only valid for dimenfix dimensionality reduction.&quot;</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">color_by</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="s2">&quot;asphericity&quot;</span><span class="p">,</span> <span class="s2">&quot;sasa&quot;</span><span class="p">,</span> <span class="s2">&quot;end_to_end&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Method </span><span class="si">{</span><span class="n">color_by</span><span class="si">}</span><span class="s2"> not supported.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
             <span class="n">axes</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># Ensure axes is a 1D array</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ax_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -384,7 +520,9 @@
 
         <span class="c1"># Create a consistent colormap for the original labels</span>
         <span class="n">unique_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">all_labels</span><span class="p">)</span>
-        <span class="n">label_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">tab20</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">)}</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;plasma&#39;</span><span class="p">)</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">)))</span>
+        <span class="n">label_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">color</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">,</span> <span class="n">colors</span><span class="p">)}</span>
         <span class="n">point_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">label_colors</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">analysis</span><span class="o">.</span><span class="n">all_labels</span><span class="p">]</span>
 
         <span class="c1"># Scatter plot with original labels</span>
@@ -413,86 +551,30 @@
         <span class="n">legend_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="n">label_colors</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">legend_labels</span><span class="p">]</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend_handles</span><span class="p">,</span> <span class="n">legend_labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Original Labels&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_dir</span> <span class="o">+</span> <span class="s1">&#39;/dimenfix_scatter.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">axes</span></div>
-
-
-<div class="viewcode-block" id="Visualization.umap_scatter">
-<a class="viewcode-back" href="../../dpet.html#dpet.visualization.Visualization.umap_scatter">[docs]</a>
-    <span class="k">def</span> <span class="nf">umap_scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="n">save</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a scatter plot of the transformed data using UMAP.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        color_by: str, optional</span>
-<span class="sd">            The feature extraction method used for coloring points in the scatter plot. Options are &quot;rg&quot;, &quot;prolateness&quot;, &quot;asphericity&quot;, &quot;sasa&quot;, and &quot;end_to_end&quot;. Default is &quot;rg&quot;.</span>
-<span class="sd">        </span>
-<span class="sd">        save : bool, optional</span>
-<span class="sd">            If True, the plot will be saved as an image file. Default is False.</span>
-
-<span class="sd">        ax : Union[None, List[plt.Axes]], optional</span>
-<span class="sd">            A list of Axes objects to plot on. Default is None, which creates new axes.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        List[plt.Axes]</span>
-<span class="sd">            The Axes objects for the scatter plot.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        This method creates a scatter plot of the transformed data using UMAP.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">analysis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span>
-
-        <span class="k">if</span> <span class="n">analysis</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">!=</span> <span class="s2">&quot;umap&quot;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Analysis is only valid for UMAP dimensionality reduction.&quot;</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">color_by</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="s2">&quot;asphericity&quot;</span><span class="p">,</span> <span class="s2">&quot;sasa&quot;</span><span class="p">,</span> <span class="s2">&quot;end_to_end&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Method </span><span class="si">{</span><span class="n">color_by</span><span class="si">}</span><span class="s2"> not supported.&quot;</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-            <span class="n">axes</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># Ensure axes is a 1D array</span>
+        <span class="k">if</span> <span class="n">kde_by_ensemble</span><span class="p">:</span>
+            <span class="c1"># KDE plot for each ensemble</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">unique_labels</span><span class="p">:</span>
+                <span class="n">ensemble_data</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">all_labels</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">]</span>
+                <span class="n">kde</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">([</span><span class="n">ensemble_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">ensemble_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]])</span>
+                <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">ensemble_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]):</span><span class="nb">max</span><span class="p">(</span><span class="n">ensemble_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]):</span><span class="mi">100</span><span class="n">j</span><span class="p">,</span>
+                                <span class="nb">min</span><span class="p">(</span><span class="n">ensemble_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]):</span><span class="nb">max</span><span class="p">(</span><span class="n">ensemble_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]):</span><span class="mi">100</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">zi</span> <span class="o">=</span> <span class="n">kde</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">xi</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">yi</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]))</span>
+                <span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">zi</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xi</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Ensemble </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="n">label_colors</span><span class="p">[</span><span class="n">label</span><span class="p">]])</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Density Plot (Ensemble-wise)&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Ensemble&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># Flatten the provided axes</span>
-            <span class="n">fig</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">figure</span>
-
-        <span class="c1"># Create a consistent colormap for the original labels</span>
-        <span class="n">unique_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">all_labels</span><span class="p">)</span>
-        <span class="n">label_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">tab20</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">)}</span>
-        <span class="n">point_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">label_colors</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">analysis</span><span class="o">.</span><span class="n">all_labels</span><span class="p">]</span>
-
-        <span class="c1"># Scatter plot with original labels</span>
-        <span class="n">scatter_labeled</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">point_colors</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Scatter plot (original labels)&#39;</span><span class="p">)</span>
-
-        <span class="c1"># Concatenate feature values from all ensembles</span>
-        <span class="n">feature_values</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">analysis</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">color_by</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">feature_values</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">feature_values</span><span class="p">)</span>
-
-        <span class="c1"># Scatter plot with feature-based labels</span>
-        <span class="n">rg_labeled</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">rg_labeled</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Scatter plot (</span><span class="si">{</span><span class="n">color_by</span><span class="si">}</span><span class="s1"> labels)&#39;</span><span class="p">)</span>
-
-        <span class="c1"># Manage legend</span>
-        <span class="n">legend_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">label_colors</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="n">legend_handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Line2D</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">label_colors</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">legend_labels</span><span class="p">]</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legend_handles</span><span class="p">,</span> <span class="n">legend_labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Original Labels&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
-
-        <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="c1"># Single KDE plot for concatenated ensembles</span>
+            <span class="n">kde</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">([</span><span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]])</span>
+            <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]):</span><span class="nb">max</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]):</span><span class="mi">100</span><span class="n">j</span><span class="p">,</span>
+                            <span class="nb">min</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]):</span><span class="nb">max</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">transformed_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]):</span><span class="mi">100</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">zi</span> <span class="o">=</span> <span class="n">kde</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">xi</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">yi</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]))</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">zi</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xi</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">levels</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Density Plot&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_dir</span> <span class="o">+</span> <span class="s1">&#39;/umap_scatter.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_dir</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span class="n">analysis</span><span class="o">.</span><span class="n">reduce_dim_method</span><span class="si">}</span><span class="s1">_scatter.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">axes</span></div>
-
+        <span class="k">return</span> <span class="n">axes</span>
 
 <div class="viewcode-block" id="Visualization.pca_cumulative_explained_variance">
 <a class="viewcode-back" href="../../dpet.html#dpet.visualization.Visualization.pca_cumulative_explained_variance">[docs]</a>
@@ -1846,7 +1928,7 @@
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">])</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Residue Index&quot;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Site-specific flexibility parameter&quot;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
         
         <span class="k">if</span> <span class="n">pointer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">pointer</span><span class="p">:</span>
@@ -1903,12 +1985,12 @@
 
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">dict_order_parameter</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
         
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">])</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Residue Index&quot;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Site-specific order parameter&quot;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
         
         <span class="k">if</span> <span class="n">pointer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">pointer</span><span class="p">:</span>
@@ -1955,22 +2037,24 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span>
 
-        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">]</span>
+        
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ens</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">analysis</span><span class="o">.</span><span class="n">ensembles</span><span class="p">):</span>
-
+            <span class="n">color</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">_get_lines</span><span class="o">.</span><span class="n">prop_cycler</span><span class="p">)[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span>
             <span class="n">res_based_sasa</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">shrake_rupley</span><span class="p">(</span><span class="n">ens</span><span class="o">.</span><span class="n">trajectory</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;residue&#39;</span><span class="p">)</span>
             <span class="n">sasa_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">res_based_sasa</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">sasa_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">res_based_sasa</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>        
 
-            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sasa_mean</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sasa_mean</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)],</span> <span class="n">label</span><span class="o">=</span><span class="n">ens</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sasa_mean</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sasa_mean</span> <span class="o">-</span> <span class="n">sasa_std</span><span class="p">,</span> <span class="n">sasa_mean</span> <span class="o">+</span> <span class="n">sasa_std</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sasa_mean</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sasa_mean</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">ens</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+            <span class="c1"># ax.fill_between(np.arange(1, len(sasa_mean) + 1), sasa_mean - sasa_std, sasa_mean + sasa_std, alpha=0.3, color=colors[i % len(colors)])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sasa_mean</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sasa_mean</span> <span class="o">+</span> <span class="n">sasa_std</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sasa_mean</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sasa_mean</span> <span class="o">-</span> <span class="n">sasa_std</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sasa_mean</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">])</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Residue Index&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Mean SASA&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Mean SASA for Each Residue in Ensembles&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># ax.grid(True)</span>
         
         <span class="k">if</span> <span class="n">pointer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">pointer</span><span class="p">:</span>
@@ -2064,9 +2148,127 @@
                 <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_dir</span><span class="p">,</span> <span class="s1">&#39;dist_ca_com_&#39;</span> <span class="o">+</span> <span class="n">ens</span><span class="o">.</span><span class="n">code</span><span class="p">))</span>  
 
         <span class="k">return</span> <span class="n">axes</span></div>
-</div>
 
     
+    
+<div class="viewcode-block" id="Visualization.comparison_matrix">
+<a class="viewcode-back" href="../../dpet.html#dpet.visualization.Visualization.comparison_matrix">[docs]</a>
+    <span class="k">def</span> <span class="nf">comparison_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">score</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">featurization_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+            <span class="n">bootstrap_iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="n">bootstrap_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">bootstrap_replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">bins</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+            <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">ax</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">6.00</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+            <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">std</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;viridis_r&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">cbar_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">textcolors</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates and visualizes the pairwise comparison matrix for the ensembles.</span>
+<span class="sd">        This function computes the comparison matrix using the specified score</span>
+<span class="sd">        type and feature. It then visualizes the matrix using a heatmap.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        score, feature, featurization_params, bootstrap_iters, bootstrap_frac,</span>
+<span class="sd">        bootstrap_replace, bins, random_seed, verbose:</span>
+<span class="sd">            See the documentation of `EnsembleAnalysis.comparison_scores` for</span>
+<span class="sd">            more information about these arguments.</span>
+<span class="sd">        ax: Union[None, plt.Axes], optional</span>
+<span class="sd">            Axes object where to plot the comparison heatmap. If `None` (the</span>
+<span class="sd">            default value) is provided, a new Figure will be created.</span>
+<span class="sd">        figsize: Tuple[int], optional</span>
+<span class="sd">            The size of the figure for the heatmap. Default is (6.00, 5.0). Only</span>
+<span class="sd">            takes effect if `ax` is not `None`.</span>
+<span class="sd">        dpi: int, optional</span>
+<span class="sd">            DPIs of the figure for the heatmap. Default is 100. Only takes</span>
+<span class="sd">            effect if `ax` is not `None`.</span>
+<span class="sd">        std, cmap, title, cbar_label, textcolors:</span>
+<span class="sd">            See the documentation of `dpet.visualization.plot_comparison_matrix`</span>
+<span class="sd">            for more information about these arguments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        results: dict</span>
+<span class="sd">            A dictionary containing the following keys:</span>
+<span class="sd">                `ax`: the Axes object with the comparison matrix heatmap.</span>
+<span class="sd">                `scores`: comparison matrix. See `EnsembleAnalysis.comparison_scores`</span>
+<span class="sd">                    for more information.</span>
+<span class="sd">                `codes`: codes of the ensembles that were compared.</span>
+<span class="sd">                `fig`: Figure object, only returned when a new figure is created</span>
+<span class="sd">                    inside this function.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">        ------</span>
+<span class="sd">        The comparison matrix is annotated with the scores, and the axes are</span>
+<span class="sd">        labeled with the ensemble labels.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">### Score divergences.</span>
+        <span class="n">scores</span><span class="p">,</span> <span class="n">codes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">comparison_scores</span><span class="p">(</span>
+            <span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">,</span>
+            <span class="n">feature</span><span class="o">=</span><span class="n">feature</span><span class="p">,</span>
+            <span class="n">featurization_params</span><span class="o">=</span><span class="n">featurization_params</span><span class="p">,</span>
+            <span class="n">bootstrap_iters</span><span class="o">=</span><span class="n">bootstrap_iters</span><span class="p">,</span>
+            <span class="n">bootstrap_frac</span><span class="o">=</span><span class="n">bootstrap_frac</span><span class="p">,</span>
+            <span class="n">bootstrap_replace</span><span class="o">=</span><span class="n">bootstrap_replace</span><span class="p">,</span>
+            <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+            <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+        <span class="p">)</span>
+
+        <span class="c1">### Setup the plot.</span>
+        <span class="c1"># Axes.</span>
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Title.</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">score</span> <span class="o">==</span> <span class="s2">&quot;emd&quot;</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">score</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> based on </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="n">score</span> <span class="o">==</span> <span class="s2">&quot;jsd&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">feature</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+                    <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;aJSD_d&quot;</span>
+                <span class="k">elif</span> <span class="n">feature</span> <span class="o">==</span> <span class="s2">&quot;alpha_angle&quot;</span><span class="p">:</span>
+                    <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;aJSD_t&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">score</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> based on </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+        <span class="c1"># Colorbar label.</span>
+        <span class="k">if</span> <span class="n">cbar_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cbar_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">score</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> score&quot;</span>
+
+        <span class="c1">### Actually plots.</span>
+        <span class="n">plot_comparison_matrix</span><span class="p">(</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">scores</span><span class="o">=</span><span class="n">scores</span><span class="p">,</span>
+            <span class="n">codes</span><span class="o">=</span><span class="n">codes</span><span class="p">,</span>
+            <span class="n">std</span><span class="o">=</span><span class="n">std</span><span class="p">,</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">cbar_label</span><span class="o">=</span><span class="n">cbar_label</span><span class="p">,</span>
+            <span class="n">textcolors</span><span class="o">=</span><span class="n">textcolors</span>
+        <span class="p">)</span>
+
+        <span class="c1">### Return results.</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ax&quot;</span><span class="p">:</span> <span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;scores&quot;</span><span class="p">:</span> <span class="n">scores</span><span class="p">,</span> <span class="s2">&quot;codes&quot;</span><span class="p">:</span> <span class="n">codes</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;fig&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fig</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+</div>
+
 </pre></div>
 
            </div>

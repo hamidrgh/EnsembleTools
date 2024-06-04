@@ -45,6 +45,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">EnsembleTools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo</a></li>
 </ul>
 
         </div>
@@ -115,14 +116,18 @@
 </li>
       <li><a href="dpet.featurization.html#dpet.featurization.distances.calc_com_dmap">calc_com_dmap() (in module dpet.featurization.distances)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="dpet.html#dpet.dimensionality_reduction.DimenFixReduction.cluster">cluster() (dpet.dimensionality_reduction.DimenFixReduction method)</a>
 
       <ul>
         <li><a href="dpet.html#dpet.dimensionality_reduction.UMAPReduction.cluster">(dpet.dimensionality_reduction.UMAPReduction method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="dpet.html#dpet.visualization.Visualization.comparison_matrix">comparison_matrix() (dpet.visualization.Visualization method)</a>
+</li>
+      <li><a href="dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores">comparison_scores() (dpet.ensemble_analysis.EnsembleAnalysis method)</a>
+</li>
       <li><a href="dpet.html#dpet.visualization.Visualization.contact_prob_maps">contact_prob_maps() (dpet.visualization.Visualization method)</a>
 </li>
   </ul></td>
@@ -131,9 +136,9 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dpet.html#dpet.visualization.Visualization.dimenfix_scatter">dimenfix_scatter() (dpet.visualization.Visualization method)</a>
-</li>
       <li><a href="dpet.html#dpet.dimensionality_reduction.DimenFixReduction">DimenFixReduction (class in dpet.dimensionality_reduction)</a>
+</li>
+      <li><a href="dpet.html#dpet.visualization.Visualization.dimensionality_reduction_scatter">dimensionality_reduction_scatter() (dpet.visualization.Visualization method)</a>
 </li>
       <li><a href="dpet.html#dpet.dimensionality_reduction.DimensionalityReduction">DimensionalityReduction (class in dpet.dimensionality_reduction)</a>
 </li>
@@ -284,6 +289,8 @@
 </li>
       <li><a href="dpet.html#dpet.dimensionality_reduction.TSNEReduction.get_best_results">get_best_results() (dpet.dimensionality_reduction.TSNEReduction method)</a>
 </li>
+      <li><a href="dpet.html#dpet.ensemble.Ensemble.get_chains_from_pdb">get_chains_from_pdb() (dpet.ensemble.Ensemble method)</a>
+</li>
       <li><a href="dpet.featurization.html#dpet.featurization.angles.get_dihedrals">get_dihedrals() (in module dpet.featurization.angles)</a>
 </li>
       <li><a href="dpet.html#dpet.ensemble.Ensemble.get_features">get_features() (dpet.ensemble.Ensemble method)</a>
@@ -297,6 +304,8 @@
       <li><a href="dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.get_features_summary_dataframe">get_features_summary_dataframe() (dpet.ensemble_analysis.EnsembleAnalysis method)</a>
 </li>
       <li><a href="dpet.featurization.html#dpet.featurization.utils.get_max_sep">get_max_sep() (in module dpet.featurization.utils)</a>
+</li>
+      <li><a href="dpet.html#dpet.ensemble.Ensemble.get_num_residues">get_num_residues() (dpet.ensemble.Ensemble method)</a>
 </li>
       <li><a href="dpet.html#dpet.dimensionality_reduction.DimensionalityReductionFactory.get_reducer">get_reducer() (dpet.dimensionality_reduction.DimensionalityReductionFactory static method)</a>
 </li>
@@ -379,6 +388,8 @@
 </li>
       <li><a href="dpet.html#dpet.visualization.Visualization.per_residue_mean_sasa">per_residue_mean_sasa() (dpet.visualization.Visualization method)</a>
 </li>
+      <li><a href="dpet.html#dpet.visualization.plot_comparison_matrix">plot_comparison_matrix() (in module dpet.visualization)</a>
+</li>
       <li><a href="dpet.html#dpet.visualization.plot_histogram">plot_histogram() (in module dpet.visualization)</a>
 </li>
       <li><a href="dpet.html#dpet.visualization.plot_violins">plot_violins() (in module dpet.visualization)</a>
@@ -449,8 +460,6 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dpet.html#dpet.visualization.Visualization.tsne_scatter">tsne_scatter() (dpet.visualization.Visualization method)</a>
-</li>
       <li><a href="dpet.html#dpet.dimensionality_reduction.TSNEReduction">TSNEReduction (class in dpet.dimensionality_reduction)</a>
 </li>
   </ul></td>
@@ -459,14 +468,12 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dpet.html#dpet.visualization.Visualization.umap_scatter">umap_scatter() (dpet.visualization.Visualization method)</a>
-</li>
       <li><a href="dpet.html#dpet.dimensionality_reduction.UMAPReduction">UMAPReduction (class in dpet.dimensionality_reduction)</a>
+</li>
+      <li><a href="dpet.html#dpet.dimensionality_reduction.unit_vector_distance">unit_vector_distance() (in module dpet.dimensionality_reduction)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="dpet.html#dpet.dimensionality_reduction.unit_vector_distance">unit_vector_distance() (in module dpet.dimensionality_reduction)</a>
-</li>
       <li><a href="dpet.html#dpet.dimensionality_reduction.unit_vector_kernel">unit_vector_kernel() (in module dpet.dimensionality_reduction)</a>
 </li>
       <li><a href="dpet.html#dpet.dimensionality_reduction.unit_vectorize">unit_vectorize() (in module dpet.dimensionality_reduction)</a>
