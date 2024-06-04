@@ -2,8 +2,7 @@ import os
 from typing import List, Tuple, Union
 import numpy as np
 from matplotlib.lines import Line2D
-from matplotlib import cm, colors, pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib import colors, pyplot as plt
 from scipy.stats import gaussian_kde
 from sklearn.cluster import KMeans
 import mdtraj
@@ -284,7 +283,7 @@ class Visualization:
             
         # Create a consistent colormap for the original labels
         unique_labels = np.unique(analysis.all_labels)
-        cmap = cm.get_cmap('plasma')
+        cmap = plt.get_cmap('plasma')
         colors = cmap(np.linspace(0, 1, len(unique_labels)))
         label_colors = {label: color for label, color in zip(unique_labels, colors)}
         point_colors = [label_colors[label] for label in analysis.all_labels]
@@ -294,7 +293,7 @@ class Visualization:
         ax[0].set_title('Scatter plot (original labels)')
 
         # Scatter plot with clustering labels
-        cmap = cm.get_cmap('jet', analysis.reducer.bestK)
+        cmap = plt.get_cmap('jet', analysis.reducer.bestK)
         scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=10, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
         ax[1].set_title('Scatter plot (clustering labels)')
 
@@ -431,7 +430,7 @@ class Visualization:
 
         # Create a consistent colormap for the original labels
         unique_labels = np.unique(analysis.all_labels)
-        cmap = cm.get_cmap('plasma')
+        cmap = plt.get_cmap('plasma')
         colors = cmap(np.linspace(0, 1, len(unique_labels)))
         label_colors = {label: color for label, color in zip(unique_labels, colors)}
         point_colors = [label_colors[label] for label in analysis.all_labels]
@@ -703,7 +702,7 @@ class Visualization:
         if analysis.reduce_dim_method != "pca" or analysis.featurization != "ca_dist":
             raise ValueError("Analysis is only valid for pca dimensionality reduction with ca_dist feature extraction.")
         
-        cmap = cm.get_cmap("RdBu")  # RdBu, PiYG
+        cmap = plt.get_cmap("RdBu")  # RdBu, PiYG
         norm = colors.Normalize(-0.07, 0.07)  # NOTE: this range should be adapted when analyzing other systems via PCA!
         dpi = 120
 
@@ -910,7 +909,7 @@ class Visualization:
         
         ax.set_ylabel("Asphericity")
         ax.set_xlabel("Radius of Gyration (Rg) [nm]")
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.legend()
         
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Asphericity_' + analysis.ens_codes[0]))
@@ -951,7 +950,7 @@ class Visualization:
 
         ax.set_ylabel("Prolateness")
         ax.set_xlabel("Radius of Gyration (Rg) [nm]")
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.legend()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Rg_vs_Prolateness_' + analysis.ens_codes[0]))
@@ -1019,7 +1018,7 @@ class Visualization:
         ax.set_xlabel('Residue Index')
         ax.set_ylabel('Relative Content of H (Helix)')
         ax.set_title('Relative Content of H in Each Residue in the ensembles')
-        ax.legend(bbox_to_anchor=(1.04,0), loc="lower left")
+        ax.legend()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'relative_helix_' + self.analysis.ens_codes[0]))
@@ -1601,7 +1600,7 @@ class Visualization:
         num_cols = 2
         num_rows = (num_proteins + num_cols - 1) // num_cols
 
-        cmap = cm.get_cmap(cmap_color)
+        cmap = plt.get_cmap(cmap_color)
         
         if ax is None:
             fig, axes = plt.subplots(num_rows, num_cols, figsize=(8 * num_cols, 6 * num_rows), dpi=dpi)
@@ -1730,7 +1729,7 @@ class Visualization:
                 ax.scatter(phi, psi, s=1, label=ens.code)
             ax.set_xlabel('Phi (ϕ) Angle (degrees)')
             ax.set_ylabel('Psi (ψ) Angle (degrees)')
-            ax.legend(bbox_to_anchor=(1.04, 0), loc="lower left")
+            ax.legend()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'ramachandran_' + self.analysis.ens_codes[0]))  
@@ -1889,9 +1888,12 @@ class Visualization:
         else:
             fig = ax.figure
 
+        # Get the color cycle from matplotlib
+        prop_cycle = plt.rcParams['axes.prop_cycle']
+        colors = prop_cycle.by_key()['color']
         
         for i, ens in enumerate(analysis.ensembles):
-            color = next(ax._get_lines.prop_cycler)['color']
+            color = colors[i % len(colors)]
             res_based_sasa = mdtraj.shrake_rupley(ens.trajectory, mode='residue')
             sasa_mean = np.mean(res_based_sasa, axis=0)
             sasa_std = np.std(res_based_sasa, axis=0)        
