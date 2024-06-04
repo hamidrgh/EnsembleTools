@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global analysis &#8212; functions analysis  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Local analysis" href="local_analysis.html" />
+    <link rel="prev" title="Demo" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="global-analysis">
+<h1>Global analysis<a class="headerlink" href="#global-analysis" title="Permalink to this headline">¶</a></h1>
+<p>The global analysis of a protein is a fundamental technique for understanding its structural and dynamic properties. This approach allows the examination of various parameters, such as the radius of gyration, asphericity, and the spatial distribution of atoms, providing an overview of the protein’s conformation and behavior.</p>
+<p>In our package, we have implemented several functions for visualizing these parameters. These functions help interpret and compare results, making protein analysis easier.</p>
+<p>To illustrate the output of our functions, we have chosen the analysis of the SH3 protein as an example. The graphs we present are related to the analysis of this protein, comparing three distinct ensembles downloaded directly from the Protein Ensemble Database (PED): PED00156, PED00157, and PED00158. These ensembles represent structural states of the N-terminal SH3 domain of the Drk protein (residues 1-59) in its unfolded form, generated with different approaches to initialize pools of random conformations.</p>
+<ul class="simple">
+<li><p><strong>PED00156</strong>: This ensemble consists of conformations generated randomly and optimized through an iterative process.</p></li>
+<li><p><strong>PED00157</strong>: This ensemble includes conformations generated using the ENSEMBLE method, which creates a variety of realistic conformations of an unfolded protein.</p></li>
+<li><p><strong>PED00158</strong>: This ensemble is a combination of conformations from the RANDOM and ENSEMBLE pools, offering greater conformational diversity.</p></li>
+</ul>
+<div class="section" id="radius-of-gyration">
+<h2>Radius of gyration<a class="headerlink" href="#radius-of-gyration" title="Permalink to this headline">¶</a></h2>
+<p>The radius of gyration of a protein is the square root of the mean square distances of the protein residues from the protein’s center of mass. It is therefore a measure of the compactness of its three-dimensional structure.</p>
+<p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
+<p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
+<p><em>“multiple_hist_ax”: If True, plots each histogram on a separate axis.</em></p>
+<p><em>“violin_plot”: If True, displays a violin plot; default is False.</em></p>
+<p><em>“median”: If True, shows the median; default is False.</em></p>
+<p><em>“means”: If True, shows the mean; default is False.</em></p>
+<p><em>“dpi”: The DPI (dots per inch) of the output figure; default is 96.</em></p>
+<p><em>“save”: If True, saves the plot as an image file; default is False.</em></p>
+<p><em>“ax”: The matplotlib Axes object(s) on which to plot; if None, new Axes object(s) will be created.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">radius_of_gyration</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/rgg.png" class="align-center" src="_images/rgg.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">radius_of_gyration</span><span class="p">(</span><span class="n">multiple_hist_ax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">median</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">means</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/rg.png" class="align-center" src="_images/rg.png" />
+</div>
+<div class="section" id="end-to-end-distance">
+<h2>End to end distance<a class="headerlink" href="#end-to-end-distance" title="Permalink to this headline">¶</a></h2>
+<p>The end_to_end_distances function is designed to visualize the distributions of end-to-end distances in molecular structure trajectories. The end-to-end distance refers to the distance between the first and last atom in a molecular chain, a parameter often used to understand the overall conformation of a molecule.</p>
+<ul class="simple">
+<li><p><em>“rg_norm”(bool,optional):If set to True, normalizes the end-to-end distances based on the average radius of gyration.[The default value is False]</em></p></li>
+<li><p><em>“bins”(int,optional): Defines the number of bins for the histogram of distances. More bins provide a more detailed distribution, but it may be noisier.[The default value is 50]</em></p></li>
+<li><p><em>“hist_range”(tuple, optional):A tuple specifying the minimum and maximum values for the histogram. If not specified (None), it uses the minimum and maximum values present in the data.</em></p></li>
+<li><p><em>“violin_plot”(bool,optional):If set to True, the function will generate a violin plot of the distances. [The default value is True]</em></p></li>
+<li><p><em>“means” (bool, optional):If set to True, shows the means of the distances in the violin plot. [The default value is True]</em></p></li>
+<li><p><em>“median” (bool, optional):If set to True, shows the medians of the distances in the violin plot. [The default value is True]</em></p></li>
+<li><p><em>“save” (bool, optional):If set to True, the generated plot will be saved as an image file. [The default value is False]</em></p></li>
+<li><p><em>“ax” (plt.Axes, optional):The axes on which to plot. [The default value is None]</em></p></li>
+</ul>
+<p>This example generates a violin plot of the end-to-end distances without showing the medians but including the means.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances</span><span class="p">(</span><span class="n">median</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/end_to_end.png" class="align-center" src="_images/end_to_end.png" />
+<p>This example normalizes the end-to-end distances based on the average radius of gyration, generates a violin plot without showing the medians but including the means.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances</span><span class="p">(</span><span class="n">rg_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">violin_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/end_to_end_norm.png" class="align-center" src="_images/end_to_end_norm.png" />
+</div>
+<div class="section" id="asphericity-distribution">
+<h2>Asphericity distribution<a class="headerlink" href="#asphericity-distribution" title="Permalink to this headline">¶</a></h2>
+<p>The asphericity the measure of deviation from the spherical shape of a molecule. It indicates how much a molecule differs from the ideal spherical form. A protein with an asphericity greater than zero is generally more elongated or flattened compared to a sphere.</p>
+<p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
+<p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
+<p><em>“violin_plot”: If True, displays a violin plot; default is True.</em></p>
+<p><em>“means”: If True, shows the means in the violin plot; default is True.</em></p>
+<p><em>“median”: If True, shows the medians in the violin plot; default is True.</em></p>
+<p><em>“save”: If True, saves the plot as an image file; default is False.</em></p>
+<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new figure and axes.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">asphericity</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/asphericity.png" class="align-center" src="_images/asphericity.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">asphericity</span><span class="p">(</span><span class="n">violin_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/asph1.png" class="align-center" src="_images/asph1.png" />
+</div>
+<div class="section" id="prolatness-distribution">
+<h2>Prolatness distribution<a class="headerlink" href="#prolatness-distribution" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The prolateness the measure of a molecule’s shape, indicating how elongated it is compared to its transverse dimensions. A protein with a prolateness greater than one is generally more elongated than a spherical shape.</p>
+</div></blockquote>
+<p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
+<p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
+<p><em>“violin_plot”: If True, displays a violin plot; default is True.</em></p>
+<p><em>“means”: If True, shows the means in the violin plot; default is True.</em></p>
+<p><em>“median”: If True, shows the medians in the violin plot; default is True.</em></p>
+<p><em>“save”: If True, saves the plot as an image file; default is False.</em></p>
+<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new figure and axes.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">prolatness</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/prolateness.png" class="align-center" src="_images/prolateness.png" />
+</div>
+<div class="section" id="radius-of-gyration-vs-asphericity">
+<h2>Radius of gyration vs Asphericity<a class="headerlink" href="#radius-of-gyration-vs-asphericity" title="Permalink to this headline">¶</a></h2>
+<p>The function <em>rg_vs_asphericity</em> also prints the Pearson correlation coefficients, which measure the strength and direction of the linear relationship between the radius of gyration (Rg) and asphericity. A Pearson coefficient value close to 1 or -1 indicates a strong positive or negative correlation, respectively, while a value close to 0 indicates a weak or no correlation.</p>
+<p><em>“save”: If True, saves the plot as an image file; default is False.</em></p>
+<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new figure and axes.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">rg_vs_asphericity</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/rgasp.png"><img alt="_images/rgasp.png" class="align-center" src="_images/rgasp.png" style="width: 443.79999999999995px; height: 89.6px;" /></a>
+<img alt="_images/rg_vs_asph.png" class="align-center" src="_images/rg_vs_asph.png" />
+</div>
+<div class="section" id="radius-of-gyration-vs-prolatness">
+<h2>Radius of gyration vs Prolatness<a class="headerlink" href="#radius-of-gyration-vs-prolatness" title="Permalink to this headline">¶</a></h2>
+<p>The function <em>rg_vs_prolateness</em> also prints the Pearson correlation coefficients, which measure the strength and direction of the linear relationship between the radius of gyration (Rg) and prolateness. A Pearson coefficient value close to 1 or -1 indicates a strong positive or negative correlation, respectively, while a value close to 0 indicates a weak or no correlation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">rg_vs_prolatness</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/rgproll.png"><img alt="_images/rgproll.png" class="align-center" src="_images/rgproll.png" style="width: 448.0px; height: 109.19999999999999px;" /></a>
+<img alt="_images/rg_vs_prol.png" class="align-center" src="_images/rg_vs_prol.png" />
+</div>
+<div class="section" id="global-sasa-distribution">
+<h2>Global sasa distribution<a class="headerlink" href="#global-sasa-distribution" title="Permalink to this headline">¶</a></h2>
+<p>The acronym “SASA” stands for “Solvent Accessible Surface Area” and refers to the surface area of a molecule that is accessible to the solvent. At the conformational level, “total SASA” indicates the total surface area accessible to the solvent for each conformation in the molecule’s trajectory, while at the residue level, it is calculated by summing the solvent-accessible surface areas of all residues within the molecule, providing a measure of the accessibility of individual residues to the solvent. We initially analyzed this feature for each conformation and subsequently for each residue, resulting in the following graphs.</p>
+<p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
+<p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
+<p><em>“violin_plot”: If True, displays a violin plot; default is True.</em></p>
+<p><em>“means”: If True, shows the mean; default is True.</em></p>
+<p><em>“medians”: If True, shows the median; default is True.</em></p>
+<p><em>“save”: If True, saves the plot in the data directory; default is False.</em></p>
+<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new Axes object.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">ensemble_sasa</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/global_sasa.png" class="align-center" src="_images/global_sasa.png" />
+</div>
+<div class="section" id="alpha-angles-dihedral-distribution">
+<h2>Alpha angles dihedral distribution<a class="headerlink" href="#alpha-angles-dihedral-distribution" title="Permalink to this headline">¶</a></h2>
+<p>The dihedral angles represent the rotation around the bonds between consecutive alpha carbons, and their distribution reflects the spatial arrangement of amino acids in the polypeptide chain, directly influencing its three-dimensional conformation.</p>
+<p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
+<p><em>“save”: If True, saves the plot in the data directory; default is False.</em></p>
+<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new Axes object.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">alpha_angles</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/dihedral.png" class="align-center" src="_images/dihedral.png" />
+</div>
+<div class="section" id="relative-helix-content">
+<h2>Relative helix content<a class="headerlink" href="#relative-helix-content" title="Permalink to this headline">¶</a></h2>
+<p>The helix content of a protein refers to the proportion or percentage of amino acids within the protein sequence that are structured into helical secondary structures. It provides insight into the amount of helical structural motifs present in the protein, which is important for understanding its overall structure, stability, and function.</p>
+<p><em>“save”: If True, saves the plot in the data directory; default is False.</em></p>
+<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new Axes object.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">relative_helix_content</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/contentH.png" class="align-center" src="_images/contentH.png" />
+</div>
+<div class="section" id="flory-scaling-exponents">
+<h2>Flory scaling exponents<a class="headerlink" href="#flory-scaling-exponents" title="Permalink to this headline">¶</a></h2>
+<p>The following code block is used to calculate and print the Flory scaling exponents for different ensembles.
+This code utilizes the get_features function of the EnsembleAnalysis class to extract the Flory exponents for each ensemble and then prints these values.</p>
+<p>The Flory exponent is a parameter that describes the behavior of a polymer chain in solution, reflecting its ability to extend and occupy space in the surrounding environment. In more technical terms, it represents the relationship between the chain length and its size in three-dimensional space.</p>
+<p>This parameter can vary from a minimum of 0.5, corresponding to a completely rigid and non-extensible chain, to a maximum of approximately 0.6-0.7, indicating a highly flexible chain capable of occupying a larger volume.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v_values</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="s2">&quot;flory_exponent&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">v_values</span><span class="p">:</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v_values</span><span class="p">[</span><span class="n">code</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/flory.png"><img alt="_images/flory.png" class="align-center" src="_images/flory.png" style="width: 247.2px; height: 98.39999999999999px;" /></a>
+</div>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>This code snippet calculates and displays a summary of features for each analyzed dataset. The function <em>get_features_summary_dataframe</em> is used to create a summary DataFrame that includes information about the selected key parameters.</p>
+<p>In the provided example, the following parameters are selected: radius of gyration (rg), end-to-end distance (end_to_end), end-to-end distance to radius of gyration ratio (ee_on_rg), and Flory exponent (flory_exponent). This DataFrame is then displayed using the display(summary) statement.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">summary</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">get_features_summary_dataframe</span><span class="p">(</span>
+<span class="n">selected_features</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="s2">&quot;end_to_end&quot;</span><span class="p">,</span> <span class="s2">&quot;ee_on_rg&quot;</span><span class="p">,</span> <span class="s2">&quot;flory_exponent&quot;</span><span class="p">],</span>
+<span class="n">show_variability</span><span class="o">=</span><span class="kc">False</span>
+ <span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/summary.png" class="align-center" src="_images/summary.png" />
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">functions analysis</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Global analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#radius-of-gyration">Radius of gyration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#end-to-end-distance">End to end distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#asphericity-distribution">Asphericity distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prolatness-distribution">Prolatness distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#radius-of-gyration-vs-asphericity">Radius of gyration vs Asphericity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#radius-of-gyration-vs-prolatness">Radius of gyration vs Prolatness</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#global-sasa-distribution">Global sasa distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#alpha-angles-dihedral-distribution">Alpha angles dihedral distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#relative-helix-content">Relative helix content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#flory-scaling-exponents">Flory scaling exponents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="local_analysis.html">Local analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dimensional_reduction.html">Dimensional Reduction Analysis</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Demo</a></li>
+      <li>Next: <a href="local_analysis.html" title="next chapter">Local analysis</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Bartocci.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/Global_analysis.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
