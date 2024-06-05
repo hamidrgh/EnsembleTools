@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dpet.featurization package &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -92,36 +92,25 @@
 <span id="dpet-featurization-utils-module"></span><h2>dpet.featurization.utils module<a class="headerlink" href="#module-dpet.featurization.utils" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="dpet.featurization.utils.get_max_sep">
-<span class="sig-prename descclassname"><span class="pre">dpet.featurization.utils.</span></span><span class="sig-name descname"><span class="pre">get_max_sep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/dpet/featurization/utils.html#get_max_sep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.utils.get_max_sep" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.utils.</span></span><span class="sig-name descname"><span class="pre">get_max_sep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/dpet/featurization/utils.html#get_max_sep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.utils.get_max_sep" title="Permalink to this definition"></a></dt>
 <dd><p>Get the maximum separation between indices.</p>
-<section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>L<span class="classifier">int</span></dt><dd><p>The size of the matrix.</p>
 </dd>
 <dt>max_sep<span class="classifier">Union[None, int, float]</span></dt><dd><p>The maximum separation between indices.</p>
 </dd>
 </dl>
-</section>
-<section id="returns">
-<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>int</dt><dd><p>The maximum separation between indices.</p>
 </dd>
 </dl>
-</section>
-<section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Permalink to this heading"></a></h3>
 <p>This function calculates the maximum separation between indices based on the size of the matrix and the provided maximum separation value.</p>
-</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dpet.featurization.utils.get_triu_indices">
-<span class="sig-prename descclassname"><span class="pre">dpet.featurization.utils.</span></span><span class="sig-name descname"><span class="pre">get_triu_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/featurization/utils.html#get_triu_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.utils.get_triu_indices" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.utils.</span></span><span class="sig-name descname"><span class="pre">get_triu_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dpet/featurization/utils.html#get_triu_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dpet.featurization.utils.get_triu_indices" title="Permalink to this definition"></a></dt>
 <dd><p>Get the upper triangle indices of a square matrix with specified minimum and maximum separations.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>L<span class="classifier">int</span></dt><dd><p>The size of the square matrix.</p>
 </dd>
@@ -130,18 +119,11 @@
 <dt>max_sep<span class="classifier">Union[None, int, float], optional</span></dt><dd><p>The maximum separation between indices. Default is None.</p>
 </dd>
 </dl>
-</section>
-<section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
 <dl class="simple">
 <dt>List[list]</dt><dd><p>A list of lists containing the upper triangle indices of the square matrix.</p>
 </dd>
 </dl>
-</section>
-<section id="id3">
-<h3>Notes<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
 <p>This function returns the upper triangle indices of a square matrix with the specified minimum and maximum separations.</p>
-</section>
 </dd></dl>
 
 </section>
