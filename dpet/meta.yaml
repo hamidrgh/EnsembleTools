@@ -27,6 +27,7 @@ requirements:
     - scikit-learn
     - umap-learn
     - requests
+    - numba
 
 test:
   imports:
