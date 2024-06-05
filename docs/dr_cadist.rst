@@ -99,7 +99,7 @@ t-SNE moves the points incrementally, choosing a direction at each step that mak
 
     analysis.reduce_features(method='tsne', perplexity_vals = [1,10,15,20], circular=True, range_n_clusters=range(2,10,1))
 
-.. image:: images/sh3/dim_red_ca/tsne_nv.png
+.. image:: images/sh3/dim_red_ca/tsne.png
    :align: center
    :scale: 40%
 
@@ -117,7 +117,7 @@ t-SNE moves the points incrementally, choosing a direction at each step that mak
 
 
 
-.. image:: images/sh3/dim_red_ca/tsne_scatter_nv.png
+.. image:: images/sh3/dim_red_ca/tsne_scatter.png
    :align: center
 
 As it is shown it's possible to set different paramenters:
@@ -141,7 +141,7 @@ For example, even when setting perplexity_vals to [1, 200, 5] and obtaining an o
 
     analysis.reduce_features(method='tsne', perplexity_vals = [50, 170, 200], circular=True, range_n_clusters=range(2,10,1))
 
-.. image:: images/sh3/dim_red_ca/tsne_nv1.png
+.. image:: images/sh3/dim_red_ca/tsne1.png
    :align: center
    :scale: 40%
 
@@ -150,7 +150,7 @@ For example, even when setting perplexity_vals to [1, 200, 5] and obtaining an o
    visualization.dimensionality_reduction_scatter(color_by="end_to_end", save=False, kde_by_ensemble=True)
 
 
-.. image:: images/sh3/dim_red_ca/tsne_scatter_nv1.png
+.. image:: images/sh3/dim_red_ca/tsne_scatter1.png
    :align: center
 
 
@@ -254,12 +254,6 @@ Conversely, a too low value might excessively reduce the dimensionality of the d
 .. image:: images/sh3/dim_red_ca/pca1d.png
    :align: center
 
-.. code-block:: python
-
-    visualization.pca_correlation(59,[0,1,2])
-
-.. image:: images/sh3/dim_red_ca/pca_correlation.png
-   :align: center
 
 DimenFix
 -------------
@@ -279,7 +273,7 @@ The parameter "range_n_clusters" determines the range of cluster values to consi
     reduce_dim_params = {'method': "dimenfix", 'range_n_clusters':[2, 3, 4, 5, 6]}
     analysis.execute_pipeline(featurization_params=featurization_params , reduce_dim_params=reduce_dim_params)
 
-.. image:: images/sh3/dim_red_ca/dimenfix_nv.png
+.. image:: images/sh3/dim_red_ca/dimenfix.png
    :align: center
    :scale: 40%
 
@@ -298,7 +292,7 @@ The parameter "range_n_clusters" determines the range of cluster values to consi
 
 
 
-.. image:: images/sh3/dim_red_ca/dimenfix_scatter_nv.png
+.. image:: images/sh3/dim_red_ca/dimenfix_scatter.png
    :align: center
 
 
@@ -327,7 +321,7 @@ These libraries allow you to reduce the dimensionality of the data while preserv
 
     visualization.dimensionality_reduction_scatter(color_by="prolateness", save=True)
 
-.. image:: images/sh3/dim_red_ca/umap_scatter_nv.png
+.. image:: images/sh3/dim_red_ca/umap.png
    :align: center
 
 UMAP has several hyperparameters that can significantly impact the resulting embedding:
@@ -353,7 +347,7 @@ Lower values of *n_neighbors* will force UMAP to focus on very local structures 
 
     visualization.dimensionality_reduction_scatter(color_by="prolateness", save=True)
 
-.. image:: images/sh3/dim_red_ca/umap_scatter_nv2.png
+.. image:: images/sh3/dim_red_ca/umap1.png
    :align: center
 
 .. admonition:: min_dist
@@ -402,7 +396,7 @@ The "metric" parameter in UMAP controls how distances are calculated in the inpu
 
     visualization.dimensionality_reduction_scatter(color_by="prolateness", save=True)
 
-.. image:: images/sh3/dim_red_ca/umap_scatter_nv3.png
+.. image:: images/sh3/dim_red_ca/umap2.png
    :align: center
 
 

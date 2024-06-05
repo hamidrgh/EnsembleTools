@@ -317,7 +317,7 @@ These libraries allow you to reduce the dimensionality of the data while preserv
 
    visualization.dimensionality_reduction_scatter(color_by="prolateness", save=True)
 
-.. image:: images/sh3/dim_red_phipsi/umap_nv.png
+.. image:: images/sh3/dim_red_phipsi/umap.png
    :align: center
 
 UMAP has several hyperparameters that can significantly impact the resulting embedding:
@@ -347,7 +347,7 @@ This time we find a peak silhouette score for n_clusters = 3 and n_clusters = 6,
 
    visualization.dimensionality_reduction_scatter(color_by="prolateness", save=True)
 
-.. image:: images/sh3/dim_red_phipsi/umap_nv2.png
+.. image:: images/sh3/dim_red_phipsi/umap1.png
    :align: center
 
 .. admonition:: min_dist
@@ -396,7 +396,7 @@ The "metric" parameter in UMAP controls how distances are calculated in the inpu
    
    visualization.dimensionality_reduction_scatter(color_by="prolateness", save=True)
 
-.. image:: images/sh3/dim_red_phipsi/umap_nv3.png
+.. image:: images/sh3/dim_red_phipsi/umap2.png
    :align: center
 
 A better visualization of the clusters is possible changing the metric from ‘Euclidean’ to ‘cosine’ because cosine similarity’s ability to focus on the orientation of vectors, its robustness in capturing pattern similarities, and its compatibility with dimensionality reduction techniques make it a superior choice for clustering and analysis of features like phi and psi in proteins, where the orientation of these angles is of paramount importance.

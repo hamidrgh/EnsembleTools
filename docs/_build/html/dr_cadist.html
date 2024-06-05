@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dimensional reduction on carbon alpha distances &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -167,7 +167,7 @@ t-SNE moves the points incrementally, choosing a direction at each step that mak
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">reduce_features</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;tsne&#39;</span><span class="p">,</span> <span class="n">perplexity_vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">circular</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">range_n_clusters</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="images/sh3/dim_red_ca/tsne_nv.png"><img alt="images/sh3/dim_red_ca/tsne_nv.png" class="align-center" src="images/sh3/dim_red_ca/tsne_nv.png" /></a>
+<a class="reference internal image-reference" href="images/sh3/dim_red_ca/tsne.png"><img alt="images/sh3/dim_red_ca/tsne.png" class="align-center" src="images/sh3/dim_red_ca/tsne.png" /></a>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">dimensionality_reduction_scatter</span><span class="p">(</span><span class="n">color_by</span><span class="o">=</span><span class="s2">&quot;end_to_end&quot;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kde_by_ensemble</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -175,7 +175,7 @@ t-SNE moves the points incrementally, choosing a direction at each step that mak
 <p><em>“save (bool, optional)”: If set to True, the plot will be saved in the data directory. The default value is False.</em></p>
 <p><em>“ax (Union[None, List[plt.Axes]], optional)”: Allows you to provide a list of existing Axes objects to plot on. If set to None, new Axes objects will be created. The default value is None.</em></p>
 <p><em>“kde_by_ensemble (bool, optional)”: If set to True, generates a KDE plot for each ensemble separately. If False, a single KDE plot is generated for the concatenated ensembles. The default value is False.</em></p>
-<img alt="images/sh3/dim_red_ca/tsne_scatter_nv.png" class="align-center" src="images/sh3/dim_red_ca/tsne_scatter_nv.png" />
+<img alt="images/sh3/dim_red_ca/tsne_scatter.png" class="align-center" src="images/sh3/dim_red_ca/tsne_scatter.png" />
 <p>As it is shown it’s possible to set different paramenters:</p>
 <div class="admonition-perplexity-vals admonition">
 <p class="admonition-title">perplexity_vals</p>
@@ -190,11 +190,11 @@ However, a too low value might overly emphasize local structures, while a too hi
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">reduce_features</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;tsne&#39;</span><span class="p">,</span> <span class="n">perplexity_vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">170</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="n">circular</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">range_n_clusters</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="images/sh3/dim_red_ca/tsne_nv1.png"><img alt="images/sh3/dim_red_ca/tsne_nv1.png" class="align-center" src="images/sh3/dim_red_ca/tsne_nv1.png" /></a>
+<a class="reference internal image-reference" href="images/sh3/dim_red_ca/tsne1.png"><img alt="images/sh3/dim_red_ca/tsne1.png" class="align-center" src="images/sh3/dim_red_ca/tsne1.png" /></a>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">dimensionality_reduction_scatter</span><span class="p">(</span><span class="n">color_by</span><span class="o">=</span><span class="s2">&quot;end_to_end&quot;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kde_by_ensemble</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="images/sh3/dim_red_ca/tsne_scatter_nv1.png" class="align-center" src="images/sh3/dim_red_ca/tsne_scatter_nv1.png" />
+<img alt="images/sh3/dim_red_ca/tsne_scatter1.png" class="align-center" src="images/sh3/dim_red_ca/tsne_scatter1.png" />
 <div class="admonition-metric admonition">
 <p class="admonition-title">metric</p>
 <p>str, optional-Metric to use. Default is “euclidean”.</p>
@@ -261,10 +261,6 @@ Conversely, a too low value might excessively reduce the dimensionality of the d
 <p><em>“save (bool, optional)”: If set to True, the plot will be saved as an image file in the data directory. The default value is False.</em></p>
 <p><em>“ax (Union[None, plt.Axes], optional)”: This parameter allows you to provide an existing matplotlib Axes object to plot on. If set to None, a new Axes object will be created.</em></p>
 <img alt="images/sh3/dim_red_ca/pca1d.png" class="align-center" src="images/sh3/dim_red_ca/pca1d.png" />
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">pca_correlation</span><span class="p">(</span><span class="mi">59</span><span class="p">,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
-</pre></div>
-</div>
-<img alt="images/sh3/dim_red_ca/pca_correlation.png" class="align-center" src="images/sh3/dim_red_ca/pca_correlation.png" />
 </section>
 <section id="dimenfix">
 <h2>DimenFix<a class="headerlink" href="#dimenfix" title="Permalink to this heading"></a></h2>
@@ -280,7 +276,7 @@ Conversely, a too low value might excessively reduce the dimensionality of the d
 <span class="n">analysis</span><span class="o">.</span><span class="n">execute_pipeline</span><span class="p">(</span><span class="n">featurization_params</span><span class="o">=</span><span class="n">featurization_params</span> <span class="p">,</span> <span class="n">reduce_dim_params</span><span class="o">=</span><span class="n">reduce_dim_params</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="images/sh3/dim_red_ca/dimenfix_nv.png"><img alt="images/sh3/dim_red_ca/dimenfix_nv.png" class="align-center" src="images/sh3/dim_red_ca/dimenfix_nv.png" /></a>
+<a class="reference internal image-reference" href="images/sh3/dim_red_ca/dimenfix.png"><img alt="images/sh3/dim_red_ca/dimenfix.png" class="align-center" src="images/sh3/dim_red_ca/dimenfix.png" /></a>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">dimensionality_reduction_scatter</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color_by</span><span class="o">=</span><span class="s1">&#39;asphericity&#39;</span><span class="p">,</span> <span class="n">kde_by_ensemble</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -288,7 +284,7 @@ Conversely, a too low value might excessively reduce the dimensionality of the d
 <p><em>“save (bool, optional)”: If set to True, the plot will be saved in the data directory. The default value is False.</em></p>
 <p><em>“ax (Union[None, List[plt.Axes]], optional)”: Allows you to provide a list of existing Axes objects to plot on. If set to None, new Axes objects will be created. The default value is None.</em></p>
 <p><em>“kde_by_ensemble (bool, optional)”: If set to True, generates a KDE plot for each ensemble separately. If False, a single KDE plot is generated for the concatenated ensembles. The default value is False.</em></p>
-<img alt="images/sh3/dim_red_ca/dimenfix_scatter_nv.png" class="align-center" src="images/sh3/dim_red_ca/dimenfix_scatter_nv.png" />
+<img alt="images/sh3/dim_red_ca/dimenfix_scatter.png" class="align-center" src="images/sh3/dim_red_ca/dimenfix_scatter.png" />
 </section>
 <section id="umap-uniform-manifold-approximation-and-projection">
 <h2>UMAP (Uniform Manifold Approximation and Projection)<a class="headerlink" href="#umap-uniform-manifold-approximation-and-projection" title="Permalink to this heading"></a></h2>
@@ -306,7 +302,7 @@ These libraries allow you to reduce the dimensionality of the data while preserv
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">dimensionality_reduction_scatter</span><span class="p">(</span><span class="n">color_by</span><span class="o">=</span><span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="images/sh3/dim_red_ca/umap_scatter_nv.png" class="align-center" src="images/sh3/dim_red_ca/umap_scatter_nv.png" />
+<img alt="images/sh3/dim_red_ca/umap.png" class="align-center" src="images/sh3/dim_red_ca/umap.png" />
 <p>UMAP has several hyperparameters that can significantly impact the resulting embedding:</p>
 <div class="admonition-n-neighbors admonition">
 <p class="admonition-title">n_neighbors</p>
@@ -322,7 +318,7 @@ Lower values of <em>n_neighbors</em> will force UMAP to focus on very local stru
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">dimensionality_reduction_scatter</span><span class="p">(</span><span class="n">color_by</span><span class="o">=</span><span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="images/sh3/dim_red_ca/umap_scatter_nv2.png" class="align-center" src="images/sh3/dim_red_ca/umap_scatter_nv2.png" />
+<img alt="images/sh3/dim_red_ca/umap1.png" class="align-center" src="images/sh3/dim_red_ca/umap1.png" />
 <div class="admonition-min-dist admonition">
 <p class="admonition-title">min_dist</p>
 <p>float, optional-Minimum distance. [Default is 0.1].</p>
@@ -356,7 +352,7 @@ This can lead to a loss of important details in the local relationships between 
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">dimensionality_reduction_scatter</span><span class="p">(</span><span class="n">color_by</span><span class="o">=</span><span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="images/sh3/dim_red_ca/umap_scatter_nv3.png" class="align-center" src="images/sh3/dim_red_ca/umap_scatter_nv3.png" />
+<img alt="images/sh3/dim_red_ca/umap2.png" class="align-center" src="images/sh3/dim_red_ca/umap2.png" />
 <div class="admonition-differences-between-t-sne-and-umap admonition">
 <p class="admonition-title">Differences between t-SNE and UMAP</p>
 <ol class="arabic simple">

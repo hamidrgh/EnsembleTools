@@ -114,7 +114,7 @@ The asphericity the measure of deviation from the spherical shape of a molecule.
 
     visualization.asphericity(violin_plot=False)
 
-.. image:: images/sh3/global_analysis/asph1.png
+.. image:: images/sh3/global_analysis/asphericity1.png
    :align: center
 
 Prolatness distribution
@@ -139,7 +139,7 @@ Prolatness distribution
 
     visualization.prolatness()
 
-.. image:: images/sh3/global_analysis/prolateness.png
+.. image:: images/sh3/global_analysis/prolatness.png
    :align: center
   
 
@@ -203,7 +203,7 @@ The acronym "SASA" stands for "Solvent Accessible Surface Area" and refers to th
 
     visualization.ensemble_sasa()
 
-.. image:: images/sh3/global_analysis/global_sasa.png
+.. image:: images/sh3/global_analysis/sasa.png
    :align: center
   
 Alpha angles dihedral distribution

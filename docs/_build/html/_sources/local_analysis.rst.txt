@@ -60,7 +60,7 @@ The graphs show the contact maps generated from the coordinates of the alpha car
 
     visualization.contact_prob_maps(threshold=0.7)
 
-.. image:: images/sh3/local_analysis/contactmap.png
+.. image:: images/sh3/local_analysis/probmap.png
    :align: center
 
 Site-specific flexibility parameter
@@ -81,7 +81,7 @@ A disorder value close to **0** suggests **rigidity or a stable conformation** o
 
     visualization.ss_flexibility_parameter(pointer=[])
 
-.. image:: images/sh3/local_analysis/ssm_disorder.png
+.. image:: images/sh3/local_analysis/ssflex_param.png
    :align: center
 
 Site-specific order parameter 
@@ -100,18 +100,6 @@ The "Site-specific order parameter" is an indicator that evaluates the local ord
 
     visualization.ss_order_parameter(pointer=[])
 
-.. image:: images/sh3/local_analysis/sso_param.png
+.. image:: images/sh3/local_analysis/ssorder_param.png
    :align: center
 
-Local sasa distribution
----------------------------
-SASA is a metric that quantifies the surface area of a residue accessible to the solvent. 
-In this context, 'local SASA distribution' refers to the distribution of the Specific Solvent Accessible Surface Area (SASA) for residues within a protein structure.
-
-
-.. code-block:: python
-
-    visualization.local_sasa_dist(pointer=[])
-
-.. image:: images/sh3/local_analysis/local_sasa.png
-   :align: center
