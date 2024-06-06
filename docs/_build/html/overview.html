@@ -89,26 +89,50 @@ Moreover, by implementing different dimensionality reduction algorithms whithin 
 <span class="kn">from</span> <span class="nn">dpet.ensemble</span> <span class="kn">import</span> <span class="n">Ensemble</span>
 <span class="kn">from</span> <span class="nn">dpet.ensemble_analysis</span> <span class="kn">import</span> <span class="n">EnsembleAnalysis</span>
 <span class="kn">from</span> <span class="nn">dpet.visualization</span> <span class="kn">import</span> <span class="n">Visualization</span>
+</pre></div>
+</div>
+<p>There are three possibilities for downloading the data:</p>
+<ul class="simple">
+<li><p>From the <strong>atlas</strong> database:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;3a1g_B&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;atlas&#39;</span><span class="p">)</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>From the <strong>PED</strong> database:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00156e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">),</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00157e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">),</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00158e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">)</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>From specified File Paths:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00156e001&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00156e001.pdb&#39;</span><span class="p">),</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00158e001&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00158e001.dcd&#39;</span><span class="p">,</span> <span class="n">top_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00158e001.top.pdb&#39;</span><span class="p">)</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># Create an EnsembleAnalysis object with the given ensembles and specify the output directory</span>
+ <span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ensembles</span><span class="o">=</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s1">&#39;path/to/output_directory&#39;</span><span class="p">)</span>
+ <span class="c1"># Load the trajectories for each ensemble</span>
+ <span class="n">analysis</span><span class="o">.</span><span class="n">load_trajectories</span><span class="p">()</span>
+ <span class="c1"># Create a Visualization object using the EnsembleAnalysis object</span>
+ <span class="c1">#to enable visualization of the analysis results</span>
+ <span class="n">visualization</span> <span class="o">=</span> <span class="n">Visualization</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
 
- <span class="c1"># read in the simulation trajectory</span>
- <span class="n">TO</span> <span class="o">=</span> <span class="n">SSTrajectory</span><span class="p">(</span><span class="s1">&#39;traj.xtc&#39;</span><span class="p">,</span> <span class="s1">&#39;start.pdb&#39;</span><span class="p">)</span>
 
- <span class="c1"># once the trajectory has been read in, proteins can be extracted</span>
- <span class="c1"># from the proteinTrajectoryList</span>
+<span class="c1"># Visualize the distribution of the radius of gyration</span>
+<span class="n">visualization</span><span class="o">.</span><span class="n">radius_of_gyration</span><span class="p">()</span>
 
- <span class="n">protein</span> <span class="o">=</span> <span class="n">TO</span><span class="o">.</span><span class="n">proteinTrajectoryList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
- <span class="c1"># calculate per-residue distance between residues 10 and 20</span>
- <span class="n">d_10_20</span> <span class="o">=</span> <span class="n">protein</span><span class="o">.</span><span class="n">get_inter_residue_COM_distance</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-
- <span class="c1"># calculate the ensemble asphericity</span>
- <span class="n">asph</span> <span class="o">=</span> <span class="n">protein</span><span class="o">.</span><span class="n">get_asphericity</span><span class="p">()</span>
-
- <span class="c1"># calculate the ensemble asphericity</span>
- <span class="n">rg</span> <span class="o">=</span> <span class="n">protein</span><span class="o">.</span><span class="n">get_radius_of_gyration</span><span class="p">()</span>
-
- <span class="c1"># calculate the ensemble distance map</span>
- <span class="n">dm</span> <span class="o">=</span> <span class="n">protein</span><span class="o">.</span><span class="n">get_distance_map</span><span class="p">()</span>
+<span class="c1"># Visualize the contact maps</span>
+<span class="n">visualization</span><span class="o">.</span><span class="n">contact_prob_maps</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>

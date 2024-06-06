@@ -14,22 +14,50 @@ As an example:
  from dpet.ensemble_analysis import EnsembleAnalysis
  from dpet.visualization import Visualization
 
-  # read in the simulation trajectory 
-  TO = SSTrajectory('traj.xtc', 'start.pdb')
 
-  # once the trajectory has been read in, proteins can be extracted
-  # from the proteinTrajectoryList
-  
-  protein = TO.proteinTrajectoryList[0]
+There are three possibilities for downloading the data:
 
-  # calculate per-residue distance between residues 10 and 20
-  d_10_20 = protein.get_inter_residue_COM_distance(10, 20)
+- From the **atlas** database:
 
-  # calculate the ensemble asphericity
-  asph = protein.get_asphericity()
+.. code-block:: python
 
-  # calculate the ensemble asphericity
-  rg = protein.get_radius_of_gyration()
+  ensembles = [
+    Ensemble(ens_code='3a1g_B', database='atlas')
+  ]
 
-  # calculate the ensemble distance map
-  dm = protein.get_distance_map()
+- From the **PED** database:
+
+.. code-block:: python
+
+  ensembles = [
+    Ensemble(ens_code='PED00156e001', database='ped'),
+    Ensemble(ens_code='PED00157e001', database='ped'),
+    Ensemble(ens_code='PED00158e001', database='ped')
+  ]
+
+- From specified File Paths:
+
+.. code-block:: python
+
+  ensembles = [
+    Ensemble(ens_code='PED00156e001', data_path='path/to/data/PED00156e001.pdb'),
+    Ensemble(ens_code='PED00158e001', data_path='path/to/data/PED00158e001.dcd', top_path='path/to/data/PED00158e001.top.pdb')
+  ]
+
+
+.. code-block:: python
+    
+  # Create an EnsembleAnalysis object with the given ensembles and specify the output directory
+  analysis = EnsembleAnalysis(ensembles=ensembles, output_dir='path/to/output_directory')
+  # Load the trajectories for each ensemble
+  analysis.load_trajectories()
+  # Create a Visualization object using the EnsembleAnalysis object 
+  #to enable visualization of the analysis results
+  visualization = Visualization(analysis)
+
+
+ # Visualize the distribution of the radius of gyration 
+ visualization.radius_of_gyration()
+
+ # Visualize the contact maps
+ visualization.contact_prob_maps()
