@@ -3,6 +3,14 @@ Comparing Ensambles
 High level (moderate controll)
 ---------------------------------
 
+The code performs two comparative visualizations using the Jensen-Shannon Divergence (JSD) score:
+
+1. **ca_dist**: Comparison of the distributions of the feature ca_dist, visualized with the "Oranges" color map.
+2. **alpha_angle**: Comparison of the distributions of the feature alpha_angle, visualized with the "Purples" color map.
+
+**JSD (Jensen-Shannon Divergence)** is a measure of similarity between two probability distributions. It is based on the Kullback-Leibler (KL) divergence but is symmetric and bounded between 0 and 1, where 0 indicates that the distributions are identical and 1 indicates maximum difference.
+
+
 .. code-block:: python
 
    bootstrap_iters=5
@@ -31,11 +39,26 @@ High level (moderate controll)
    plt.show()
 
 
-.. image:: images/sh3/comparing_ensambles/comp_hl_JDS.png
+.. image:: images/sh3/comparing_ensambles/comp_hl_JSD.png
    :align: center
 
-.. image:: images/sh3/comparing_ensambles/comparing_hl_JDS.png
+We note that each feature is compared across 6 pairs of ensembles, with 5 bootstrap iterations for each pair, for a total of 30 comparisons.
+
+
+.. image:: images/sh3/comparing_ensambles/comparing_hl_JSD.png
    :align: center
+
+
+The Jensen-Shannon divergence between the distributions of *ca_dist* provides an indication of how different the calcium distributions are across the different pairs of ensembles. A low JSD value would indicate that the distributions are very similar, while a high value would indicate very different distributions.
+
+Similarly, the JSD calculated for *alpha_angle* measures the difference between the distributions of alpha angles among the pairs of ensembles. This can help understand how the alpha angles vary between different conditions or configurations.
+
+
+
+Similarly, now the code performs the same two comparative visualizations using the EMD metric.
+
+**The Earth Mover's Distance (EMD)** is a measure of the distance between two probability distributions and is calculated as the minimum cost of transforming one distribution into the other, where the cost is defined in terms of the "work" needed to move the probability mass.
+
 
 .. code-block:: python
 
@@ -67,10 +90,24 @@ High level (moderate controll)
 .. image:: images/sh3/comparing_ensambles/comp_hl_EMD.png
    :align: center
 
+- each feature is compared across 6 pairs of ensembles, with 5 bootstrap iterations for each pair, for a total of 30 comparisons.
+- Distance Function (RMSD): The Root Mean Square Deviation (RMSD) is used to compare the distributions of ca_dist. This function measures the mean quadratic difference between two distributions, providing a clear and intuitive indication of the differences between them.
+- Distance Function (Angular L2): The L2 norm for angles is used to compare the distributions of alpha_angle. This metric is appropriate for measuring differences between angles, as it takes into account the cyclic nature of angles and possible discontinuities.
+
+
 .. image:: images/sh3/comparing_ensambles/comparing_hl_EMD.png
+
+The **EMD** can range from 0 to ∞ (infinity). 
+
+- A low value of EMD indicates that the two distributions are very similar, requiring little "work" to transform one distribution into the other.
+- A high value of EMD indicates that the two distributions are very different.
 
 Intermediate level (slightly more control)
 --------------------------------------------
+
+The provided code manually calculates the JSD divergence scores between all ensemble pairs using the Ensemble class. 
+
+Using EnsembleAnalysis to manually calculate divergence scores allows for detailed customization of the analysis process. You can choose the type of score, the number of bootstrap iterations, the method for bins, and more.
 
 .. code-block:: python
    
@@ -98,6 +135,8 @@ Intermediate level (slightly more control)
 
 .. image:: images/sh3/comparing_ensambles/comp_il.png
    :scale: center
+
+After using the comparison_scores function of the analysis class to manually calculate the JSD scores for each feature (ca_dist and alpha_angle), the plot_comparison_matrix function is used to visualize the results.
 
 .. code-block:: python
 
@@ -129,6 +168,10 @@ Intermediate level (slightly more control)
 
 .. image:: images/sh3/comparing_ensambles/comparing_il.png
    :align: center
+
+This function accepts manually calculated scores and displays them, allowing for greater customization of the graphs.
+
+On the other hand, the previous code (high level-moderate control) directly uses the comparison_matrix function to calculate and display the results in a single step, without the possibility of further customizing the graphs. Therefore, it is simpler and more automated but with fewer customization options.
 
 Low level (full control)
 --------------------------

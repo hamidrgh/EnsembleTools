@@ -95,6 +95,12 @@
 <h1>Comparing Ensambles<a class="headerlink" href="#comparing-ensambles" title="Permalink to this heading"></a></h1>
 <section id="high-level-moderate-controll">
 <h2>High level (moderate controll)<a class="headerlink" href="#high-level-moderate-controll" title="Permalink to this heading"></a></h2>
+<p>The code performs two comparative visualizations using the Jensen-Shannon Divergence (JSD) score:</p>
+<ol class="arabic simple">
+<li><p><strong>ca_dist</strong>: Comparison of the distributions of the feature ca_dist, visualized with the “Oranges” color map.</p></li>
+<li><p><strong>alpha_angle</strong>: Comparison of the distributions of the feature alpha_angle, visualized with the “Purples” color map.</p></li>
+</ol>
+<p><strong>JSD (Jensen-Shannon Divergence)</strong> is a measure of similarity between two probability distributions. It is based on the Kullback-Leibler (KL) divergence but is symmetric and bounded between 0 and 1, where 0 indicates that the distributions are identical and 1 indicates maximum difference.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bootstrap_iters</span><span class="o">=</span><span class="mi">5</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 
@@ -121,8 +127,13 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="images/sh3/comparing_ensambles/comp_hl_JDS.png" class="align-center" src="images/sh3/comparing_ensambles/comp_hl_JDS.png" />
-<img alt="images/sh3/comparing_ensambles/comparing_hl_JDS.png" class="align-center" src="images/sh3/comparing_ensambles/comparing_hl_JDS.png" />
+<img alt="images/sh3/comparing_ensambles/comp_hl_JSD.png" class="align-center" src="images/sh3/comparing_ensambles/comp_hl_JSD.png" />
+<p>We note that each feature is compared across 6 pairs of ensembles, with 5 bootstrap iterations for each pair, for a total of 30 comparisons.</p>
+<img alt="images/sh3/comparing_ensambles/comparing_hl_JSD.png" class="align-center" src="images/sh3/comparing_ensambles/comparing_hl_JSD.png" />
+<p>The Jensen-Shannon divergence between the distributions of <em>ca_dist</em> provides an indication of how different the calcium distributions are across the different pairs of ensembles. A low JSD value would indicate that the distributions are very similar, while a high value would indicate very different distributions.</p>
+<p>Similarly, the JSD calculated for <em>alpha_angle</em> measures the difference between the distributions of alpha angles among the pairs of ensembles. This can help understand how the alpha angles vary between different conditions or configurations.</p>
+<p>Similarly, now the code performs the same two comparative visualizations using the EMD metric.</p>
+<p><strong>The Earth Mover’s Distance (EMD)</strong> is a measure of the distance between two probability distributions and is calculated as the minimum cost of transforming one distribution into the other, where the cost is defined in terms of the “work” needed to move the probability mass.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
 
 <span class="n">visualization</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">(</span>
@@ -150,10 +161,22 @@
 </pre></div>
 </div>
 <img alt="images/sh3/comparing_ensambles/comp_hl_EMD.png" class="align-center" src="images/sh3/comparing_ensambles/comp_hl_EMD.png" />
+<ul class="simple">
+<li><p>each feature is compared across 6 pairs of ensembles, with 5 bootstrap iterations for each pair, for a total of 30 comparisons.</p></li>
+<li><p>Distance Function (RMSD): The Root Mean Square Deviation (RMSD) is used to compare the distributions of ca_dist. This function measures the mean quadratic difference between two distributions, providing a clear and intuitive indication of the differences between them.</p></li>
+<li><p>Distance Function (Angular L2): The L2 norm for angles is used to compare the distributions of alpha_angle. This metric is appropriate for measuring differences between angles, as it takes into account the cyclic nature of angles and possible discontinuities.</p></li>
+</ul>
 <img alt="images/sh3/comparing_ensambles/comparing_hl_EMD.png" src="images/sh3/comparing_ensambles/comparing_hl_EMD.png" />
+<p>The <strong>EMD</strong> can range from 0 to ∞ (infinity).</p>
+<ul class="simple">
+<li><p>A low value of EMD indicates that the two distributions are very similar, requiring little “work” to transform one distribution into the other.</p></li>
+<li><p>A high value of EMD indicates that the two distributions are very different.</p></li>
+</ul>
 </section>
 <section id="intermediate-level-slightly-more-control">
 <h2>Intermediate level (slightly more control)<a class="headerlink" href="#intermediate-level-slightly-more-control" title="Permalink to this heading"></a></h2>
+<p>The provided code manually calculates the JSD divergence scores between all ensemble pairs using the Ensemble class.</p>
+<p>Using EnsembleAnalysis to manually calculate divergence scores allows for detailed customization of the analysis process. You can choose the type of score, the number of bootstrap iterations, the method for bins, and more.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">boostrap_iters</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">bins</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
 <span class="n">score</span> <span class="o">=</span> <span class="s2">&quot;jsd&quot;</span>
@@ -177,6 +200,7 @@
 <span class="p">)</span>
 </pre></div>
 </div>
+<p>After using the comparison_scores function of the analysis class to manually calculate the JSD scores for each feature (ca_dist and alpha_angle), the plot_comparison_matrix function is used to visualize the results.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">14.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">))</span>
 
 <span class="n">show_std</span> <span class="o">=</span> <span class="kc">True</span>
@@ -205,6 +229,8 @@
 </pre></div>
 </div>
 <img alt="images/sh3/comparing_ensambles/comparing_il.png" class="align-center" src="images/sh3/comparing_ensambles/comparing_il.png" />
+<p>This function accepts manually calculated scores and displays them, allowing for greater customization of the graphs.</p>
+<p>On the other hand, the previous code (high level-moderate control) directly uses the comparison_matrix function to calculate and display the results in a single step, without the possibility of further customizing the graphs. Therefore, it is simpler and more automated but with fewer customization options.</p>
 </section>
 <section id="low-level-full-control">
 <h2>Low level (full control)<a class="headerlink" href="#low-level-full-control" title="Permalink to this heading"></a></h2>
