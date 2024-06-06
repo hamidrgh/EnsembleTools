@@ -67,7 +67,7 @@ Furthermore, to effectively manage the large volumes of data associated with the
    </div>
 
    <div class='icon-item'>
-    <img src="images/icons/comp_ensambles.png" alt="comparing_ensamble" title="" onclick="redirectToPage('comparing_ensambles.html')" style="cursor: pointer;width: 200px; height: 200px;">
+    <img src="images/icons/comp_ensambles.png" alt="comparing_ensamble" title="We have explored techniques for comparing and analyzing datasets, focusing on the calculation of various metrics " onclick="redirectToPage('comparing_ensambles.html')" style="cursor: pointer;width: 200px; height: 200px;">
     <div style="font-size: 12px; color: #001;">Comparing Ensambles analysis</div>
    </div>
 

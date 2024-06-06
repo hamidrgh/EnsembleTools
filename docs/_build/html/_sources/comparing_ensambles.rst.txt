@@ -1,6 +1,12 @@
 Comparing Ensambles
 ***********************
-High level (moderate controll)
+We have explored techniques for comparing and analyzing datasets, focusing on the calculation of various metrics such as Jensen-Shannon Divergence (JSD) and Earth Mover's Distance (EMD).
+
+Comparing datasets is crucial for understanding the similarities and differences between different datasets or models, and quantifying them can provide insights into the underlying patterns and distributions present in the data.
+
+Practical examples are provided, demonstrating how to manually calculate these metrics, referring to 3 ensembles downloaded directly from the Protein Ensemble Database (PED): PED00156, PED00157, and PED00158. These ensembles represent structural states of the N-terminal SH3 domain of the Drk protein (residues 1-59) in its unfolded form, generated with different approaches to initialize pools of random conformations.
+
+High level (moderate control)
 ---------------------------------
 
 The code performs two comparative visualizations using the Jensen-Shannon Divergence (JSD) score:
@@ -176,11 +182,20 @@ On the other hand, the previous code (high level-moderate control) directly uses
 Low level (full control)
 --------------------------
 
+
+The following code is an example of how to manually calculate JSD (Jensen-Shannon Divergence) and EMD (Earth Mover's Distance) scores between two sets of data. This approach is more manual and provides the highest level of control, as features are extracted manually and scores are calculated without using automated library functions for visualization. 
+It allows for customization at every step, from feature calculation to implementing one's own bootstrap strategy.
+
+
 .. code-block:: python
 
    ens_1 = analysis["PED00156e001"]
    ens_2 = analysis["PED00157e001"]
    ens_3 = analysis["PED00158e001"]
+
+Here, the aJSD score is calculated for calcium distances (aJSD_d) and for alpha angles (aJSD_t) between two sets of data. 
+The variables score_ajsd_d and score_ajsd_t are functions that perform these calculations, also returning the number of bins used.
+
 
 .. code-block:: python
 
@@ -212,46 +227,44 @@ Low level (full control)
 
 .. image:: images/sh3/comparing_ensambles/comp_ll_23.png
 
+This code demonstrates how to manually extract alpha angles from each dataset and calculate the average JSD score using these features.
+
+
 .. code-block:: python
 
    # Manually compute features (alpha_angles).
    alpha_1 = ens_1.get_features(featurization="a_angle")
-   print("- features 1 shape:", alpha_1.shape)
    alpha_2 = ens_2.get_features(featurization="a_angle")
+   alpha_3 = ens_3.get_features(featurization="a_angle")
+
+   print("- features 1 shape:", alpha_1.shape)
    print("- features 2 shape:", alpha_2.shape)
    # Manually compute average JSD approximation. You can also provide any other
    # 2d feature matrix as input to the `score_avg_jsd` function.
    score, bins = score_avg_jsd(alpha_1, alpha_2, bins="auto", return_bins=True)
    print(f"- aJSD_t score: {score:.4f}, bins used: {bins}")
 
-   # Manually compute features (alpha_angles).
-   alpha_1 = ens_1.get_features(featurization="a_angle")
    print("- features 1 shape:", alpha_1.shape)
-   alpha_3 = ens_3.get_features(featurization="a_angle")
    print("- features 3 shape:", alpha_3.shape)
-   # Manually compute average JSD approximation. You can also provide any other
-   # 2d feature matrix as input to the `score_avg_jsd` function.
    score, bins = score_avg_jsd(alpha_1, alpha_3, bins="auto", return_bins=True)
    print(f"- aJSD_t score: {score:.4f}, bins used: {bins}")
 
-   # Manually compute features (alpha_angles).
-   alpha_1 = ens_2.get_features(featurization="a_angle")
    print("- features 2 shape:", alpha_2.shape)
-   alpha_2 = ens_3.get_features(featurization="a_angle")
    print("- features 3 shape:", alpha_3.shape)
-   # Manually compute average JSD approximation. You can also provide any other
-   # 2d feature matrix as input to the `score_avg_jsd` function.
    score, bins = score_avg_jsd(alpha_2, alpha_3, bins="auto", return_bins=True)
    print(f"- aJSD_t score: {score:.4f}, bins used: {bins}")
 
 .. image:: images/sh3/comparing_ensambles/comp_ll_1.png
 
+Finally, the EMD score between the extracted features is manually computed. For angular features, angular_l2 is used as the comparison metric.
+
 .. code-block:: python
 
    # Let's compute features (alpha_angles).
    alpha_1 = ens_1.get_features(featurization="a_angle")
-   print("- features 1 shape:", alpha_1.shape)
    alpha_2 = ens_2.get_features(featurization="a_angle")
+   alpha_3 = ens_3.get_features(featurization="a_angle")
+   print("- features 1 shape:", alpha_1.shape)
    print("- features 2 shape:", alpha_2.shape)
    # Manually score EMD approximation. NOTE: since we are comparing angular features,
    # make sure to use `angular_l2` as the `metric` argument. For all other features
@@ -259,26 +272,16 @@ Low level (full control)
    score = score_emd_approximation(alpha_1, alpha_2, metric="angular_l2")
    print(f"- EMD on alpha angles: {score:.4f}")
 
-   # Let's compute features (alpha_angles).
-   alpha_1 = ens_1.get_features(featurization="a_angle")
    print("- features 1 shape:", alpha_1.shape)
-   alpha_3 = ens_3.get_features(featurization="a_angle")
    print("- features 3 shape:", alpha_3.shape)
-   # Manually score EMD approximation. NOTE: since we are comparing angular features,
-   # make sure to use `angular_l2` as the `metric` argument. For all other features
-   # (e.g.: interatomic distances) you should use `rmsd` or `l2` instead.
    score = score_emd_approximation(alpha_1, alpha_3, metric="angular_l2")
    print(f"- EMD on alpha angles: {score:.4f}")
 
-   # Let's compute features (alpha_angles).
-   alpha_2 = ens_2.get_features(featurization="a_angle")
    print("- features 2 shape:", alpha_2.shape)
-   alpha_3 = ens_3.get_features(featurization="a_angle")
    print("- features 3 shape:", alpha_3.shape)
-   # Manually score EMD approximation. NOTE: since we are comparing angular features,
-   # make sure to use `angular_l2` as the `metric` argument. For all other features
-   # (e.g.: interatomic distances) you should use `rmsd` or `l2` instead.
    score = score_emd_approximation(alpha_2, alpha_3, metric="angular_l2")
    print(f"- EMD on alpha angles: {score:.4f}")
 
 .. image:: images/sh3/comparing_ensambles/comp_ll_2.png
+
+Note that visualization is not directly included in the code, unlike previous examples where comparison matrices were created and displayed automatically.
