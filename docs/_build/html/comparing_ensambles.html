@@ -52,7 +52,12 @@
 <li class="toctree-l2"><a class="reference internal" href="Global_analysis.html">Global analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="local_analysis.html">Local analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dimensional_reduction.html">Dimensional Reduction Analysis</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Comparing Ensambles</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Comparing Ensambles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#high-level-moderate-controll">High level (moderate controll)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intermediate-level-slightly-more-control">Intermediate level (slightly more control)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#low-level-full-control">Low level (full control)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dm.html">dimensionality_reduction</a></li>
@@ -88,6 +93,218 @@
              
   <section id="comparing-ensambles">
 <h1>Comparing Ensambles<a class="headerlink" href="#comparing-ensambles" title="Permalink to this heading"></a></h1>
+<section id="high-level-moderate-controll">
+<h2>High level (moderate controll)<a class="headerlink" href="#high-level-moderate-controll" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bootstrap_iters</span><span class="o">=</span><span class="mi">5</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+
+<span class="n">visualization</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">(</span>
+   <span class="n">score</span><span class="o">=</span><span class="s2">&quot;jsd&quot;</span><span class="p">,</span><span class="n">feature</span><span class="o">=</span><span class="s2">&quot;ca_dist&quot;</span><span class="p">,</span>
+   <span class="n">bootstrap_iters</span><span class="o">=</span><span class="n">bootstrap_iters</span><span class="p">,</span>
+   <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+   <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+   <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Oranges&quot;</span><span class="p">,</span>
+   <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">visualization</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">(</span>
+   <span class="n">score</span><span class="o">=</span><span class="s2">&quot;jsd&quot;</span><span class="p">,</span>
+   <span class="n">feature</span><span class="o">=</span><span class="s2">&quot;alpha_angle&quot;</span><span class="p">,</span>
+   <span class="n">bootstrap_iters</span><span class="o">=</span><span class="n">bootstrap_iters</span><span class="p">,</span>
+   <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+   <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+   <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Purples&quot;</span><span class="p">,</span>
+   <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="images/sh3/comparing_ensambles/comp_hl_JDS.png" class="align-center" src="images/sh3/comparing_ensambles/comp_hl_JDS.png" />
+<img alt="images/sh3/comparing_ensambles/comparing_hl_JDS.png" class="align-center" src="images/sh3/comparing_ensambles/comparing_hl_JDS.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+
+<span class="n">visualization</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">(</span>
+ <span class="n">score</span><span class="o">=</span><span class="s2">&quot;emd&quot;</span><span class="p">,</span>
+ <span class="n">feature</span><span class="o">=</span><span class="s2">&quot;ca_dist&quot;</span><span class="p">,</span>
+ <span class="n">bootstrap_iters</span><span class="o">=</span><span class="n">bootstrap_iters</span><span class="p">,</span>
+ <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+ <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+ <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Reds&quot;</span><span class="p">,</span>
+ <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">visualization</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">(</span>
+ <span class="n">score</span><span class="o">=</span><span class="s2">&quot;emd&quot;</span><span class="p">,</span>
+ <span class="n">feature</span><span class="o">=</span><span class="s2">&quot;alpha_angle&quot;</span><span class="p">,</span>
+ <span class="n">bootstrap_iters</span><span class="o">=</span><span class="n">bootstrap_iters</span><span class="p">,</span>
+ <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+ <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+ <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Greens&quot;</span><span class="p">,</span>
+ <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="images/sh3/comparing_ensambles/comp_hl_EMD.png" class="align-center" src="images/sh3/comparing_ensambles/comp_hl_EMD.png" />
+<img alt="images/sh3/comparing_ensambles/comparing_hl_EMD.png" src="images/sh3/comparing_ensambles/comparing_hl_EMD.png" />
+</section>
+<section id="intermediate-level-slightly-more-control">
+<h2>Intermediate level (slightly more control)<a class="headerlink" href="#intermediate-level-slightly-more-control" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">boostrap_iters</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">bins</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+<span class="n">score</span> <span class="o">=</span> <span class="s2">&quot;jsd&quot;</span>
+
+<span class="c1"># Score divergences in Ca-Ca distances.</span>
+<span class="n">ca_dist_scores</span><span class="p">,</span> <span class="n">codes</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">comparison_scores</span><span class="p">(</span>
+ <span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">,</span>
+ <span class="n">feature</span><span class="o">=</span><span class="s2">&quot;ca_dist&quot;</span><span class="p">,</span>
+ <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+ <span class="n">bootstrap_iters</span><span class="o">=</span><span class="n">boostrap_iters</span><span class="p">,</span>
+ <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Score divergences in alpha torsions.</span>
+<span class="n">alpha_angles_scores</span><span class="p">,</span> <span class="n">codes</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">comparison_scores</span><span class="p">(</span>
+ <span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">,</span>
+ <span class="n">feature</span><span class="o">=</span><span class="s2">&quot;alpha_angle&quot;</span><span class="p">,</span>
+ <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+ <span class="n">bootstrap_iters</span><span class="o">=</span><span class="n">boostrap_iters</span><span class="p">,</span>
+ <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">14.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">))</span>
+
+<span class="n">show_std</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">plot_comparison_matrix</span><span class="p">(</span>
+ <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+ <span class="n">scores</span><span class="o">=</span><span class="n">ca_dist_scores</span><span class="p">,</span>
+ <span class="n">codes</span><span class="o">=</span><span class="n">codes</span><span class="p">,</span>
+ <span class="n">std</span><span class="o">=</span><span class="n">show_std</span><span class="p">,</span>
+ <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Oranges&quot;</span><span class="p">,</span>
+ <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Distance distributions (aJSD_d)&quot;</span><span class="p">,</span>
+ <span class="n">cbar_label</span><span class="o">=</span><span class="s2">&quot;aJSD_d score&quot;</span><span class="p">,</span>
+ <span class="n">textcolors</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">plot_comparison_matrix</span><span class="p">(</span>
+ <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+ <span class="n">scores</span><span class="o">=</span><span class="n">alpha_angles_scores</span><span class="p">,</span>
+ <span class="n">codes</span><span class="o">=</span><span class="n">codes</span><span class="p">,</span>
+ <span class="n">std</span><span class="o">=</span><span class="n">show_std</span><span class="p">,</span>
+ <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Purples&quot;</span><span class="p">,</span>
+ <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Alpha angles distributions (aJSD_t)&quot;</span><span class="p">,</span>
+ <span class="n">cbar_label</span><span class="o">=</span><span class="s2">&quot;aJSD_t score&quot;</span><span class="p">,</span>
+ <span class="n">textcolors</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span>  <span class="c1"># Changes text color.</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="images/sh3/comparing_ensambles/comparing_il.png" class="align-center" src="images/sh3/comparing_ensambles/comparing_il.png" />
+</section>
+<section id="low-level-full-control">
+<h2>Low level (full control)<a class="headerlink" href="#low-level-full-control" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ens_1</span> <span class="o">=</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;PED00156e001&quot;</span><span class="p">]</span>
+<span class="n">ens_2</span> <span class="o">=</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;PED00157e001&quot;</span><span class="p">]</span>
+<span class="n">ens_3</span> <span class="o">=</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;PED00158e001&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_ajsd_d</span><span class="p">(</span><span class="n">ens_1</span><span class="p">,</span> <span class="n">ens_2</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_d score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_ajsd_t</span><span class="p">(</span><span class="n">ens_1</span><span class="p">,</span> <span class="n">ens_2</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_t score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="images/sh3/comparing_ensambles/comp_ll_12.png" src="images/sh3/comparing_ensambles/comp_ll_12.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_ajsd_d</span><span class="p">(</span><span class="n">ens_1</span><span class="p">,</span> <span class="n">ens_3</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_d score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_ajsd_t</span><span class="p">(</span><span class="n">ens_1</span><span class="p">,</span> <span class="n">ens_3</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_t score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="images/sh3/comparing_ensambles/comp_ll_13.png" src="images/sh3/comparing_ensambles/comp_ll_13.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_ajsd_d</span><span class="p">(</span><span class="n">ens_2</span><span class="p">,</span> <span class="n">ens_3</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_d score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_ajsd_t</span><span class="p">(</span><span class="n">ens_2</span><span class="p">,</span> <span class="n">ens_3</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_t score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="images/sh3/comparing_ensambles/comp_ll_23.png" src="images/sh3/comparing_ensambles/comp_ll_23.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Manually compute features (alpha_angles).</span>
+<span class="n">alpha_1</span> <span class="o">=</span> <span class="n">ens_1</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 1 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">alpha_2</span> <span class="o">=</span> <span class="n">ens_2</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 2 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_2</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># Manually compute average JSD approximation. You can also provide any other</span>
+<span class="c1"># 2d feature matrix as input to the `score_avg_jsd` function.</span>
+<span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_avg_jsd</span><span class="p">(</span><span class="n">alpha_1</span><span class="p">,</span> <span class="n">alpha_2</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_t score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Manually compute features (alpha_angles).</span>
+<span class="n">alpha_1</span> <span class="o">=</span> <span class="n">ens_1</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 1 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">alpha_3</span> <span class="o">=</span> <span class="n">ens_3</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 3 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_3</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># Manually compute average JSD approximation. You can also provide any other</span>
+<span class="c1"># 2d feature matrix as input to the `score_avg_jsd` function.</span>
+<span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_avg_jsd</span><span class="p">(</span><span class="n">alpha_1</span><span class="p">,</span> <span class="n">alpha_3</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_t score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Manually compute features (alpha_angles).</span>
+<span class="n">alpha_1</span> <span class="o">=</span> <span class="n">ens_2</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 2 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_2</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">alpha_2</span> <span class="o">=</span> <span class="n">ens_3</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 3 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_3</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># Manually compute average JSD approximation. You can also provide any other</span>
+<span class="c1"># 2d feature matrix as input to the `score_avg_jsd` function.</span>
+<span class="n">score</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">score_avg_jsd</span><span class="p">(</span><span class="n">alpha_2</span><span class="p">,</span> <span class="n">alpha_3</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">return_bins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- aJSD_t score: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, bins used: </span><span class="si">{</span><span class="n">bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="images/sh3/comparing_ensambles/comp_ll_1.png" src="images/sh3/comparing_ensambles/comp_ll_1.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s compute features (alpha_angles).</span>
+<span class="n">alpha_1</span> <span class="o">=</span> <span class="n">ens_1</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 1 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">alpha_2</span> <span class="o">=</span> <span class="n">ens_2</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 2 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_2</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># Manually score EMD approximation. NOTE: since we are comparing angular features,</span>
+<span class="c1"># make sure to use `angular_l2` as the `metric` argument. For all other features</span>
+<span class="c1"># (e.g.: interatomic distances) you should use `rmsd` or `l2` instead.</span>
+<span class="n">score</span> <span class="o">=</span> <span class="n">score_emd_approximation</span><span class="p">(</span><span class="n">alpha_1</span><span class="p">,</span> <span class="n">alpha_2</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;angular_l2&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- EMD on alpha angles: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s compute features (alpha_angles).</span>
+<span class="n">alpha_1</span> <span class="o">=</span> <span class="n">ens_1</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 1 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_1</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">alpha_3</span> <span class="o">=</span> <span class="n">ens_3</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 3 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_3</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># Manually score EMD approximation. NOTE: since we are comparing angular features,</span>
+<span class="c1"># make sure to use `angular_l2` as the `metric` argument. For all other features</span>
+<span class="c1"># (e.g.: interatomic distances) you should use `rmsd` or `l2` instead.</span>
+<span class="n">score</span> <span class="o">=</span> <span class="n">score_emd_approximation</span><span class="p">(</span><span class="n">alpha_1</span><span class="p">,</span> <span class="n">alpha_3</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;angular_l2&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- EMD on alpha angles: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s compute features (alpha_angles).</span>
+<span class="n">alpha_2</span> <span class="o">=</span> <span class="n">ens_2</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 2 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_2</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">alpha_3</span> <span class="o">=</span> <span class="n">ens_3</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- features 3 shape:&quot;</span><span class="p">,</span> <span class="n">alpha_3</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># Manually score EMD approximation. NOTE: since we are comparing angular features,</span>
+<span class="c1"># make sure to use `angular_l2` as the `metric` argument. For all other features</span>
+<span class="c1"># (e.g.: interatomic distances) you should use `rmsd` or `l2` instead.</span>
+<span class="n">score</span> <span class="o">=</span> <span class="n">score_emd_approximation</span><span class="p">(</span><span class="n">alpha_2</span><span class="p">,</span> <span class="n">alpha_3</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;angular_l2&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- EMD on alpha angles: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="images/sh3/comparing_ensambles/comp_ll_2.png" src="images/sh3/comparing_ensambles/comp_ll_2.png" />
+</section>
 </section>
 
 
