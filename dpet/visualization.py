@@ -964,9 +964,9 @@ class Visualization:
             dssp_data_dict[ensemble.code] = mdtraj.compute_dssp(ensemble.trajectory)
         return dssp_data_dict
     
-    def relative_helix_content(self, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
+    def relative_ss_content(self, dssp_code ='H' ,save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
-        Plot the relative helix content in each ensemble for each residue. 
+        Plot the relative ss content in each ensemble for each residue. 
 
         Parameters
         ----------
@@ -974,7 +974,9 @@ class Visualization:
             If True, the plot will be saved in the data directory. Default is False.
         ax : plt.Axes, optional
             The axes on which to plot. Default is None, which creates a new figure and axes.
-
+        dssp_code : str, optional
+            The selected dssp code , it could be selected between 'H' for Helix, 'C' for Coil and 'E' for strand. It works based on
+            the simplified DSSP codes 
         Returns
         -------
         plt.Axes
@@ -996,28 +998,38 @@ class Visualization:
 
         for protein_name, dssp_data in protein_dssp_data_dict.items():
             # Count the occurrences of 'H' in each column
-            h_counts = np.count_nonzero(dssp_data == 'H', axis=0)
+            ss_counts = np.count_nonzero(dssp_data == dssp_code, axis=0)
             
             # Calculate the total number of residues for each position
             total_residues = dssp_data.shape[0]
             
             # Calculate the relative content of 'H' for each residue
-            relative_h_content = h_counts / total_residues
+            relative_ss_content = ss_counts / total_residues
 
             # Interpolate or pad the relative content to ensure all ensembles have the same length
-            if len(relative_h_content) < max_length:
-                relative_h_content = np.pad(relative_h_content, (0, max_length - len(relative_h_content)), mode='constant')
+            if len(relative_ss_content) < max_length:
+                relative_ss_content = np.pad(relative_ss_content, (0, max_length - len(relative_ss_content)), mode='constant')
             
             # Plot the relative content for each protein
-            x = np.arange(len(relative_h_content))
+            x = np.arange(len(relative_ss_content))
             mask = x < len(dssp_data[0])  # Create a mask to filter out padded values
-            ax.plot(x[mask], relative_h_content[mask], marker='o', linestyle='dashed', label=protein_name, alpha=0.5)
+            ax.plot(x[mask], relative_ss_content[mask], marker='o', linestyle='dashed', label=protein_name, alpha=0.5)
 
-            bottom += relative_h_content
+            bottom += relative_ss_content
         
         ax.set_xlabel('Residue Index')
-        ax.set_ylabel('Relative Content of H (Helix)')
-        ax.set_title('Relative Content of H in Each Residue in the ensembles')
+        if dssp_code == 'H':
+            dssp_name = 'Helix'
+            ax.set_ylabel(f'Relative Content of {dssp_name}')
+            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the ensembles')
+        elif dssp_code == 'C':
+            dssp_name = 'Coil'
+            ax.set_ylabel(f'Relative Content of {dssp_name}')
+            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the ensembles')
+        elif dssp_code == 'E':
+            dssp_name = 'Strand'
+            ax.set_ylabel(f'Relative Content of {dssp_name}')
+            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the ensembles')
         ax.legend()
 
         if save:
@@ -1110,7 +1122,7 @@ class Visualization:
             else:
                 fig = ax.figure
 
-        axis_label = "Radius of Gyration (Rg)"
+        axis_label = "Radius of Gyration [nm] (Rg)"
         title = "Radius of Gyration"
 
         if violin_plot:
