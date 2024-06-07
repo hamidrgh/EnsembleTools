@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Introduction to Disordered Protein Ensemble Tools &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d563738"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -47,7 +47,6 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="demo.html">Demo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dm.html">dimensionality_reduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
@@ -78,7 +77,7 @@
            <div itemprop="articleBody">
              
   <section id="introduction-to-disordered-protein-ensemble-tools">
-<span id="intro"></span><h1>Introduction to Disordered Protein Ensemble Tools<a class="headerlink" href="#introduction-to-disordered-protein-ensemble-tools" title="Link to this heading"></a></h1>
+<span id="intro"></span><h1>Introduction to Disordered Protein Ensemble Tools<a class="headerlink" href="#introduction-to-disordered-protein-ensemble-tools" title="Permalink to this heading"></a></h1>
 <p>TODO: Write the introduction</p>
 <nav class="contents local" id="table-of-contents">
 <p class="topic-title">Table of Contents</p>
@@ -91,7 +90,7 @@
 </ul>
 </nav>
 <section id="basic-workflow-example">
-<h2><a class="toc-backref" href="#id1" role="doc-backlink">Basic Workflow Example</a><a class="headerlink" href="#basic-workflow-example" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Basic Workflow Example</a><a class="headerlink" href="#basic-workflow-example" title="Permalink to this heading"></a></h2>
 <p>TODO: Perhaps insert a graphical representation of the pipeline steps in order</p>
 <p>The first step of the pipeline is to instantiate the EnsembleAnalysis class by providing a list of Ensembles to analyze and the path to the output directory.
 Different input types are supported. Ensembles can be loaded from a data file (for example, a PDB file), a trajectory file with an accompanying topology file,
@@ -131,7 +130,7 @@ In the example below, the figure is saved in the output directory.</p>
 <img alt="images/tsnep10_kmeans2_scatter.png" src="images/tsnep10_kmeans2_scatter.png" />
 </section>
 <section id="end-to-end-example">
-<h2><a class="toc-backref" href="#id2" role="doc-backlink">End-to-End Example</a><a class="headerlink" href="#end-to-end-example" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">End-to-End Example</a><a class="headerlink" href="#end-to-end-example" title="Permalink to this heading"></a></h2>
 <dl class="simple">
 <dt>In the example below, the complete data analysis pipeline is executed with one function call. The pipeline consists of:</dt><dd><ol class="arabic simple">
 <li><p>Downloading trajectories from the Atlas database</p></li>
@@ -162,7 +161,7 @@ In the example below, the figure is saved in the output directory.</p>
 <img alt="images/dimenfix_scatter.png" src="images/dimenfix_scatter.png" />
 </section>
 <section id="plot-example">
-<h2><a class="toc-backref" href="#id3" role="doc-backlink">Plot Example</a><a class="headerlink" href="#plot-example" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Plot Example</a><a class="headerlink" href="#plot-example" title="Permalink to this heading"></a></h2>
 <p>In this example, we perform analysis on ensembles from PED by displaying several plots on the same figure.
 If axes are not passed as a parameter to the plot functions, they will be displayed as separate plots.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the ensemble codes with their respective data paths and topology files</span>
@@ -203,11 +202,11 @@ If axes are not passed as a parameter to the plot functions, they will be displa
 <img alt="Visualization of end-to-end distances, asphericity, and average distance maps" src="images/analysis_visualization_example.png" />
 </section>
 <section id="coarse-grained-models">
-<h2><a class="toc-backref" href="#id4" role="doc-backlink">Coarse-Grained Models</a><a class="headerlink" href="#coarse-grained-models" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Coarse-Grained Models</a><a class="headerlink" href="#coarse-grained-models" title="Permalink to this heading"></a></h2>
 <p>Coarse-Grained models are supported, however they are incompatible with some functionalities of the package.</p>
 </section>
 <section id="ensemble-files-with-multiple-chains">
-<h2><a class="toc-backref" href="#id5" role="doc-backlink">Ensemble Files with Multiple Chains</a><a class="headerlink" href="#ensemble-files-with-multiple-chains" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Ensemble Files with Multiple Chains</a><a class="headerlink" href="#ensemble-files-with-multiple-chains" title="Permalink to this heading"></a></h2>
 <p>When dealing with PDB ensemble files that contain multiple chains, it is necessary to specify which chain to analyze when instantiating an <cite>Ensemble</cite> object.
 Example usage:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the ensemble with a specified chain ID</span>

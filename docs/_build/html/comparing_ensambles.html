@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Comparing Ensambles &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d563738"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="dimensionality_reduction" href="dm.html" />
+    <link rel="next" title="ensemble_analysis" href="ensemble_analysis.html" />
     <link rel="prev" title="Dimensional reduction on carbon alpha distances" href="dr_cadist.html" /> 
 </head>
 
@@ -60,7 +60,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="dm.html">dimensionality_reduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
@@ -92,12 +91,12 @@
            <div itemprop="articleBody">
              
   <section id="comparing-ensambles">
-<h1>Comparing Ensambles<a class="headerlink" href="#comparing-ensambles" title="Link to this heading"></a></h1>
+<h1>Comparing Ensambles<a class="headerlink" href="#comparing-ensambles" title="Permalink to this heading"></a></h1>
 <p>We have explored techniques for comparing and analyzing datasets, focusing on the calculation of various metrics such as Jensen-Shannon Divergence (JSD) and Earth Mover’s Distance (EMD).</p>
 <p>Comparing datasets is crucial for understanding the similarities and differences between different datasets or models, and quantifying them can provide insights into the underlying patterns and distributions present in the data.</p>
 <p>Practical examples are provided, demonstrating how to manually calculate these metrics, referring to 3 ensembles downloaded directly from the Protein Ensemble Database (PED): PED00156, PED00157, and PED00158. These ensembles represent structural states of the N-terminal SH3 domain of the Drk protein (residues 1-59) in its unfolded form, generated with different approaches to initialize pools of random conformations.</p>
 <section id="high-level-moderate-control">
-<h2>High level (moderate control)<a class="headerlink" href="#high-level-moderate-control" title="Link to this heading"></a></h2>
+<h2>High level (moderate control)<a class="headerlink" href="#high-level-moderate-control" title="Permalink to this heading"></a></h2>
 <p>The code performs two comparative visualizations using the Jensen-Shannon Divergence (JSD) score:</p>
 <ol class="arabic simple">
 <li><p><strong>ca_dist</strong>: Comparison of the distributions of the feature ca_dist, visualized with the “Oranges” color map.</p></li>
@@ -177,7 +176,7 @@
 </ul>
 </section>
 <section id="intermediate-level-slightly-more-control">
-<h2>Intermediate level (slightly more control)<a class="headerlink" href="#intermediate-level-slightly-more-control" title="Link to this heading"></a></h2>
+<h2>Intermediate level (slightly more control)<a class="headerlink" href="#intermediate-level-slightly-more-control" title="Permalink to this heading"></a></h2>
 <p>The provided code manually calculates the JSD divergence scores between all ensemble pairs using the Ensemble class.</p>
 <p>Using EnsembleAnalysis to manually calculate divergence scores allows for detailed customization of the analysis process. You can choose the type of score, the number of bootstrap iterations, the method for bins, and more.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">boostrap_iters</span> <span class="o">=</span> <span class="mi">5</span>
@@ -236,7 +235,7 @@
 <p>On the other hand, the previous code (high level-moderate control) directly uses the comparison_matrix function to calculate and display the results in a single step, without the possibility of further customizing the graphs. Therefore, it is simpler and more automated but with fewer customization options.</p>
 </section>
 <section id="low-level-full-control">
-<h2>Low level (full control)<a class="headerlink" href="#low-level-full-control" title="Link to this heading"></a></h2>
+<h2>Low level (full control)<a class="headerlink" href="#low-level-full-control" title="Permalink to this heading"></a></h2>
 <p>The following code is an example of how to manually calculate JSD (Jensen-Shannon Divergence) and EMD (Earth Mover’s Distance) scores between two sets of data. This approach is more manual and provides the highest level of control, as features are extracted manually and scores are calculated without using automated library functions for visualization.
 It allows for customization at every step, from feature calculation to implementing one’s own bootstrap strategy.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ens_1</span> <span class="o">=</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;PED00156e001&quot;</span><span class="p">]</span>
@@ -329,7 +328,7 @@ The variables score_ajsd_d and score_ajsd_t are functions that perform these cal
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="dr_cadist.html" class="btn btn-neutral float-left" title="Dimensional reduction on carbon alpha distances" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="dm.html" class="btn btn-neutral float-right" title="dimensionality_reduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ensemble_analysis.html" class="btn btn-neutral float-right" title="ensemble_analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

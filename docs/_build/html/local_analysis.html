@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Local analysis &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d563738"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -61,7 +61,6 @@
 <li class="toctree-l2"><a class="reference internal" href="comparing_ensambles.html">Comparing Ensambles</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="dm.html">dimensionality_reduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
@@ -93,7 +92,7 @@
            <div itemprop="articleBody">
              
   <section id="local-analysis">
-<h1>Local analysis<a class="headerlink" href="#local-analysis" title="Link to this heading"></a></h1>
+<h1>Local analysis<a class="headerlink" href="#local-analysis" title="Permalink to this heading"></a></h1>
 <p>Local protein analysis is a detailed study of specific regions of a protein to better understand their structure, dynamics, and functionality. This type of analysis is crucial for identifying how individual parts of a protein contribute to its overall behavior and molecular interactions.</p>
 <p>In the following package, several functions have been implemented to support this analysis, including the distance map, contact map, and various flexibility and order parameters. These tools are designed to provide in-depth information on the local structure of proteins.</p>
 <p>To illustrate the output of the implemented functions, the SH3 protein analysis was chosen as an example. Data for three distinct ensembles were directly downloaded from the Protein Ensemble Database (PED): PED00156, PED00157, and PED00158. These ensembles represent structural states of the N-terminal SH3 domain of the Drk protein (residues 1-59) in its unfolded form, generated using different approaches to initialize pools of random conformations.</p>
@@ -104,7 +103,7 @@
 </ul>
 <p>The presented graphs compare the different structural and dynamic characteristics of the various ensembles, providing valuable information on the flexibility and order of the SH3 protein in different states.</p>
 <section id="distance-map">
-<h2>Distance map<a class="headerlink" href="#distance-map" title="Link to this heading"></a></h2>
+<h2>Distance map<a class="headerlink" href="#distance-map" title="Permalink to this heading"></a></h2>
 <p>We extracted the trajectories’ coordinates of the alpha carbon atoms, which are crucial for determining the overall structure and dynamics of proteins.
 Indeed, the spatial arrangement of alpha carbon atoms influences the folding process, stability, and interactions of proteins; they are covalently bonded to amino acid residues and serve as central points for the organization of the protein backbone.
 Therefore, analyzing the distances between alpha carbon atoms provides valuable insights into the local conformation and geometry of the protein chain.</p>
@@ -120,7 +119,7 @@ Therefore, analyzing the distances between alpha carbon atoms provides valuable 
 <img alt="images/sh3/local_analysis/dmap.png" class="align-center" src="images/sh3/local_analysis/dmap.png" />
 </section>
 <section id="contact-map">
-<h2>Contact map<a class="headerlink" href="#contact-map" title="Link to this heading"></a></h2>
+<h2>Contact map<a class="headerlink" href="#contact-map" title="Permalink to this heading"></a></h2>
 <p>The contact map is a graphical representation of the contact matrix, whose elements represent the likelihood of contact between two residues, with values approaching 1 indicating close proximity and values approaching 0 indicating spatial separation.
 The graphs show the contact maps generated from the coordinates of the alpha carbon atoms of the proteins under study, aiming to understand the spatial relationships and local interactions within the protein structure.</p>
 <p><em>“norm”: If True, use a log scale range; default is True.</em></p>
@@ -136,7 +135,7 @@ The graphs show the contact maps generated from the coordinates of the alpha car
 <img alt="images/sh3/local_analysis/probmap.png" class="align-center" src="images/sh3/local_analysis/probmap.png" />
 </section>
 <section id="site-specific-flexibility-parameter">
-<h2>Site-specific flexibility parameter<a class="headerlink" href="#site-specific-flexibility-parameter" title="Link to this heading"></a></h2>
+<h2>Site-specific flexibility parameter<a class="headerlink" href="#site-specific-flexibility-parameter" title="Permalink to this heading"></a></h2>
 <p>The “Site-specific flexibility parameter” is an indicator that provides a measure of the local flexibility or disorder of a residue within a protein. This measure is based on the circular variance of the Ramachandran angles (φ and ψ) for each residue.</p>
 <p>A disorder value close to <strong>0</strong> suggests <strong>rigidity or a stable conformation</strong> of the residue, while a value close to <strong>1</strong> indicates a uniform distribution of dihedral angles and thus <strong>greater flexibility or variability</strong> in the residue’s conformation.</p>
 <p><em>“pointer”: A list of desired residues; vertical dashed lines will be added to point to these residues. Default is None.</em></p>
@@ -149,7 +148,7 @@ The graphs show the contact maps generated from the coordinates of the alpha car
 <img alt="images/sh3/local_analysis/ssflex_param.png" class="align-center" src="images/sh3/local_analysis/ssflex_param.png" />
 </section>
 <section id="site-specific-order-parameter">
-<h2>Site-specific order parameter<a class="headerlink" href="#site-specific-order-parameter" title="Link to this heading"></a></h2>
+<h2>Site-specific order parameter<a class="headerlink" href="#site-specific-order-parameter" title="Permalink to this heading"></a></h2>
 <p>The “Site-specific order parameter” is an indicator that evaluates the local order within a protein chain. This parameter measures the orientation correlation between neighboring residues along the protein chain, based on the direction of the Cα-Cα vectors.</p>
 <p><em>“pointer”: A list of desired residues; vertical dashed lines will be added to point to these residues. Default is None.</em></p>
 <p><em>“figsize”: The size of the figure. Default is (15, 5).</em></p>

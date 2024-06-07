@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dimensional reduction on carbon alpha distances &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8d563738"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -65,7 +65,6 @@
 <li class="toctree-l2"><a class="reference internal" href="comparing_ensambles.html">Comparing Ensambles</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="dm.html">dimensionality_reduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
@@ -98,7 +97,7 @@
            <div itemprop="articleBody">
              
   <section id="dimensional-reduction-on-carbon-alpha-distances">
-<h1>Dimensional reduction on carbon alpha distances<a class="headerlink" href="#dimensional-reduction-on-carbon-alpha-distances" title="Link to this heading"></a></h1>
+<h1>Dimensional reduction on carbon alpha distances<a class="headerlink" href="#dimensional-reduction-on-carbon-alpha-distances" title="Permalink to this heading"></a></h1>
 <p>Alpha carbons (Cα) of a protein are the carbon atoms located in the central structure of each amino acid, bonded to an amino group, a carboxyl group, a hydrogen atom, and a side chain specific to the amino acid.
 They are important because they form the main backbone of the protein structure, determining the three-dimensional configuration of the protein through the peptide bond.</p>
 <p>As in the other analysis to illustrate the output of our functions, we have chosen the analysis of the SH3 protein as an example.
@@ -151,7 +150,7 @@ The graphs we present are related to the analysis of this protein, comparing thr
 <li><p>“gamma”: Kernel coefficient. Default is None.</p></li>
 </ul>
 <section id="t-sne">
-<h2>t-SNE<a class="headerlink" href="#t-sne" title="Link to this heading"></a></h2>
+<h2>t-SNE<a class="headerlink" href="#t-sne" title="Permalink to this heading"></a></h2>
 <p>This technique converts similarities between data points into joint probabilities and seeks to minimize the Kullback-Leibler
 divergence between the joint probabilities of the low-dimensional embedding and the high-dimensional data.</p>
 <p>Starting from the original scatterplot, the data points are initially projected into the low-dimensional space randomly and then gradually moved to form distinct clusters.
@@ -226,7 +225,7 @@ Conversely, a too low value risks slowing down the algorithm’s convergence.</p
 <p>This parameter refers to the range of possible numbers of clusters one wishes to consider in the analysis.</p>
 </section>
 <section id="pca-principal-component-analysis">
-<h2>PCA (Principal Component Analysis)<a class="headerlink" href="#pca-principal-component-analysis" title="Link to this heading"></a></h2>
+<h2>PCA (Principal Component Analysis)<a class="headerlink" href="#pca-principal-component-analysis" title="Permalink to this heading"></a></h2>
 <p>PCA is a dimensionality reduction technique based on the decomposition of the eigenvectors of the covariance matrix of high-dimensional data, aiming to identify a set of components that capture the maximum variance present in the data.</p>
 <p>To achieve this, PCA projects the original data onto a new coordinate system defined by these principal components. The first principal component corresponds to the direction with the highest variance in the data, the second principal component to the direction with the second-highest variance, and so forth.</p>
 <div class="admonition-num-dim admonition">
@@ -264,7 +263,7 @@ Conversely, a too low value might excessively reduce the dimensionality of the d
 <img alt="images/sh3/dim_red_ca/pca1d.png" class="align-center" src="images/sh3/dim_red_ca/pca1d.png" />
 </section>
 <section id="dimenfix">
-<h2>DimenFix<a class="headerlink" href="#dimenfix" title="Link to this heading"></a></h2>
+<h2>DimenFix<a class="headerlink" href="#dimenfix" title="Permalink to this heading"></a></h2>
 <p>DimenFix allows for the analysis of high-dimensional data by highlighting original labels, radius of gyration (Rg) labels, and clustering labels, to facilitate the understanding of the structures and relationships present in the dataset.</p>
 <p>To achieve this, DimenFix graphically represents the transformed data using random colors to distinguish between different original labels. Subsequently, it utilizes Rg values as colors to represent the radius of gyration for each data point. Finally, it applies the K-means method to group the data, visualizing the clusters.</p>
 <div class="admonition-range-n-clusters admonition">
@@ -288,7 +287,7 @@ Conversely, a too low value might excessively reduce the dimensionality of the d
 <img alt="images/sh3/dim_red_ca/dimenfix_scatter.png" class="align-center" src="images/sh3/dim_red_ca/dimenfix_scatter.png" />
 </section>
 <section id="umap-uniform-manifold-approximation-and-projection">
-<h2>UMAP (Uniform Manifold Approximation and Projection)<a class="headerlink" href="#umap-uniform-manifold-approximation-and-projection" title="Link to this heading"></a></h2>
+<h2>UMAP (Uniform Manifold Approximation and Projection)<a class="headerlink" href="#umap-uniform-manifold-approximation-and-projection" title="Permalink to this heading"></a></h2>
 <p>UMAP (Uniform Manifold Approximation and Projection) is a non-linear dimensionality reduction algorithm that aims to maintain the topological structure of the original data.
 The goal of UMAP is to create a low-dimensional representation that preserves the clusters and relationships present in the high-dimensional data.</p>
 <p>To achieve this, UMAP calculates similarity scores to identify clustered points and seeks to maintain these clusters in the low-dimensional representation.

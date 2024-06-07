@@ -19,10 +19,10 @@ Welcome to the IDPET documentation!
    overview
    installation
    demo
-   dm
    ensemble_analysis
    ensemble
    visualization
+   
 
 
 
