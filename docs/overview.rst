@@ -15,9 +15,9 @@ As an example:
  from dpet.visualization import Visualization
 
 
-There are three possibilities for downloading the data:
+There are three possibilities for loading the data:
 
-- From the **atlas** database:
+- Downloading from the **atlas** database:
 
 .. code-block:: python
 
@@ -25,25 +25,26 @@ There are three possibilities for downloading the data:
     Ensemble(ens_code='3a1g_B', database='atlas')
   ]
 
-- From the **PED** database:
+- Downloading from the **PED** database:
 
 .. code-block:: python
 
   ensembles = [
-    Ensemble(ens_code='PED00156e001', database='ped'),
-    Ensemble(ens_code='PED00157e001', database='ped'),
-    Ensemble(ens_code='PED00158e001', database='ped')
+    Ensemble(code='PED00156e001', database='ped'),
+    Ensemble(code='PED00157e001', database='ped'),
+    Ensemble(code='PED00158e001', database='ped')
   ]
 
-- From specified File Paths:
+- Loading from specified File Paths:
 
 .. code-block:: python
 
   ensembles = [
-    Ensemble(ens_code='PED00156e001', data_path='path/to/data/PED00156e001.pdb'),
-    Ensemble(ens_code='PED00158e001', data_path='path/to/data/PED00158e001.dcd', top_path='path/to/data/PED00158e001.top.pdb')
-  ]
+    Ensemble(code='PED00156e001', data_path='path/to/data/PED00156e001.pdb'),
+    Ensemble(code='PED00158e001', data_path='path/to/data/PED00158e001.dcd', top_path='path/to/data/PED00158e001.top.pdb')]
 
+
+- How to visualize the analysis:  
 
 .. code-block:: python
     
@@ -51,6 +52,7 @@ There are three possibilities for downloading the data:
   analysis = EnsembleAnalysis(ensembles=ensembles, output_dir='path/to/output_directory')
   # Load the trajectories for each ensemble
   analysis.load_trajectories()
+
   # Create a Visualization object using the EnsembleAnalysis object 
   #to enable visualization of the analysis results
   visualization = Visualization(analysis)
@@ -59,5 +61,8 @@ There are three possibilities for downloading the data:
  # Visualize the distribution of the radius of gyration 
  visualization.radius_of_gyration()
 
- # Visualize the contact maps
+ # Visualize the contact probability maps
  visualization.contact_prob_maps()
+
+ # Visualize the comparison matrix between loaded ensembles 
+ visualization.comparison_matrix()

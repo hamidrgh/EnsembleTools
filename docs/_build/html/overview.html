@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -15,9 +15,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -80,7 +80,7 @@
            <div itemprop="articleBody">
              
   <section id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h1>
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
 <p>IDPET is a python library which can easily analyze multiple structural ensembles of disordered protein in paralle. The data could automatically downloaded from the databases like Protein Ensemble Database (PED) using the package or could be loaded from local data files. IDPET provide various functions to faciliatate the visualization of the results through various plots.
 Using mdtraj as the backend engine, IDPET can read and load multiple data as the inputs and through web APIs it can directly download, store and analyzes the data from PED and ATLAS which are two important databases for disordered and flexible proteins.
 Moreover, by implementing different dimensionality reduction algorithms whithin the package more various types of analysis can be performed using IDPET.</p>
@@ -91,9 +91,9 @@ Moreover, by implementing different dimensionality reduction algorithms whithin 
 <span class="kn">from</span> <span class="nn">dpet.visualization</span> <span class="kn">import</span> <span class="n">Visualization</span>
 </pre></div>
 </div>
-<p>There are three possibilities for downloading the data:</p>
+<p>There are three possibilities for loading the data:</p>
 <ul class="simple">
-<li><p>From the <strong>atlas</strong> database:</p></li>
+<li><p>Downloading from the <strong>atlas</strong> database:</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
   <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;3a1g_B&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;atlas&#39;</span><span class="p">)</span>
@@ -101,28 +101,31 @@ Moreover, by implementing different dimensionality reduction algorithms whithin 
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>From the <strong>PED</strong> database:</p></li>
+<li><p>Downloading from the <strong>PED</strong> database:</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00156e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">),</span>
-  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00157e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">),</span>
-  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00158e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">)</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s1">&#39;PED00156e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">),</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s1">&#39;PED00157e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">),</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s1">&#39;PED00158e001&#39;</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="s1">&#39;ped&#39;</span><span class="p">)</span>
 <span class="p">]</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>From specified File Paths:</p></li>
+<li><p>Loading from specified File Paths:</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ensembles</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00156e001&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00156e001.pdb&#39;</span><span class="p">),</span>
-  <span class="n">Ensemble</span><span class="p">(</span><span class="n">ens_code</span><span class="o">=</span><span class="s1">&#39;PED00158e001&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00158e001.dcd&#39;</span><span class="p">,</span> <span class="n">top_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00158e001.top.pdb&#39;</span><span class="p">)</span>
-<span class="p">]</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s1">&#39;PED00156e001&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00156e001.pdb&#39;</span><span class="p">),</span>
+  <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s1">&#39;PED00158e001&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00158e001.dcd&#39;</span><span class="p">,</span> <span class="n">top_path</span><span class="o">=</span><span class="s1">&#39;path/to/data/PED00158e001.top.pdb&#39;</span><span class="p">)]</span>
 </pre></div>
 </div>
+<ul class="simple">
+<li><p>How to visualize the analysis:</p></li>
+</ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="c1"># Create an EnsembleAnalysis object with the given ensembles and specify the output directory</span>
  <span class="n">analysis</span> <span class="o">=</span> <span class="n">EnsembleAnalysis</span><span class="p">(</span><span class="n">ensembles</span><span class="o">=</span><span class="n">ensembles</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s1">&#39;path/to/output_directory&#39;</span><span class="p">)</span>
  <span class="c1"># Load the trajectories for each ensemble</span>
  <span class="n">analysis</span><span class="o">.</span><span class="n">load_trajectories</span><span class="p">()</span>
+
  <span class="c1"># Create a Visualization object using the EnsembleAnalysis object</span>
  <span class="c1">#to enable visualization of the analysis results</span>
  <span class="n">visualization</span> <span class="o">=</span> <span class="n">Visualization</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
@@ -131,8 +134,11 @@ Moreover, by implementing different dimensionality reduction algorithms whithin 
 <span class="c1"># Visualize the distribution of the radius of gyration</span>
 <span class="n">visualization</span><span class="o">.</span><span class="n">radius_of_gyration</span><span class="p">()</span>
 
-<span class="c1"># Visualize the contact maps</span>
+<span class="c1"># Visualize the contact probability maps</span>
 <span class="n">visualization</span><span class="o">.</span><span class="n">contact_prob_maps</span><span class="p">()</span>
+
+<span class="c1"># Visualize the comparison matrix between loaded ensembles</span>
+<span class="n">visualization</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
