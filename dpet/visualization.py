@@ -1729,6 +1729,9 @@ class Visualization:
                 axis.set_title(f'Ramachandran Plot for cluster {ens.code}')
                 axis.set_xlabel('Phi (ϕ) Angle (degrees)')
                 axis.set_ylabel('Psi (ψ) Angle (degrees)')
+
+                cbar = fig.colorbar(hist[3], ax=axis)
+                cbar.set_label('Density')
             fig.tight_layout()
         else:
             if ax is None:

@@ -16,7 +16,7 @@ def compute_asphericity(trajectory: mdtraj.Trajectory):
         lambda_mid = eigenvalues[1]  # Middle eigenvalue
         lambda_min = eigenvalues[0]
         
-        asphericity = (lambda_max - lambda_min) / (lambda_max + lambda_mid + lambda_min)
+        asphericity = 1-3*((eigenvalues[0]*eigenvalues[1] + eigenvalues[1]*eigenvalues[-1] + eigenvalues[-1]*eigenvalues[0])/np.power(eigenvalues[0]+eigenvalues[1]+eigenvalues[-1],2))
         asphericities.append(asphericity)
     
     return asphericities
