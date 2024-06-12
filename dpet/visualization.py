@@ -1572,13 +1572,12 @@ class Visualization:
         return ax
 
     def contact_prob_maps(self,
-                        norm=True, 
-                        min_sep=2,
-                        max_sep=None,
+                        log_scale: bool = True,
+                        avoid_zero_count: bool = False,
                         threshold: float = 0.8,
                         dpi: int = 96, 
                         save: bool = False, 
-                        cmap_color='Blues',
+                        cmap_color: str = 'Blues',
                         ax: Union[None, List[plt.Axes], np.ndarray] = None) -> Union[List[plt.Axes], np.ndarray]:
         from matplotlib.colors import LogNorm
         """
@@ -1586,12 +1585,10 @@ class Visualization:
 
         Parameters
         ----------
-        norm : bool, optional
+        log_scale : bool, optional
             If True, use log scale range. Default is True.
-        min_sep : int, optional
-            Minimum separation distance between atoms to consider. Default is 2.
-        max_sep : int, optional
-            Maximum separation distance between atoms to consider. Default is None.
+        avoid_zero_count: bool, optional
+            If True, avoid contacts with zero counts by adding to all contacts a pseudo count of 1e-6.
         threshold : float, optional
             Determining the threshold for calculating the contact frequencies. Default is 0.8 [nm].
         dpi : int, optional
@@ -1599,7 +1596,7 @@ class Visualization:
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
         cmap_color : str, optional
-            Select a color for the contact map. Default is "Blues".
+            Select a matplotlib colormap for the plot. Default is "Blues".
 
         Returns
         -------
@@ -1625,13 +1622,17 @@ class Visualization:
         for i, ensemble in enumerate(ensembles):
             ax = axes[i]
             
-            if ensemble.coarse_grained:
-                matrix_p_map = contact_probability_map(ensemble.trajectory, scheme='closest', contact=self._pair_ids(min_sep=min_sep, max_sep=max_sep), threshold=threshold)
-            else:
-                matrix_p_map = contact_probability_map(ensemble.trajectory, threshold=threshold)
+            matrix_p_map = contact_probability_map(
+                ensemble.trajectory,
+                scheme='ca' if not ensemble.coarse_grained else 'closest',
+                threshold=threshold
+            )
+            if avoid_zero_count:
+                matrix_p_map += 1e-6
 
-            if norm:
-                im = ax.imshow(matrix_p_map, cmap=cmap, norm=LogNorm())
+            if log_scale:
+                im = ax.imshow(matrix_p_map, cmap=cmap,
+                               norm=LogNorm(vmin=1e-3, vmax=1.0))
             else:
                 im = ax.imshow(matrix_p_map, cmap=cmap)
             ax.set_title(f"Contact Probability Map: {ensemble.code}", fontsize=14)

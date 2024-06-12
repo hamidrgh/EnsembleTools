@@ -57,20 +57,13 @@ def create_consecutive_indices_matrix(ca_indices):
 
     return consecutive_indices_matrix
 
-def contact_probability_map(traj,scheme='ca', contact='all' ,threshold = 0.8):
-    distances = mdtraj.compute_contacts(traj,contacts=contact ,scheme=scheme)[0]
-    res_pair = mdtraj.compute_contacts(traj,contacts=contact ,scheme=scheme)[1]
+def contact_probability_map(traj, scheme='ca', contact='all', threshold=0.8):
+    cmap_out = mdtraj.compute_contacts(traj, contacts=contact, scheme=scheme)
+    distances, res_pair = cmap_out
     contact_distance = mdtraj.geometry.squareform(distances, res_pair)
-    matrix_contact_prob = np.zeros(contact_distance.shape)
-    threshold = threshold
-    for ens in range(contact_distance.shape[0]):
-        for i in range(contact_distance.shape[1]):
-            for j in range(contact_distance.shape[2]):
-                if contact_distance[ens][i][j] < threshold:
-                    matrix_contact_prob[ens][i][j] = 1
-                else:
-                    matrix_contact_prob[ens][i][j] = 0
-    matrix_prob_avg = np.mean(matrix_contact_prob, axis=0)
+    # Get the number of distances below `threshold` and divide by number of
+    # conformers.
+    matrix_prob_avg = np.mean(contact_distance < threshold, axis=0)
     return matrix_prob_avg
 
 def dict_phi_psi_normal_cases(dict_phi_psi):
