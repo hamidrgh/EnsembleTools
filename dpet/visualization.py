@@ -964,7 +964,7 @@ class Visualization:
             dssp_data_dict[ensemble.code] = mdtraj.compute_dssp(ensemble.trajectory)
         return dssp_data_dict
     
-    def relative_ss_content(self, dssp_code ='H' ,save: bool = False, ax: plt.Axes = None) -> plt.Axes:
+    def relative_dssp_content(self, dssp_code ='H' ,save: bool = False, ax: plt.Axes = None) -> plt.Axes:
         """
         Plot the relative ss content in each ensemble for each residue. 
 
