@@ -91,8 +91,7 @@ def plot_violins(
         ax: plt.Axes,
         data: List[np.ndarray],
         labels: List[str],
-        means: bool = False,
-        median: bool = True,
+        location : str = 'mean',
         title: str = "Histogram",
         xlabel: str = "x"
     ):
@@ -107,10 +106,8 @@ def plot_violins(
         List of NumPy array storing the data to be plotted.
     labels: List[str]
         List of strings with the labels of the arrays.
-    means : bool, optional
-            If True, means are shown in the violin plot. Default is True.
-    median : bool, optional
-        If True, medians are shown in the violin plot. Default is True.
+    location: str, optional
+        Select between "median" or "mean" to show in violin plot. Default value is "mean"
     title: str, optional
         Title of the axis object.
     xlabel: str, optional
@@ -121,8 +118,10 @@ def plot_violins(
     plt.Axes
         Axis objects for the histogram plot of original labels.
     """
-    
-    ax.violinplot(data, showmeans=means, showmedians=median)
+    if location == 'mean':
+        ax.violinplot(data, showmeans=True, showmedians=False)
+    elif location == 'median':
+        ax.violinplot(data, showmeans=False, showmedians=True)
     ax.set_xticks(ticks=[y + 1 for y in range(len(labels))])
     ax.set_xticklabels(labels=labels, rotation=45.0, ha="center")
     ax.set_ylabel(xlabel)
@@ -205,9 +204,9 @@ def plot_comparison_matrix(
                 color_ij = textcolors[int(im.norm(scores_mean[i, j]) > threshold)]
             kw = {"color": color_ij}
             if scores_err is not None:
-                label_ij = f"{scores_mean[i, j]:.3f} ± {scores_err[i, j]:.3f}"
+                label_ij = f"{scores_mean[i, j]:.2f} ± {scores_err[i, j]:.2f}"
             else:
-                label_ij = f"{scores_mean[i, j]:.3f}"
+                label_ij = f"{scores_mean[i, j]:.2f}"
             text = im.axes.text(j, i, label_ij, ha="center", va="center", **kw)
 
     return ax
@@ -794,8 +793,9 @@ class Visualization:
                       bins: int = 50, 
                       hist_range: Tuple = None, 
                       violin_plot: bool = True, 
-                      means: bool = True, 
-                      medians: bool = True, 
+                      location : str = 'mean',
+                    #   means: bool = True, 
+                    #   medians: bool = True, 
                       save: bool = False, 
                       ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
@@ -810,10 +810,8 @@ class Visualization:
             which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
-        means : bool, optional
-            If True, it will show the mean. Default is True.
-        medians : bool, optional
-            If True, it will show the median. Default is True.
+        location: str, optional
+            Select between "median" or "mean" to show in violin plot. Default value is "mean"
         save : bool, optional
             If True, the plot will be saved in the data directory. Default is False.
         ax : Union[None, plt.Axes], optional
@@ -854,8 +852,7 @@ class Visualization:
                 ax=ax,
                 data=hist_data,
                 labels=labels,
-                means=means,
-                median=medians,
+                location= location,
                 title=title,
                 xlabel=axis_label
             )
@@ -1050,8 +1047,9 @@ class Visualization:
             hist_range: Tuple = None,
             multiple_hist_ax: bool = False,
             violin_plot: bool = False,
+            location: str = 'mean',
             median: bool = False,
-            means: bool = False,
+            mean: bool = False,
             dpi: int = 96,
             save: bool = False,
             ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
@@ -1071,9 +1069,11 @@ class Visualization:
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is False.
         median : bool, optional
-            If True, median is shown in the plot. Default is False.
+            If True, median is shown in the hist plot. Default is False.
         means : bool, optional
-            If True, mean is shown in the plot. Default is False.
+            If True, mean is shown in the his plot. Default is False.
+        location: str, optional
+            Select between "median" or "mean" to show in violin plot. Default value is "mean"
         dpi : int, optional
             The DPI (dots per inch) of the output figure. Default is 96.
         save : bool, optional
@@ -1126,12 +1126,13 @@ class Visualization:
         title = "Radius of Gyration"
 
         if violin_plot:
+            if median or mean:
+                raise ValueError("Please avoid using median and mean parameters for violin plot you can show either mean or medain using location parameter")
             plot_violins(
                 ax=ax,
                 data=hist_data,
                 labels=labels,
-                means=means,
-                median=median,
+                location=location,
                 title=title,
                 xlabel=axis_label
             )
@@ -1162,7 +1163,7 @@ class Visualization:
                         ax[i].set_ylabel("Density")
                     ax[i].set_xlabel(axis_label)
                     legend_handles = []
-                    if means:
+                    if mean:
                         mean_rg = np.mean(rg_i)
                         mean_line = ax[i].axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
                         mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
@@ -1285,7 +1286,15 @@ class Visualization:
 
         return axes    
 
-    def end_to_end_distances(self, rg_norm: bool = False, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
+    def end_to_end_distances(self, rg_norm: bool = False, 
+                             bins: int = 50, 
+                             hist_range: Tuple = None, 
+                             violin_plot: bool = True,
+                            #  means: bool = True, 
+                            #  median: bool = True, 
+                             location: str = 'mean',
+                             save: bool = False, 
+                             ax: plt.Axes = None) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
 
@@ -1350,8 +1359,7 @@ class Visualization:
                 ax=ax,
                 data=hist_data,
                 labels=labels,
-                means=means,
-                median=median,
+                location= location,
                 title=title,
                 xlabel=axis_label
             )
@@ -1371,7 +1379,15 @@ class Visualization:
 
         return ax
 
-    def asphericity(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, means: bool = True, median: bool = True, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
+    def asphericity(self, 
+                    bins: int = 50,
+                    hist_range: Tuple = None,
+                    violin_plot: bool = True,
+                    location:str = 'mean',
+                    # means: bool = True,
+                    # median: bool = True,
+                    save: bool = False,
+                    ax: plt.Axes = None) -> plt.Axes:
         """
         Plot asphericity distribution in each ensemble.
         Asphericity is calculated based on the gyration tensor.
@@ -1385,10 +1401,8 @@ class Visualization:
             which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
-        means : bool, optional
-            If True, means are shown in the violin plot. Default is True.
-        median : bool, optional
-            If True, medians are shown in the violin plot. Default is True.
+        location: str, optional
+            Select between "median" or "mean" to show in violin plot. Default value is "mean"
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
         ax : plt.Axes, optional
@@ -1424,8 +1438,7 @@ class Visualization:
                 ax=ax,
                 data=asph_list,
                 labels=labels,
-                means=means,
-                median=median,
+                location=location,
                 title=title,
                 xlabel=axis_label
             )
@@ -1445,7 +1458,15 @@ class Visualization:
 
         return ax
 
-    def prolateness(self, bins: int = 50, hist_range: Tuple = None, violin_plot: bool = True, median: bool = False, means: bool = False, save: bool = False, ax: plt.Axes = None) -> plt.Axes:
+    def prolateness(self,
+                    bins: int = 50,
+                    hist_range: Tuple = None,
+                    violin_plot: bool = True,
+                    location:str = 'mean',
+                    # median: bool = False,
+                    # means: bool = False,
+                    save: bool = False,
+                    ax: plt.Axes = None) -> plt.Axes:
         """
         Plot prolateness distribution in each ensemble.
         Prolateness is calculated based on the gyration tensor.
@@ -1459,10 +1480,8 @@ class Visualization:
             which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
-        median : bool, optional
-            If True, median is showing in the violin plot. Default is False.
-        means : bool, optional
-            If True, mean is showing in the violin plot. Default is False.
+        location: str, optional
+            Select between "median" or "mean" to show in violin plot. Default value is "mean"
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
         ax : plt.Axes, optional
@@ -1498,8 +1517,7 @@ class Visualization:
                 ax=ax,
                 data=prolat_list,
                 labels=labels,
-                means=means,
-                median=median,
+                location=location,
                 title=title,
                 xlabel=axis_label
             )
