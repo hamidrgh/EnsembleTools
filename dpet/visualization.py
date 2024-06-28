@@ -212,6 +212,43 @@ def plot_comparison_matrix(
     return ax
 
 
+def _get_random_a_angle_ids(n: int, prot_len: int) -> np.ndarray:
+    rand_ids = np.random.choice(prot_len-3, n, replace=False)
+    torsion_ids = _get_a_angle_ids(rand_ids)
+    return torsion_ids
+
+def _get_a_angle_ids(ids):
+    torsion_ids = []
+    for i in ids:
+        torsion_ids.append([i, i+1, i+2, i+3])
+    return np.array(torsion_ids)
+
+def _get_random_pairs(
+        n: int,
+        prot_len: int,
+        min_sep: int = 1
+    ) -> np.ndarray:
+    pairs = np.triu_indices(prot_len, k=min_sep)
+    pairs = np.vstack(pairs).T
+    rand_ids = np.random.choice(pairs.shape[0], n, replace=False)
+    return pairs[rand_ids]
+
+def _to_array(x):
+    return np.array(x, copy=False)
+
+_phi_psi_offsets = {"phi": 1, "psi": 0}
+
+def _get_max_hist(min_len, feature):
+    if feature == "ca_dist":
+        return min_len*(min_len-1)/2
+    elif feature == "a_angle":
+        return min_len-3
+    elif feature in ("phi", "psi"):
+        return min_len-1
+    else:
+        raise KeyError(feature)
+
+
 class Visualization:
     """
     Visualization class for ensemble analysis.
@@ -2035,6 +2072,240 @@ class Visualization:
         return axes
     
     
+    def plot_histogram_grid(self,
+            feature: str = "ca_dist",
+            ids: Union[np.ndarray, List[list]] = None,
+            n_rows: int = 2,
+            n_cols: int = 3,
+            subplot_width: int = 2.0,
+            subplot_height: int = 2.2,
+            bins: Union[str, int] = None,
+            dpi: int = 90
+        ) -> plt.Axes:
+        """
+        Plot a grid if histograms for distance or angular features. Can only be
+        be used when analyzing ensembles of proteins with same number of
+        residues. The fuction will create a new matplotlib figure for histogram
+        grid.
+
+        Parameters
+        ----------
+        feature: str, optional
+            Feature to analyze. Must be one of `ca_dist` (Ca-Ca distances),
+            `a_angle` (alpha angles), `phi` or `psi` (phi or psi backbone
+            angles).
+        ids: Union[list, List[list]], optional
+            Residue indices (integers starting from zero) to define the residues
+            to analyze. For angular features it must be a 1d list with N indices
+            of the residues. For distance features it must be 2d list/array of
+            shape (N, 2) in which N is the number of residue pairs to analyze
+            are 2 their indices. Each of the N indices (or pair of indices) will
+            be plotted in an histogram of the grid. If this argument is not
+            provided, random indices will be sampled, which is useful for
+            quickly comparing the distance or angle distributions of multiple
+            ensembles.
+        n_rows: int, optional
+            Number of rows in the histogram grid.
+        n_cols: int, optional
+            Number of columns in the histogram grid.
+        subplot_width: int, optional
+            Use to specify the Matplotlib width of the figure. The size of the
+            figure will be calculated as: figsize = (n_cols*subplot_width, n_rows*subplot_height).
+        subplot_height: int, optional
+            See the subplot_width argument.
+        bins: Union[str, int], optional
+            Number of bins in all the histograms.
+        dpi: int, optional
+            DPI of the figure.
+
+        Returns
+        -------
+        ax: plt.Axes
+            The Axes object for the histogram grid.
+        """
+        
+        ### Check the ensembles.
+        ensembles = self.analysis.ensembles
+        ens_lens = set([e.get_num_residues() for e in ensembles])
+        if len(ens_lens) != 1:
+            # May remove the limit in the future.
+            raise ValueError(
+                "Cannot build an histogram grid with proteins of different lengths"
+            )
+        min_len = min(ens_lens)  # Get the minimum number of residues.
+        
+        ### Select the features to analyze.
+        n_hist = n_rows*n_cols
+        if _get_max_hist(min_len, feature) < n_hist:
+            raise ValueError(f"Not enough residues to plot {n_hist} {feature} histograms")
+        if ids is not None and n_hist != len(ids):
+            raise ValueError(
+                f"The number of provided ids ({len(ids)}) is incompatible with"
+                f" the number of histograms ({n_hist})")
+        if feature == "ca_dist":
+            if ids is not None:
+                rand_ids = _to_array(ids)
+                if len(rand_ids.shape) != 2 or rand_ids.shape[1] != 2:
+                    raise ValueError(
+                        "Invalid shape for residue ids for Ca-Ca distances, received"
+                        f" {tuple(rand_ids.shape)} expected ({n_hist}, 2)"
+                    )
+                if np.max(ids) + 1 > min_len:
+                    raise ValueError(
+                        f"Maximum residue idx ({np.max(ids)}) exceeds the number of"
+                        f" residues ({min_len})"
+                    )
+            else:
+                rand_ids = _get_random_pairs(n=n_hist, prot_len=min_len)
+        elif feature == "a_angle":
+            if ids is not None:
+                rand_ids = _get_a_angle_ids(ids)
+                if len(rand_ids.shape) != 2 or rand_ids.shape[1] != 2:
+                    raise ValueError(
+                        "Invalid shape for residue ids for Ca-Ca distances, received"
+                        f" {tuple(rand_ids.shape)} expected ({n_hist}, 2)"
+                    )
+                if np.max(ids) + 1 > min_len - 3:
+                    raise ValueError(
+                        f"Maximum residue idx ({max(ids)}) exceeds the number of"
+                        f" plottable alpha torsion angles ({min_len - 3})"
+                    )
+            else:
+                rand_ids = _get_random_a_angle_ids(n=n_hist, prot_len=min_len)
+        elif feature in ("phi", "psi"):
+            if any([e.coarse_grained for e in ensembles]):
+                raise ValueError(
+                    f"Cannot analyze {feature} angles when a coarse-grained"
+                    " ensemble is loaded."
+                )
+            if ids is not None:
+                rand_ids = _to_array(ids)
+                if len(rand_ids.shape) != 1:
+                    raise ValueError(
+                        f"Invalid shape for residue ids for {feature} angles, received"
+                        f" {tuple(rand_ids.shape)} expected (*, )"
+                    )
+                if np.max(rand_ids) + 1 > min_len - (1 - _phi_psi_offsets[feature]):
+                    raise ValueError(
+                        f"Maximum residue idx ({max(rand_ids)}) exceeds the number of"
+                        f" plottable {feature} angles for proteins with {min_len} residues"
+                    )
+                if feature == "phi" and 0 in rand_ids:
+                    raise ValueError(f"Cannot use residue idx 0 with phi angles")
+            else:
+                rand_ids = np.random.choice(min_len-1, n_hist, replace=False) + _phi_psi_offsets[feature]
+        else:
+            raise KeyError(feature)
+            
+        if np.any(rand_ids < 0):
+            raise ValueError("Can only use residue indices >= 0")
+
+        ### Calculate features.
+        hist_data = []
+        for ensemble in ensembles:
+            ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
+            if feature == "ca_dist":
+                data_k = mdtraj.compute_distances(ensemble.trajectory, ca_indices[rand_ids])
+            elif feature == "a_angle":
+                data_k = mdtraj.compute_dihedrals(ensemble.trajectory, ca_indices[rand_ids])
+            elif feature in ("phi", "psi"):
+                data_k = getattr(mdtraj, f"compute_{feature}")(ensemble.trajectory)[1]
+                data_k = data_k[:,rand_ids - 1*_phi_psi_offsets[feature]]
+            else:
+                raise KeyError(feature)
+            hist_data.append(data_k)
+        
+        ### Initialize the plot.
+        # Initialize the figure.
+        figsize = (n_cols*subplot_width, n_rows*subplot_height)
+        fig = plt.figure(
+            figsize=figsize,
+            dpi=dpi,
+            layout="constrained"
+        )
+        # Initialize the subplots.
+        ax = fig.subplots(n_rows, n_cols, squeeze=False)
+        # Figure elements.
+        if feature == "ca_dist":
+            axis_label = "Distance [nm]"
+            title = r"C$\alpha$-C$\alpha$ distances"
+        elif feature == "a_angle":
+            axis_label = "Angle [rad]"
+            title = r"$\alpha$ angles"
+        elif feature in ("phi", "psi"):
+            axis_label = "Angle [rad]"
+            title = rf"$\{feature}$ angles"
+        else:
+            raise KeyError(feature)
+        fig.suptitle(title)
+        
+        ### Plot the histograms.
+        row_c = 0
+        col_c = 0
+        hist_args = {"histtype": "step", "density": True}
+        labels = [e.code for e in ensembles]
+        for m in range(n_hist):
+            
+            # Define variables to build the histograms.
+            if feature in ("ca_dist", ):
+                _min = min([x[:,m].min() for x in hist_data])
+                _max = max([x[:,m].max() for x in hist_data])
+                idx_i, idx_j = rand_ids[m]
+                text = rf"C$\alpha$ {idx_i}-{idx_j}"
+            elif feature in ("a_angle", ):
+                _min = -np.pi
+                _max = np.pi
+                idx_i, idx_j, idx_k, idx_l = rand_ids[m]
+                text = rf"C$\alpha$ {idx_i}-{idx_j}-{idx_k}-{idx_l}"
+            elif feature in ("phi", "psi"):
+                _min = -np.pi
+                _max = np.pi
+                text = rf"Residue {rand_ids[m]}"
+            else:
+                raise KeyError(feature)
+                
+            # Histogram.
+            for k in range(len(ensembles)):
+                data_km = hist_data[k][:,m]
+                ax[row_c][col_c].hist(
+                    data_km,
+                    range=(_min, _max),
+                    bins=bins,
+                    label=ensembles[k].code if (row_c == 0 and col_c == 0) else None,
+                    **hist_args
+                )
+                
+            # Labels and titles.
+            default_font_size = plt.rcParams['font.size']
+            ax[row_c][col_c].set_title(text, fontsize=default_font_size)
+            # ax[row_c][col_c].text(0.95, 0.95, text, verticalalignment='top',
+            #                       horizontalalignment='right',
+            #                       transform=ax[row_c][col_c].transAxes, fontsize=8,
+            #                       color='black', alpha=0.8)
+
+            if col_c == 0:
+                ax[row_c][col_c].set_ylabel("Density")
+            if row_c + 1 == n_rows:
+                ax[row_c][col_c].set_xlabel(axis_label)
+                
+            # Increase row and column counters.
+            col_c += 1
+            if col_c == n_cols:
+                row_c += 1
+                col_c = 0
+
+        # Legend.
+        handles, labels = ax[0, 0].get_legend_handles_labels()
+        fig.legend(
+            handles, labels,
+            loc='upper left',
+            bbox_to_anchor=(1.02, 1),
+            bbox_transform=ax[0, n_cols-1].transAxes
+        )
+        
+        return ax
+
+
     def comparison_matrix(self,
             score: str,
             feature: str,

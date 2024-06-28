@@ -88,10 +88,21 @@ class EnsembleAnalysis:
         return {ensemble.code: ensemble.reduce_dim_data for ensemble in self.ensembles}
     
     def __getitem__(self, code):
+        ensemble = None
+        count = 0
         for e in self.ensembles:
             if e.code == code:
-                return e
-        raise KeyError(f"Ensemble with code '{code}' not found")
+                ensemble = e
+                count += 1
+        if count == 1:
+            return ensemble
+        elif count > 1:
+            raise KeyError(
+                f"More than one ensembles with code '{code}' found. Cannot"
+                " access via indexing"
+            )
+        else:  # count == 0
+            raise KeyError(f"Ensemble with code '{code}' not found")
 
     def __del__(self):
         if hasattr(self, 'api_client'):
