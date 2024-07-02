@@ -22,9 +22,7 @@ The radius of gyration of a protein is the square root of the mean square distan
 
 *"violin_plot": If True, displays a violin plot; default is False.*
 
-*"median": If True, shows the median; default is False.*
-
-*"means": If True, shows the mean; default is False.*
+*"location": It allows you to specify whether to calculate and use the mean ('mean') or the median ('median') as the reference value.*
 
 *"dpi": The DPI (dots per inch) of the output figure; default is 96.*
 
@@ -34,14 +32,14 @@ The radius of gyration of a protein is the square root of the mean square distan
 
 .. code-block:: python
 
-    visualization.radius_of_gyration()
+    visualization.radius_of_gyration(violin_plot=True ,location='median')
 
-.. image:: images/sh3/global_analysis/rgg.png 
+.. image:: images/sh3/global_analysis/r_of_g.png 
    :align: center
   
 .. code-block:: python
 
-    visualization.radius_of_gyration(multiple_hist_ax=True,median=True,means=True)
+    visualization.radius_of_gyration(multiple_hist_ax=True ,hist_range=(0.5,4) ,mean=True, median=True, bins=40)
 
 .. image:: images/sh3/global_analysis/rg.png
    :align: center
@@ -50,27 +48,30 @@ End to end distance
 ---------------------
 The end_to_end_distances function is designed to visualize the distributions of end-to-end distances in molecular structure trajectories. The end-to-end distance refers to the distance between the first and last atom in a molecular chain, a parameter often used to understand the overall conformation of a molecule.
 
-- *"rg_norm"(bool,optional):If set to True, normalizes the end-to-end distances based on the average radius of gyration.[The default value is False]*
+*"rg_norm"(bool,optional):If set to True, normalizes the end-to-end distances based on the average radius of gyration.[The default value is False]*
 
-- *"bins"(int,optional): Defines the number of bins for the histogram of distances. More bins provide a more detailed distribution, but it may be noisier.[The default value is 50]*
+*"bins"(int,optional): Defines the number of bins for the histogram of distances. More bins provide a more detailed distribution, but it may be noisier.[The default value is 50]*
 
-- *"hist_range"(tuple, optional):A tuple specifying the minimum and maximum values for the histogram. If not specified (None), it uses the minimum and maximum values present in the data.*
+*"hist_range"(tuple, optional):A tuple specifying the minimum and maximum values for the histogram. If not specified (None), it uses the minimum and maximum values present in the data.*
 
-- *"violin_plot"(bool,optional):If set to True, the function will generate a violin plot of the distances. [The default value is True]*
+*"violin_plot"(bool,optional):If set to True, the function will generate a violin plot of the distances. [The default value is True]*
 
-- *"means" (bool, optional):If set to True, shows the means of the distances in the violin plot. [The default value is True]*
+*"location": It allows you to specify whether to calculate and use the mean ('mean') or the median ('median') as the reference value.*
 
-- *"median" (bool, optional):If set to True, shows the medians of the distances in the violin plot. [The default value is True]*
+*"save" (bool, optional):If set to True, the generated plot will be saved as an image file. [The default value is False]*
 
-- *"save" (bool, optional):If set to True, the generated plot will be saved as an image file. [The default value is False]*
+*"ax" (plt.Axes, optional):The axes on which to plot. [The default value is None]*
 
-- *"ax" (plt.Axes, optional):The axes on which to plot. [The default value is None]*
+The end-to-end distances are computed by selecting the Cα atoms from each ensemble's trajectory and calculating the distance between the first and last Cα atoms in each frame:
+
+$ d_{\text{end-to-end}} = \| \mathbf{r}_{\text{end}} - \mathbf{r}_{\text{start}} \| $
 
 This example generates a violin plot of the end-to-end distances without showing the medians but including the means.
 
+
 .. code-block:: python
 
-    visualization.end_to_end_distances(median=False, means=True)
+    visualization.end_to_end_distances(location='median')
 
 .. image:: images/sh3/global_analysis/end_to_end.png 
    :align: center
@@ -79,7 +80,7 @@ This example normalizes the end-to-end distances based on the average radius of 
 
 .. code-block:: python
 
-    visualization.end_to_end_distances(rg_norm=True, violin_plot=True, median=False, means=True)
+    visualization.end_to_end_distances(rg_norm=True, violin_plot=True, location='mean')
 
 .. image:: images/sh3/global_analysis/end_to_end_norm.png 
    :align: center
@@ -95,9 +96,7 @@ The asphericity the measure of deviation from the spherical shape of a molecule.
 
 *"violin_plot": If True, displays a violin plot; default is True.*
 
-*"means": If True, shows the means in the violin plot; default is True.*
-
-*"median": If True, shows the medians in the violin plot; default is True.*
+*"location": It allows you to specify whether to calculate and use the mean ('mean') or the median ('median') as the reference value.*
 
 *"save": If True, saves the plot as an image file; default is False.*
 
@@ -105,7 +104,7 @@ The asphericity the measure of deviation from the spherical shape of a molecule.
 
 .. code-block:: python
 
-    visualization.asphericity()
+    visualization.asphericity(location='mean')
 
 .. image:: images/sh3/global_analysis/asphericity.png
    :align: center
@@ -191,9 +190,7 @@ The acronym "SASA" stands for "Solvent Accessible Surface Area" and refers to th
 
 *"violin_plot": If True, displays a violin plot; default is True.*
 
-*"means": If True, shows the mean; default is True.*
-
-*"medians": If True, shows the median; default is True.*
+*"location": It allows you to specify whether to calculate and use the mean ('mean') or the median ('median') as the reference value.*
 
 *"save": If True, saves the plot in the data directory; default is False.*
 
@@ -201,43 +198,14 @@ The acronym "SASA" stands for "Solvent Accessible Surface Area" and refers to th
 
 .. code-block:: python
 
-    visualization.ensemble_sasa()
+    visualization.ensemble_sasa(location='mean')
 
-.. image:: images/sh3/global_analysis/sasa.png
+.. image:: images/sh3/global_analysis/output.png
    :align: center
   
-Alpha angles dihedral distribution
---------------------------------------
-The dihedral angles represent the rotation around the bonds between consecutive alpha carbons, and their distribution reflects the spatial arrangement of amino acids in the polypeptide chain, directly influencing its three-dimensional conformation.
 
-*"bins": Number of bins for the histogram; default is 50.*
-
-*"save": If True, saves the plot in the data directory; default is False.*
-
-*"ax": The matplotlib Axes object on which to plot; if None, creates a new Axes object.*
-
-
-.. code-block:: python
-
-    visualization.alpha_angles()
-
-.. image:: images/sh3/global_analysis/dihedral.png
-   :align: center
   
-Relative helix content
--------------------------------
-The helix content of a protein refers to the proportion or percentage of amino acids within the protein sequence that are structured into helical secondary structures. It provides insight into the amount of helical structural motifs present in the protein, which is important for understanding its overall structure, stability, and function.
 
-*"save": If True, saves the plot in the data directory; default is False.*
-
-*"ax": The matplotlib Axes object on which to plot; if None, creates a new Axes object.*
-
-.. code-block:: python
-
-    visualization.relative_helix_content()
-
-.. image:: images/sh3/global_analysis/contentH.png
-   :align: center
   
 Flory scaling exponents
 -------------------------

@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Global analysis &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -57,8 +57,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#radius-of-gyration-vs-asphericity">Radius of gyration vs Asphericity</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#radius-of-gyration-vs-prolatness">Radius of gyration vs Prolatness</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#global-sasa-distribution">Global sasa distribution</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#alpha-angles-dihedral-distribution">Alpha angles dihedral distribution</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#relative-helix-content">Relative helix content</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#flory-scaling-exponents">Flory scaling exponents</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#summary">Summary</a></li>
 </ul>
@@ -115,16 +113,15 @@
 <p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
 <p><em>“multiple_hist_ax”: If True, plots each histogram on a separate axis.</em></p>
 <p><em>“violin_plot”: If True, displays a violin plot; default is False.</em></p>
-<p><em>“median”: If True, shows the median; default is False.</em></p>
-<p><em>“means”: If True, shows the mean; default is False.</em></p>
+<p><em>“location”: It allows you to specify whether to calculate and use the mean (‘mean’) or the median (‘median’) as the reference value.</em></p>
 <p><em>“dpi”: The DPI (dots per inch) of the output figure; default is 96.</em></p>
 <p><em>“save”: If True, saves the plot as an image file; default is False.</em></p>
 <p><em>“ax”: The matplotlib Axes object(s) on which to plot; if None, new Axes object(s) will be created.</em></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">radius_of_gyration</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">radius_of_gyration</span><span class="p">(</span><span class="n">violin_plot</span><span class="o">=</span><span class="kc">True</span> <span class="p">,</span><span class="n">location</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="images/sh3/global_analysis/rgg.png" class="align-center" src="images/sh3/global_analysis/rgg.png" />
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">radius_of_gyration</span><span class="p">(</span><span class="n">multiple_hist_ax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">median</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">means</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<img alt="images/sh3/global_analysis/r_of_g.png" class="align-center" src="images/sh3/global_analysis/r_of_g.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">radius_of_gyration</span><span class="p">(</span><span class="n">multiple_hist_ax</span><span class="o">=</span><span class="kc">True</span> <span class="p">,</span><span class="n">hist_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="p">,</span><span class="n">mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="images/sh3/global_analysis/rg.png" class="align-center" src="images/sh3/global_analysis/rg.png" />
@@ -132,23 +129,22 @@
 <section id="end-to-end-distance">
 <h2>End to end distance<a class="headerlink" href="#end-to-end-distance" title="Permalink to this heading"></a></h2>
 <p>The end_to_end_distances function is designed to visualize the distributions of end-to-end distances in molecular structure trajectories. The end-to-end distance refers to the distance between the first and last atom in a molecular chain, a parameter often used to understand the overall conformation of a molecule.</p>
-<ul class="simple">
-<li><p><em>“rg_norm”(bool,optional):If set to True, normalizes the end-to-end distances based on the average radius of gyration.[The default value is False]</em></p></li>
-<li><p><em>“bins”(int,optional): Defines the number of bins for the histogram of distances. More bins provide a more detailed distribution, but it may be noisier.[The default value is 50]</em></p></li>
-<li><p><em>“hist_range”(tuple, optional):A tuple specifying the minimum and maximum values for the histogram. If not specified (None), it uses the minimum and maximum values present in the data.</em></p></li>
-<li><p><em>“violin_plot”(bool,optional):If set to True, the function will generate a violin plot of the distances. [The default value is True]</em></p></li>
-<li><p><em>“means” (bool, optional):If set to True, shows the means of the distances in the violin plot. [The default value is True]</em></p></li>
-<li><p><em>“median” (bool, optional):If set to True, shows the medians of the distances in the violin plot. [The default value is True]</em></p></li>
-<li><p><em>“save” (bool, optional):If set to True, the generated plot will be saved as an image file. [The default value is False]</em></p></li>
-<li><p><em>“ax” (plt.Axes, optional):The axes on which to plot. [The default value is None]</em></p></li>
-</ul>
+<p><em>“rg_norm”(bool,optional):If set to True, normalizes the end-to-end distances based on the average radius of gyration.[The default value is False]</em></p>
+<p><em>“bins”(int,optional): Defines the number of bins for the histogram of distances. More bins provide a more detailed distribution, but it may be noisier.[The default value is 50]</em></p>
+<p><em>“hist_range”(tuple, optional):A tuple specifying the minimum and maximum values for the histogram. If not specified (None), it uses the minimum and maximum values present in the data.</em></p>
+<p><em>“violin_plot”(bool,optional):If set to True, the function will generate a violin plot of the distances. [The default value is True]</em></p>
+<p><em>“location”: It allows you to specify whether to calculate and use the mean (‘mean’) or the median (‘median’) as the reference value.</em></p>
+<p><em>“save” (bool, optional):If set to True, the generated plot will be saved as an image file. [The default value is False]</em></p>
+<p><em>“ax” (plt.Axes, optional):The axes on which to plot. [The default value is None]</em></p>
+<p>The end-to-end distances are computed by selecting the Cα atoms from each ensemble’s trajectory and calculating the distance between the first and last Cα atoms in each frame:</p>
+<p>$ d_{text{end-to-end}} = | mathbf{r}_{text{end}} - mathbf{r}_{text{start}} | $</p>
 <p>This example generates a violin plot of the end-to-end distances without showing the medians but including the means.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances</span><span class="p">(</span><span class="n">median</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="images/sh3/global_analysis/end_to_end.png" class="align-center" src="images/sh3/global_analysis/end_to_end.png" />
 <p>This example normalizes the end-to-end distances based on the average radius of gyration, generates a violin plot without showing the medians but including the means.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances</span><span class="p">(</span><span class="n">rg_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">violin_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">median</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">means</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances</span><span class="p">(</span><span class="n">rg_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">violin_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="images/sh3/global_analysis/end_to_end_norm.png" class="align-center" src="images/sh3/global_analysis/end_to_end_norm.png" />
@@ -159,11 +155,10 @@
 <p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
 <p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
 <p><em>“violin_plot”: If True, displays a violin plot; default is True.</em></p>
-<p><em>“means”: If True, shows the means in the violin plot; default is True.</em></p>
-<p><em>“median”: If True, shows the medians in the violin plot; default is True.</em></p>
+<p><em>“location”: It allows you to specify whether to calculate and use the mean (‘mean’) or the median (‘median’) as the reference value.</em></p>
 <p><em>“save”: If True, saves the plot as an image file; default is False.</em></p>
 <p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new figure and axes.</em></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">asphericity</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">asphericity</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="images/sh3/global_analysis/asphericity.png" class="align-center" src="images/sh3/global_analysis/asphericity.png" />
@@ -215,35 +210,13 @@
 <p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
 <p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
 <p><em>“violin_plot”: If True, displays a violin plot; default is True.</em></p>
-<p><em>“means”: If True, shows the mean; default is True.</em></p>
-<p><em>“medians”: If True, shows the median; default is True.</em></p>
+<p><em>“location”: It allows you to specify whether to calculate and use the mean (‘mean’) or the median (‘median’) as the reference value.</em></p>
 <p><em>“save”: If True, saves the plot in the data directory; default is False.</em></p>
 <p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new Axes object.</em></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">ensemble_sasa</span><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">ensemble_sasa</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="images/sh3/global_analysis/sasa.png" class="align-center" src="images/sh3/global_analysis/sasa.png" />
-</section>
-<section id="alpha-angles-dihedral-distribution">
-<h2>Alpha angles dihedral distribution<a class="headerlink" href="#alpha-angles-dihedral-distribution" title="Permalink to this heading"></a></h2>
-<p>The dihedral angles represent the rotation around the bonds between consecutive alpha carbons, and their distribution reflects the spatial arrangement of amino acids in the polypeptide chain, directly influencing its three-dimensional conformation.</p>
-<p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
-<p><em>“save”: If True, saves the plot in the data directory; default is False.</em></p>
-<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new Axes object.</em></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">alpha_angles</span><span class="p">()</span>
-</pre></div>
-</div>
-<img alt="images/sh3/global_analysis/dihedral.png" class="align-center" src="images/sh3/global_analysis/dihedral.png" />
-</section>
-<section id="relative-helix-content">
-<h2>Relative helix content<a class="headerlink" href="#relative-helix-content" title="Permalink to this heading"></a></h2>
-<p>The helix content of a protein refers to the proportion or percentage of amino acids within the protein sequence that are structured into helical secondary structures. It provides insight into the amount of helical structural motifs present in the protein, which is important for understanding its overall structure, stability, and function.</p>
-<p><em>“save”: If True, saves the plot in the data directory; default is False.</em></p>
-<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new Axes object.</em></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">relative_helix_content</span><span class="p">()</span>
-</pre></div>
-</div>
-<img alt="images/sh3/global_analysis/contentH.png" class="align-center" src="images/sh3/global_analysis/contentH.png" />
+<img alt="images/sh3/global_analysis/output.png" class="align-center" src="images/sh3/global_analysis/output.png" />
 </section>
 <section id="flory-scaling-exponents">
 <h2>Flory scaling exponents<a class="headerlink" href="#flory-scaling-exponents" title="Permalink to this heading"></a></h2>

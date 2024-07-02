@@ -103,3 +103,37 @@ The "Site-specific order parameter" is an indicator that evaluates the local ord
 .. image:: images/sh3/local_analysis/ssorder_param.png
    :align: center
 
+Alpha angles dihedral distribution
+--------------------------------------
+The dihedral angles represent the rotation around the bonds between consecutive alpha carbons, and their distribution reflects the spatial arrangement of amino acids in the polypeptide chain, directly influencing its three-dimensional conformation.
+
+*"bins": Number of bins for the histogram; default is 50.*
+
+*"save": If True, saves the plot in the data directory; default is False.*
+
+*"ax": The matplotlib Axes object on which to plot; if None, creates a new Axes object.*
+
+
+.. code-block:: python
+
+    visualization.alpha_angles()
+
+.. image:: images/sh3/global_analysis/dihedral.png
+   :align: center
+
+Relative DSSP (Dictionary of Secondary Structure of Proteins) content
+------------------------------------------------------------------------
+The following function visualizes the relative content of a specific secondary structure (helix, coil, strand) for each residue in various protein ensembles. After checking the compatibility of the analysis, it retrieves the DSSP data of the proteins and creates a plot showing the frequency of the selected structure at each position.
+
+*"dssp_code": This parameter specifies the type of secondary structure to analyze, which can be 'H' for Helix, 'C' for Coil, or 'E' for Strand.*
+
+*"save":If True, the plot will be saved in the data directory. Default is False.*
+
+*"ax": The matplotlib Axes object on which to plot; if None, creates a new Axes object.*
+
+.. code-block:: python
+
+    visualization.relative_dssp_content(self, dssp_code ='H') 
+
+.. image:: images/sh3/global_analysis/contentH.png
+   :align: center
