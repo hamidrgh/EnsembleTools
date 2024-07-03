@@ -64,9 +64,17 @@ The end_to_end_distances function is designed to visualize the distributions of 
 
 The end-to-end distances are computed by selecting the Cα atoms from each ensemble's trajectory and calculating the distance between the first and last Cα atoms in each frame:
 
-$ d_{\text{end-to-end}} = \| \mathbf{r}_{\text{end}} - \mathbf{r}_{\text{start}} \| $
+.. math::
 
-This example generates a violin plot of the end-to-end distances without showing the medians but including the means.
+   d_{\text{end-to-end}} = \| \mathbf{r}_{\text{end}} - \mathbf{r}_{\text{start}} \|
+
+Where:
+
+- :math:`\mathbf{r}_{\text{start}}` is the position of the first Cα atom.
+- :math:`\mathbf{r}_{\text{end}}` is the position of the last Cα atom.
+
+
+This example generates a violin plot of the end-to-end distances without showing the means but including the medians.
 
 
 .. code-block:: python
@@ -76,7 +84,13 @@ This example generates a violin plot of the end-to-end distances without showing
 .. image:: images/sh3/global_analysis/end_to_end.png 
    :align: center
 
-This example normalizes the end-to-end distances based on the average radius of gyration, generates a violin plot without showing the medians but including the means.
+It is also possible normaize the end-to-end distances based on the average radius of gyration, generating violin plots that include the means.
+
+.. math::
+
+   d_{\text{normalized}} = \frac{d_{\text{end-to-end}}}{RG}
+
+Where RG is the mean Radius of Gyration of the trajectory.
 
 .. code-block:: python
 
@@ -89,6 +103,17 @@ This example normalizes the end-to-end distances based on the average radius of 
 Asphericity distribution
 ---------------------------
 The asphericity the measure of deviation from the spherical shape of a molecule. It indicates how much a molecule differs from the ideal spherical form. A protein with an asphericity greater than zero is generally more elongated or flattened compared to a sphere.
+In order to obtain this values, frits of all the gyration tensor is computed for each frame of the trajectory,then eigenvalues of this tensor, which indicate the principal moments of inertia and reflect the molecule's shape and symmetry, are sorted in ascending order. 
+Finally asphericity is then computed using the formula:
+
+
+.. math::
+
+   \text{Asphericity} = 1-3 \frac{\lambda_{1}\lambda_{2}+\lambda_{2}\lambda_{3}+\lambda_{3}\lambda_{1}}{(\lambda_{1}+\lambda_{2}+\lambda_{3})^2}
+
+where :math:`\lambda_{1},\lambda_{2},\lambda_{3}` are the sorted eigenvalues of the gyration tensor.
+
+
 
 *"bins": Number of bins for the histogram; default is 50.*
 
@@ -119,6 +144,14 @@ The asphericity the measure of deviation from the spherical shape of a molecule.
 Prolatness distribution
 --------------------------
  The prolateness the measure of a molecule's shape, indicating how elongated it is compared to its transverse dimensions. A protein with a prolateness greater than one is generally more elongated than a spherical shape.
+After computing the gyration tensor for each frame of the trajectory and sorting the eigenvalues of the gyration tensor in ascending order, the prolateness is then calculated using the following formula:
+
+.. math::
+
+   \text{Prolatness} =  \frac{\lambda_{2}-\lambda_{1}}{\lambda_{3}}
+
+where :math:`\lambda_{1},\lambda_{2},\lambda_{3}` are the sorted eigenvalues of the gyration tensor.
+
 
 *"bins": Number of bins for the histogram; default is 50.*
 
@@ -182,7 +215,7 @@ The function *rg_vs_prolateness* also prints the Pearson correlation coefficient
 
 Global sasa distribution
 ---------------------------
-The acronym "SASA" stands for "Solvent Accessible Surface Area" and refers to the surface area of a molecule that is accessible to the solvent. At the conformational level, "total SASA" indicates the total surface area accessible to the solvent for each conformation in the molecule's trajectory, while at the residue level, it is calculated by summing the solvent-accessible surface areas of all residues within the molecule, providing a measure of the accessibility of individual residues to the solvent. We initially analyzed this feature for each conformation and subsequently for each residue, resulting in the following graphs.
+The acronym 'SASA' stands for 'Solvent Accessible Surface Area,' which denotes the surface area of a molecule that is accessible to the solvent. The Shrake-Rupley algorithm in MDTraj calculates the SASA based on the positions of atoms and the probe radius used for the calculation. At the conformational level, 'total SASA' indicates the overall surface area accessible to the solvent for each conformation within the molecule's trajectory. At the residue level, it is computed by aggregating the solvent-accessible surface areas of all residues, providing insights into the accessibility of individual residues to the solvent. We initially analyzed this feature for each conformation and subsequently for each residue, leading to the creation of the following graphs.
 
 *"bins": Number of bins for the histogram; default is 50.*
 
@@ -210,11 +243,18 @@ The acronym "SASA" stands for "Solvent Accessible Surface Area" and refers to th
 Flory scaling exponents
 -------------------------
 The following code block is used to calculate and print the Flory scaling exponents for different ensembles.
-This code utilizes the get_features function of the EnsembleAnalysis class to extract the Flory exponents for each ensemble and then prints these values.
+The Flory exponent, denoted as **ν**, is a parameter that describes the scaling behavior of a polymer chain in a solvent, used to characterize the conformation of chains and is particularly relevant for understanding the compaction of intrinsically disordered regions (IDRs) in proteins. 
+It s related to the radius of gyration (Rg) and the end-to-end distance (Ree) of the polymer chain.
+An ideal-chain polymer, achieving equilibrium among residue-residue, residue-solvent, and solvent-solvent interactions, exhibits a ν of 0.5, signifying a Gaussian chain structure. Deviations from this value indicate more compact (ν < 0.5) or more extended (ν > 0.5) conformations. 
 
-The Flory exponent is a parameter that describes the behavior of a polymer chain in solution, reflecting its ability to extend and occupy space in the surrounding environment. In more technical terms, it represents the relationship between the chain length and its size in three-dimensional space.
+As detailed in the paper (reference), Flory scaling exponents, ν, were determined by fitting mean-squared residue-residue distances, R⟨ij2⟩, calculated for sequential separations greater than five residues along the linear sequence.
+Moreover, this analysis underscores the role of ν in elucidating the compaction of IDRs, revealing correlations with biological functions and cellular localizations of full-length proteins: proteins with compact IDRs (lower ν values) often participate in crucial functions like binding chromatin and DNA cis-regulatory sequences, suggesting a pivotal role for IDR compaction in protein functionality and phase behavior.
 
-This parameter can vary from a minimum of 0.5, corresponding to a completely rigid and non-extensible chain, to a maximum of approximately 0.6-0.7, indicating a highly flexible chain capable of occupying a larger volume.
+
+
+
+
+
 
 .. code-block:: python
 

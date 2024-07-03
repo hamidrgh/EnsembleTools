@@ -18,6 +18,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -137,13 +138,22 @@
 <p><em>“save” (bool, optional):If set to True, the generated plot will be saved as an image file. [The default value is False]</em></p>
 <p><em>“ax” (plt.Axes, optional):The axes on which to plot. [The default value is None]</em></p>
 <p>The end-to-end distances are computed by selecting the Cα atoms from each ensemble’s trajectory and calculating the distance between the first and last Cα atoms in each frame:</p>
-<p>$ d_{text{end-to-end}} = | mathbf{r}_{text{end}} - mathbf{r}_{text{start}} | $</p>
-<p>This example generates a violin plot of the end-to-end distances without showing the medians but including the means.</p>
+<div class="math notranslate nohighlight">
+\[d_{\text{end-to-end}} = \| \mathbf{r}_{\text{end}} - \mathbf{r}_{\text{start}} \|\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\mathbf{r}_{\text{start}}\)</span> is the position of the first Cα atom.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mathbf{r}_{\text{end}}\)</span> is the position of the last Cα atom.</p></li>
+</ul>
+<p>This example generates a violin plot of the end-to-end distances without showing the means but including the medians.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="images/sh3/global_analysis/end_to_end.png" class="align-center" src="images/sh3/global_analysis/end_to_end.png" />
-<p>This example normalizes the end-to-end distances based on the average radius of gyration, generates a violin plot without showing the medians but including the means.</p>
+<p>It is also possible normaize the end-to-end distances based on the average radius of gyration, generating violin plots that include the means.</p>
+<div class="math notranslate nohighlight">
+\[d_{\text{normalized}} = \frac{d_{\text{end-to-end}}}{RG}\]</div>
+<p>Where RG is the mean Radius of Gyration of the trajectory.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">end_to_end_distances</span><span class="p">(</span><span class="n">rg_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">violin_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -151,7 +161,12 @@
 </section>
 <section id="asphericity-distribution">
 <h2>Asphericity distribution<a class="headerlink" href="#asphericity-distribution" title="Permalink to this heading"></a></h2>
-<p>The asphericity the measure of deviation from the spherical shape of a molecule. It indicates how much a molecule differs from the ideal spherical form. A protein with an asphericity greater than zero is generally more elongated or flattened compared to a sphere.</p>
+<p>The asphericity the measure of deviation from the spherical shape of a molecule. It indicates how much a molecule differs from the ideal spherical form. A protein with an asphericity greater than zero is generally more elongated or flattened compared to a sphere.
+In order to obtain this values, frits of all the gyration tensor is computed for each frame of the trajectory,then eigenvalues of this tensor, which indicate the principal moments of inertia and reflect the molecule’s shape and symmetry, are sorted in ascending order.
+Finally asphericity is then computed using the formula:</p>
+<div class="math notranslate nohighlight">
+\[\text{Asphericity} = 1-3 \frac{\lambda_{1}\lambda_{2}+\lambda_{2}\lambda_{3}+\lambda_{3}\lambda_{1}}{(\lambda_{1}+\lambda_{2}+\lambda_{3})^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda_{1},\lambda_{2},\lambda_{3}\)</span> are the sorted eigenvalues of the gyration tensor.</p>
 <p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
 <p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
 <p><em>“violin_plot”: If True, displays a violin plot; default is True.</em></p>
@@ -172,6 +187,10 @@
 <blockquote>
 <div><p>The prolateness the measure of a molecule’s shape, indicating how elongated it is compared to its transverse dimensions. A protein with a prolateness greater than one is generally more elongated than a spherical shape.</p>
 </div></blockquote>
+<p>After computing the gyration tensor for each frame of the trajectory and sorting the eigenvalues of the gyration tensor in ascending order, the prolateness is then calculated using the following formula:</p>
+<div class="math notranslate nohighlight">
+\[\text{Prolatness} =  \frac{\lambda_{2}-\lambda_{1}}{\lambda_{3}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lambda_{1},\lambda_{2},\lambda_{3}\)</span> are the sorted eigenvalues of the gyration tensor.</p>
 <p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
 <p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
 <p><em>“violin_plot”: If True, displays a violin plot; default is True.</em></p>
@@ -206,7 +225,7 @@
 </section>
 <section id="global-sasa-distribution">
 <h2>Global sasa distribution<a class="headerlink" href="#global-sasa-distribution" title="Permalink to this heading"></a></h2>
-<p>The acronym “SASA” stands for “Solvent Accessible Surface Area” and refers to the surface area of a molecule that is accessible to the solvent. At the conformational level, “total SASA” indicates the total surface area accessible to the solvent for each conformation in the molecule’s trajectory, while at the residue level, it is calculated by summing the solvent-accessible surface areas of all residues within the molecule, providing a measure of the accessibility of individual residues to the solvent. We initially analyzed this feature for each conformation and subsequently for each residue, resulting in the following graphs.</p>
+<p>The acronym ‘SASA’ stands for ‘Solvent Accessible Surface Area,’ which denotes the surface area of a molecule that is accessible to the solvent. The Shrake-Rupley algorithm in MDTraj calculates the SASA based on the positions of atoms and the probe radius used for the calculation. At the conformational level, ‘total SASA’ indicates the overall surface area accessible to the solvent for each conformation within the molecule’s trajectory. At the residue level, it is computed by aggregating the solvent-accessible surface areas of all residues, providing insights into the accessibility of individual residues to the solvent. We initially analyzed this feature for each conformation and subsequently for each residue, leading to the creation of the following graphs.</p>
 <p><em>“bins”: Number of bins for the histogram; default is 50.</em></p>
 <p><em>“hist_range”: A tuple defining the min and max values for the histogram; if None, uses the data range.</em></p>
 <p><em>“violin_plot”: If True, displays a violin plot; default is True.</em></p>
@@ -221,9 +240,11 @@
 <section id="flory-scaling-exponents">
 <h2>Flory scaling exponents<a class="headerlink" href="#flory-scaling-exponents" title="Permalink to this heading"></a></h2>
 <p>The following code block is used to calculate and print the Flory scaling exponents for different ensembles.
-This code utilizes the get_features function of the EnsembleAnalysis class to extract the Flory exponents for each ensemble and then prints these values.</p>
-<p>The Flory exponent is a parameter that describes the behavior of a polymer chain in solution, reflecting its ability to extend and occupy space in the surrounding environment. In more technical terms, it represents the relationship between the chain length and its size in three-dimensional space.</p>
-<p>This parameter can vary from a minimum of 0.5, corresponding to a completely rigid and non-extensible chain, to a maximum of approximately 0.6-0.7, indicating a highly flexible chain capable of occupying a larger volume.</p>
+The Flory exponent, denoted as <strong>ν</strong>, is a parameter that describes the scaling behavior of a polymer chain in a solvent, used to characterize the conformation of chains and is particularly relevant for understanding the compaction of intrinsically disordered regions (IDRs) in proteins.
+It s related to the radius of gyration (Rg) and the end-to-end distance (Ree) of the polymer chain.
+An ideal-chain polymer, achieving equilibrium among residue-residue, residue-solvent, and solvent-solvent interactions, exhibits a ν of 0.5, signifying a Gaussian chain structure. Deviations from this value indicate more compact (ν &lt; 0.5) or more extended (ν &gt; 0.5) conformations.</p>
+<p>As detailed in the paper (reference), Flory scaling exponents, ν, were determined by fitting mean-squared residue-residue distances, R⟨ij2⟩, calculated for sequential separations greater than five residues along the linear sequence.
+Moreover, this analysis underscores the role of ν in elucidating the compaction of IDRs, revealing correlations with biological functions and cellular localizations of full-length proteins: proteins with compact IDRs (lower ν values) often participate in crucial functions like binding chromatin and DNA cis-regulatory sequences, suggesting a pivotal role for IDR compaction in protein functionality and phase behavior.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">v_values</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="s2">&quot;flory_exponent&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">v_values</span><span class="p">:</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v_values</span><span class="p">[</span><span class="n">code</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
