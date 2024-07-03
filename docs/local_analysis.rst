@@ -12,30 +12,6 @@ To illustrate the output of the implemented functions, the SH3 protein analysis 
 
 The presented graphs compare the different structural and dynamic characteristics of the various ensembles, providing valuable information on the flexibility and order of the SH3 protein in different states.
 
-Distance map
----------------
-We extracted the trajectories' coordinates of the alpha carbon atoms, which are crucial for determining the overall structure and dynamics of proteins. 
-Indeed, the spatial arrangement of alpha carbon atoms influences the folding process, stability, and interactions of proteins; they are covalently bonded to amino acid residues and serve as central points for the organization of the protein backbone. 
-Therefore, analyzing the distances between alpha carbon atoms provides valuable insights into the local conformation and geometry of the protein chain.
-
-We have printed the graphs related to the distance map for each protein, providing us with a representation of the spatial relationships and distances between these atoms within a protein molecule.
-
-*"ticks_fontsize", "cbar_fontsize", "title_fontsize": Font size for tick labels on the plot axes, for labels on the color bar and for titles of individual subplots, respectively; default is 14.*
-
-*"dpi": Dots per inch (resolution) of the output figure; default is 96.*
-
-*"use_ylabel": If True, y-axis labels are displayed on the subplots; default is True.*
-
-*"save": If True, the plot will be saved as an image file; default is False.*
-
-*"ax": A list or 2D list of Axes objects to plot on; default is None, which creates new axes.*
-
-.. code-block:: python
-
-    visualization.average_distance_maps()
-
-.. image:: images/sh3/local_analysis/dmap.png
-   :align: center
   
 Contact map
 -------------
@@ -63,49 +39,10 @@ The graphs show the contact maps generated from the coordinates of the alpha car
 .. image:: images/sh3/local_analysis/probmap.png
    :align: center
 
-Site-specific flexibility parameter
--------------------------------------
-The "Site-specific flexibility parameter" is an indicator that provides a measure of the local flexibility or disorder of a residue within a protein. This measure is based on the circular variance of the Ramachandran angles (φ and ψ) for each residue.
-
-A disorder value close to **0** suggests **rigidity or a stable conformation** of the residue, while a value close to **1** indicates a uniform distribution of dihedral angles and thus **greater flexibility or variability** in the residue's conformation.
-
-*"pointer": A list of desired residues; vertical dashed lines will be added to point to these residues. Default is None.*
-
-*"figsize": The size of the figure. Default is (15, 5).*
-
-*"save": If True, the plot will be saved as an image file. Default is False.*
-
-*"ax": The matplotlib Axes object on which to plot; if None, a new Axes object will be created. Default is None.*
-
-.. code-block:: python
-
-    visualization.ss_flexibility_parameter(pointer=[])
-
-.. image:: images/sh3/local_analysis/ssflex_param.png
-   :align: center
-
-Site-specific order parameter 
---------------------------------
-The "Site-specific order parameter" is an indicator that evaluates the local order within a protein chain. This parameter measures the orientation correlation between neighboring residues along the protein chain, based on the direction of the Cα-Cα vectors. 
-
-*"pointer": A list of desired residues; vertical dashed lines will be added to point to these residues. Default is None.*
-
-*"figsize": The size of the figure. Default is (15, 5).*
-
-*"save": If True, the plot will be saved as an image file. Default is False.*
-
-*"ax": The matplotlib Axes object on which to plot; if None, a new Axes object will be created. Default is None.*
-
-.. code-block:: python
-
-    visualization.ss_order_parameter(pointer=[])
-
-.. image:: images/sh3/local_analysis/ssorder_param.png
-   :align: center
-
 Alpha angles dihedral distribution
 --------------------------------------
-The dihedral angles represent the rotation around the bonds between consecutive alpha carbons, and their distribution reflects the spatial arrangement of amino acids in the polypeptide chain, directly influencing its three-dimensional conformation.
+Alpha angles are a type of dihedral angle calculated using the backbone atoms of the protein, typically involving the C-alpha (Cα) atoms. So frist of all we remind that a dihedral angle, also known as a torsion angle, is the angle between two planes formed by four sequentially bonded atoms in a molecule and  it provides insight into the 3D conformation of the molecule.
+Consequentially the calculation of alpha angles involves computing the dihedral angles formed by consecutive Cα atoms. Frist of all the code identify the indices of all Cα atoms in the protein and create sets of four consecutive Cα atoms. Afterwards, using these sets of atoms, the torsion angles are calculated using the *MDTraj* function, that takes in input the trajectory and a list of tuples, where each tuple contains the indices of four consecutive Cα atoms. The output is a numpy array that contains the dihedral angles calculated for each set of four consecutive Cα atoms. These dihedral angles represent the alpha angles of the protein and provide crucial insights into its three-dimensional conformation and dynamics.
 
 *"bins": Number of bins for the histogram; default is 50.*
 
@@ -137,3 +74,90 @@ The following function visualizes the relative content of a specific secondary s
 
 .. image:: images/sh3/global_analysis/contentH.png
    :align: center
+
+Site-specific flexibility parameter
+-------------------------------------
+The "Site-specific flexibility parameter" quantifies the local flexibility of a protein chain at a specific residue, it anges from 0 (high flexibility) to 1 (no flexibility).
+If all conformers have the same dihedral angles at a residue, the circular variance is equal to one, indicating no flexibility, conversely, for a large ensemble with a uniform distribution of dihedral angles, the circular variance tends to zero.
+
+The site-specific flexibility parameter is defined using the circular variance of the Ramachandran angles :math:` \phi_{i}` and :math:`\psi_{i}`. The circular variance of :math:`\phi_{i}` is given by:
+
+.. math::
+
+   R_{\phi_{i}} =(\frac{1}{C} \sum_{c=1}^{C} w_{c} sin \phi_{i,c})^2 + (\frac{1}{C} \sum_{c=1}^{C} w_{c} cos \phi_{i,c})^2
+
+An analogous expression applies for :math:`R_{\psi_{i}}`. The site-specific flexibility parameter :math:`f_{i}` is then defined as:
+
+.. math::
+
+    f_i = 1 - \frac{1}{2} \left( R_{\phi_i} + R_{\psi_i} \right) 
+ 
+*"pointer": A list of desired residues; vertical dashed lines will be added to point to these residues. Default is None.*
+
+*"figsize": The size of the figure. Default is (15, 5).*
+
+*"save": If True, the plot will be saved as an image file. Default is False.*
+
+*"ax": The matplotlib Axes object on which to plot; if None, a new Axes object will be created. Default is None.*
+
+.. code-block:: python
+
+    visualization.ss_flexibility_parameter(pointer=[])
+
+.. image:: images/sh3/local_analysis/ssflex_param.png
+   :align: center
+
+Site-specific order parameter 
+--------------------------------
+The "Site-specific order parameter" is an indicator that evaluates the local order within a protein chain. This parameter measures the orientation correlation between neighboring residues along the protein chain, based on the direction of the Cα-Cα vectors.
+The parameter is derived by computing the ensemble mean of the cosine of the angle between these vectors and assessing its variance across conformers. 
+
+The mean orientation correlation :math:`<cos \theta_{ij}>` is calculated as:
+
+.. math::
+
+   <cos \theta_{ij}> = \frac{1}{C} \sum_{c=1}^{C} w_{c} cos\theta_{ij,c}
+
+Where:
+
+- :math:`w_c` is the weight of conformer :math:`c`
+- :math:`C` is the total number of conformers
+- :math:`cos \theta_{ij,c}` is  the cosine of the angle between vectors :math:`r_{i,i+1}` and :math:`r_{j,j+1}` for conformer :math:`c`.
+
+The variance :math:`<\sigma_{ij}^2>` of  :math:`<cos \theta_{ij}>` is given by:
+
+.. math::
+
+   \sigma_{ij}^2 = \frac{1}{C} \sum_{c=1}^{C} (w_{c} cos  \theta_{ij,c}-<cos  \theta_{ij}>)^2
+
+
+The site-specific order parameter :math:`K_{ij}` is defined as:
+
+.. math::
+
+   K_{ij} = 1 - \sigma_{ij}^2
+
+To characterize the order at residue :math:`i`  in relation to the entire chain, the site-specific order parameter :math:`o_{i}` is computed by summing :math:`K_{ij}` over all residues :math:`j` :
+
+.. math::
+
+   o_{i} = \frac{1}{N} \sum_{j=1}^{N} K_{ij}
+
+where :math:`N` represents the total number of residues in the protein chain. 
+
+
+*"pointer": A list of desired residues; vertical dashed lines will be added to point to these residues. Default is None.*
+
+*"figsize": The size of the figure. Default is (15, 5).*
+
+*"save": If True, the plot will be saved as an image file. Default is False.*
+
+*"ax": The matplotlib Axes object on which to plot; if None, a new Axes object will be created. Default is None.*
+
+.. code-block:: python
+
+    visualization.ss_order_parameter(pointer=[])
+
+.. image:: images/sh3/local_analysis/ssorder_param.png
+   :align: center
+

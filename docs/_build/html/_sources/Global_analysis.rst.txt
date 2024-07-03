@@ -215,7 +215,8 @@ The function *rg_vs_prolateness* also prints the Pearson correlation coefficient
 
 Global sasa distribution
 ---------------------------
-The acronym 'SASA' stands for 'Solvent Accessible Surface Area,' which denotes the surface area of a molecule that is accessible to the solvent. The Shrake-Rupley algorithm in MDTraj calculates the SASA based on the positions of atoms and the probe radius used for the calculation. At the conformational level, 'total SASA' indicates the overall surface area accessible to the solvent for each conformation within the molecule's trajectory. At the residue level, it is computed by aggregating the solvent-accessible surface areas of all residues, providing insights into the accessibility of individual residues to the solvent. We initially analyzed this feature for each conformation and subsequently for each residue, leading to the creation of the following graphs.
+The acronym ‘SASA’ stands for ‘Solvent Accessible Surface Area,’ which denotes the surface area of a molecule that is accessible to the solvent. The Shrake-Rupley algorithm implemented in MDTraj calculates SASA based on the positions of atoms and the specified probe radius. This algorithm partitions the molecular surface into a grid and computes areas accessible to solvent molecules. At the conformational level, 'total SASA' quantifies the overall surface area accessible to the solvent for each molecular conformation in the trajectory. At the residue level, SASA is computed by summing the solvent-accessible surface areas of all residues, offering insights into individual residue accessibility to the solvent.
+
 
 *"bins": Number of bins for the histogram; default is 50.*
 
@@ -247,7 +248,7 @@ The Flory exponent, denoted as **ν**, is a parameter that describes the scaling
 It s related to the radius of gyration (Rg) and the end-to-end distance (Ree) of the polymer chain.
 An ideal-chain polymer, achieving equilibrium among residue-residue, residue-solvent, and solvent-solvent interactions, exhibits a ν of 0.5, signifying a Gaussian chain structure. Deviations from this value indicate more compact (ν < 0.5) or more extended (ν > 0.5) conformations. 
 
-As detailed in the paper (reference), Flory scaling exponents, ν, were determined by fitting mean-squared residue-residue distances, R⟨ij2⟩, calculated for sequential separations greater than five residues along the linear sequence.
+As detailed in the paper (https://doi.org/10.1038/s41586-023-07004-5), Flory scaling exponents, ν, were determined by fitting mean-squared residue-residue distances, R⟨ij2⟩, calculated for sequential separations greater than five residues along the linear sequence.
 Moreover, this analysis underscores the role of ν in elucidating the compaction of IDRs, revealing correlations with biological functions and cellular localizations of full-length proteins: proteins with compact IDRs (lower ν values) often participate in crucial functions like binding chromatin and DNA cis-regulatory sequences, suggesting a pivotal role for IDR compaction in protein functionality and phase behavior.
 
 
