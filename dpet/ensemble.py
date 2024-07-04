@@ -152,7 +152,7 @@ class Ensemble():
             topology=self.original_trajectory.topology)
         print(f"{sample_size} conformations sampled from {self.code} trajectory.")
         
-    def extract_features(self, featurization: str, min_sep: int = None, max_sep: int = None):
+    def extract_features(self, featurization: str, *args, **kwargs):
         """
         Extract features from the trajectory using the specified featurization method.
 
@@ -176,31 +176,30 @@ class Ensemble():
                 traj=self.trajectory, 
                 get_names=True,
                 atom_selector=self.atom_selector,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "phi_psi":
             features, names = featurize_phi_psi(
                 traj=self.trajectory, 
-                get_names=True)
+                get_names=True,
+                *args, **kwargs)
         elif featurization == "a_angle":
             features, names = featurize_a_angle(
                 traj=self.trajectory, 
                 get_names=True, 
-                atom_selector=self.atom_selector)
+                atom_selector=self.atom_selector,
+                *args, **kwargs)
         elif featurization == "tr_omega":
             features, names = featurize_tr_angle(
                 traj=self.trajectory,
                 type="omega",
                 get_names=True,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "tr_phi":
             features, names = featurize_tr_angle(
                 traj=self.trajectory,
                 type="phi",
                 get_names=True,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
 
@@ -208,7 +207,7 @@ class Ensemble():
         self.names = names
         print("Transformed ensemble shape:", self.features.shape)
 
-    def get_features(self, featurization: str, min_sep: int = 2, max_sep: int = None) -> Sequence:
+    def get_features(self, featurization: str, *args, **kwargs) -> Sequence:
         """
         Get features from the trajectory using the specified featurization method.
 
@@ -235,31 +234,30 @@ class Ensemble():
                 traj=self.trajectory, 
                 get_names=False,
                 atom_selector=self.atom_selector,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "phi_psi":
             return featurize_phi_psi(
                 traj=self.trajectory, 
-                get_names=False)
+                get_names=False,
+                *args, **kwargs)
         elif featurization == "a_angle":
             return featurize_a_angle(
                 traj=self.trajectory, 
                 get_names=False, 
-                atom_selector=self.atom_selector)
+                atom_selector=self.atom_selector,
+                *args, **kwargs)
         elif featurization == "tr_omega":
             return featurize_tr_angle(
                 traj=self.trajectory,
                 type="omega",
                 get_names=False,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "tr_phi":
             return featurize_tr_angle(
                 traj=self.trajectory,
                 type="phi",
                 get_names=False,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "rg":
             return mdtraj.compute_rg(self.trajectory)
         elif featurization == "prolateness":
