@@ -39,6 +39,28 @@ The graphs show the contact maps generated from the coordinates of the alpha car
 .. image:: images/sh3/local_analysis/probmap.png
    :align: center
 
+2D Ramachandran histograms
+---------------------------
+The function generates Ramachandran plots to visualize the distribution of phi (ϕ) and psi (ψ) torsion angles of proteins within the ensembles. To calculate the torsion angles, MDTraj functions are used, and the results are then converted to degrees using *np.degrees*. 
+If *two_d_hist* is set to False, it returns a simple scatter plot for all ensembles in a single plot. If set to True, it returns a 2D histogram for each ensemble, where the angles are grouped into a 2D histogram showing the population density of the conformations.
+
+*"two_d_hist": Boolean that determines whether to display a 2D histogram (True) or a scatter plot (False).
+
+*"linespaces": Tuple that specifies the range and the number of bins for the 2D histogram.
+
+*"save": If True, saves the plot in the data directory; default is False.*
+
+*"ax": The matplotlib Axes object on which to plot; if None, creates a new Axes object.*
+
+
+.. code-block:: python
+
+   visualization.ramachandran_plots(two_d_hist=True)
+
+.. image:: images/sh3/local_analysis/rama.png
+   :align: center
+
+
 Alpha angles dihedral distribution
 --------------------------------------
 Alpha angles are a type of dihedral angle calculated using the backbone atoms of the protein, typically involving the C-alpha (Cα) atoms. So frist of all we remind that a dihedral angle, also known as a torsion angle, is the angle between two planes formed by four sequentially bonded atoms in a molecule and  it provides insight into the 3D conformation of the molecule.
