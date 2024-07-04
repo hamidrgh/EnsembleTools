@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../">
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dpet.ensemble_analysis &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
 
   
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=8d563738"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -43,9 +43,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">EnsembleTools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction to Disordered Protein Ensemble Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../demo.html">Demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ensemble_analysis.html">ensemble_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ensemble.html">ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">visualization</a></li>
 </ul>
 
         </div>
@@ -92,9 +95,7 @@
     <span class="n">score_avg_jsd</span><span class="p">,</span> <span class="n">score_emd_approximation</span><span class="p">,</span> <span class="n">get_num_comparison_bins</span>
 <span class="p">)</span>
 
-<div class="viewcode-block" id="EnsembleAnalysis">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis">[docs]</a>
-<span class="k">class</span> <span class="nc">EnsembleAnalysis</span><span class="p">:</span>
+<div class="viewcode-block" id="EnsembleAnalysis"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis">[docs]</a><span class="k">class</span> <span class="nc">EnsembleAnalysis</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Data analysis pipeline for ensemble data.</span>
 
@@ -285,9 +286,7 @@
 
         <span class="k">return</span> <span class="n">new_ensembles</span>
 
-<div class="viewcode-block" id="EnsembleAnalysis.load_trajectories">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.load_trajectories">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">]:</span>
+<div class="viewcode-block" id="EnsembleAnalysis.load_trajectories"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.load_trajectories">[docs]</a>    <span class="k">def</span> <span class="nf">load_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load trajectories for all ensembles.</span>
 
@@ -329,10 +328,7 @@
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span></div>
 
-
-<div class="viewcode-block" id="EnsembleAnalysis.random_sample_trajectories">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories">[docs]</a>
-    <span class="k">def</span> <span class="nf">random_sample_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<div class="viewcode-block" id="EnsembleAnalysis.random_sample_trajectories"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories">[docs]</a>    <span class="k">def</span> <span class="nf">random_sample_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sample a defined random number of conformations from the ensemble </span>
 <span class="sd">        trajectory. </span>
@@ -346,10 +342,7 @@
             <span class="n">ensemble</span><span class="o">.</span><span class="n">random_sample_trajectory</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span></div>
 
-
-<div class="viewcode-block" id="EnsembleAnalysis.extract_features">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.extract_features">[docs]</a>
-    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<div class="viewcode-block" id="EnsembleAnalysis.extract_features"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.extract_features">[docs]</a>    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the selected feature.</span>
 
@@ -378,10 +371,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_data</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span></div>
 
-
-<div class="viewcode-block" id="EnsembleAnalysis.exists_coarse_grained">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained">[docs]</a>
-    <span class="k">def</span> <span class="nf">exists_coarse_grained</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="EnsembleAnalysis.exists_coarse_grained"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained">[docs]</a>    <span class="k">def</span> <span class="nf">exists_coarse_grained</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if at least one of the loaded ensembles is coarse-grained after loading trajectories.</span>
 
@@ -391,7 +381,6 @@
 <span class="sd">            True if at least one ensemble is coarse-grained, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span></div>
-
 
     <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists_coarse_grained</span><span class="p">():</span>
@@ -429,9 +418,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Concatenated featurized ensemble shape:&quot;</span><span class="p">,</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">concat_features</span>
 
-<div class="viewcode-block" id="EnsembleAnalysis.reduce_features">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">[docs]</a>
-    <span class="k">def</span> <span class="nf">reduce_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="EnsembleAnalysis.reduce_features"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">[docs]</a>    <span class="k">def</span> <span class="nf">reduce_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Perform dimensionality reduction on the extracted features.</span>
 
@@ -515,10 +502,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span></div>
 
-
-<div class="viewcode-block" id="EnsembleAnalysis.execute_pipeline">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">[docs]</a>
-    <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EnsembleAnalysis.execute_pipeline"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Execute the data analysis pipeline end-to-end. The pipeline includes:</span>
 <span class="sd">            1. Download from database (optional)</span>
@@ -545,10 +529,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="o">**</span><span class="n">featurization_params</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reduce_features</span><span class="p">(</span><span class="o">**</span><span class="n">reduce_dim_params</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="EnsembleAnalysis.get_features">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.get_features">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<div class="viewcode-block" id="EnsembleAnalysis.get_features"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.get_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">min_sep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_sep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.</span>
 
@@ -604,11 +585,8 @@
                 <span class="n">features_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
         
         <span class="k">return</span> <span class="n">features_dict</span></div>
-
     
-<div class="viewcode-block" id="EnsembleAnalysis.get_features_summary_dataframe">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.get_features_summary_dataframe">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_features_summary_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="s2">&quot;asphericity&quot;</span><span class="p">,</span> <span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="s2">&quot;sasa&quot;</span><span class="p">,</span> <span class="s2">&quot;end_to_end&quot;</span><span class="p">,</span> <span class="s2">&quot;flory_exponent&quot;</span><span class="p">],</span> <span class="n">show_variability</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="EnsembleAnalysis.get_features_summary_dataframe"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.get_features_summary_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">get_features_summary_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="s2">&quot;asphericity&quot;</span><span class="p">,</span> <span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="s2">&quot;sasa&quot;</span><span class="p">,</span> <span class="s2">&quot;end_to_end&quot;</span><span class="p">,</span> <span class="s2">&quot;flory_exponent&quot;</span><span class="p">],</span> <span class="n">show_variability</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a summary DataFrame for each ensemble.</span>
 
@@ -675,12 +653,9 @@
                                      <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;_std&quot;</span><span class="p">,</span> <span class="s2">&quot;_err&quot;</span><span class="p">))]]</span>
         
         <span class="k">return</span> <span class="n">summary_df</span></div>
-
     
     
-<div class="viewcode-block" id="EnsembleAnalysis.comparison_scores">
-<a class="viewcode-back" href="../../dpet.html#dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores">[docs]</a>
-    <span class="k">def</span> <span class="nf">comparison_scores</span><span class="p">(</span>
+<div class="viewcode-block" id="EnsembleAnalysis.comparison_scores"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores">[docs]</a>    <span class="k">def</span> <span class="nf">comparison_scores</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">score</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
             <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -887,9 +862,7 @@
                 <span class="n">score_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">score_ijk</span>
                 <span class="n">score_matrix</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">score_ijk</span>
 
-        <span class="k">return</span> <span class="n">score_matrix</span><span class="p">,</span> <span class="n">codes</span></div>
-</div>
-
+        <span class="k">return</span> <span class="n">score_matrix</span><span class="p">,</span> <span class="n">codes</span></div></div>
 </pre></div>
 
            </div>
