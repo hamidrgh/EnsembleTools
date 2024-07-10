@@ -1014,6 +1014,7 @@ class Visualization:
 
             bottom += relative_ss_content
         
+        ax.set_xticks([i for i in np.arange(1, len(x) + 1) if i == 1 or i % 5 == 0])
         ax.set_xlabel('Residue Index')
         if dssp_code == 'H':
             dssp_name = 'Helix'
@@ -1816,7 +1817,7 @@ class Visualization:
             x = np.arange(1, len(values) + 1)
             ax.plot(x, values, marker='o', linestyle='-', label=key)
         
-        ax.set_xticks([i for i in x if i == 1 or i % 5 == 0])
+        ax.set_xticks([i for i in np.arange(1, len(x) + 1) if i == 1 or i % 5 == 0])
         ax.set_xlabel("Residue Index")
         ax.set_ylabel("Site-specific flexibility parameter")
         ax.legend()
@@ -1875,7 +1876,7 @@ class Visualization:
             x = np.arange(1, len(values) + 1)
             ax.plot(x, values, label=key, marker= 'o', linestyle='-')
         
-        ax.set_xticks([i for i in x if i == 1 or i % 5 == 0])
+        ax.set_xticks([i for i in np.arange(1, len(x) + 1) if i == 1 or i % 5 == 0])
         ax.set_xlabel("Residue Index")
         ax.set_ylabel("Site-specific order parameter")
         ax.legend()
