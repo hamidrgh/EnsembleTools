@@ -207,7 +207,7 @@ class Ensemble():
         self.names = names
         print("Transformed ensemble shape:", self.features.shape)
 
-    def get_features(self, featurization: str, *args, **kwargs) -> Sequence:
+    def get_features(self, featurization: str, normalize: bool, *args, **kwargs) -> Sequence:
         """
         Get features from the trajectory using the specified featurization method.
 
@@ -267,7 +267,7 @@ class Ensemble():
         elif featurization == "sasa":
             return compute_ensemble_sasa(self.trajectory)
         elif featurization == "end_to_end":
-            return compute_end_to_end_distances(self.trajectory, self.atom_selector)
+            return compute_end_to_end_distances(self.trajectory, self.atom_selector, normalize)
         elif featurization == "ee_on_rg":
             ee = compute_end_to_end_distances(self.trajectory, self.atom_selector)
             rg = mdtraj.compute_rg(self.trajectory).mean()

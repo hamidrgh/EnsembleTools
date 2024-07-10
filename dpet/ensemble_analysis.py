@@ -485,18 +485,19 @@ class EnsembleAnalysis:
         if featurization in ("phi_psi", "tr_omega", "tr_phi") and self.exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         
-        if normalize and featurization != "ca_dist":
+        if normalize and featurization not in ("ca_dist", "end_to_end"):
             raise ValueError("Normalization is only supported when featurization is 'ca_dist'.")
         
         features_dict = {}
         for ensemble in self.ensembles:
+            kwargs['normalize'] = normalize
             features = ensemble.get_features(featurization=featurization, *args, **kwargs)
             if featurization != "flory_exponent":
                 features_dict[ensemble.code] = features
             else:
                 features_dict[ensemble.code] = features[0]
             
-        if normalize:
+        if normalize and featurization == "ca_dist":
             feature_sizes = set(features.shape[1] for features in features_dict.values())
             if len(feature_sizes) > 1:
                 raise ValueError("Error: Features from ensembles have different sizes. Cannot normalize data.")
