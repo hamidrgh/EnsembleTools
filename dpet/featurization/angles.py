@@ -56,7 +56,7 @@ def featurize_phi_psi(traj: mdtraj.Trajectory, get_names: bool = True, ravel: bo
 
 def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True, atom_selector:str = "protein and name CA") -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
     """
-    Calculate alpha (ϕ) angles from a given MD trajectory.
+    Calculate Cα-based torsion angles angles from a given MD trajectory.
 
     Parameters
     ----------
@@ -75,7 +75,7 @@ def featurize_a_angle(traj: mdtraj.Trajectory, get_names: bool = True, atom_sele
 
     Notes
     -----
-    This function calculates alpha (ϕ) angles from a given MD trajectory.
+    This function calculates Cα-based torsion angles angles from a given MD trajectory.
 
     """
 

@@ -100,11 +100,22 @@ class Ensemble():
         elif os.path.isdir(self.data_path):
             files_in_dir = [f for f in os.listdir(self.data_path) if f.endswith('.pdb')]
             if files_in_dir:
+                chain_ids = self.get_chains_from_pdb()
+                print(f"{self.code} chain ids: {chain_ids}")
+
                 print(f"Generating trajectory for {self.code}...")
                 full_paths = [os.path.join(self.data_path, file) for file in files_in_dir]
                 self.trajectory = mdtraj.load(full_paths)
-                traj_dcd = os.path.join(data_dir, f'{self.code}.dcd')
-                traj_top = os.path.join(data_dir, f'{self.code}.top.pdb')
+                
+                chain_selected = self._select_chain(chain_ids)
+
+                if chain_selected:
+                    traj_suffix = f'_{self.chain_id.upper()}'
+                else:
+                    traj_suffix = ''
+
+                traj_dcd = os.path.join(data_dir, f'{self.code}{traj_suffix}.dcd')
+                traj_top = os.path.join(data_dir, f'{self.code}{traj_suffix}.top.pdb')
                 self.trajectory.save(traj_dcd)
                 self.trajectory[0].save(traj_top)
                 print(f"Generated trajectory saved to {data_dir}.")
@@ -152,7 +163,7 @@ class Ensemble():
             topology=self.original_trajectory.topology)
         print(f"{sample_size} conformations sampled from {self.code} trajectory.")
         
-    def extract_features(self, featurization: str, min_sep: int = None, max_sep: int = None):
+    def extract_features(self, featurization: str, *args, **kwargs):
         """
         Extract features from the trajectory using the specified featurization method.
 
@@ -176,31 +187,30 @@ class Ensemble():
                 traj=self.trajectory, 
                 get_names=True,
                 atom_selector=self.atom_selector,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "phi_psi":
             features, names = featurize_phi_psi(
                 traj=self.trajectory, 
-                get_names=True)
+                get_names=True,
+                *args, **kwargs)
         elif featurization == "a_angle":
             features, names = featurize_a_angle(
                 traj=self.trajectory, 
                 get_names=True, 
-                atom_selector=self.atom_selector)
+                atom_selector=self.atom_selector,
+                *args, **kwargs)
         elif featurization == "tr_omega":
             features, names = featurize_tr_angle(
                 traj=self.trajectory,
                 type="omega",
                 get_names=True,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "tr_phi":
             features, names = featurize_tr_angle(
                 traj=self.trajectory,
                 type="phi",
                 get_names=True,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
 
@@ -208,7 +218,7 @@ class Ensemble():
         self.names = names
         print("Transformed ensemble shape:", self.features.shape)
 
-    def get_features(self, featurization: str, min_sep: int = 2, max_sep: int = None) -> Sequence:
+    def get_features(self, featurization: str, normalize: bool, *args, **kwargs) -> Sequence:
         """
         Get features from the trajectory using the specified featurization method.
 
@@ -235,31 +245,30 @@ class Ensemble():
                 traj=self.trajectory, 
                 get_names=False,
                 atom_selector=self.atom_selector,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "phi_psi":
             return featurize_phi_psi(
                 traj=self.trajectory, 
-                get_names=False)
+                get_names=False,
+                *args, **kwargs)
         elif featurization == "a_angle":
             return featurize_a_angle(
                 traj=self.trajectory, 
                 get_names=False, 
-                atom_selector=self.atom_selector)
+                atom_selector=self.atom_selector,
+                *args, **kwargs)
         elif featurization == "tr_omega":
             return featurize_tr_angle(
                 traj=self.trajectory,
                 type="omega",
                 get_names=False,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "tr_phi":
             return featurize_tr_angle(
                 traj=self.trajectory,
                 type="phi",
                 get_names=False,
-                min_sep=min_sep,
-                max_sep=max_sep)
+                *args, **kwargs)
         elif featurization == "rg":
             return mdtraj.compute_rg(self.trajectory)
         elif featurization == "prolateness":
@@ -269,7 +278,7 @@ class Ensemble():
         elif featurization == "sasa":
             return compute_ensemble_sasa(self.trajectory)
         elif featurization == "end_to_end":
-            return compute_end_to_end_distances(self.trajectory, self.atom_selector)
+            return compute_end_to_end_distances(self.trajectory, self.atom_selector, normalize)
         elif featurization == "ee_on_rg":
             ee = compute_end_to_end_distances(self.trajectory, self.atom_selector)
             rg = mdtraj.compute_rg(self.trajectory).mean()
@@ -370,17 +379,26 @@ class Ensemble():
         Raises
         ------
         FileNotFoundError
-            If the specified PDB file does not exist.
+            If the specified PDB file or directory does not exist, or if no PDB file is found in the directory.
         ValueError
-            If the specified file is not a PDB file.
+            If the specified file is not a PDB file and the path is not a directory.
         """
         if not os.path.exists(self.data_path):
-            raise FileNotFoundError(f"The file {self.data_path} does not exist.")
+            raise FileNotFoundError(f"The path {self.data_path} does not exist.")
         
-        if not self.data_path.endswith('.pdb'):
-            raise ValueError(f"The file {self.data_path} is not a PDB file.")
-        
-        with open(self.data_path, 'r') as f:
+        if os.path.isdir(self.data_path):
+            # Use the only one .pdb file
+            files = os.listdir(self.data_path)
+            pdb_files = [file for file in files if file.endswith('.pdb')]
+            if not pdb_files:
+                raise FileNotFoundError(f"No PDB file found in the directory {self.data_path}.")
+            pdb_file = os.path.join(self.data_path, pdb_files[0])
+        else:
+            if not self.data_path.endswith('.pdb'):
+                raise ValueError(f"The file {self.data_path} is not a PDB file.")
+            pdb_file = self.data_path
+
+        with open(pdb_file, 'r') as f:
             lines = f.readlines()
 
         chain_ids = []  # Use a list to preserve the order

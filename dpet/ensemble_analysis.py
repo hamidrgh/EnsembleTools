@@ -264,7 +264,7 @@ class EnsembleAnalysis:
             ensemble.random_sample_trajectory(sample_size)
         return self.trajectories
 
-    def extract_features(self, featurization: str, normalize: bool = False, min_sep: int = 2, max_sep: Optional[int] = None) -> Dict[str, np.ndarray]:
+    def extract_features(self, featurization: str, normalize: bool = False, *args, **kwargs) -> Dict[str, np.ndarray]:
         """
         Extract the selected feature.
 
@@ -287,7 +287,7 @@ class EnsembleAnalysis:
         Dict[str, np.ndarray]
             A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
-        self._featurize(featurization=featurization, min_sep=min_sep, max_sep=max_sep)
+        self._featurize(featurization=featurization, *args, **kwargs)
         self._create_all_labels()
         if normalize and featurization == "ca_dist":
             self._normalize_data()
@@ -304,12 +304,12 @@ class EnsembleAnalysis:
         """
         return any(ensemble.coarse_grained for ensemble in self.ensembles)
 
-    def _featurize(self, featurization: str, min_sep, max_sep):
+    def _featurize(self, featurization: str, *args, **kwargs):
         if featurization in ("phi_psi", "tr_omega", "tr_phi") and self.exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         self.featurization = featurization
         for ensemble in self.ensembles:
-            ensemble.extract_features(featurization, min_sep, max_sep)
+            ensemble.extract_features(featurization, *args, **kwargs)
         self.feature_names = list(self.ensembles)[0].names
         print("Feature names:", self.feature_names)
 
@@ -451,7 +451,7 @@ class EnsembleAnalysis:
         self.extract_features(**featurization_params)
         self.reduce_features(**reduce_dim_params)
 
-    def get_features(self, featurization: str, min_sep: int = 2, max_sep: Optional[int] = None, normalize: bool = False) -> Dict[str, np.ndarray]:
+    def get_features(self, featurization: str, normalize: bool = False, *args, **kwargs) -> Dict[str, np.ndarray]:
         """
         Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.
 
@@ -485,18 +485,18 @@ class EnsembleAnalysis:
         if featurization in ("phi_psi", "tr_omega", "tr_phi") and self.exists_coarse_grained():
             raise ValueError(f"{featurization} feature extraction is not possible when working with coarse-grained models.")
         
-        if normalize and featurization != "ca_dist":
+        if normalize and featurization not in ("ca_dist", "end_to_end"):
             raise ValueError("Normalization is only supported when featurization is 'ca_dist'.")
         
         features_dict = {}
         for ensemble in self.ensembles:
-            features = ensemble.get_features(featurization=featurization, min_sep=min_sep, max_sep=max_sep)
+            features = ensemble.get_features(featurization=featurization, normalize=normalize, *args, **kwargs)
             if featurization != "flory_exponent":
                 features_dict[ensemble.code] = features
             else:
                 features_dict[ensemble.code] = features[0]
             
-        if normalize:
+        if normalize and featurization == "ca_dist":
             feature_sizes = set(features.shape[1] for features in features_dict.values())
             if len(feature_sizes) > 1:
                 raise ValueError("Error: Features from ensembles have different sizes. Cannot normalize data.")
@@ -551,7 +551,7 @@ class EnsembleAnalysis:
             ]
             
             for feature in selected_features:
-                features = ensemble.get_features(featurization=feature)
+                features = ensemble.get_features(featurization=feature, normalize=False)
                 if feature not in ensemble_features:
                     features_array = np.array(features)
                     feature_mean = features_array.mean()
@@ -699,12 +699,13 @@ class EnsembleAnalysis:
         for ensemble_i in self.ensembles:
             if feature == "ca_dist":
                 feats_i = ensemble_i.get_features(
+                    normalize=False,
                     featurization="ca_dist",
                     min_sep=featurization_params.get("min_sep", 2),
                     max_sep=featurization_params.get("max_sep"),
                 )
             elif feature == "alpha_angle":
-                feats_i = ensemble_i.get_features(featurization="a_angle")
+                feats_i = ensemble_i.get_features(featurization="a_angle", normalize=False)
             else:
                 raise ValueError(f"Invalid feature for comparison: {feature}")
             features.append(feats_i)

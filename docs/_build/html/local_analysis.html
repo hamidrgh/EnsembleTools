@@ -53,6 +53,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Global_analysis.html">Global analysis</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Local analysis</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#contact-map">Contact map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#d-ramachandran-histograms">2D Ramachandran histograms</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#alpha-angles-dihedral-distribution">Alpha angles dihedral distribution</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#relative-dssp-dictionary-of-secondary-structure-of-proteins-content">Relative DSSP (Dictionary of Secondary Structure of Proteins) content</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#site-specific-flexibility-parameter">Site-specific flexibility parameter</a></li>
@@ -119,6 +120,19 @@ The graphs show the contact maps generated from the coordinates of the alpha car
 </pre></div>
 </div>
 <img alt="images/sh3/local_analysis/probmap.png" class="align-center" src="images/sh3/local_analysis/probmap.png" />
+</section>
+<section id="d-ramachandran-histograms">
+<h2>2D Ramachandran histograms<a class="headerlink" href="#d-ramachandran-histograms" title="Permalink to this heading"></a></h2>
+<p>The function generates Ramachandran plots to visualize the distribution of phi (ϕ) and psi (ψ) torsion angles of proteins within the ensembles. To calculate the torsion angles, MDTraj functions are used, and the results are then converted to degrees using <em>np.degrees</em>.
+If <em>two_d_hist</em> is set to False, it returns a simple scatter plot for all ensembles in a single plot. If set to True, it returns a 2D histogram for each ensemble, where the angles are grouped into a 2D histogram showing the population density of the conformations.</p>
+<p><a href="#id1"><span class="problematic" id="id2">*</span></a>”two_d_hist”: Boolean that determines whether to display a 2D histogram (True) or a scatter plot (False).</p>
+<p><a href="#id3"><span class="problematic" id="id4">*</span></a>”linespaces”: Tuple that specifies the range and the number of bins for the 2D histogram.</p>
+<p><em>“save”: If True, saves the plot in the data directory; default is False.</em></p>
+<p><em>“ax”: The matplotlib Axes object on which to plot; if None, creates a new Axes object.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualization</span><span class="o">.</span><span class="n">ramachandran_plots</span><span class="p">(</span><span class="n">two_d_hist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="images/sh3/local_analysis/rama.png" class="align-center" src="images/sh3/local_analysis/rama.png" />
 </section>
 <section id="alpha-angles-dihedral-distribution">
 <h2>Alpha angles dihedral distribution<a class="headerlink" href="#alpha-angles-dihedral-distribution" title="Permalink to this heading"></a></h2>

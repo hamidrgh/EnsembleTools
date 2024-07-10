@@ -44,9 +44,12 @@ def compute_ensemble_sasa(trajectory: mdtraj.Trajectory):
     total_sasa = sasa.sum(axis=1)
     return total_sasa
 
-def compute_end_to_end_distances(trajectory: mdtraj.Trajectory, atom_selector:str):
+def compute_end_to_end_distances(trajectory: mdtraj.Trajectory, atom_selector:str, rg_norm: bool = False):
     ca_indices = trajectory.topology.select(atom_selector)
     dist = mdtraj.compute_distances(
         trajectory, [[ca_indices[0], ca_indices[-1]]]
     ).ravel()
+    if rg_norm:
+        rg_i = mdtraj.compute_rg(trajectory).mean()
+        dist = dist / rg_i
     return dist

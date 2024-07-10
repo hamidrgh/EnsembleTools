@@ -101,11 +101,8 @@ def _featurize_dist(
 
 def featurize_ca_dist(
         traj: mdtraj.Trajectory,
-        min_sep: int = 2,
-        max_sep: int = None,
-        inverse: bool = False,
         get_names: bool = True,
-        atom_selector: str = "name CA") -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
+        atom_selector: str = "name CA", *args, **kwargs) -> Union[np.ndarray, Tuple[np.ndarray, List[str]]]:
     """
     Calculate C-alpha distances between pairs of residues.
 
@@ -134,11 +131,9 @@ def featurize_ca_dist(
     This function calculates C-alpha distances between pairs of residues.
     """
     return _featurize_dist(traj=traj,
-                           min_sep=min_sep,
-                           max_sep=max_sep,
-                           inverse=inverse,
                            get_names=get_names,
-                           atom_selector=atom_selector)
+                           atom_selector=atom_selector,
+                           *args, **kwargs)
 
 def featurize_com_dist(
         traj: mdtraj.Trajectory,
