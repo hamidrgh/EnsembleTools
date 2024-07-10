@@ -490,8 +490,7 @@ class EnsembleAnalysis:
         
         features_dict = {}
         for ensemble in self.ensembles:
-            kwargs['normalize'] = normalize
-            features = ensemble.get_features(featurization=featurization, *args, **kwargs)
+            features = ensemble.get_features(featurization=featurization, normalize=normalize, *args, **kwargs)
             if featurization != "flory_exponent":
                 features_dict[ensemble.code] = features
             else:
