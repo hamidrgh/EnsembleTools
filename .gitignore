@@ -15,3 +15,5 @@ outputdir/
 *.egg-info
 *.tar.gz
 *.whl
+docs/
+notebooks/develop_plots.ipynb
