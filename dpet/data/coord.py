@@ -88,7 +88,7 @@ def ss_measure_disorder(features_dict:dict):
     
     """This function accepts the dictionary of phi-psi arrays
     which is saved in featurized_data attribute and as an output provide
-    lexibility parameter for each residue in the ensemble
+    flexibility parameter for each residue in the ensemble
     Note: this function only works on phi/psi feature """
 
     f = {}

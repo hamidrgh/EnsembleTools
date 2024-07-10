@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 import numpy as np
 from matplotlib.lines import Line2D
 from matplotlib import colors, pyplot as plt
@@ -87,13 +87,17 @@ def _get_hist_bins(data: List[np.ndarray], bins: int, range: Tuple = None):
         _bins = bins
     return _bins
 
+
+
 def plot_violins(
         ax: plt.Axes,
         data: List[np.ndarray],
         labels: List[str],
         location : str = 'mean',
         title: str = "Histogram",
-        xlabel: str = "x"
+        xlabel: str = "x",
+        color: str = 'blue'
+
     ):
     """
     Make a violin plot.
@@ -119,9 +123,15 @@ def plot_violins(
         Axis objects for the histogram plot of original labels.
     """
     if location == 'mean':
-        ax.violinplot(data, showmeans=True, showmedians=False)
+        vp = ax.violinplot(data, showmeans=True, showmedians=False)
     elif location == 'median':
-        ax.violinplot(data, showmeans=False, showmedians=True)
+        vp = ax.violinplot(data, showmeans=False, showmedians=True)
+    
+    for pc in vp['bodies']:
+        pc.set_facecolor(color)
+        pc.set_edgecolor('black')  # Set edge color to black for better visibility
+        pc.set_alpha(0.7)  # Set transparency level
+
     ax.set_xticks(ticks=[y + 1 for y in range(len(labels))])
     ax.set_xticklabels(labels=labels, rotation=45.0, ha="center")
     ax.set_ylabel(xlabel)
@@ -230,7 +240,8 @@ class Visualization:
             color_by: str = "rg",
             kde_by_ensemble: bool = False,
             save: bool = False,
-            ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
+            ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None,
+            size: int = 10
     ) -> List[plt.Axes]:
         """
         Plot the results of t-SNE analysis. 
@@ -288,12 +299,12 @@ class Visualization:
         point_colors = [label_colors[label] for label in analysis.all_labels]
 
         # Scatter plot with original labels
-        scatter_labeled = ax[0].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=point_colors, s=10, alpha=0.5)
+        scatter_labeled = ax[0].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=point_colors, s=size, alpha=0.5)
         ax[0].set_title('Scatter plot (original labels)')
 
         # Scatter plot with clustering labels
         cmap = plt.get_cmap('jet', analysis.reducer.bestK)
-        scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=10, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
+        scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=size, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
         ax[1].set_title('Scatter plot (clustering labels)')
 
         feature_values = []
@@ -301,7 +312,7 @@ class Visualization:
             feature_values.extend(values)
         colors = np.array(feature_values)
 
-        feature_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=10, alpha=0.5)
+        feature_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=size, alpha=0.5)
         cbar = plt.colorbar(feature_labeled, ax=ax[2])
         ax[2].set_title(f'Scatter plot ({color_by} labels)')
 
@@ -341,7 +352,8 @@ class Visualization:
                                          color_by: str = "rg", 
                                          save: bool = False, 
                                          ax: Union[None, List[plt.Axes]] = None,
-                                         kde_by_ensemble: bool = False) -> List[plt.Axes]:
+                                         kde_by_ensemble: bool = False,
+                                         size: int = 10) -> List[plt.Axes]:
         """
         Plot the results of dimensionality reduction using the method specified in the analysis.
 
@@ -375,9 +387,9 @@ class Visualization:
 
         method = self.analysis.reduce_dim_method
         if method in ("dimenfix", "umap"):
-            self._dimenfix_umap_scatter(color_by=color_by, save=save, ax=ax, kde_by_ensemble=kde_by_ensemble)
+            self._dimenfix_umap_scatter(color_by=color_by, save=save, ax=ax, kde_by_ensemble=kde_by_ensemble, size=size)
         elif method == "tsne":
-            self._tsne_scatter(color_by=color_by, kde_by_ensemble=kde_by_ensemble, save=save, ax=ax)
+            self._tsne_scatter(color_by=color_by, kde_by_ensemble=kde_by_ensemble, save=save, ax=ax, size=size)
         else:
             raise NotImplementedError(f"Scatter plot for method '{method}' is not implemented. Please select between 'tsne', 'dimenfix', and 'umap'.")
 
@@ -386,6 +398,7 @@ class Visualization:
                          save: bool = False, 
                          ax: Union[None, List[plt.Axes]] = None,
                          kde_by_ensemble: bool = False,
+                         size: int = 10 
                          ) -> List[plt.Axes]:
         """
         Plot the complete results for dimenfix and umap methods. 
@@ -435,7 +448,7 @@ class Visualization:
         point_colors = [label_colors[label] for label in analysis.all_labels]
 
         # Scatter plot with original labels
-        scatter_labeled = axes[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=10, alpha=0.5)
+        scatter_labeled = axes[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=size, alpha=0.5)
         axes[0].set_title('Scatter plot (original labels)')
 
         # Scatter plot with different labels
@@ -444,7 +457,7 @@ class Visualization:
             feature_values.extend(values)
         colors = np.array(feature_values)
         
-        rg_labeled = axes[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=10, alpha=0.5)
+        rg_labeled = axes[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=size, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=axes[2])
         axes[2].set_title(f'Scatter plot ({color_by} labels)')
 
@@ -452,7 +465,7 @@ class Visualization:
         best_k = max(analysis.reducer.sil_scores, key=lambda x: x[1])[0]
         kmeans = KMeans(n_clusters=best_k, random_state=42)
         labels = kmeans.fit_predict(analysis.transformed_data)
-        scatter_cluster = axes[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=10, c=labels, cmap='viridis')
+        scatter_cluster = axes[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=size, c=labels, cmap='viridis')
         axes[1].set_title('Scatter plot (clustering labels)')
 
         # Manage legend for original labels
@@ -797,6 +810,7 @@ class Visualization:
                     #   means: bool = True, 
                     #   medians: bool = True, 
                       save: bool = False, 
+                      color: str = 'blue',
                       ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
         Plot the distribution of SASA for each conformation within the ensembles.
@@ -854,7 +868,8 @@ class Visualization:
                 labels=labels,
                 location= location,
                 title=title,
-                xlabel=axis_label
+                xlabel=axis_label,
+                color = color
             )
         else:
             plot_histogram(
@@ -1052,7 +1067,8 @@ class Visualization:
             mean: bool = False,
             dpi: int = 96,
             save: bool = False,
-            ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
+            ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None,
+            color: str = 'blue'
         ) -> Union[plt.Axes, List[plt.Axes]]:
         """
         Plot the distribution of the radius of gyration (Rg) within each ensemble.
@@ -1134,7 +1150,8 @@ class Visualization:
                 labels=labels,
                 location=location,
                 title=title,
-                xlabel=axis_label
+                xlabel=axis_label,
+                color=color
             )
         else:
             if not multiple_hist_ax:
@@ -1293,7 +1310,8 @@ class Visualization:
                             #  means: bool = True, 
                             #  median: bool = True, 
                              location: str = 'mean',
-                             save: bool = False, 
+                             save: bool = False,
+                             color: str = 'blue', 
                              ax: plt.Axes = None) -> plt.Axes:
         """
         Plot end-to-end distance distributions.
@@ -1361,7 +1379,8 @@ class Visualization:
                 labels=labels,
                 location= location,
                 title=title,
-                xlabel=axis_label
+                xlabel=axis_label,
+                color=color
             )
         else:
             plot_histogram(
@@ -1387,6 +1406,7 @@ class Visualization:
                     # means: bool = True,
                     # median: bool = True,
                     save: bool = False,
+                    color: str = 'blue',
                     ax: plt.Axes = None) -> plt.Axes:
         """
         Plot asphericity distribution in each ensemble.
@@ -1440,7 +1460,8 @@ class Visualization:
                 labels=labels,
                 location=location,
                 title=title,
-                xlabel=axis_label
+                xlabel=axis_label,
+                color=color
             )
         else:
             plot_histogram(
@@ -1466,6 +1487,7 @@ class Visualization:
                     # median: bool = False,
                     # means: bool = False,
                     save: bool = False,
+                    color: str = 'blue',
                     ax: plt.Axes = None) -> plt.Axes:
         """
         Plot prolateness distribution in each ensemble.
@@ -1519,7 +1541,8 @@ class Visualization:
                 labels=labels,
                 location=location,
                 title=title,
-                xlabel=axis_label
+                xlabel=axis_label,
+                color=color
             )
         else:
             plot_histogram(
@@ -1957,7 +1980,7 @@ class Visualization:
                          min_sep: int = 2, 
                          max_sep: Union[int, None] = None, 
                          get_names: bool = True, 
-                         inverse: bool = False,
+                         inverse: bool  = False,
                          save: bool = False,
                          ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None
                         ) -> List[plt.Axes]:
