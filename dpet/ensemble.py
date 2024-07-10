@@ -100,11 +100,22 @@ class Ensemble():
         elif os.path.isdir(self.data_path):
             files_in_dir = [f for f in os.listdir(self.data_path) if f.endswith('.pdb')]
             if files_in_dir:
+                chain_ids = self.get_chains_from_pdb()
+                print(f"{self.code} chain ids: {chain_ids}")
+
                 print(f"Generating trajectory for {self.code}...")
                 full_paths = [os.path.join(self.data_path, file) for file in files_in_dir]
                 self.trajectory = mdtraj.load(full_paths)
-                traj_dcd = os.path.join(data_dir, f'{self.code}.dcd')
-                traj_top = os.path.join(data_dir, f'{self.code}.top.pdb')
+                
+                chain_selected = self._select_chain(chain_ids)
+
+                if chain_selected:
+                    traj_suffix = f'_{self.chain_id.upper()}'
+                else:
+                    traj_suffix = ''
+
+                traj_dcd = os.path.join(data_dir, f'{self.code}{traj_suffix}.dcd')
+                traj_top = os.path.join(data_dir, f'{self.code}{traj_suffix}.top.pdb')
                 self.trajectory.save(traj_dcd)
                 self.trajectory[0].save(traj_top)
                 print(f"Generated trajectory saved to {data_dir}.")
@@ -368,17 +379,26 @@ class Ensemble():
         Raises
         ------
         FileNotFoundError
-            If the specified PDB file does not exist.
+            If the specified PDB file or directory does not exist, or if no PDB file is found in the directory.
         ValueError
-            If the specified file is not a PDB file.
+            If the specified file is not a PDB file and the path is not a directory.
         """
         if not os.path.exists(self.data_path):
-            raise FileNotFoundError(f"The file {self.data_path} does not exist.")
+            raise FileNotFoundError(f"The path {self.data_path} does not exist.")
         
-        if not self.data_path.endswith('.pdb'):
-            raise ValueError(f"The file {self.data_path} is not a PDB file.")
-        
-        with open(self.data_path, 'r') as f:
+        if os.path.isdir(self.data_path):
+            # Use the only one .pdb file
+            files = os.listdir(self.data_path)
+            pdb_files = [file for file in files if file.endswith('.pdb')]
+            if not pdb_files:
+                raise FileNotFoundError(f"No PDB file found in the directory {self.data_path}.")
+            pdb_file = os.path.join(self.data_path, pdb_files[0])
+        else:
+            if not self.data_path.endswith('.pdb'):
+                raise ValueError(f"The file {self.data_path} is not a PDB file.")
+            pdb_file = self.data_path
+
+        with open(pdb_file, 'r') as f:
             lines = f.readlines()
 
         chain_ids = []  # Use a list to preserve the order
