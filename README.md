@@ -1,3 +1,5 @@
+![Logo](/idpet_logo.png)
+
 Badges which can be included! <br>
 ![PyPI](https://img.shields.io/pypi/v/IDPEnsembletools.svg)
 ![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.1234567-blue)
