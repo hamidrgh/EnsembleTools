@@ -5,7 +5,7 @@ Badges which can be included! <br>
 ![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.1234567-blue)
 
 
-<img src="idpet_logo.png" alt="Logo" width="200" height="100" />
+<img src="idpet_logo.png" alt="Logo" width="260" height="100" />
 
 # IDPEnsembleTools : an open-source library for analysis of conformational ensembles of disordered proteins 
 ![Pipline Example](/pipline_example.jpeg)
