@@ -20,10 +20,11 @@ class Ensemble():
         The code identifier of the ensemble.
 
     data_path : str, optional
-        The path to the data file associated with the ensemble. Default is None.
+        The path to the data file associated with the ensemble. It could be a path to one multi-model pdb file 
+        , a path to a folder contain pdb files for each model, or .xtc , .dcd trajectory files. Default is None.
 
     top_path : str, optional
-        The path to the topology file associated with the ensemble. Default is None.
+        The path to the topology file associated with the ensemble. In case of having trajectory file. Default is None.
 
     database : str, optional
         The database from which to download the ensemble. Options are 'ped' and 'atlas'. Default is None.
@@ -154,6 +155,7 @@ class Ensemble():
         -----
         This method samples frames randomly from the original trajectory and updates the ensemble's trajectory attribute.
         """
+        
         total_frames = len(self.original_trajectory)
         if sample_size > total_frames:
             raise ValueError("Sample size cannot be larger than the total number of frames in the trajectory.")
@@ -161,6 +163,7 @@ class Ensemble():
         self.trajectory = mdtraj.Trajectory(
             xyz=self.original_trajectory.xyz[random_indices],
             topology=self.original_trajectory.topology)
+        self._select_residues()
         print(f"{sample_size} conformations sampled from {self.code} trajectory.")
         
     def extract_features(self, featurization: str, *args, **kwargs):

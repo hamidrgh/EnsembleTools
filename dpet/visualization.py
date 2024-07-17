@@ -214,7 +214,7 @@ def plot_comparison_matrix(
                 color_ij = textcolors[int(im.norm(scores_mean[i, j]) > threshold)]
             kw = {"color": color_ij}
             if scores_err is not None:
-                label_ij = f"{scores_mean[i, j]:.2f} ± {scores_err[i, j]:.2f}"
+                label_ij = f"{scores_mean[i, j]:.2f} ± {scores_err[i, j]:.1f}"
             else:
                 label_ij = f"{scores_mean[i, j]:.2f}"
             text = im.axes.text(j, i, label_ij, ha="center", va="center", **kw)
@@ -1336,6 +1336,8 @@ class Visualization:
             If True, the plot will be saved as an image file. Default is False.
         ax : plt.Axes, optional
             The axes on which to plot. Default is None, which creates a new figure and axes.
+        color: str, optional
+            Change the color of the violin plot
 
         Returns
         -------
