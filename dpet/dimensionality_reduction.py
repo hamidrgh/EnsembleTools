@@ -154,7 +154,16 @@ class TSNEReduction(DimensionalityReduction):
             )
             tsne = tsneObject.fit_transform(data)
             self._cluster(tsne, perplexity)
-        self.bestP, self.bestK, self.best_tsne, self.best_kmeans = self.get_best_results()
+        best_result = max(self.results, key=lambda x: x['silhouette_product'])
+        self.bestP = best_result['perplexity']
+        self.bestK = best_result['n_clusters']
+        self.best_tsne = best_result['tsne_features']
+        self.best_kmeans = best_result['kmeans_model']
+        print("Best Perplexity:", self.bestP)
+        print("Best Number of Clusters:", self.bestK)
+        print("Silhouette Score Low Dimensional:", best_result['silhouette_ld'])
+        print("Silhouette Score High Dimensional:", best_result['silhouette_hd'])
+        print("Silhouette Score Product", best_result['silhouette_product'])
         return self.best_tsne
 
     def _cluster(self, tsne:np.ndarray, perplexity:float):
@@ -172,25 +181,6 @@ class TSNEReduction(DimensionalityReduction):
                 'kmeans_model': kmeans
             }
             self.results.append(result)
-
-    def get_best_results(self) -> tuple:
-        """
-        Get the best combination of perplexity and number of clusters based on silhouette scores.
-
-        Returns
-        -------
-        tuple
-            A tuple containing the best perplexity, the best number of clusters, the corresponding
-            t-SNE features, and the KMeans clustering model for the best combination.
-        """
-        best_result = max(self.results, key=lambda x: x['silhouette_product'])
-        best_perplexity = best_result['perplexity']
-        best_n_clusters = best_result['n_clusters']
-        best_tsne = best_result['tsne_features']
-        best_kmeans = best_result['kmeans_model']
-        print("Best Perplexity:", best_perplexity)
-        print("Best Number of Clusters:", best_n_clusters)
-        return best_perplexity, best_n_clusters, best_tsne, best_kmeans
 
 class DimenFixReduction(DimensionalityReduction):
     """
