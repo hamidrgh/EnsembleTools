@@ -173,7 +173,7 @@ class Ensemble():
         Parameters
         ----------
         featurization : str
-            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega' and 'tr_phi'.
+            The method to use for feature extraction. Supported options: 'ca_dist', 'phi_psi', 'a_angle', 'tr_omega', 'tr_phi', and 'ca_phi_psi'.
         min_sep : int, optional
             The minimum sequence separation for angle calculations. Required for certain featurization methods.
         max_sep : int, optional
@@ -214,6 +214,18 @@ class Ensemble():
                 type="phi",
                 get_names=True,
                 *args, **kwargs)
+        elif featurization == "ca_phi_psi":
+            features_ca, names_ca = featurize_ca_dist(
+                traj=self.trajectory, 
+                get_names=True,
+                atom_selector=self.atom_selector,
+                *args, **kwargs)
+            features_phi_psi, names_phi_psi = featurize_phi_psi(
+                traj=self.trajectory, 
+                get_names=True,
+                *args, **kwargs)
+            features = np.concatenate((features_ca, features_phi_psi), axis=1)
+            names = names_ca + names_phi_psi
         else:
             raise NotImplementedError("Unsupported feature extraction method.")
 
