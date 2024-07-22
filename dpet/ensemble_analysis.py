@@ -13,7 +13,7 @@ import numpy as np
 from dpet.dimensionality_reduction import DimensionalityReductionFactory
 from dpet.featurization.ensemble_level import ensemble_features
 import itertools
-from dpet.data.comparison import (
+from dpet.comparison import (
     score_avg_jsd, score_emd_approximation, get_num_comparison_bins
 )
 
@@ -634,7 +634,7 @@ class EnsembleAnalysis:
             If `True`, bootstrap will sample with replacement. Default is `True`.
         bins: Union[int, str], optional
             Number of bins or bin assignment rule for JSD comparisons. See the
-            documentation of `dpet.data.comparison.get_num_comparison_bins` for
+            documentation of `dpet.comparison.get_num_comparison_bins` for
             more information.
         random_seed: int, optional
             Random seed used when performing bootstrapping.

@@ -23,8 +23,8 @@ def get_num_comparison_bins(
         same value will simply be returned. When providing a string, the following
         rules to determine bin value will be applied:
         `auto`: applies `sqrt` if the size of the smallest ensemble is <
-            `dpet.data.comparison.min_samples_auto_hist`. If it >= than this
-            value, returns `dpet.data.comparison.num_default_bins`.
+            `dpet.comparison.min_samples_auto_hist`. If it >= than this
+            value, returns `dpet.comparison.num_default_bins`.
         `sqrt`: applies the square root rule for determining bin number using
             the size of the smallest ensemble (https://en.wikipedia.org/wiki/Histogram#Square-root_choice).
         `sturges`: applies Sturge's formula for determining bin number using
@@ -105,7 +105,7 @@ def score_jsd_approximation(
         distribution to be compared.
     bins: Union[int, str], optional
         Determines the number of bins to be used when constructing histograms.
-        See `dpet.data.comparison.get_num_comparison_bins` for more information.
+        See `dpet.comparison.get_num_comparison_bins` for more information.
     pseudo_c: float, optional
         Pseudo-count value used in estimating the probabilities of the bins.
     return_bins: bool, optional
@@ -160,7 +160,7 @@ def score_avg_jsd(
         be different.
     bins: Union[int, str], optional
         Determines the number of bins to be used when constructing histograms.
-        See `dpet.data.comparison.get_num_comparison_bins` for more information.
+        See `dpet.comparison.get_num_comparison_bins` for more information.
     return_bins: bool, optional
         If `True`, returns the number of bins used in the calculation.
 
@@ -212,7 +212,7 @@ def score_ajsd_d(
 
     Remaining arguments and output
     ------------------------------
-        See `dpet.data.comparison.score_avg_jsd` for more information.
+        See `dpet.comparison.score_avg_jsd` for more information.
 
     """
     # Calculate Ca-Ca distances.
@@ -252,7 +252,7 @@ def score_ajsd_t(
 
     Remaining arguments and output
     ------------------------------
-        See `dpet.data.comparison.score_avg_jsd` for more information.
+        See `dpet.comparison.score_avg_jsd` for more information.
 
     """
     # Calculate torsion angles (alpha_angles).
