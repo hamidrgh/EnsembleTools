@@ -11,7 +11,8 @@ from dpet.ensemble_analysis import EnsembleAnalysis
 from dpet.featurization.angles import featurize_a_angle
 from dpet.data.coord import *
 from dpet.featurization.glob import compute_asphericity, compute_prolateness
-
+import plotly.express as px
+import pandas as pd
 PLOT_DIR = "plots"
 
 def plot_histogram(
@@ -235,13 +236,22 @@ class Visualization:
         self.plot_dir = os.path.join(self.analysis.output_dir, PLOT_DIR)
         os.makedirs(self.plot_dir, exist_ok=True)
 
+    def _index_models(self):
+        analysis = self.analysis
+        model_indexes = []
+        for ensemble in analysis.trajectories:
+            for frame in range(analysis.trajectories[ensemble].n_frames):
+                model_indexes.append(f'model{frame+1}_{ensemble}')
+        return model_indexes
+
     def _tsne_scatter(
             self,
             color_by: str = "rg",
             kde_by_ensemble: bool = False,
             save: bool = False,
             ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None,
-            size: int = 10
+            size: int = 10,
+            plotly = False
     ) -> List[plt.Axes]:
         """
         Plot the results of t-SNE analysis. 
@@ -343,6 +353,14 @@ class Visualization:
 
         fig.tight_layout()
 
+        if plotly == True:
+            # df = pd.DataFrame({'x':analysis.reducer.best_tsne[:, 0], 'y': analysis.reducer.best_tsne[:, 1], 'index': range(len(analysis.reducer.best_tsne[:, 0]))})
+            fig = px.scatter(x=analysis.reducer.best_tsne[:, 0], y=analysis.reducer.best_tsne[:, 1], color=colors, hover_data={'index':self._index_models()} )
+            fig.update_coloraxes(colorbar_title=f'{color_by}')
+            fig.show()
+
+            
+
         if save:
             fig.savefig(self.plot_dir + f'/tsnep{int(analysis.reducer.bestP)}_kmeans{int(analysis.reducer.bestK)}_scatter.png', dpi=800)
 
@@ -353,7 +371,9 @@ class Visualization:
                                          save: bool = False, 
                                          ax: Union[None, List[plt.Axes]] = None,
                                          kde_by_ensemble: bool = False,
-                                         size: int = 10) -> List[plt.Axes]:
+                                         size: int = 10,
+                                         plotly = False,
+                                         n_comp = 2) -> List[plt.Axes]:
         """
         Plot the results of dimensionality reduction using the method specified in the analysis.
 
@@ -386,10 +406,12 @@ class Visualization:
         """
 
         method = self.analysis.reduce_dim_method
-        if method in ("dimenfix", "umap"):
-            self._dimenfix_umap_scatter(color_by=color_by, save=save, ax=ax, kde_by_ensemble=kde_by_ensemble, size=size)
-        elif method == "tsne":
-            self._tsne_scatter(color_by=color_by, kde_by_ensemble=kde_by_ensemble, save=save, ax=ax, size=size)
+        if method in ("dimenfix", "umap") and n_comp <= 2:
+            self._dimenfix_umap_scatter(color_by=color_by, save=save, ax=ax, kde_by_ensemble=kde_by_ensemble, size=size, plotly=plotly)
+        elif method == "tsne" and n_comp == 2:
+            self._tsne_scatter(color_by=color_by, kde_by_ensemble=kde_by_ensemble, save=save, ax=ax, size=size, plotly=plotly)
+        elif n_comp == 3 :
+            self._scatter_3d(color_by=color_by, kde_by_ensemble=kde_by_ensemble, save=save, ax=ax, size=size, plotly=plotly)
         else:
             raise NotImplementedError(f"Scatter plot for method '{method}' is not implemented. Please select between 'tsne', 'dimenfix', and 'umap'.")
 
@@ -398,7 +420,8 @@ class Visualization:
                          save: bool = False, 
                          ax: Union[None, List[plt.Axes]] = None,
                          kde_by_ensemble: bool = False,
-                         size: int = 10 
+                         size: int = 10,
+                         plotly = False 
                          ) -> List[plt.Axes]:
         """
         Plot the complete results for dimenfix and umap methods. 
@@ -448,8 +471,10 @@ class Visualization:
         point_colors = [label_colors[label] for label in analysis.all_labels]
 
         # Scatter plot with original labels
+        
         scatter_labeled = axes[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=size, alpha=0.5)
         axes[0].set_title('Scatter plot (original labels)')
+
 
         # Scatter plot with different labels
         feature_values = []
@@ -460,6 +485,8 @@ class Visualization:
         rg_labeled = axes[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=size, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=axes[2])
         axes[2].set_title(f'Scatter plot ({color_by} labels)')
+
+        
 
         # Scatter plot with clustering labels
         best_k = max(analysis.reducer.sil_scores, key=lambda x: x[1])[0]
@@ -495,8 +522,112 @@ class Visualization:
 
         if save:
             fig.savefig(self.plot_dir + f'/{analysis.reduce_dim_method}_scatter.png', dpi=800)
+        
+        if plotly == True:
+            # df = pd.DataFrame({'x':analysis.reducer.best_tsne[:, 0], 'y': analysis.reducer.best_tsne[:, 1], 'index': range(len(analysis.reducer.best_tsne[:, 0]))})
+            fig = px.scatter(x=analysis.transformed_data[:, 0], y=analysis.transformed_data[:, 1], color=colors, hover_data={'index':self._index_models()} )
+            fig.update_coloraxes(colorbar_title=f'{color_by}')
+            fig.show()
 
         return axes
+    
+    def _scatter_3d(self, 
+                         color_by: str = "rg", 
+                         save: bool = False, 
+                         ax: Union[None, List[plt.Axes]] = None,
+                         kde_by_ensemble: bool = False,
+                         size: int = 10,
+                         plotly=False
+
+                         ) -> List[plt.Axes]:
+
+
+
+
+        from mpl_toolkits.mplot3d import Axes3D
+        analysis = self.analysis
+
+        if analysis.reduce_dim_method not in ("dimenfix", "umap"):
+            bestclust = analysis.reducer.best_kmeans.labels_
+            cmap = plt.get_cmap('jet', analysis.reducer.bestK)
+            labels_clust = bestclust.astype(float)
+
+        else:
+            bestclust = max(analysis.reducer.sil_scores, key=lambda x: x[1])[0]
+            kmeans = KMeans(n_clusters=bestclust, random_state=42)
+            labels_clust = kmeans.fit_predict(analysis.transformed_data)
+            cmap = 'viridis'
+            
+            
+        
+        if color_by not in ("rg", "prolateness", "asphericity", "sasa", "end_to_end"):
+            raise ValueError(f"Method {color_by} not supported.")
+
+        if ax is None:
+            fig = plt.figure( figsize=(13, 6))
+            # axes = ax.flatten()  # Ensure axes is a 1D array
+        else:
+            ax_array = np.array(ax).flatten()
+            axes = ax_array  # If ax is provided, flatten it to 1D
+            fig = axes[0].figure
+
+        # Create a consistent colormap for the original labels
+        unique_labels = np.unique(analysis.all_labels)
+        cmap = plt.get_cmap('plasma')
+        colors = cmap(np.linspace(0, 1, len(unique_labels)))
+        label_colors = {label: color for label, color in zip(unique_labels, colors)}
+        point_colors = [label_colors[label] for label in analysis.all_labels]
+
+        # Scatter plot with original labels
+        ax1 = fig.add_subplot(131, projection='3d')
+        scatter_labeled = ax1.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], analysis.transformed_data[:, 2],c=point_colors, s=size, alpha=0.5)
+        ax1.set_title('Scatter plot (original labels)')
+        ax1.view_init(elev=20, azim=45)
+
+        # Scatter plot with different labels
+        feature_values = []
+        for values in analysis.get_features(color_by).values():
+            feature_values.extend(values)
+        colors = np.array(feature_values)
+
+
+        ax2 = fig.add_subplot(132, projection='3d')
+        rg_labeled = ax2.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1],analysis.transformed_data[:, 2] ,c=colors, s=size, alpha=0.5)
+        cbar = plt.colorbar(rg_labeled, ax=ax2, fraction=0.075)
+        ax2.set_title(f'Scatter plot ({color_by} labels)')
+        ax2.view_init(elev=20, azim=45)
+
+        # Scatter plot with clustering labels
+        ax3 = fig.add_subplot(133, projection='3d')
+        scatter_cluster = ax3.scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1],analysis.transformed_data[:, 2] ,s=size, c=labels_clust, cmap=cmap, alpha=0.5)
+        ax3.set_title('Scatter plot (clustering labels)')
+        ax3.view_init(elev=20, azim=45)
+
+
+
+   
+
+        # Manage legend for original labels
+        legend_labels = list(label_colors.keys())
+        legend_handles = [Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
+
+        if plotly == True:
+            # df = pd.DataFrame({'x':analysis.reducer.best_tsne[:, 0], 'y': analysis.reducer.best_tsne[:, 1], 'index': range(len(analysis.reducer.best_tsne[:, 0]))})
+            fig = px.scatter(x=analysis.transformed_data[:, 0], y=analysis.transformed_data[:, 1], color=colors, hover_data={'index':self._index_models()} )
+            fig.update_coloraxes(colorbar_title=f'{color_by}')
+            fig.show()
+
+        plt.show()
+
+
+
+
+
+
+
+
+
 
     def pca_cumulative_explained_variance(self, save: bool = False, ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
