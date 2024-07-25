@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Union, Tuple
 import zipfile
 
 import pandas as pd
+from scipy.stats import mannwhitneyu
 from dpet.data.api_client import APIClient
 from dpet.ensemble import Ensemble
 from dpet.data.extract_tar_gz import extract_tar_gz
@@ -582,7 +583,7 @@ class EnsembleAnalysis:
             score: str,
             feature: str,
             featurization_params: dict = {},
-            bootstrap_iters: int = 3,
+            bootstrap_iters: int = None,
             bootstrap_frac: float = 1.0,
             bootstrap_replace: bool = True,
             bins: Union[int, str] = 50,
@@ -611,21 +612,33 @@ class EnsembleAnalysis:
             Optional dictionary to customize the featurization process for the
             above features.
         bootstrap_iters: int, optional
-            Number of bootstrap iterations. If the value is > 1, each pair of
-            ensembles will be compared `bootstrap_iters` times by randomly
-            selecting (bootstrapping) conformations from it. For small protein
-            structural ensembles (less than 500-1,000 conformations) comparison
-            scores in DPED are not robust estimators of divergence/distance. By
-            performing bootstrapping, you can have an idea of how the size of
-            your ensembles impacts the comparison. Specifically, you should
-            look at auto-comparisons: each ensemble will be compared with itself
-            by bootstrapping different subsamples. The scores obtained by these
-            auto-comparisons give an estimate of the "uncertainty" related to
-            sample size: for large ensembles, the auto-comparison scores (on the
-            diagonal of the matrix) should tend to 0. For smaller ensembles you
-            will get increasingly higher values. Use values >= 5 especially when
-            comparing small ensembles. When comparing large ensembles (more than
-            10,000 conformations) you can avoid bootstrapping.
+            Number of bootstrap iterations. By default its value is None. In
+            this case, IDPET will directly compare each pair of ensemble $i$ and
+            $j$ by using all of their conformers and perform the comparison only
+            once. On the other hand, if providing an integer value to this
+            argument, each pair of ensembles $i$ and $j$ will be compared
+            `bootstrap_iters` times by randomly selecting (bootstrapping)
+            conformations from them. Additionally, each ensemble will be
+            auto-compared with itself by subsampling conformers via
+            bootstrapping. Then IDPET will perform a statistical test to
+            establish if the inter-ensemble ($i != j$) scores are significantly
+            different from the intra-ensemble ($i == j$) scores. The tests work
+            as follows: for each ensemble pair $i != j$ IDPET will get their
+            inter-ensemble comparison scores obtained in bootstrapping. Then, it
+            will get the bootstrapping scores from auto-comparisons of ensemble
+            $i$ and $j$ and the scores with the higher mean here are selected as
+            reference intra-ensemble scores. Finally, the inter-ensemble and
+            intra-ensemble scores are compared via a one-sided Mann-Whitney U
+            test with the alternative hypothesis being: inter-ensemble scores
+            are stochastically greater than intra-ensemble scores. The p-values
+            obtained in these tests will additionally be returned. For small
+            protein structural ensembles (less than 500 conformations) most
+            comparison scores in IDPET are not robust estimators of
+            divergence/distance. By performing bootstrapping, you can have an
+            idea of how the size of your ensembles impacts the comparison. Use
+            values >= 50 when comparing ensembles with very few conformations
+            (less than 100). When comparing large ensembles (more than
+            1,000-5,000 conformations) you can safely avoid bootstrapping.
         bootstrap_frac: float, optional
             Fraction of the total conformations to sample when bootstrapping.
             Default value is 1.0, which results in bootstrap samples with the
@@ -644,14 +657,21 @@ class EnsembleAnalysis:
 
         Returns
         -------
-        results: Tuple[np.ndarray, List[str]]
+        results: Tuple[dict, List[str]]
             A tuple containing:
-                `score_matrix`: a (M, M, B) NumPy array storing the comparison
-                scores, where M is the number of ensembles being compared and B
-                is the number of bootstrap iterations (B will be 1 if
-                bootstrapping was not performed).
+                `comparison_output`: a dictionary containing the following
+                key-value pairs:
+                    `scores`: a (M, M, B) NumPy array storing the comparison
+                        scores, where M is the number of ensembles being
+                        compared and B is the number of bootstrap iterations (B
+                        will be 1 if bootstrapping was not performed).
+                    `p_values`: a (M, M) NumPy array storing the p-values
+                        obtained in the statistical test performed when using
+                        a bootstrapping strategy (see the `bootstrap_iters`)
+                        method. Returned only when performing a bootstrapping
+                        strategy.
                 `codes`: a list of M strings, containing the codes of the
-                ensembles that were compared.
+                    ensembles that were compared.
         """
 
         allowed_scores = {
@@ -674,6 +694,18 @@ class EnsembleAnalysis:
                 f"The '{score}' score must be calculated based on the"
                 f" following features: {allowed_scores[score]}"
             )
+
+        min_bootstrap_iters = 2
+        if isinstance(bootstrap_iters, int):
+            if bootstrap_iters < min_bootstrap_iters:
+                raise ValueError(
+                    "Need at leasts {min_bootstrap_iters} bootstrap_iters"
+                )
+            comparison_iters = bootstrap_iters
+        elif bootstrap_iters is None:
+            comparison_iters = 1
+        else:
+            raise TypeError(bootstrap_iters)
 
         if not 0 <= bootstrap_frac <= 1:
             raise ValueError(f"Invalid bootstrap_frac: {bootstrap_frac}")
@@ -710,10 +742,10 @@ class EnsembleAnalysis:
                 raise ValueError(f"Invalid feature for comparison: {feature}")
             features.append(feats_i)
         
-        ### Performs the comparisons.
+        ### Setup the comparisons.
         if verbose:
             print(f"# Scoring '{score}' using features '{feature}'")
-        codes = list(self.trajectories.keys())
+        codes = [e.code for e in self.ensembles]
         n = len(codes)
 
         # Define the parameters for the evaluation.
@@ -734,33 +766,51 @@ class EnsembleAnalysis:
         else:
             raise ValueError(score)
 
-        # Initialize a (n, n, bootstrap_iters) matrix.
-        comparisons_iters = 1 if bootstrap_iters < 2 else bootstrap_iters
-        score_matrix = np.zeros((n, n, comparisons_iters))
-
-        # Get the pairs to compare.
+        # Initialize a (n, n, *) matrices for storing the comparison scores.
+        score_matrix = np.zeros((n, n, comparison_iters))
+        
+         # Get the pairs to compare.
         pairs_to_compare = []
         for i, code_i in enumerate(codes):
             for j, code_j in enumerate(codes):
-                if j >= i:
-                    if j != i or bootstrap_iters > 1:
-                        pairs_to_compare.append((i, j))
+                if j > i:
+                    pairs_to_compare.append((i, j))
+                elif i == j and comparison_iters > 1:
+                    pairs_to_compare.append((i, j))
+        
+        # Get the total number of comparisons to perform.
+        if comparison_iters > 1:
+            permutation_scores = np.zeros((n, n, comparison_iters))
+            tot_comparisons = (len(pairs_to_compare) + len(pairs_to_compare))*comparison_iters
+        else:
+            tot_comparisons = len(pairs_to_compare)
         if verbose:
             print(
-                f"- Will perform: {len(pairs_to_compare)} (pairs of ensembles)"
-                f" x {comparisons_iters} (iterations) ="
-                f" {len(pairs_to_compare)*comparisons_iters} (comparisons)"
+                f"- We have {len(pairs_to_compare)} pairs of ensembles"
+                f" and will perform a total of {tot_comparisons} comparisons."
             )
 
-        # Compare pairs of ensembles.
-        for i, j in pairs_to_compare:
-            for k in range(comparisons_iters):
-                # Use all conformers.
-                if bootstrap_iters == 0:
-                    features_ik = features[i]
-                    features_jk = features[j]
-                # When using bootstrapping, subsample the ensembles.
-                else:
+        ### Perform the comparisons.
+
+        ## Use all conformers, repeat only once.
+        if comparison_iters == 1:
+            
+            for i, j in pairs_to_compare:
+                # Score.
+                score_ij = score_func(
+                    features[i], features[j], **scoring_params
+                )
+                # Store the results.
+                score_matrix[i, j, 0] = score_ij
+                score_matrix[j, i, 0] = score_ij
+
+        ## Bootstrap analysis, compare ensembles multiple times by subsampling.
+        else:
+            
+            for i, j in pairs_to_compare:
+
+                for k in range(comparison_iters):
+
                     # Features for ensemble i.
                     n_i = features[i].shape[0]
                     rand_ids_ik = rand_func(
@@ -777,12 +827,41 @@ class EnsembleAnalysis:
                         replace=bootstrap_replace
                     )
                     features_jk = features[j][rand_ids_jk]
-                # Score.
-                score_ijk = score_func(
-                    features_ik, features_jk, **scoring_params
-                )
-                # Store the results.
-                score_matrix[i, j, k] = score_ijk
-                score_matrix[j, i, k] = score_ijk
+                    # Score.
+                    score_ijk = score_func(
+                        features_ik, features_jk, **scoring_params
+                    )
+                    # Store the results.
+                    score_matrix[i, j, k] = score_ijk
+                    score_matrix[j, i, k] = score_ijk
 
-        return score_matrix, codes
+
+        ### Prepare the output.
+        output = {"scores": score_matrix}
+        if comparison_iters > 1:
+            # Perform mannwhitneyu test to check if inter-ensembles scores are
+            # different in a statistically significant way from intra-ensemble
+            # scores.
+            p_values = np.zeros((n, n, ))
+            for i in range(n):
+                for j in range(n):
+                    if i >= j:
+                        continue
+                    scores_i = score_matrix[i, i]
+                    scores_j = score_matrix[j, j]
+                    # Get the higher intra-ensemble scores between ensemble
+                    # i and j.
+                    scores_ref = scores_i if scores_i.mean() > scores_j.mean() \
+                                          else scores_j
+                    # Run the statistical test.
+                    u_ij = mannwhitneyu(
+                        x=score_matrix[i, j],
+                        y=scores_ref,
+                        alternative='greater'
+                    )
+                    # Store p-values.
+                    p_values[i, j] = u_ij[1]
+                    p_values[j, i] = u_ij[1]
+            output["p_values"] = p_values
+
+        return output, codes

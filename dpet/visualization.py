@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Union, Optional
+from typing import List, Tuple, Union
 import numpy as np
 from matplotlib.lines import Line2D
 from matplotlib import colors, pyplot as plt
@@ -11,6 +11,7 @@ from dpet.ensemble_analysis import EnsembleAnalysis
 from dpet.featurization.angles import featurize_a_angle
 from dpet.data.coord import *
 from dpet.featurization.glob import compute_asphericity, compute_prolateness
+from dpet.comparison import confidence_interval
 
 PLOT_DIR = "plots"
 
@@ -88,7 +89,6 @@ def _get_hist_bins(data: List[np.ndarray], bins: int, range: Tuple = None):
     return _bins
 
 
-
 def plot_violins(
         ax: plt.Axes,
         data: List[np.ndarray],
@@ -140,31 +140,48 @@ def plot_violins(
 
 def plot_comparison_matrix(
         ax: plt.Axes,
-        scores: np.ndarray,
+        comparison_out: np.ndarray,
         codes: List[str],
-        std: bool = False,
+        confidence_level: float = 0.95,
+        significance_level: float = 0.05,
         cmap: str = "viridis_r",
         title: str = "New Comparison",
         cbar_label: str = "score",
         textcolors: Union[str, tuple] = ("black", "white")
     ):
     """
-    Plot a matrix with all vs all comparison scores as a heatmap.
+    Plot a matrix with all-vs-all comparison scores of M ensembles as a heatmap.
+    If plotting the results of a regular all-vs-all analysis (no bootstraping
+    involved), it will just plot the M x M comparison scores, with empty values
+    on the diagonal. If plotting the results of an all-vs-all analysis with
+    bootstrapping it will plot the M x M confidence intervals for the scores.
+    The intervals are obtained by using the 'percentile' method. Additionally,
+    it will plot an asterisk for those non-diagonal entries in for which the
+    inter-ensemble scores are significantly higher than the intra-ensemble
+    scores according to a Mann–Whitney U test.
 
     Parameters
     ----------
     ax: plt.Axes
         Axes object where the heatmap should be created.
-    scores: np.ndarray
-        NumPy array with shape (M, M, B) containing the comparison scores for M
-        ensembles and B bootstrap iterations. See the documentation for the
-        output of `EnsembleAnalysis.comparison_scores` for more information.
+    comparison_out: dict
+        A dictionary containing the output of the `comparison_scores` method of
+        the `dpet.ensemble_analysis.EnsembleAnalysis` class. It must contain the
+        following key-value pairs:
+            `scores`: NumPy array with shape (M, M, B) containing the comparison
+                scores for M ensembles and B bootstrap iterations. If no bootstrap
+                analysis was performed, `B = 1`, otherwise it will be `B > 1`.
+            `p_values` (optional): used only when a bootstrap analysis was
+                performed. A (M, M) NumPy array storiging the p-values obtained
+                by comparing with a statistical test the inter-ensemble and
+                intra-ensemble comparison scores.
     codes: List[str]
         List of strings with the codes of the ensembles.
-    std: bool, optional
-        Show the standard deviation of the comparison scores over B bootstrap
-        iterations for each of each score in the M x M matrix. Only takes effect
-        if B >= 2. Default is `False`.
+    confidence_level: float, optional
+        Condifence level for the bootstrap intervals of the comparison scores.
+    significance_level: float, optional
+        Significance level for the statistical test used to compare inter and
+        intra-ensemble comparison scores.
     cmap: str, optional
         Matplotlib colormap name to use in the heatmap.
     title: str, optional
@@ -181,7 +198,9 @@ def plot_comparison_matrix(
     Returns
     -------
     ax: plt.Axes
-        The same updated Axes object from the input.
+        The same updated Axes object from the input. The `comparison_out` will
+        be updated to store confidence intervals if performing a bootstrap
+        analysis.
     
     Notes
     -----
@@ -189,13 +208,38 @@ def plot_comparison_matrix(
     with the ensemble labels.
 
     """
-    scores_mean = scores.mean(axis=2)
-    if scores.shape[2] > 1 and std:
-        # More than 1 bootstrap iteration, can calculate std.
-        scores_err = scores.std(axis=2)
+    if not isinstance(comparison_out, dict):
+        raise TypeError()
+    if len(comparison_out) == 1:
+        if "scores" not in comparison_out:
+            raise KeyError()
+        mode = "single"
+        scores_mean = comparison_out["scores"][:,:,0]
+    elif len(comparison_out) == 2:
+        if "scores" not in comparison_out:
+            raise KeyError()
+        if "p_values" not in comparison_out:
+            raise KeyError()
+        mode = "bootstrap"
+        scores_mean = comparison_out["scores"].mean(axis=2)
+        conf_intervals = np.zeros((scores_mean.shape[0], scores_mean.shape[1], 2))
+        p_values = comparison_out["p_values"]
+        for i in range(conf_intervals.shape[0]):
+            for j in range(conf_intervals.shape[1]):
+                if i > j:
+                    continue
+                c_ij = confidence_interval(
+                    comparison_out["scores"][i, j],
+                    confidence_level=confidence_level
+                )
+                conf_intervals[i, j][0] = c_ij[0]
+                conf_intervals[i, j][1] = c_ij[1]
+                conf_intervals[j, i][0] = c_ij[0]
+                conf_intervals[j, i][1] = c_ij[1]
+        comparison_out["confidence_intervals"] = conf_intervals
+        p_values = comparison_out["p_values"]
     else:
-        # One or less bootstrap iterations.
-        scores_err = None
+        raise KeyError()
 
     ax.set_title(title)
     im = ax.imshow(scores_mean, cmap=cmap)
@@ -213,13 +257,58 @@ def plot_comparison_matrix(
             else:
                 color_ij = textcolors[int(im.norm(scores_mean[i, j]) > threshold)]
             kw = {"color": color_ij}
-            if scores_err is not None:
-                label_ij = f"{scores_mean[i, j]:.2f} ± {scores_err[i, j]:.1f}"
-            else:
+            if mode == "single":
                 label_ij = f"{scores_mean[i, j]:.2f}"
-            text = im.axes.text(j, i, label_ij, ha="center", va="center", **kw)
+                if i == j:
+                    label_ij = "-"
+                size = 10
+            elif mode == "bootstrap":
+                label_ij = f"[{conf_intervals[i, j][0]:.3f}, \n {conf_intervals[i, j][1]:.3f}]"
+                if i != j and p_values[i, j] < significance_level:
+                    label_ij += "*"
+                size = 8
+            else:
+                raise NotImplementedError()
+            text = im.axes.text(j, i, label_ij, size=size, ha="center", va="center", **kw)
 
     return ax
+
+
+def _get_random_a_angle_ids(n: int, prot_len: int) -> np.ndarray:
+    rand_ids = np.random.choice(prot_len-3, n, replace=False)
+    torsion_ids = _get_a_angle_ids(rand_ids)
+    return torsion_ids
+
+def _get_a_angle_ids(ids):
+    torsion_ids = []
+    for i in ids:
+        torsion_ids.append([i, i+1, i+2, i+3])
+    return np.array(torsion_ids)
+
+def _get_random_pairs(
+        n: int,
+        prot_len: int,
+        min_sep: int = 1
+    ) -> np.ndarray:
+    pairs = np.triu_indices(prot_len, k=min_sep)
+    pairs = np.vstack(pairs).T
+    rand_ids = np.random.choice(pairs.shape[0], n, replace=False)
+    return pairs[rand_ids]
+
+def _to_array(x):
+    return np.array(x, copy=False)
+
+_phi_psi_offsets = {"phi": 1, "psi": 0}
+
+def _get_max_hist(min_len, feature):
+    if feature == "ca_dist":
+        return min_len*(min_len-1)/2
+    elif feature == "a_angle":
+        return min_len-3
+    elif feature in ("phi", "psi"):
+        return min_len-1
+    else:
+        raise KeyError(feature)
 
 
 class Visualization:
@@ -2059,22 +2148,257 @@ class Visualization:
                 fig.savefig(os.path.join(self.plot_dir, 'dist_ca_com_' + ens.code))  
 
         return axes
+
+
+    def plot_histogram_grid(self,
+            feature: str = "ca_dist",
+            ids: Union[np.ndarray, List[list]] = None,
+            n_rows: int = 2,
+            n_cols: int = 3,
+            subplot_width: int = 2.0,
+            subplot_height: int = 2.2,
+            bins: Union[str, int] = None,
+            dpi: int = 90
+        ) -> plt.Axes:
+        """
+        Plot a grid if histograms for distance or angular features. Can only be
+        be used when analyzing ensembles of proteins with same number of
+        residues. The fuction will create a new matplotlib figure for histogram
+        grid.
+
+        Parameters
+        ----------
+        feature: str, optional
+            Feature to analyze. Must be one of `ca_dist` (Ca-Ca distances),
+            `a_angle` (alpha angles), `phi` or `psi` (phi or psi backbone
+            angles).
+        ids: Union[list, List[list]], optional
+            Residue indices (integers starting from zero) to define the residues
+            to analyze. For angular features it must be a 1d list with N indices
+            of the residues. For distance features it must be 2d list/array of
+            shape (N, 2) in which N is the number of residue pairs to analyze
+            are 2 their indices. Each of the N indices (or pair of indices) will
+            be plotted in an histogram of the grid. If this argument is not
+            provided, random indices will be sampled, which is useful for
+            quickly comparing the distance or angle distributions of multiple
+            ensembles.
+        n_rows: int, optional
+            Number of rows in the histogram grid.
+        n_cols: int, optional
+            Number of columns in the histogram grid.
+        subplot_width: int, optional
+            Use to specify the Matplotlib width of the figure. The size of the
+            figure will be calculated as: figsize = (n_cols*subplot_width, n_rows*subplot_height).
+        subplot_height: int, optional
+            See the subplot_width argument.
+        bins: Union[str, int], optional
+            Number of bins in all the histograms.
+        dpi: int, optional
+            DPI of the figure.
+
+        Returns
+        -------
+        ax: plt.Axes
+            The Axes object for the histogram grid.
+        """
+        
+        ### Check the ensembles.
+        ensembles = self.analysis.ensembles
+        ens_lens = set([e.get_num_residues() for e in ensembles])
+        if len(ens_lens) != 1:
+            # May remove the limit in the future.
+            raise ValueError(
+                "Cannot build an histogram grid with proteins of different lengths"
+            )
+        min_len = min(ens_lens)  # Get the minimum number of residues.
+        
+        ### Select the features to analyze.
+        n_hist = n_rows*n_cols
+        if _get_max_hist(min_len, feature) < n_hist:
+            raise ValueError(f"Not enough residues to plot {n_hist} {feature} histograms")
+        if ids is not None and n_hist != len(ids):
+            raise ValueError(
+                f"The number of provided ids ({len(ids)}) is incompatible with"
+                f" the number of histograms ({n_hist})")
+        if feature == "ca_dist":
+            if ids is not None:
+                rand_ids = _to_array(ids)
+                if len(rand_ids.shape) != 2 or rand_ids.shape[1] != 2:
+                    raise ValueError(
+                        "Invalid shape for residue ids for Ca-Ca distances, received"
+                        f" {tuple(rand_ids.shape)} expected ({n_hist}, 2)"
+                    )
+                if np.max(ids) + 1 > min_len:
+                    raise ValueError(
+                        f"Maximum residue idx ({np.max(ids)}) exceeds the number of"
+                        f" residues ({min_len})"
+                    )
+            else:
+                rand_ids = _get_random_pairs(n=n_hist, prot_len=min_len)
+        elif feature == "a_angle":
+            if ids is not None:
+                rand_ids = _get_a_angle_ids(ids)
+                if len(rand_ids.shape) != 2 or rand_ids.shape[1] != 4:
+                    raise ValueError(
+                        "Invalid shape for residue ids for a angles, received"
+                        f" {tuple(rand_ids.shape)} expected ({n_hist}, )"
+                    )
+                if np.max(ids) + 1 > min_len - 3:
+                    raise ValueError(
+                        f"Maximum residue idx ({max(ids)}) exceeds the number of"
+                        f" plottable alpha torsion angles ({min_len - 3})"
+                    )
+            else:
+                rand_ids = _get_random_a_angle_ids(n=n_hist, prot_len=min_len)
+        elif feature in ("phi", "psi"):
+            if any([e.coarse_grained for e in ensembles]):
+                raise ValueError(
+                    f"Cannot analyze {feature} angles when a coarse-grained"
+                    " ensemble is loaded."
+                )
+            if ids is not None:
+                rand_ids = _to_array(ids)
+                if len(rand_ids.shape) != 1:
+                    raise ValueError(
+                        f"Invalid shape for residue ids for {feature} angles, received"
+                        f" {tuple(rand_ids.shape)} expected (*, )"
+                    )
+                if np.max(rand_ids) + 1 > min_len - (1 - _phi_psi_offsets[feature]):
+                    raise ValueError(
+                        f"Maximum residue idx ({max(rand_ids)}) exceeds the number of"
+                        f" plottable {feature} angles for proteins with {min_len} residues"
+                    )
+                if feature == "phi" and 0 in rand_ids:
+                    raise ValueError(f"Cannot use residue idx 0 with phi angles")
+            else:
+                rand_ids = np.random.choice(min_len-1, n_hist, replace=False) + _phi_psi_offsets[feature]
+        else:
+            raise KeyError(feature)
+            
+        if np.any(rand_ids < 0):
+            raise ValueError("Can only use residue indices >= 0")
+
+        ### Calculate features.
+        hist_data = []
+        for ensemble in ensembles:
+            ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
+            if feature == "ca_dist":
+                data_k = mdtraj.compute_distances(ensemble.trajectory, ca_indices[rand_ids])
+            elif feature == "a_angle":
+                data_k = mdtraj.compute_dihedrals(ensemble.trajectory, ca_indices[rand_ids])
+            elif feature in ("phi", "psi"):
+                data_k = getattr(mdtraj, f"compute_{feature}")(ensemble.trajectory)[1]
+                data_k = data_k[:,rand_ids - 1*_phi_psi_offsets[feature]]
+            else:
+                raise KeyError(feature)
+            hist_data.append(data_k)
+        
+        ### Initialize the plot.
+        # Initialize the figure.
+        figsize = (n_cols*subplot_width, n_rows*subplot_height)
+        fig = plt.figure(
+            figsize=figsize,
+            dpi=dpi,
+            layout="constrained"
+        )
+        # Initialize the subplots.
+        ax = fig.subplots(n_rows, n_cols, squeeze=False)
+        # Figure elements.
+        if feature == "ca_dist":
+            axis_label = "Distance [nm]"
+            title = r"C$\alpha$-C$\alpha$ distances"
+        elif feature == "a_angle":
+            axis_label = "Angle [rad]"
+            title = r"$\alpha$ angles"
+        elif feature in ("phi", "psi"):
+            axis_label = "Angle [rad]"
+            title = rf"$\{feature}$ angles"
+        else:
+            raise KeyError(feature)
+        fig.suptitle(title)
+        
+        ### Plot the histograms.
+        row_c = 0
+        col_c = 0
+        hist_args = {"histtype": "step", "density": True}
+        labels = [e.code for e in ensembles]
+        for m in range(n_hist):
+            
+            # Define variables to build the histograms.
+            if feature in ("ca_dist", ):
+                _min = min([x[:,m].min() for x in hist_data])
+                _max = max([x[:,m].max() for x in hist_data])
+                idx_i, idx_j = rand_ids[m]
+                text = rf"C$\alpha$ {idx_i}-{idx_j}"
+            elif feature in ("a_angle", ):
+                _min = -np.pi
+                _max = np.pi
+                idx_i, idx_j, idx_k, idx_l = rand_ids[m]
+                text = rf"C$\alpha$ {idx_i}-{idx_j}-{idx_k}-{idx_l}"
+            elif feature in ("phi", "psi"):
+                _min = -np.pi
+                _max = np.pi
+                text = rf"Residue {rand_ids[m]}"
+            else:
+                raise KeyError(feature)
+                
+            # Histogram.
+            for k in range(len(ensembles)):
+                data_km = hist_data[k][:,m]
+                ax[row_c][col_c].hist(
+                    data_km,
+                    range=(_min, _max),
+                    bins=bins,
+                    label=ensembles[k].code if (row_c == 0 and col_c == 0) else None,
+                    **hist_args
+                )
+                
+            # Labels and titles.
+            default_font_size = plt.rcParams['font.size']
+            ax[row_c][col_c].set_title(text, fontsize=default_font_size)
+            # ax[row_c][col_c].text(0.95, 0.95, text, verticalalignment='top',
+            #                       horizontalalignment='right',
+            #                       transform=ax[row_c][col_c].transAxes, fontsize=8,
+            #                       color='black', alpha=0.8)
+
+            if col_c == 0:
+                ax[row_c][col_c].set_ylabel("Density")
+            if row_c + 1 == n_rows:
+                ax[row_c][col_c].set_xlabel(axis_label)
+                
+            # Increase row and column counters.
+            col_c += 1
+            if col_c == n_cols:
+                row_c += 1
+                col_c = 0
+
+        # Legend.
+        handles, labels = ax[0, 0].get_legend_handles_labels()
+        fig.legend(
+            handles, labels,
+            loc='upper left',
+            bbox_to_anchor=(1.02, 1),
+            bbox_transform=ax[0, n_cols-1].transAxes
+        )
+        
+        return ax
     
     
     def comparison_matrix(self,
             score: str,
             feature: str,
             featurization_params: dict = {},
-            bootstrap_iters: int = 3,
+            bootstrap_iters: int = None,
             bootstrap_frac: float = 1.0,
             bootstrap_replace: bool = True,
+            confidence_level: float = 0.95,
+            significance_level: float = 0.05,
             bins: Union[int, str] = 50,
             random_seed: int = None,
             verbose: bool = False,
             ax: Union[None, plt.Axes] = None,
             figsize: Tuple[int] = (6.00, 5.0),
             dpi: int = 100,
-            std: bool = False,
             cmap: str = "viridis_r",
             title: str = None,
             cbar_label: str = None,
@@ -2100,7 +2424,8 @@ class Visualization:
         dpi: int, optional
             DPIs of the figure for the heatmap. Default is 100. Only takes
             effect if `ax` is not `None`.
-        std, cmap, title, cbar_label, textcolors:
+        confidence_level, significance_level, cmap, title, cbar_label,
+        textcolors:
             See the documentation of `dpet.visualization.plot_comparison_matrix`
             for more information about these arguments.
 
@@ -2123,7 +2448,7 @@ class Visualization:
         """
 
         ### Score divergences.
-        scores, codes = self.analysis.comparison_scores(
+        comparison_out, codes = self.analysis.comparison_scores(
             score=score,
             feature=feature,
             featurization_params=featurization_params,
@@ -2161,9 +2486,10 @@ class Visualization:
         ### Actually plots.
         plot_comparison_matrix(
             ax=ax,
-            scores=scores,
+            comparison_out=comparison_out,
             codes=codes,
-            std=std,
+            confidence_level=confidence_level,
+            significance_level=significance_level,
             cmap=cmap,
             title=title,
             cbar_label=cbar_label,
@@ -2171,7 +2497,7 @@ class Visualization:
         )
 
         ### Return results.
-        results = {"ax": ax, "scores": scores, "codes": codes}
+        results = {"ax": ax, "comparison": comparison_out, "codes": codes}
         if fig is not None:
             results["fig"] = fig
         return results

@@ -3,6 +3,7 @@ from typing import Union, List, Tuple
 import numpy as np
 import scipy
 from dpet.ensemble import Ensemble
+from dpet.featurization.utils import get_triu_indices
 
 
 num_default_bins = 50
@@ -130,9 +131,11 @@ def score_jsd_approximation(
     # Compute the frequencies in the bins.
     ht = (np.histogram(x_1, bins=bins)[0] + pseudo_c) / n_1
     hp = (np.histogram(x_2, bins=bins)[0] + pseudo_c) / n_2
-    hm = (ht + hp) / 2
+    hm = (ht + hp) * 0.5
+    # Compute KL divergences.
     kl_tm = -np.sum(ht * np.log(hm / ht))
     kl_pm = -np.sum(hp * np.log(hm / hp))
+    # Compute JS divergence.
     js = 0.5 * kl_pm + 0.5 * kl_tm
 
     if return_bins:
@@ -146,6 +149,7 @@ def score_avg_jsd(
         features_2: np.ndarray,
         bins: Union[int, str] = 25,
         return_bins: bool = False,
+        return_scores: bool = False,
         *args, **kwargs
     ):
     """
@@ -163,14 +167,19 @@ def score_avg_jsd(
         See `dpet.comparison.get_num_comparison_bins` for more information.
     return_bins: bool, optional
         If `True`, returns the number of bins used in the calculation.
+    return_scores: bool, optional
+        If `True`, returns the a tuple with with (avg_score, all_scores), where
+        all_scores is an array with all the F scores (one for each feature) used
+        to compute the average score.
 
     Returns
     -------
-    results: Union[float, Tuple[float, np.ndarray]]
+    results: Union[float, Tuple[float, np.ndarray], Tuple[Tuple[float, np.ndarray], np.ndarray]]
         If `return_bins` is `False`, only returns a float value for the average
         JSD score over the F features. If `return_bins` is `True`, returns a
         tuple with the average JSD score and the number of bins used in the
-        comparisons.
+        comparisons. If `return_scores` if `True` will also return the F scores
+        used to compute the average JSD score.
 
     """
 
@@ -186,16 +195,21 @@ def score_avg_jsd(
         )
         jsd.append(jsd_l)
     avg_jsd =  sum(jsd)/len(jsd)
-    if not return_bins:
-        return avg_jsd
+    if not return_scores:
+        jsd_results =  avg_jsd
     else:
-        return avg_jsd, _bins
+        jsd_results =  (avg_jsd, np.array(jsd))
+    if not return_bins:
+        return jsd_results
+    else:
+        return jsd_results, _bins
 
 def score_ajsd_d(
         ens_1: Ensemble,
         ens_2: Ensemble,
         bins: Union[str, int],
         return_bins: bool = False,
+        return_scores: bool = False,
         featurization_params: dict = {},
         *args, **kwargs
     ):
@@ -215,28 +229,99 @@ def score_ajsd_d(
         See `dpet.comparison.score_avg_jsd` for more information.
 
     """
+    min_sep = featurization_params.get("min_sep", 2)
+    max_sep = featurization_params.get("max_sep")
     # Calculate Ca-Ca distances.
     ca_dist_1 = ens_1.get_features(
         featurization="ca_dist",
-        min_sep=featurization_params.get("min_sep", 2),
-        max_sep=featurization_params.get("max_sep")
-        )
+        min_sep=min_sep,
+        max_sep=max_sep
+    )
     ca_dist_2 = ens_2.get_features(
         featurization="ca_dist",
-        min_sep=featurization_params.get("min_sep", 2),
-        max_sep=featurization_params.get("max_sep")
-        )
+        min_sep=min_sep,
+        max_sep=max_sep
+    )
     # Compute average JSD approximation.
     results = score_avg_jsd(
-        ca_dist_1, ca_dist_2, bins=bins, return_bins=return_bins, *args, **kwargs
+        ca_dist_1, ca_dist_2,
+        bins=bins,
+        return_bins=return_bins,
+        return_scores=return_scores,
+        *args, **kwargs
     )
     return results
+
+def get_ajsd_d_matrix(
+        ens_1: Ensemble,
+        ens_2: Ensemble,
+        bins: Union[str, int],
+        return_bins: bool = False,
+        featurization_params: dict = {},
+        *args, **kwargs
+    ):
+    """
+    Utility function to calculate the aJSD_d score between two ensembles and
+    return a matrix with JSD scores for each pair of Ca-Ca distances.
+
+    Parameters
+    ----------
+    ens_1, ens_2: Ensemble
+        Two Ensemble objects storing the ensemble data to compare.
+
+    Remaining arguments
+    -------------------
+        See `dpet.comparison.score_ajsd_d` for more information.
+    
+    Output
+    ------
+        If `return_bins` is False, it will return a tuple containing the
+        aJSD_d score and a (N, N) NumPy array (where N is the number of residues
+        of the protein in the ensembles being compared) containing the JSD
+        scores of individual Ca-Ca distances. If `return_bins` is True, it will
+        return also the bin value used in all the comparisons.
+
+    """
+    min_sep = featurization_params.get("min_sep", 2)
+    max_sep = featurization_params.get("max_sep")
+    out = score_ajsd_d(
+        ens_1=ens_1,
+        ens_2=ens_2,
+        bins=bins,
+        return_bins=return_bins,
+        return_scores=True,
+        featurization_params=featurization_params,
+        *args, **kwargs
+    )
+    if return_bins:
+        (avg_score, all_scores), _bins = out
+    else:
+        (avg_score, all_scores) = out
+    n_res = ens_1.get_num_residues()
+    res_ids = get_triu_indices(
+        L=n_res,
+        min_sep=min_sep,
+        max_sep=max_sep
+    )
+    if len(res_ids[0]) != len(all_scores):
+        raise ValueError()
+    matrix = np.empty((n_res, n_res,))
+    matrix[:] = np.nan
+    for i, j, s_ij in zip(res_ids[0], res_ids[1], all_scores):
+        matrix[i, j] = s_ij
+        matrix[j, i] = s_ij
+    if return_bins:
+        return (avg_score, matrix), _bins
+    else:
+         return (avg_score, matrix)
+
 
 def score_ajsd_t(
         ens_1: Ensemble,
         ens_2: Ensemble,
         bins: Union[str, int],
         return_bins: bool = False,
+        return_scores: bool = False,
         *args, **kwargs
     ):
     """
@@ -260,9 +345,65 @@ def score_ajsd_t(
     alpha_2 = ens_2.get_features(featurization="a_angle")
     # Compute average JSD approximation.
     results = score_avg_jsd(
-        alpha_1, alpha_2, bins=bins, return_bins=return_bins, *args, **kwargs
+        alpha_1,
+        alpha_2,
+        bins=bins,
+        return_bins=return_bins,
+        return_scores=return_scores,
+        *args, **kwargs
     )
     return results
+
+
+def get_ajsd_t_profile(
+        ens_1: Ensemble,
+        ens_2: Ensemble,
+        bins: Union[str, int],
+        return_bins: bool = False,
+        *args, **kwargs
+    ):
+    """
+    Utility function to calculate the aJSD_t score between two ensembles and
+    return a profile with JSD scores for each alpha angle in the proteins.
+
+    Parameters
+    ----------
+    ens_1, ens_2: Ensemble
+        Two Ensemble objects storing the ensemble data to compare.
+
+    Remaining arguments
+    -------------------
+        See `dpet.comparison.score_ajsd_t` for more information.
+    
+    Output
+    ------
+        If `return_bins` is False, it will return a tuple containing the
+        aJSD_d score and a (N-3, ) NumPy array (where N is the number of
+        residues of the protein in the ensembles being compared) containing the
+        JSD scores of individual alpha angles. If `return_bins` is True, it will
+        return also the bin value used in all the comparisons.
+
+    """
+
+    out = score_ajsd_t(
+        ens_1=ens_1,
+        ens_2=ens_2,
+        bins=bins,
+        return_bins=return_bins,
+        return_scores=True,
+        *args, **kwargs
+    )
+    if return_bins:
+        (avg_score, all_scores), _bins = out
+    else:
+        (avg_score, all_scores) = out
+    n_res = ens_1.get_num_residues()
+    if n_res - 3 != len(all_scores):
+        raise ValueError()
+    if return_bins:
+        return (avg_score, all_scores), _bins
+    else:
+         return (avg_score, all_scores)
 
 
 @check_feature_matrices
@@ -335,3 +476,25 @@ def emd_angular_l2(x_1_i, x_2):
     )
     dist = np.mean(np.square(y_ref_i[None] - y_hat).sum(axis=-1), axis=-1)
     return dist
+
+
+def percentile_func(a, q):
+    return np.percentile(a=a, q=q, axis=-1)
+
+def confidence_interval(
+        theta_boot, theta_hat=None, confidence_level=0.95, method='percentile'
+    ):
+    """
+    Returns bootstrap confidence intervals.
+    Adapted from: https://github.com/scipy/scipy/blob/v1.14.0/scipy/stats/_resampling.py
+    """
+    alpha = (1 - confidence_level)/2
+    interval = alpha, 1-alpha
+    # Calculate confidence interval of statistic
+    ci_l = percentile_func(theta_boot, interval[0]*100)
+    ci_u = percentile_func(theta_boot, interval[1]*100)
+    if method == 'basic':
+        if theta_hat is None:
+            theta_hat = np.mean(theta_boot)
+        ci_l, ci_u = 2*theta_hat - ci_u, 2*theta_hat - ci_l
+    return [ci_l, ci_u]
