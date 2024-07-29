@@ -334,9 +334,9 @@ class Visualization:
                 xi, yi = np.mgrid[min(ensemble_data[:, 0]):max(ensemble_data[:, 0]):100j,
                                 min(ensemble_data[:, 1]):max(ensemble_data[:, 1]):100j]
                 zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
-                ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, alpha=0.5, label=f'Ensemble {label}', colors=[label_colors[label]])
+                ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, alpha=0.5, colors=[label_colors[label]])
             ax[3].set_title('Density Plot (Ensemble-wise)')
-            ax[3].legend(title='Ensemble', loc='upper right')
+            # ax[3].legend(title='Ensemble', loc='upper right')
         else:
             # Single KDE plot for concatenated ensembles
             kde = gaussian_kde([analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1]])
@@ -489,8 +489,8 @@ class Visualization:
         
 
         # Scatter plot with clustering labels
-        best_k = max(analysis.reducer.sil_scores, key=lambda x: x[1])[0]
-        kmeans = KMeans(n_clusters=best_k, random_state=42)
+        best_k = max(analysis.reducer.sil_scores, key=lambda x: x[2])[1]
+        kmeans = KMeans(n_clusters=best_k,n_init=10 ,random_state=42)
         labels = kmeans.fit_predict(analysis.transformed_data)
         scatter_cluster = axes[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=size, c=labels, cmap='viridis')
         axes[1].set_title('Scatter plot (clustering labels)')
@@ -510,7 +510,7 @@ class Visualization:
                 zi = kde(np.vstack([xi.flatten(), yi.flatten()]))
                 ax[3].contour(xi, yi, zi.reshape(xi.shape), levels=5, alpha=0.5, label=f'Ensemble {label}', colors=[label_colors[label]])
             ax[3].set_title('Density Plot (Ensemble-wise)')
-            ax[3].legend(title='Ensemble', loc='upper right')
+            # ax[3].legend(title='Ensemble', loc='upper right')
         else:
             # Single KDE plot for concatenated ensembles
             kde = gaussian_kde([analysis.transformed_data[:, 0], analysis.transformed_data[:, 1]])

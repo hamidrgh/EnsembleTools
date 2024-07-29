@@ -268,12 +268,12 @@ class EnsembleAnalysis:
     def _join_ensemble_traj(self, atom_selector = 'backbone'):
         merge_traj = []
         for traj in self.trajectories:
-            print(traj)
+            
             atom_indices = self.trajectories[traj].topology.select(atom_selector)
             new_ca_traj = self.trajectories[traj].atom_slice(atom_indices)
             merge_traj.append(new_ca_traj)
         joined_traj = mdtraj.join(merge_traj, check_topology=False, discard_overlapping_frames=False)
-        print(merge_traj)
+        
         return joined_traj
 
 
