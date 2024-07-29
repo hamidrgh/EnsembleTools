@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 from typing import Dict, List, Optional, Union, Tuple
 import zipfile
-
+from dpet.featurization.distances import rmsd
 import pandas as pd
 from scipy.stats import mannwhitneyu
 from dpet.data.api_client import APIClient
@@ -39,6 +39,7 @@ class EnsembleAnalysis:
         self.feature_names = []
         self.all_labels = []
         self.ensembles: List[Ensemble] = ensembles
+        self.param_feat = None
 
     @property
     def ens_codes(self) -> List[str]:
@@ -265,6 +266,18 @@ class EnsembleAnalysis:
             ensemble.random_sample_trajectory(sample_size)
         return self.trajectories
 
+    def _join_ensemble_traj(self, atom_selector = 'backbone'):
+        merge_traj = []
+        for traj in self.trajectories:
+            
+            atom_indices = self.trajectories[traj].topology.select(atom_selector)
+            new_ca_traj = self.trajectories[traj].atom_slice(atom_indices)
+            merge_traj.append(new_ca_traj)
+        joined_traj = mdtraj.join(merge_traj, check_topology=False, discard_overlapping_frames=False)
+        
+        return joined_traj
+
+
     def extract_features(self, featurization: str, normalize: bool = False, *args, **kwargs) -> Dict[str, np.ndarray]:
         """
         Extract the selected feature.
@@ -272,7 +285,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         featurization : str
-            Choose between "phi_psi", "ca_dist", "a_angle", "tr_omega", and "tr_phi".
+            Choose between "phi_psi", "ca_dist", "a_angle", "tr_omega", "tr_phi", "rmsd".
 
         normalize : bool, optional
             Whether to normalize the data. Only applicable to the "ca_dist" method. Default is False.
@@ -288,11 +301,20 @@ class EnsembleAnalysis:
         Dict[str, np.ndarray]
             A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.
         """
-        self._featurize(featurization=featurization, *args, **kwargs)
-        self._create_all_labels()
-        if normalize and featurization == "ca_dist":
-            self._normalize_data()
-        return self.features
+        if featurization == 'rmsd':
+            self.param_feat = 'rmsd'
+            j_traj = self._join_ensemble_traj()
+            rmsd_matrix = rmsd(j_traj)
+            self._create_all_labels()
+            return rmsd_matrix
+            
+        else:
+            self.param_feat = featurization
+            self._featurize(featurization=featurization, *args, **kwargs)
+            self._create_all_labels()
+            if normalize and featurization == "ca_dist":
+                self._normalize_data()
+            return self.features
 
     def exists_coarse_grained(self) -> bool:
         """
@@ -314,10 +336,13 @@ class EnsembleAnalysis:
         self.feature_names = list(self.ensembles)[0].names
         print("Feature names:", self.feature_names)
 
+
+
+
     def _create_all_labels(self):
         self.all_labels = []
-        for ensemble in self.ensembles:
-            num_data_points = len(ensemble.features)
+        for ensemble, traj in zip(self.ensembles,self.trajectories):
+            num_data_points = self.trajectories[traj].n_frames
             self.all_labels.extend([ensemble.code] * num_data_points)
 
     def _normalize_data(self):
@@ -405,25 +430,33 @@ class EnsembleAnalysis:
             - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html
             - UMAP: https://umap-learn.readthedocs.io/en/latest/
         """
-        # Check if all ensemble features have the same size
-        # Check if all ensemble features have the same size
-        feature_sizes = set(ensemble.features.shape[1] for ensemble in self.ensembles)
-        if len(feature_sizes) > 1:
-            raise ValueError("Features from ensembles have different sizes. Cannot concatenate.")
 
-        self.concat_features = self._get_concat_features()
-        self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
-        self.reduce_dim_method = method
-        if method in ("pca","kpca"):
-            fit_on_data = self._get_concat_features(fit_on=fit_on)
-            self.reduce_dim_model = self.reducer.fit(data=fit_on_data)
-            for ensemble in self.ensembles:
-                ensemble.reduce_dim_data = self.reducer.transform(ensemble.features)
-                print("Reduced dimensionality ensemble shape:", ensemble.reduce_dim_data.shape)
-            self.transformed_data = self.reducer.transform(data=self.concat_features)
+        if self.param_feat == 'rmsd':
+            self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
+            self.reduce_dim_method = method
+            self.transformed_data = self.reducer.fit_transform(data=self.extract_features(featurization=self.param_feat))
+            return self.transformed_data
+        # Check if all ensemble features have the same size
+        # Check if all ensemble features have the same size
         else:
-            self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
-        return self.transformed_data
+            
+            feature_sizes = set(ensemble.features.shape[1] for ensemble in self.ensembles)
+            if len(feature_sizes) > 1:
+                raise ValueError("Features from ensembles have different sizes. Cannot concatenate.")
+
+            self.concat_features = self._get_concat_features()
+            self.reducer = DimensionalityReductionFactory.get_reducer(method, *args, **kwargs)
+            self.reduce_dim_method = method
+            if method in ("pca","kpca"):
+                fit_on_data = self._get_concat_features(fit_on=fit_on)
+                self.reduce_dim_model = self.reducer.fit(data=fit_on_data)
+                for ensemble in self.ensembles:
+                    ensemble.reduce_dim_data = self.reducer.transform(ensemble.features)
+                    print("Reduced dimensionality ensemble shape:", ensemble.reduce_dim_data.shape)
+                self.transformed_data = self.reducer.transform(data=self.concat_features)
+            else:
+                self.transformed_data = self.reducer.fit_transform(data=self.concat_features)
+            return self.transformed_data
 
     def execute_pipeline(self, featurization_params:Dict, reduce_dim_params:Dict, subsample_size:int=None):
         """

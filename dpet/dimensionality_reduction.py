@@ -280,6 +280,10 @@ class UMAPReduction(DimensionalityReduction):
         self.metric = metric
         self.range_n_clusters = range_n_clusters
         self.sil_scores = []
+        self.best_embedding = None
+        self.best_score = -1
+        self.best_n_clusters = None
+        self.best_n_neighbors = None
     
     def fit(self, data):
         return super().fit(data)
@@ -288,12 +292,24 @@ class UMAPReduction(DimensionalityReduction):
         return super().transform(data)
 
     def fit_transform(self, data) -> np.ndarray:
-        umap_model = UMAP(n_neighbors=self.n_neighbors, min_dist=self.min_dist, n_components=self.num_dim, metric=self.metric)
-        self.embedding = umap_model.fit_transform(data)
-        self.cluster()
-        return self.embedding
+        for n_neighbor in self.n_neighbors:
+            umap_model = UMAP(n_neighbors=n_neighbor, min_dist=self.min_dist, n_components=self.num_dim, metric=self.metric)
+            embedding = umap_model.fit_transform(data)
+            scores = self.cluster(embedding, n_neighbor)
+            best_score_for_n_neighbor = max(scores, key=lambda x: x[2])
+
+            if best_score_for_n_neighbor[2] > self.best_score:
+                self.best_score = best_score_for_n_neighbor[2]
+                self.best_embedding = embedding
+                self.best_n_clusters = best_score_for_n_neighbor[1]
+                self.best_n_neighbors = n_neighbor
+        print('UMAP is running...')
+        print(f'Best number of neighbors: {self.best_n_neighbors}')
+        print(f'Best number of clusters : {self.best_n_clusters}')
+        
+        return self.best_embedding
     
-    def cluster(self) -> List[Tuple]:
+    def cluster(self, embedding, n_neighbor) -> List[Tuple]:
         """
         Perform clustering using KMeans algorithm for each number of clusters in the specified range.
 
@@ -303,17 +319,20 @@ class UMAPReduction(DimensionalityReduction):
             A list of tuples containing the number of clusters and the corresponding silhouette score
             for each clustering result.
         """
+        
         for n_clusters in self.range_n_clusters:
             clusterer = KMeans(n_clusters=n_clusters, n_init="auto", random_state=10)
-            cluster_labels = clusterer.fit_predict(self.embedding)
-            silhouette_avg = silhouette_score(self.embedding, cluster_labels)
-            self.sil_scores.append((n_clusters,silhouette_avg))
-            print(
-                "For n_clusters =",
-                n_clusters,
-                "The average silhouette_score is :",
-                silhouette_avg,
-            )
+            cluster_labels = clusterer.fit_predict(embedding)
+            silhouette_avg = silhouette_score(embedding, cluster_labels)
+            self.sil_scores.append((n_neighbor, n_clusters,silhouette_avg))
+            # print(
+            #      "For n_neighbors =",
+            #     n_neighbor,
+            #     "For n_clusters =",
+            #     n_clusters,
+            #     "The average silhouette_score is :",
+            #     silhouette_avg,
+            # )
         return self.sil_scores
     
 class KPCAReduction(DimensionalityReduction):

@@ -176,3 +176,13 @@ def featurize_com_dist(
                            inverse=inverse,
                            get_names=get_names,
                            atom_selector=atom_selector)
+
+def rmsd(
+        traj: mdtraj.Trajectory,
+        ):
+
+    rmsd_matrix = np.empty((traj.n_frames, traj.n_frames))
+    for i in range(traj.n_frames):
+        rmsd_matrix[i] = mdtraj.rmsd(traj,traj, i)
+    return rmsd_matrix
+
