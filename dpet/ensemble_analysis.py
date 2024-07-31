@@ -373,7 +373,7 @@ class EnsembleAnalysis:
         Parameters
         ----------
         method : str
-            Choose between "pca", "tsne", "dimenfix", "mds", "kpca" and "umap".
+            Choose between "pca", "tsne", "kpca" and "umap".
 
         fit_on : List[str], optional
             if method is "pca" or "kpca", specifies on which ensembles the models should be fit. 
@@ -401,14 +401,6 @@ class EnsembleAnalysis:
             - range_n_clusters : List[int], optional
                 Range of cluster values. Default is range(2, 10, 1).
 
-        - dimenfix:
-            - range_n_clusters : List[int], optional
-                Range of cluster values. Default is range(1, 10, 1).
-
-        - mds:
-            - num_dim : int, optional
-                Number of dimensions. Default is 2.
-
         - kpca:
             - circular : bool, optional
                 Whether to use circular metrics. Default is False.
@@ -425,8 +417,6 @@ class EnsembleAnalysis:
         For more information on each method, see the corresponding documentation:
             - PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
             - t-SNE: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
-            - DimenFix: https://github.com/visml/neo_force_scheme/tree/0.0.3
-            - MDS: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html
             - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html
             - UMAP: https://umap-learn.readthedocs.io/en/latest/
         """
@@ -475,7 +465,7 @@ class EnsembleAnalysis:
             Other method-specific parameters are optional.
         reduce_dim_params: Dict
             Parameters for dimensionality reduction. The only required parameter is "method",
-            which can be "pca", "tsne", "dimenfix", "mds" or "kpca".
+            which can be "pca", "tsne" or "kpca".
         subsample_size: int, optional
             Optional parameter that specifies the trajectory subsample size. Default is None.
         """

@@ -182,79 +182,6 @@ class TSNEReduction(DimensionalityReduction):
             }
             self.results.append(result)
 
-class DimenFixReduction(DimensionalityReduction):
-    """
-    Class for performing dimensionality reduction using DimenFix algorithm.
-
-    Parameters
-    ----------
-    range_n_clusters : List[int], optional
-        Range of cluster values. Default is range(1, 10, 1).
-    """
-
-    def __init__(self, range_n_clusters:List[int] = range(1,10,1)):
-        self.range_n_clusters = range_n_clusters
-
-    def fit(self, data:np.ndarray):
-        return super().fit(data)
-    
-    def transform(self, data:np.ndarray) -> np.ndarray:
-        return super().transform(data)
-    
-    def fit_transform(self, data:np.ndarray) -> np.ndarray:
-        nfs = NeoForceScheme()
-        self.projection = nfs.fit_transform(data)
-        self.cluster()
-        return self.projection
-    
-    def cluster(self) -> List[Tuple]:
-        """
-        Perform clustering using KMeans algorithm for each number of clusters in the specified range.
-
-        Returns
-        -------
-        List[Tuple]
-            A list of tuples containing the number of clusters and the corresponding silhouette score
-            for each clustering result.
-        """
-        self.sil_scores = []
-        for n_clusters in self.range_n_clusters:
-            clusterer = KMeans(n_clusters=n_clusters, n_init="auto", random_state=10)
-            cluster_labels = clusterer.fit_predict(self.projection)
-            silhouette_avg = silhouette_score(self.projection, cluster_labels)
-            self.sil_scores.append((n_clusters,silhouette_avg))
-            print(
-                "For n_clusters =",
-                n_clusters,
-                "The average silhouette_score is :",
-                silhouette_avg,
-            )
-        return self.sil_scores
-
-class MDSReduction(DimensionalityReduction):
-    """
-    Class for performing dimensionality reduction using Multidimensional Scaling (MDS) algorithm.
-
-    Parameters
-    ----------
-    num_dim : int, optional
-        Number of dimensions for the reduced space. Default is 2.
-    """
-
-    def __init__(self, num_dim:int=2):
-        self.num_dim = num_dim
-
-    def fit(self, data:np.ndarray):
-        return super().fit(data)
-    
-    def transform(self, data:np.ndarray) -> np.ndarray:
-        return super().transform(data)
-    
-    def fit_transform(self, data:np.ndarray) -> np.ndarray:    
-        embedding = MDS(n_components=self.num_dim)
-        feature_transformed = embedding.fit_transform(data)
-        return feature_transformed
-    
 class UMAPReduction(DimensionalityReduction):
     """
     Class for performing dimensionality reduction using Uniform Manifold Approximation and Projection (UMAP) algorithm.
@@ -412,10 +339,6 @@ class DimensionalityReductionFactory:
             return PCAReduction(*args, **kwargs)
         elif method == "tsne":
             return TSNEReduction(*args, **kwargs)
-        elif method == "dimenfix":
-            return DimenFixReduction(*args, **kwargs)
-        elif method == "mds":
-            return MDSReduction(*args, **kwargs)
         elif method == "kpca":
             return KPCAReduction(*args, **kwargs)
         elif method == "umap":
