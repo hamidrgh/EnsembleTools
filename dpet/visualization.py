@@ -399,12 +399,12 @@ class Visualization:
 
         # Scatter plot with original labels
         scatter_labeled = ax[0].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=point_colors, s=size, alpha=0.5)
-        ax[0].set_title('Scatter plot (original labels)')
+        ax[0].set_title('Scatter Plot (original labels)')
 
         # Scatter plot with clustering labels
         cmap = plt.get_cmap('jet', analysis.reducer.bestK)
         scatter_cluster = ax[1].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], s=size, c=bestclust.astype(float), cmap=cmap, alpha=0.5)
-        ax[1].set_title('Scatter plot (clustering labels)')
+        ax[1].set_title('Scatter Plot (clustering labels)')
 
         feature_values = []
         for values in analysis.get_features(color_by).values():
@@ -413,7 +413,7 @@ class Visualization:
 
         feature_labeled = ax[2].scatter(analysis.reducer.best_tsne[:, 0], analysis.reducer.best_tsne[:, 1], c=colors, s=size, alpha=0.5)
         cbar = plt.colorbar(feature_labeled, ax=ax[2])
-        ax[2].set_title(f'Scatter plot ({color_by} labels)')
+        ax[2].set_title(f'Scatter Plot ({color_by} labels)')
 
         if kde_by_ensemble:
             # KDE plot for each ensemble
@@ -562,7 +562,7 @@ class Visualization:
         # Scatter plot with original labels
         
         scatter_labeled = axes[0].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=point_colors, s=size, alpha=0.5)
-        axes[0].set_title('Scatter plot (original labels)')
+        axes[0].set_title('Scatter Plot (original labels)')
 
 
         # Scatter plot with different labels
@@ -573,7 +573,7 @@ class Visualization:
         
         rg_labeled = axes[2].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], c=colors, s=size, alpha=0.5)
         cbar = plt.colorbar(rg_labeled, ax=axes[2])
-        axes[2].set_title(f'Scatter plot ({color_by} labels)')
+        axes[2].set_title(f'Scatter Plot ({color_by} labels)')
 
         
 
@@ -582,7 +582,7 @@ class Visualization:
         kmeans = KMeans(n_clusters=best_k,n_init=10 ,random_state=42)
         labels = kmeans.fit_predict(analysis.transformed_data)
         scatter_cluster = axes[1].scatter(analysis.transformed_data[:, 0], analysis.transformed_data[:, 1], s=size, c=labels, cmap='viridis')
-        axes[1].set_title('Scatter plot (clustering labels)')
+        axes[1].set_title('Scatter Plot (clustering labels)')
 
         # Manage legend for original labels
         legend_labels = list(label_colors.keys())
@@ -1022,7 +1022,7 @@ class Visualization:
 
         return axes
 
-    def ensemble_sasa(self, 
+    def global_sasa(self, 
                       bins: int = 50, 
                       hist_range: Tuple = None, 
                       violin_plot: bool = True, 
@@ -1079,7 +1079,7 @@ class Visualization:
             fig = ax.figure
 
         axis_label = r"SASA (nm$^2$)"
-        title = "SASA distribution over the ensembles"
+        title = "Global SASA Distribution"
 
         if violin_plot:
             plot_violins(
@@ -1254,15 +1254,15 @@ class Visualization:
         if dssp_code == 'H':
             dssp_name = 'Helix'
             ax.set_ylabel(f'Relative Content of {dssp_name}')
-            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the ensembles')
+            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the Ensembles')
         elif dssp_code == 'C':
             dssp_name = 'Coil'
             ax.set_ylabel(f'Relative Content of {dssp_name}')
-            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the ensembles')
+            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the Ensembles')
         elif dssp_code == 'E':
             dssp_name = 'Strand'
             ax.set_ylabel(f'Relative Content of {dssp_name}')
-            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the ensembles')
+            ax.set_title(f'Relative Content of {dssp_code} in Each Residue in the Ensembles')
         ax.legend()
 
         if save:
@@ -1360,7 +1360,7 @@ class Visualization:
                 fig = ax.figure
 
         axis_label = "Radius of Gyration [nm] (Rg)"
-        title = "Radius of Gyration"
+        title = "Radius of Gyration Distribution"
 
         if violin_plot:
             if median or mean:
@@ -1589,8 +1589,8 @@ class Visualization:
             fig = ax.figure
 
         if not rg_norm:
-            axis_label = "End-to-End distance [nm]"
-            title = "End-to-End distances distribution"
+            axis_label = "End-to-End Distance [nm]"
+            title = "End-to-End Distances Distribution"
         else:
             axis_label = r"End-to-End distance over $\langle$R$_g$$\rangle$"
             title = r"End-to-End distance over $\langle$R$_g$$\rangle$ distribution"
@@ -1674,7 +1674,7 @@ class Visualization:
             fig = ax.figure
 
         axis_label = "Asphericity"
-        title = "Asphericity distribution"
+        title = "Asphericity Distribution"
 
         if violin_plot:
             plot_violins(
@@ -1826,8 +1826,8 @@ class Visualization:
             labels=labels,
             bins=bins,
             range=(-np.pi, np.pi),
-            title="Distribution of alpha angles",
-            xlabel="angle [rad]"
+            title="Distribution of Alpha Angles",
+            xlabel="Angle [rad]"
         )
 
         if save:
@@ -1991,7 +1991,7 @@ class Visualization:
                     density=True
                 )
 
-                axis.set_title(f'Ramachandran Plot for cluster {ens.code}')
+                axis.set_title(f'Ramachandran Plot for Ensemble {ens.code}')
                 axis.set_xlabel('Phi (ϕ) Angle (degrees)')
                 axis.set_ylabel('Psi (ψ) Angle (degrees)')
 
@@ -2064,7 +2064,7 @@ class Visualization:
         
         ax.set_xticks([i for i in np.arange(1, len(x) + 1) if i == 1 or i % 5 == 0])
         ax.set_xlabel("Residue Index")
-        ax.set_ylabel("Site-specific flexibility parameter")
+        ax.set_ylabel("Site-specific Flexibility Parameter")
         ax.legend()
         
         if pointer is not None:
