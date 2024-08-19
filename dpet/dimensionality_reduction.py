@@ -102,7 +102,7 @@ class TSNEReduction(DimensionalityReduction):
     Parameters
     ----------
     perplexity_vals : List[float], optional
-        List of perplexity values. Default is range(2, 10, 2).
+        List of perplexity values. Default is [10, 20, 50, 100].
     metric : str, optional
         Metric to use. Default is "euclidean".
     circular : bool, optional
@@ -116,7 +116,7 @@ class TSNEReduction(DimensionalityReduction):
     """
 
     def __init__(
-            self, perplexity_vals:List[float]=(10, 20, 50, 100), 
+            self, perplexity_vals:List[float]=[10, 20, 50, 100], 
             metric:str="euclidean", 
             circular:bool=False, 
             n_components:int=2, 
