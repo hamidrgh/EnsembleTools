@@ -2016,7 +2016,7 @@ class Visualization:
 
         return ax
 
-    def ss_flexibility_parameter(self, 
+    def ss_flexibility(self, 
                                 pointer: List[int] = None, 
                                 figsize: Tuple[int, int] = (15, 5), 
                                 save: bool = False,
@@ -2063,8 +2063,9 @@ class Visualization:
             ax.plot(x, values, marker='o', linestyle='-', label=key)
         
         ax.set_xticks([i for i in np.arange(1, len(x) + 1) if i == 1 or i % 5 == 0])
+        ax.set_title("Site-specific Flexibility")
         ax.set_xlabel("Residue Index")
-        ax.set_ylabel("Site-specific Flexibility Parameter")
+        ax.set_ylabel("Flexibility")
         ax.legend()
         
         if pointer is not None:
@@ -2076,7 +2077,7 @@ class Visualization:
 
         return ax
 
-    def ss_order_parameter(self, 
+    def ss_order(self, 
                         pointer: List[int] = None, 
                         figsize: Tuple[int, int] = (15, 5), 
                         save: bool = False, 
@@ -2122,8 +2123,9 @@ class Visualization:
             ax.plot(x, values, label=key, marker= 'o', linestyle='-')
         
         ax.set_xticks([i for i in np.arange(1, len(x) + 1) if i == 1 or i % 5 == 0])
+        ax.set_title("Site-specific Order")
         ax.set_xlabel("Residue Index")
-        ax.set_ylabel("Site-specific order parameter")
+        ax.set_ylabel("Order")
         ax.legend()
         
         if pointer is not None:
