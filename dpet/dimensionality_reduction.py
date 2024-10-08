@@ -273,11 +273,11 @@ class UMAPReduction(DimensionalityReduction):
         Range of cluster values to consider for silhouette scoring. Default is range(2, 10, 1).
     """
 
-    def __init__(self, num_dim=2, n_neighbors=10, min_dist =0.1 , metric='euclidean', range_n_clusters = range(2,10,1)):
+    def __init__(self, num_dim=2, n_neighbors=10, min_dist =0.1 , circular = 'True',metric='euclidean', range_n_clusters = range(2,10,1)):
         self.num_dim = num_dim
         self.n_neighbors = n_neighbors
         self.min_dist = min_dist
-        self.metric = metric
+        self.metric = unit_vector_distance if circular else metric
         self.range_n_clusters = range_n_clusters
         self.sil_scores = []
         self.best_embedding = None

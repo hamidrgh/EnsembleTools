@@ -838,7 +838,7 @@ class Visualization:
 
         return axes
 
-    def pca_1d_histograms(self, save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
+    def pca_1d_histograms(self, save: bool = False, sel_dim = 1 ,ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Plot 1D histogram when the dimensionality reduction method is "pca" or "kpca".
 
@@ -849,6 +849,9 @@ class Visualization:
 
         ax: Union[None, List[plt.Axes]], optional
             A list of Axes objects to plot on. Default is None, which creates new axes.
+
+        selected_dim: int, optional
+            To select the specific component (dimension) for which you want to visualize the histogram distribution. Default is 1. 
 
         Returns
         -------
@@ -862,7 +865,7 @@ class Visualization:
             raise ValueError("Analysis is only valid for pca and kpca dimensionality reduction.")
 
         n_bins = 30
-        k = 0
+        k = sel_dim-1
         bins = np.linspace(analysis.transformed_data[:, k].min(),
                         analysis.transformed_data[:, k].max(),
                         n_bins)
@@ -975,7 +978,7 @@ class Visualization:
     def pca_rg_correlation(self, save: bool = False, ax: Union[None, List[plt.Axes]] = None) -> List[plt.Axes]:
         """
         Examine and plot the correlation between PC dimension 1 and the amount of Rg.
-        Typically high correlation can be detected here.
+        Typically high correlation can be detected in case of IDPs/IDRs .
 
         Parameters
         ----------
@@ -2294,7 +2297,7 @@ class Visualization:
         """
         Plot a grid if histograms for distance or angular features. Can only be
         be used when analyzing ensembles of proteins with same number of
-        residues. The fuction will create a new matplotlib figure for histogram
+        residues. The function will create a new matplotlib figure for histogram
         grid.
 
         Parameters
