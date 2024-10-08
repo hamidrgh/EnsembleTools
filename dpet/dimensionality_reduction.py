@@ -102,7 +102,7 @@ class TSNEReduction(DimensionalityReduction):
     Parameters
     ----------
     perplexity_vals : List[float], optional
-        List of perplexity values. Default is range(2, 10, 2).
+        List of perplexity values. Default is [10, 20, 50, 100].
     metric : str, optional
         Metric to use. Default is "euclidean".
     circular : bool, optional
@@ -116,7 +116,7 @@ class TSNEReduction(DimensionalityReduction):
     """
 
     def __init__(
-            self, perplexity_vals:List[float]=range(2, 10, 2), 
+            self, perplexity_vals:List[float]=[10, 20, 50, 100], 
             metric:str="euclidean", 
             circular:bool=False, 
             n_components:int=2, 
@@ -182,79 +182,6 @@ class TSNEReduction(DimensionalityReduction):
             }
             self.results.append(result)
 
-class DimenFixReduction(DimensionalityReduction):
-    """
-    Class for performing dimensionality reduction using DimenFix algorithm.
-
-    Parameters
-    ----------
-    range_n_clusters : List[int], optional
-        Range of cluster values. Default is range(1, 10, 1).
-    """
-
-    def __init__(self, range_n_clusters:List[int] = range(1,10,1)):
-        self.range_n_clusters = range_n_clusters
-
-    def fit(self, data:np.ndarray):
-        return super().fit(data)
-    
-    def transform(self, data:np.ndarray) -> np.ndarray:
-        return super().transform(data)
-    
-    def fit_transform(self, data:np.ndarray) -> np.ndarray:
-        nfs = NeoForceScheme()
-        self.projection = nfs.fit_transform(data)
-        self.cluster()
-        return self.projection
-    
-    def cluster(self) -> List[Tuple]:
-        """
-        Perform clustering using KMeans algorithm for each number of clusters in the specified range.
-
-        Returns
-        -------
-        List[Tuple]
-            A list of tuples containing the number of clusters and the corresponding silhouette score
-            for each clustering result.
-        """
-        self.sil_scores = []
-        for n_clusters in self.range_n_clusters:
-            clusterer = KMeans(n_clusters=n_clusters, n_init="auto", random_state=10)
-            cluster_labels = clusterer.fit_predict(self.projection)
-            silhouette_avg = silhouette_score(self.projection, cluster_labels)
-            self.sil_scores.append((n_clusters,silhouette_avg))
-            print(
-                "For n_clusters =",
-                n_clusters,
-                "The average silhouette_score is :",
-                silhouette_avg,
-            )
-        return self.sil_scores
-
-class MDSReduction(DimensionalityReduction):
-    """
-    Class for performing dimensionality reduction using Multidimensional Scaling (MDS) algorithm.
-
-    Parameters
-    ----------
-    num_dim : int, optional
-        Number of dimensions for the reduced space. Default is 2.
-    """
-
-    def __init__(self, num_dim:int=2):
-        self.num_dim = num_dim
-
-    def fit(self, data:np.ndarray):
-        return super().fit(data)
-    
-    def transform(self, data:np.ndarray) -> np.ndarray:
-        return super().transform(data)
-    
-    def fit_transform(self, data:np.ndarray) -> np.ndarray:    
-        embedding = MDS(n_components=self.num_dim)
-        feature_transformed = embedding.fit_transform(data)
-        return feature_transformed
-    
 class UMAPReduction(DimensionalityReduction):
     """
     Class for performing dimensionality reduction using Uniform Manifold Approximation and Projection (UMAP) algorithm.
@@ -263,8 +190,8 @@ class UMAPReduction(DimensionalityReduction):
     ----------
     num_dim : int, optional
         Number of dimensions for the reduced space. Default is 2.
-    n_neighbors : int, optional
-        Number of neighbors to consider for each point in the input data. Default is 10.
+    n_neighbors : List[int], optional
+        Number of neighbors to consider for each point in the input data. Default is [20, 30, 40].
     min_dist : float, optional
         The minimum distance between embedded points. Default is 0.1.
     metric : str, optional
@@ -273,7 +200,7 @@ class UMAPReduction(DimensionalityReduction):
         Range of cluster values to consider for silhouette scoring. Default is range(2, 10, 1).
     """
 
-    def __init__(self, num_dim=2, n_neighbors=10, min_dist =0.1 , circular = 'True',metric='euclidean', range_n_clusters = range(2,10,1)):
+    def __init__(self, num_dim:int=2, n_neighbors:List[int]=[20, 30, 40], min_dist:float=0.1 , metric:str='euclidean', range_n_clusters:List[int] = range(2,10,1)):
         self.num_dim = num_dim
         self.n_neighbors = n_neighbors
         self.min_dist = min_dist
@@ -412,10 +339,6 @@ class DimensionalityReductionFactory:
             return PCAReduction(*args, **kwargs)
         elif method == "tsne":
             return TSNEReduction(*args, **kwargs)
-        elif method == "dimenfix":
-            return DimenFixReduction(*args, **kwargs)
-        elif method == "mds":
-            return MDSReduction(*args, **kwargs)
         elif method == "kpca":
             return KPCAReduction(*args, **kwargs)
         elif method == "umap":
