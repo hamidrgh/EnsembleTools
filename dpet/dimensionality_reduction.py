@@ -200,7 +200,7 @@ class UMAPReduction(DimensionalityReduction):
         Range of cluster values to consider for silhouette scoring. Default is range(2, 10, 1).
     """
 
-    def __init__(self, num_dim:int=2, n_neighbors:List[int]=[20, 30, 40], min_dist:float=0.1 , metric:str='euclidean', range_n_clusters:List[int] = range(2,10,1)):
+    def __init__(self, num_dim:int=2, n_neighbors:List[int]=[20, 30, 40], circular= False,min_dist:float=0.1 , metric:str='euclidean', range_n_clusters:List[int] = range(2,10,1)):
         self.num_dim = num_dim
         self.n_neighbors = n_neighbors
         self.min_dist = min_dist

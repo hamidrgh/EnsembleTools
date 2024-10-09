@@ -89,7 +89,6 @@ def _get_hist_bins(data: List[np.ndarray], bins: int, range: Tuple = None):
         _bins = bins
     return _bins
 
-
 def plot_violins(
         ax: plt.Axes,
         data: List[np.ndarray],
@@ -123,10 +122,32 @@ def plot_violins(
     plt.Axes
         Axis objects for the histogram plot of original labels.
     """
+    from matplotlib.lines import Line2D
+
+    # Define the list of colors you want to provide
+    mycolors = ['purple', 'green', 'blue']  # You can customize this list
+
+    # Plot the violin plots and customize the colors for medians and means
     if location == 'mean':
         vp = ax.violinplot(data, showmeans=True, showmedians=False)
+        vp['cmeans'].set_color(mycolors[0])  # Set the mean color
+        mean_line = Line2D([0], [0], color=mycolors[0], linestyle='-', label='Mean')
+        ax.legend(handles=[mean_line], loc='upper right')
+
     elif location == 'median':
         vp = ax.violinplot(data, showmeans=False, showmedians=True)
+        vp['cmedians'].set_color(mycolors[1])  # Set the median color
+        median_line = Line2D([0], [0], color=mycolors[1], linestyle='-', label='Median')
+        ax.legend(handles=[median_line], loc='upper right')
+
+    elif location == 'both':
+        vp = ax.violinplot(data, showmeans=True, showmedians=True)
+        vp['cmeans'].set_color(mycolors[0])    # Set the mean color
+        vp['cmedians'].set_color(mycolors[1])  # Set the median color
+        mean_line = Line2D([0], [0], color=mycolors[0], linestyle='-', label='Mean')
+        median_line = Line2D([0], [0], color=mycolors[1], linestyle='-', label='Median')
+        ax.legend(handles=[mean_line, median_line], loc='upper right')
+
     
     for pc in vp['bodies']:
         pc.set_facecolor(color)
@@ -273,7 +294,6 @@ def plot_comparison_matrix(
             text = im.axes.text(j, i, label_ij, size=size, ha="center", va="center", **kw)
 
     return ax
-
 
 def _get_random_a_angle_ids(n: int, prot_len: int) -> np.ndarray:
     rand_ids = np.random.choice(prot_len-3, n, replace=False)
@@ -709,15 +729,6 @@ class Visualization:
 
         plt.show()
 
-
-
-
-
-
-
-
-
-
     def pca_cumulative_explained_variance(self, save: bool = False, ax: Union[None, plt.Axes] = None) -> plt.Axes:
         """
         Plot the cumulative variance. Only applicable when the
@@ -1024,17 +1035,17 @@ class Visualization:
             fig.savefig(os.path.join(self.plot_dir, 'PCA_RG' + analysis.ens_codes[0]))
 
         return axes
-
+    
     def global_sasa(self, 
-                      bins: int = 50, 
-                      hist_range: Tuple = None, 
-                      violin_plot: bool = True, 
-                      location : str = 'mean',
-                    #   means: bool = True, 
-                    #   medians: bool = True, 
-                      save: bool = False, 
-                      color: str = 'blue',
-                      ax: Union[None, plt.Axes] = None) -> plt.Axes:
+                bins: int = 50, 
+                hist_range: Tuple = None, 
+                violin_plot: bool = True, 
+                location: str = 'mean',
+                save: bool = False, 
+                dpi = 96,
+                color: str = 'blue',
+                multiple_hist_ax: bool = False,
+                ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None) -> plt.Axes:
         """
         Plot the distribution of SASA for each conformation within the ensembles.
 
@@ -1048,10 +1059,14 @@ class Visualization:
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
         location: str, optional
-            Select between "median" or "mean" to show in violin plot. Default value is "mean"
+            Select between "median" or "mean" or "both" to show in violin plot. Default is "mean".
         save : bool, optional
             If True, the plot will be saved in the data directory. Default is False.
-        ax : Union[None, plt.Axes], optional
+        color : str, optional
+            Color of the violin plot. Default is blue.
+        multiple_hist_ax : bool, optional
+            If True, it will plot each histogram in a different axis.
+        ax : Union[None, plt.Axes, np.ndarray, List[plt.Axes]], optional
             The matplotlib Axes object on which to plot. If None, a new Axes object will be created. Default is None.
 
         Returns
@@ -1075,35 +1090,94 @@ class Visualization:
             hist_data.append(total_sasa_i)
             labels.append(ensemble.code)
 
-        # Plot.
-        if ax is None:
-            fig, ax = plt.subplots()
+        # Plot setup depending on plot type and multiple_hist_ax setting
+        if not violin_plot and multiple_hist_ax:
+            # Create one axis for each histogram
+            if ax is None:
+                fig, ax = plt.subplots(
+                    1, len(ensembles), 
+                    figsize=(3 * len(ensembles), 3),
+                    dpi=96
+                )
+            else:
+                if not isinstance(ax, (list, np.ndarray)):
+                    ax = [ax]
+                ax = np.array(ax).flatten()
+                fig = ax[0].figure
         else:
-            fig = ax.figure
+            # Single axis for all histograms or violin plot
+            if ax is None:
+                fig, ax = plt.subplots(dpi=dpi)
+            else:
+                fig = ax.figure
 
         axis_label = r"SASA (nm$^2$)"
         title = "Global SASA Distribution"
 
         if violin_plot:
+            # Plot the violin plot
             plot_violins(
                 ax=ax,
                 data=hist_data,
                 labels=labels,
-                location= location,
+                location=location,
                 title=title,
                 xlabel=axis_label,
-                color = color
+                color=color
             )
         else:
-            plot_histogram(
-                ax=ax,
-                data=hist_data,
-                labels=labels,
-                bins=bins,
-                range=hist_range,
-                title=title,
-                xlabel=axis_label
-            )
+            if not multiple_hist_ax:
+                # Single histogram plot
+                plot_histogram(
+                    ax=ax,
+                    data=hist_data,
+                    labels=labels,
+                    bins=bins,
+                    range=hist_range,
+                    title=title,
+                    xlabel=axis_label
+                )
+            else:
+                # Plot separate histograms for each ensemble on separate axes
+                _bins = _get_hist_bins(
+                    data=hist_data, bins=bins, range=hist_range
+                )
+                h_args = {"histtype": "step", "density": True}
+
+                for i, (name_i, hist_data_i) in enumerate(zip(labels, hist_data)):
+                    ax[i].hist(hist_data_i, bins=_bins, label=name_i, **h_args)
+                    ax[i].set_title(name_i)
+                    if i == 0:
+                        ax[i].set_ylabel("Density")
+                    ax[i].set_xlabel(axis_label)
+
+                    # Adding mean/median/both lines with legend
+                    legend_handles = []
+                    if location == 'mean':
+                        mean_sasa = np.mean(hist_data_i)
+                        mean_line = ax[i].axvline(mean_sasa, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                    if location == 'median':
+                        median_sasa = np.median(hist_data_i)
+                        median_line = ax[i].axvline(median_sasa, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+                    if location == 'both':
+                        mean_sasa = np.mean(hist_data_i)
+                        mean_line = ax[i].axvline(mean_sasa, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                        median_sasa = np.median(hist_data_i)
+                        median_line = ax[i].axvline(median_sasa, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+
+                    # Add legend if needed
+                    if legend_handles:
+                        ax[i].legend(handles=legend_handles, loc='upper right')
+
+                fig.tight_layout()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'Global_SASA_dist' + self.analysis.ens_codes[0]))
@@ -1287,8 +1361,6 @@ class Visualization:
             multiple_hist_ax: bool = False,
             violin_plot: bool = False,
             location: str = 'mean',
-            median: bool = False,
-            mean: bool = False,
             dpi: int = 96,
             save: bool = False,
             ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None,
@@ -1308,12 +1380,8 @@ class Visualization:
             If True, it will plot each histogram in a different axis.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is False.
-        median : bool, optional
-            If True, median is shown in the hist plot. Default is False.
-        means : bool, optional
-            If True, mean is shown in the his plot. Default is False.
         location: str, optional
-            Select between "median" or "mean" to show in violin plot. Default value is "mean"
+            Select between "median" or "mean" or "both" to show in violin plot. Default value is "mean"
         dpi : int, optional
             The DPI (dots per inch) of the output figure. Default is 96.
         save : bool, optional
@@ -1366,8 +1434,7 @@ class Visualization:
         title = "Radius of Gyration Distribution"
 
         if violin_plot:
-            if median or mean:
-                raise ValueError("Please avoid using median and mean parameters for violin plot you can show either mean or medain using location parameter")
+            
             plot_violins(
                 ax=ax,
                 data=hist_data,
@@ -1404,16 +1471,26 @@ class Visualization:
                         ax[i].set_ylabel("Density")
                     ax[i].set_xlabel(axis_label)
                     legend_handles = []
-                    if mean:
+                    if location =='mean':
                         mean_rg = np.mean(rg_i)
                         mean_line = ax[i].axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
                         mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
                         legend_handles.append(mean_legend)
-                    if median:
+                    if location == 'median':
                         median_rg = np.median(rg_i)
                         median_line = ax[i].axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
                         median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
                         legend_handles.append(median_legend)
+                    if location == 'both':
+                        mean_rg = np.mean(rg_i)
+                        mean_line = ax[i].axvline(mean_rg, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                        median_rg = np.median(rg_i)
+                        median_line = ax[i].axvline(median_rg, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+
                     if legend_handles:
                         ax[i].legend(handles=legend_handles, loc='upper right')
 
@@ -1526,17 +1603,17 @@ class Visualization:
             fig.savefig(os.path.join(self.plot_dir, 'avg_dmap_' + self.analysis.ens_codes[0]))
 
         return axes    
-
+    
     def end_to_end_distances(self, rg_norm: bool = False, 
-                             bins: int = 50, 
-                             hist_range: Tuple = None, 
-                             violin_plot: bool = True,
-                            #  means: bool = True, 
-                            #  median: bool = True, 
-                             location: str = 'mean',
-                             save: bool = False,
-                             color: str = 'blue', 
-                             ax: plt.Axes = None) -> plt.Axes:
+                         bins: int = 50, 
+                         hist_range: Tuple = None, 
+                         violin_plot: bool = True,
+                         location: str = 'mean',
+                         dpi = 96,
+                         save: bool = False,
+                         color: str = 'blue', 
+                         multiple_hist_ax = False,
+                         ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None) -> Union[plt.Axes, List[plt.Axes]]:
         """
         Plot end-to-end distance distributions.
 
@@ -1551,21 +1628,21 @@ class Visualization:
             which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
-        means : bool, optional
-            If True, means are shown in the violin plot. Default is True.
-        median : bool, optional
-            If True, medians are shown in the violin plot. Default is True.
+        location: str, optional
+            Select between "median" or "mean" or "both" to show in violin plot. Default value is "mean"
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
-        ax : plt.Axes, optional
+        ax : Union[None, plt.Axes, np.ndarray, List[plt.Axes]], optional
             The axes on which to plot. Default is None, which creates a new figure and axes.
         color: str, optional
             Change the color of the violin plot
+        multiple_hist_ax: bool, optional
+            If True, it will plot each histogram in a different axis.
 
         Returns
         -------
-        plt.Axes
-            The Axes object containing the plot.
+        Union[plt.Axes, List[plt.Axes]]
+            The Axes object or a list of Axes objects containing the plot(s).
         """
 
         ensembles = self.analysis.ensembles
@@ -1573,6 +1650,7 @@ class Visualization:
         # Calculate features.
         hist_data = []
         labels = []
+        n_systems = len(ensembles)
 
         for ensemble in ensembles:
             ca_indices = ensemble.trajectory.topology.select(ensemble.atom_selector)
@@ -1585,12 +1663,28 @@ class Visualization:
             hist_data.append(hist_data_i)
             labels.append(ensemble.code)
 
-        # Plot.
-        if ax is None:
-            fig, ax = plt.subplots()
+        # Plot setup depending on plot type and multiple_hist_ax setting
+        if not violin_plot and multiple_hist_ax:
+            # Create one axis for each histogram
+            if ax is None:
+                fig, ax = plt.subplots(
+                    1, n_systems, 
+                    figsize=(3 * n_systems, 3),
+                    dpi=dpi
+                )
+            else:
+                if not isinstance(ax, (list, np.ndarray)):
+                    ax = [ax]
+                ax = np.array(ax).flatten()
+                fig = ax[0].figure
         else:
-            fig = ax.figure
+            # Single axis for all histograms or violin plot
+            if ax is None:
+                fig, ax = plt.subplots(dpi=dpi)
+            else:
+                fig = ax.figure
 
+        # Set axis labels and title based on rg_norm
         if not rg_norm:
             axis_label = "End-to-End Distance [nm]"
             title = "End-to-End Distances Distribution"
@@ -1599,25 +1693,67 @@ class Visualization:
             title = r"End-to-End distance over $\langle$R$_g$$\rangle$ distribution"
 
         if violin_plot:
+            # Plot the violin plot
             plot_violins(
                 ax=ax,
                 data=hist_data,
                 labels=labels,
-                location= location,
+                location=location,
                 title=title,
                 xlabel=axis_label,
                 color=color
             )
         else:
-            plot_histogram(
-                ax=ax,
-                data=hist_data,
-                labels=labels,
-                bins=bins,
-                range=hist_range,
-                title=title,
-                xlabel=axis_label
-            )
+            if not multiple_hist_ax:
+                # Single histogram plot
+                plot_histogram(
+                    ax=ax,
+                    data=hist_data,
+                    labels=labels,
+                    bins=bins,
+                    range=hist_range,
+                    title=title,
+                    xlabel=axis_label
+                )
+            else:
+                # Plot separate histograms for each ensemble on separate axes
+                _bins = _get_hist_bins(
+                    data=hist_data, bins=bins, range=hist_range
+                )
+                h_args = {"histtype": "step", "density": True}
+
+                for i, (name_i, hist_data_i) in enumerate(zip(labels, hist_data)):
+                    ax[i].hist(hist_data_i, bins=_bins, label=name_i, **h_args)
+                    ax[i].set_title(name_i)
+                    if i == 0:
+                        ax[i].set_ylabel("Density")
+                    ax[i].set_xlabel(axis_label)
+
+                    legend_handles = []
+                    if location == 'mean':
+                        mean_dist = np.mean(hist_data_i)
+                        mean_line = ax[i].axvline(mean_dist, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                    if location == 'median':
+                        median_dist = np.median(hist_data_i)
+                        median_line = ax[i].axvline(median_dist, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+                    if location == 'both':
+                        mean_dist = np.mean(hist_data_i)
+                        mean_line = ax[i].axvline(mean_dist, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                        median_dist = np.median(hist_data_i)
+                        median_line = ax[i].axvline(median_dist, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+
+                    if legend_handles:
+                        ax[i].legend(handles=legend_handles, loc='upper right')
+
+                fig.tight_layout()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'e2e_distances_' + self.analysis.ens_codes[0]))
@@ -1628,12 +1764,11 @@ class Visualization:
                     bins: int = 50,
                     hist_range: Tuple = None,
                     violin_plot: bool = True,
-                    location:str = 'mean',
-                    # means: bool = True,
-                    # median: bool = True,
+                    location: str = 'mean',
                     save: bool = False,
                     color: str = 'blue',
-                    ax: plt.Axes = None) -> plt.Axes:
+                    multiple_hist_ax: bool = False,
+                    ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None) -> plt.Axes:
         """
         Plot asphericity distribution in each ensemble.
         Asphericity is calculated based on the gyration tensor.
@@ -1647,11 +1782,15 @@ class Visualization:
             which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
-        location: str, optional
-            Select between "median" or "mean" to show in violin plot. Default value is "mean"
+        location : str, optional
+            Select between "median" or "mean" or "both" to show in violin plot. Default value is "mean".
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
-        ax : plt.Axes, optional
+        color : str, optional
+            Color of the violin plot. Default is blue.
+        multiple_hist_ax : bool, optional
+            If True, each histogram will be plotted on separate axes. Default is False.
+        ax : Union[None, plt.Axes, np.ndarray, List[plt.Axes]], optional
             The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
@@ -1662,7 +1801,7 @@ class Visualization:
 
         ensembles = self.analysis.ensembles
 
-        # Calculate features.
+        # Calculate asphericity for each ensemble
         asph_list = []
         labels = []
         for ensemble in ensembles:
@@ -1670,16 +1809,32 @@ class Visualization:
             asph_list.append(asphericity)
             labels.append(ensemble.code)
 
-        # Plot.
-        if ax is None:
-            fig, ax = plt.subplots()
+        # Plot setup depending on the type of plot and multiple_hist_ax setting
+        if not violin_plot and multiple_hist_ax:
+            # Create one axis for each histogram
+            if ax is None:
+                fig, ax = plt.subplots(
+                    1, len(ensembles), 
+                    figsize=(3 * len(ensembles), 3),
+                    dpi=96
+                )
+            else:
+                if not isinstance(ax, (list, np.ndarray)):
+                    ax = [ax]
+                ax = np.array(ax).flatten()
+                fig = ax[0].figure
         else:
-            fig = ax.figure
+            # Single axis for all histograms or violin plot
+            if ax is None:
+                fig, ax = plt.subplots(dpi=96)
+            else:
+                fig = ax.figure
 
         axis_label = "Asphericity"
         title = "Asphericity Distribution"
 
         if violin_plot:
+            # Plot the violin plot
             plot_violins(
                 ax=ax,
                 data=asph_list,
@@ -1690,15 +1845,58 @@ class Visualization:
                 color=color
             )
         else:
-            plot_histogram(
-                ax=ax,
-                data=asph_list,
-                labels=labels,
-                bins=bins,
-                range=hist_range,
-                title=title,
-                xlabel=axis_label
-            )
+            if not multiple_hist_ax:
+                # Single histogram plot
+                plot_histogram(
+                    ax=ax,
+                    data=asph_list,
+                    labels=labels,
+                    bins=bins,
+                    range=hist_range,
+                    title=title,
+                    xlabel=axis_label
+                )
+            else:
+                # Plot separate histograms for each ensemble on separate axes
+                _bins = _get_hist_bins(
+                    data=asph_list, bins=bins, range=hist_range
+                )
+                h_args = {"histtype": "step", "density": True}
+
+                for i, (name_i, asph_data_i) in enumerate(zip(labels, asph_list)):
+                    ax[i].hist(asph_data_i, bins=_bins, label=name_i, **h_args)
+                    ax[i].set_title(name_i)
+                    if i == 0:
+                        ax[i].set_ylabel("Density")
+                    ax[i].set_xlabel(axis_label)
+
+                    # Adding mean/median/both lines with legend
+                    legend_handles = []
+                    if location == 'mean':
+                        mean_asph = np.mean(asph_data_i)
+                        mean_line = ax[i].axvline(mean_asph, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                    if location == 'median':
+                        median_asph = np.median(asph_data_i)
+                        median_line = ax[i].axvline(median_asph, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+                    if location == 'both':
+                        mean_asph = np.mean(asph_data_i)
+                        mean_line = ax[i].axvline(mean_asph, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                        median_asph = np.median(asph_data_i)
+                        median_line = ax[i].axvline(median_asph, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+
+                    # Add legend if needed
+                    if legend_handles:
+                        ax[i].legend(handles=legend_handles, loc='upper right')
+
+                fig.tight_layout()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'asphericity_dist_' + self.analysis.ens_codes[0]))
@@ -1706,15 +1904,14 @@ class Visualization:
         return ax
 
     def prolateness(self,
-                    bins: int = 50,
-                    hist_range: Tuple = None,
-                    violin_plot: bool = True,
-                    location:str = 'mean',
-                    # median: bool = False,
-                    # means: bool = False,
-                    save: bool = False,
-                    color: str = 'blue',
-                    ax: plt.Axes = None) -> plt.Axes:
+                bins: int = 50,
+                hist_range: Tuple = None,
+                violin_plot: bool = True,
+                location: str = 'mean',
+                save: bool = False,
+                color: str = 'blue',
+                multiple_hist_ax: bool = False,
+                ax: Union[None, plt.Axes, np.ndarray, List[plt.Axes]] = None) -> plt.Axes:
         """
         Plot prolateness distribution in each ensemble.
         Prolateness is calculated based on the gyration tensor.
@@ -1728,11 +1925,15 @@ class Visualization:
             which corresponds to using the min a max value across all data.
         violin_plot : bool, optional
             If True, a violin plot is visualized. Default is True.
-        location: str, optional
-            Select between "median" or "mean" to show in violin plot. Default value is "mean"
+        location : str, optional
+            Select between "median", "mean", or "both" to show in violin plot. Default is "mean".
         save : bool, optional
             If True, the plot will be saved as an image file. Default is False.
-        ax : plt.Axes, optional
+        color : str, optional
+            Color of the violin plot. Default is blue.
+        multiple_hist_ax : bool, optional
+            If True, each histogram will be plotted on separate axes. Default is False.
+        ax : Union[None, plt.Axes, np.ndarray, List[plt.Axes]], optional
             The axes on which to plot. Default is None, which creates a new figure and axes.
 
         Returns
@@ -1743,7 +1944,7 @@ class Visualization:
 
         ensembles = self.analysis.ensembles
 
-        # Calculate features.
+        # Calculate prolateness for each ensemble
         prolat_list = []
         labels = []
         for ensemble in ensembles:
@@ -1751,16 +1952,32 @@ class Visualization:
             prolat_list.append(prolat)
             labels.append(ensemble.code)
 
-        # Plot.
-        if ax is None:
-            fig, ax = plt.subplots()  # Create a new figure if ax is not provided
+        # Plot setup depending on the type of plot and multiple_hist_ax setting
+        if not violin_plot and multiple_hist_ax:
+            # Create one axis for each histogram
+            if ax is None:
+                fig, ax = plt.subplots(
+                    1, len(ensembles), 
+                    figsize=(3 * len(ensembles), 3),
+                    dpi=96
+                )
+            else:
+                if not isinstance(ax, (list, np.ndarray)):
+                    ax = [ax]
+                ax = np.array(ax).flatten()
+                fig = ax[0].figure
         else:
-            fig = ax.figure  # Use the figure associated with the provided ax
+            # Single axis for all histograms or violin plot
+            if ax is None:
+                fig, ax = plt.subplots(dpi=96)
+            else:
+                fig = ax.figure
 
         axis_label = "Prolateness"
-        title = "Prolateness distribution"
+        title = "Prolateness Distribution"
 
         if violin_plot:
+            # Plot the violin plot
             plot_violins(
                 ax=ax,
                 data=prolat_list,
@@ -1771,15 +1988,58 @@ class Visualization:
                 color=color
             )
         else:
-            plot_histogram(
-                ax=ax,
-                data=prolat_list,
-                labels=labels,
-                bins=bins,
-                range=hist_range,
-                title=title,
-                xlabel=axis_label
-            )
+            if not multiple_hist_ax:
+                # Single histogram plot
+                plot_histogram(
+                    ax=ax,
+                    data=prolat_list,
+                    labels=labels,
+                    bins=bins,
+                    range=hist_range,
+                    title=title,
+                    xlabel=axis_label
+                )
+            else:
+                # Plot separate histograms for each ensemble on separate axes
+                _bins = _get_hist_bins(
+                    data=prolat_list, bins=bins, range=hist_range
+                )
+                h_args = {"histtype": "step", "density": True}
+
+                for i, (name_i, prolat_data_i) in enumerate(zip(labels, prolat_list)):
+                    ax[i].hist(prolat_data_i, bins=_bins, label=name_i, **h_args)
+                    ax[i].set_title(name_i)
+                    if i == 0:
+                        ax[i].set_ylabel("Density")
+                    ax[i].set_xlabel(axis_label)
+
+                    # Adding mean/median/both lines with legend
+                    legend_handles = []
+                    if location == 'mean':
+                        mean_prolat = np.mean(prolat_data_i)
+                        mean_line = ax[i].axvline(mean_prolat, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                    if location == 'median':
+                        median_prolat = np.median(prolat_data_i)
+                        median_line = ax[i].axvline(median_prolat, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+                    if location == 'both':
+                        mean_prolat = np.mean(prolat_data_i)
+                        mean_line = ax[i].axvline(mean_prolat, color='k', linestyle='dashed', linewidth=1)
+                        mean_legend = Line2D([0], [0], color='k', linestyle='dashed', linewidth=1, label='Mean')
+                        legend_handles.append(mean_legend)
+                        median_prolat = np.median(prolat_data_i)
+                        median_line = ax[i].axvline(median_prolat, color='r', linestyle='dashed', linewidth=1)
+                        median_legend = Line2D([0], [0], color='r', linestyle='dashed', linewidth=1, label='Median')
+                        legend_handles.append(median_legend)
+
+                    # Add legend if needed
+                    if legend_handles:
+                        ax[i].legend(handles=legend_handles, loc='upper right')
+
+                fig.tight_layout()
 
         if save:
             fig.savefig(os.path.join(self.plot_dir, 'prolateness_dist_' + self.analysis.ens_codes[0]))
@@ -2285,7 +2545,6 @@ class Visualization:
 
         return axes
 
-
     def plot_histogram_grid(self,
             feature: str = "ca_dist",
             ids: Union[np.ndarray, List[list]] = None,
@@ -2518,7 +2777,6 @@ class Visualization:
         )
         
         return ax
-    
     
     def comparison_matrix(self,
             score: str,

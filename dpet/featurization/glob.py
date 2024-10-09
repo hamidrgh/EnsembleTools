@@ -1,5 +1,12 @@
 import mdtraj
 import numpy as np
+three_to_one = {
+    'ALA': 'A', 'CYS': 'C', 'ASP': 'D', 'GLU': 'E', 'PHE': 'F',
+    'GLY': 'G', 'HIS': 'H', 'ILE': 'I', 'LYS': 'K', 'LEU': 'L',
+    'MET': 'M', 'ASN': 'N', 'PRO': 'P', 'GLN': 'Q', 'ARG': 'R',
+    'SER': 'S', 'THR': 'T', 'VAL': 'V', 'TRP': 'W', 'TYR': 'Y'
+}
+
 
 def compute_asphericity(trajectory: mdtraj.Trajectory):
     gyration_tensors = mdtraj.compute_gyration_tensor(trajectory)
@@ -53,3 +60,4 @@ def compute_end_to_end_distances(trajectory: mdtraj.Trajectory, atom_selector:st
         rg_i = mdtraj.compute_rg(trajectory).mean()
         dist = dist / rg_i
     return dist
+
