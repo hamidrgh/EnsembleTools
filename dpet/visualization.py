@@ -190,13 +190,13 @@ def plot_comparison_matrix(
         A dictionary containing the output of the `comparison_scores` method of
         the `dpet.ensemble_analysis.EnsembleAnalysis` class. It must contain the
         following key-value pairs:
-            `scores`: NumPy array with shape (M, M, B) containing the comparison
-                scores for M ensembles and B bootstrap iterations. If no bootstrap
-                analysis was performed, `B = 1`, otherwise it will be `B > 1`.
-            `p_values` (optional): used only when a bootstrap analysis was
-                performed. A (M, M) NumPy array storiging the p-values obtained
-                by comparing with a statistical test the inter-ensemble and
-                intra-ensemble comparison scores.
+        `scores`: NumPy array with shape (M, M, B) containing the comparison
+        scores for M ensembles and B bootstrap iterations. If no bootstrap
+        analysis was performed, `B = 1`, otherwise it will be `B > 1`.
+        `p_values` (optional): used only when a bootstrap analysis was
+        performed. A (M, M) NumPy array storiging the p-values obtained
+        by comparing with a statistical test the inter-ensemble and
+        intra-ensemble comparison scores.
     codes: List[str]
         List of strings with the codes of the ensembles.
     confidence_level: float, optional
