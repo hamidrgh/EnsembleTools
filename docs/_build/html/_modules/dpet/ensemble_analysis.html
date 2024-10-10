@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dpet.ensemble_analysis &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Disordered Protein Ensemble Tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demo.html">Demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ensemble_analysis.html">ensemble_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ensemble.html">ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">visualization</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Disordered Protein Ensemble Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dpet.ensemble_analysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for dpet.ensemble_analysis</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">from</span> <span class="nn">dpet.featurization.distances</span> <span class="kn">import</span> <span class="n">rmsd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">dpet.data.api_client</span> <span class="kn">import</span> <span class="n">APIClient</span>
+<span class="kn">from</span> <span class="nn">dpet.ensemble</span> <span class="kn">import</span> <span class="n">Ensemble</span>
+<span class="kn">from</span> <span class="nn">dpet.data.extract_tar_gz</span> <span class="kn">import</span> <span class="n">extract_tar_gz</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">mdtraj</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dpet.dimensionality_reduction</span> <span class="kn">import</span> <span class="n">DimensionalityReductionFactory</span>
+<span class="kn">from</span> <span class="nn">dpet.featurization.ensemble_level</span> <span class="kn">import</span> <span class="n">ensemble_features</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">dpet.data.comparison</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">score_avg_jsd</span><span class="p">,</span> <span class="n">score_emd_approximation</span><span class="p">,</span> <span class="n">get_num_comparison_bins</span>
+<span class="p">)</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis">[docs]</a><span class="k">class</span> <span class="nc">EnsembleAnalysis</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data analysis pipeline for ensemble data.</span>
+
+<span class="sd">    Initializes with a list of ensemble objects and a directory path</span>
+<span class="sd">    for storing data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ensembles : List[Ensemble])</span>
+<span class="sd">        List of ensembles.</span>
+<span class="sd">    output_dir : str</span>
+<span class="sd">        Directory path for storing data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensembles</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Ensemble</span><span class="p">],</span> <span class="n">output_dir</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span> <span class="o">=</span> <span class="n">APIClient</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Ensemble</span><span class="p">]</span> <span class="o">=</span> <span class="n">ensembles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_feat</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ens_codes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the ensemble codes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[str]</span>
+<span class="sd">            A list of ensemble codes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the trajectories associated with each ensemble.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, mdtraj.Trajectory]</span>
+<span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">:</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">trajectory</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">features</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the features associated with each ensemble.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, np.ndarray]</span>
+<span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">:</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">features</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">}</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reduce_dim_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the transformed data associated with each ensemble.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, np.ndarray]</span>
+<span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">:</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">reduce_dim_data</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">}</span>
+    
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">code</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">e</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ensemble with code &#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;api_client&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">close_session</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_download_from_ped</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensemble</span><span class="p">:</span> <span class="n">Ensemble</span><span class="p">):</span>
+        <span class="n">ped_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^(PED\d</span><span class="si">{5}</span><span class="s1">)(e\d</span><span class="si">{3}</span><span class="s1">)$&#39;</span>
+
+        <span class="n">code</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">ped_pattern</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> does not match the PED ID pattern.&quot;</span><span class="p">)</span>
+        
+        <span class="n">ped_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ensemble_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">tar_gz_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.tar.gz&#39;</span>
+        <span class="n">tar_gz_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">tar_gz_filename</span><span class="p">)</span>
+
+        <span class="n">pdb_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.pdb&#39;</span>
+        <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">pdb_filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tar_gz_file</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://deposition.proteinensemble.org/api/v1/entries/</span><span class="si">{</span><span class="n">ped_id</span><span class="si">}</span><span class="s1">/ensembles/</span><span class="si">{</span><span class="n">ensemble_id</span><span class="si">}</span><span class="s1">/ensemble-pdb&#39;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> from PED.&quot;</span><span class="p">)</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;*/*&#39;</span><span class="p">}</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">perform_get_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to connect to PED server for entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> from PED. HTTP status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Download and save the response content to a file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">download_response_content</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">tar_gz_file</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded file </span><span class="si">{</span><span class="n">tar_gz_filename</span><span class="si">}</span><span class="s2"> from PED.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ensemble </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> already downloaded. Skipping.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Extract the .tar.gz file</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
+            <span class="n">extract_tar_gz</span><span class="p">(</span><span class="n">tar_gz_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">pdb_filename</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted file </span><span class="si">{</span><span class="n">pdb_filename</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">pdb_filename</span><span class="si">}</span><span class="s2"> already exists. Skipping extraction.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set the data path to the downloaded file</span>
+        <span class="c1"># If the trajectory is already generated it will be used instead of the pdb file</span>
+        <span class="n">ensemble</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">pdb_file</span>      
+        <span class="n">chain_ids</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">get_chains_from_pdb</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chain_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">chain_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">chain_id</span> <span class="ow">in</span> <span class="n">chain_ids</span><span class="p">:</span>
+            <span class="n">traj_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">chain_id</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">traj_suffix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="n">traj_dcd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="si">}{</span><span class="n">traj_suffix</span><span class="si">}</span><span class="s1">.dcd&#39;</span><span class="p">)</span>
+        <span class="n">traj_top</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="si">}{</span><span class="n">traj_suffix</span><span class="si">}</span><span class="s1">.top.pdb&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">traj_dcd</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">traj_top</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trajectory file already exists for ensemble </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">traj_dcd</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">top_path</span> <span class="o">=</span> <span class="n">traj_top</span>
+
+    <span class="k">def</span> <span class="nf">_download_from_atlas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ensemble</span><span class="p">:</span> <span class="n">Ensemble</span><span class="p">):</span>
+        <span class="n">pdb_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\d\w</span><span class="si">{3}</span><span class="s1">_[A-Z]$&#39;</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">code</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pdb_pattern</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> does not match the PDB ID pattern.&quot;</span><span class="p">)</span>
+
+        <span class="n">zip_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">.zip&#39;</span>
+        <span class="n">zip_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">zip_filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">zip_file</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> from Atlas.&quot;</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.dsimb.inserm.fr/ATLAS/database/ATLAS/</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">_protein.zip&quot;</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;accept&#39;</span><span class="p">:</span> <span class="s1">&#39;*/*&#39;</span><span class="p">}</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">perform_get_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to connect to Atlas server for entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download entry </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2"> from Atlas. HTTP status code: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Download and save the response content to a file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_client</span><span class="o">.</span><span class="n">download_response_content</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">zip_file</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded file </span><span class="si">{</span><span class="n">zip_filename</span><span class="si">}</span><span class="s2"> from Atlas.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File already exists. Skipping download.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+                <span class="c1"># Map reps to original ensemble code</span>
+                <span class="n">zip_contents</span> <span class="o">=</span> <span class="n">zip_ref</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span>
+                <span class="n">new_ensembles</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">zip_contents</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xtc&#39;</span><span class="p">):</span>
+                        <span class="n">new_code</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+                        <span class="n">top_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">.pdb&quot;</span><span class="p">)</span>
+                        <span class="n">ensemble</span> <span class="o">=</span> <span class="n">Ensemble</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">new_code</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">top_path</span><span class="o">=</span><span class="n">top_path</span><span class="p">)</span>
+                        <span class="n">new_ensembles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ensemble</span><span class="p">)</span>
+                <span class="c1"># Unzip</span>
+                <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted file </span><span class="si">{</span><span class="n">zip_file</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Remove unused files.</span>
+                <span class="k">for</span> <span class="n">unused_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.tpr&quot;</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">unused_path</span><span class="p">)</span>
+                <span class="n">readme_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;README.txt&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">readme_path</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">readme_path</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">BadZipFile</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">BadZipFile</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to unzip file </span><span class="si">{</span><span class="n">zip_file</span><span class="si">}</span><span class="s2">. The file may be corrupted.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_ensembles</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis.load_trajectories"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.load_trajectories">[docs]</a>    <span class="k">def</span> <span class="nf">load_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load trajectories for all ensembles.</span>
+
+<span class="sd">        This method iterates over each ensemble in the `ensembles` list and downloads</span>
+<span class="sd">        data files if they are not already available. </span>
+<span class="sd">        Trajectories are then loaded for each ensemble.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, mdtraj.Trajectory]</span>
+<span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        This method assumes that the `output_dir` attribute of the class specifies the directory</span>
+<span class="sd">        where trajectory files will be saved or extracted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_ensembles_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="s1">&#39;ped&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_download_from_ped</span><span class="p">(</span><span class="n">ensemble</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="s1">&#39;atlas&#39;</span><span class="p">:</span>
+                <span class="n">new_ensembles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_from_atlas</span><span class="p">(</span><span class="n">ensemble</span><span class="p">)</span>
+                <span class="n">new_ensembles_mapping</span><span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_ensembles</span>
+            <span class="k">elif</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">database</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown database: </span><span class="si">{</span><span class="n">ensemble</span><span class="o">.</span><span class="n">database</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update self.ensembles using the mapping</span>
+        <span class="n">updated_ensembles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">new_ensembles</span> <span class="o">=</span> <span class="n">new_ensembles_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="p">[</span><span class="n">ensemble</span><span class="p">])</span>
+            <span class="n">updated_ensembles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_ensembles</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span> <span class="o">=</span> <span class="n">updated_ensembles</span>
+        
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">load_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span></div>
+
+<div class="viewcode-block" id="EnsembleAnalysis.random_sample_trajectories"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories">[docs]</a>    <span class="k">def</span> <span class="nf">random_sample_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sample a defined random number of conformations from the ensemble </span>
+<span class="sd">        trajectory. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sample_size: int</span>
+<span class="sd">            Number of conformations sampled from the ensemble. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">random_sample_trajectory</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span></div>
+
+    <span class="k">def</span> <span class="nf">_join_ensemble_traj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_selector</span> <span class="o">=</span> <span class="s1">&#39;backbone&#39;</span><span class="p">):</span>
+        <span class="n">merge_traj</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">traj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+            <span class="n">atom_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">traj</span><span class="p">]</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">atom_selector</span><span class="p">)</span>
+            <span class="n">new_ca_traj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">traj</span><span class="p">]</span><span class="o">.</span><span class="n">atom_slice</span><span class="p">(</span><span class="n">atom_indices</span><span class="p">)</span>
+            <span class="n">merge_traj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_ca_traj</span><span class="p">)</span>
+        <span class="n">joined_traj</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">merge_traj</span><span class="p">,</span> <span class="n">check_topology</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">discard_overlapping_frames</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">merge_traj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">joined_traj</span>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.extract_features"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.extract_features">[docs]</a>    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract the selected feature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        featurization : str</span>
+<span class="sd">            Choose between &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot;, &quot;tr_phi&quot;, &quot;rmsd&quot;.</span>
+
+<span class="sd">        normalize : bool, optional</span>
+<span class="sd">            Whether to normalize the data. Only applicable to the &quot;ca_dist&quot; method. Default is False.</span>
+
+<span class="sd">        min_sep : int or None, optional</span>
+<span class="sd">            Minimum separation distance for &quot;ca_dist&quot;, &quot;tr_omega&quot;, and &quot;tr_phi&quot; methods. Default is 2.</span>
+
+<span class="sd">        max_sep : int, optional</span>
+<span class="sd">            Maximum separation distance for &quot;ca_dist&quot;, &quot;tr_omega&quot;, and &quot;tr_phi&quot; methods. Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict[str, np.ndarray]</span>
+<span class="sd">            A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s1">&#39;rmsd&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_feat</span> <span class="o">=</span> <span class="s1">&#39;rmsd&#39;</span>
+            <span class="n">j_traj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_join_ensemble_traj</span><span class="p">()</span>
+            <span class="n">rmsd_matrix</span> <span class="o">=</span> <span class="n">rmsd</span><span class="p">(</span><span class="n">j_traj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_all_labels</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">rmsd_matrix</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_feat</span> <span class="o">=</span> <span class="n">featurization</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_featurize</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_create_all_labels</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_data</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span></div>
+
+<div class="viewcode-block" id="EnsembleAnalysis.exists_coarse_grained"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained">[docs]</a>    <span class="k">def</span> <span class="nf">exists_coarse_grained</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if at least one of the loaded ensembles is coarse-grained after loading trajectories.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if at least one ensemble is coarse-grained, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coarse_grained</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists_coarse_grained</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">featurization</span> <span class="o">=</span> <span class="n">featurization</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">names</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature names:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">)</span>
+
+
+
+
+    <span class="k">def</span> <span class="nf">_create_all_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ensemble</span><span class="p">,</span> <span class="n">traj</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">):</span>
+            <span class="n">num_data_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">traj</span><span class="p">]</span><span class="o">.</span><span class="n">n_frames</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_data_points</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_normalize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">feature_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: Features from ensembles have different sizes. Cannot normalize data.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">ensemble</span><span class="o">.</span><span class="n">normalize_features</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_concat_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fit_on</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fit_on</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot fit on ensembles that were not provided as input.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fit_on</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fit_on</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span>
+        <span class="n">concat_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span> <span class="k">if</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">code</span> <span class="ow">in</span> <span class="n">fit_on</span><span class="p">]</span>
+        <span class="n">concat_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Concatenated featurized ensemble shape:&quot;</span><span class="p">,</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">concat_features</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis.reduce_features"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">[docs]</a>    <span class="k">def</span> <span class="nf">reduce_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fit_on</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform dimensionality reduction on the extracted features.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : str</span>
+<span class="sd">            Choose between &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot;, &quot;kpca&quot; and &quot;umap&quot;.</span>
+
+<span class="sd">        fit_on : List[str], optional</span>
+<span class="sd">            if method is &quot;pca&quot; or &quot;kpca&quot;, specifies on which ensembles the models should be fit. </span>
+<span class="sd">            The model will then be used to transform all ensembles.</span>
+
+<span class="sd">        Additional Parameters</span>
+<span class="sd">        ---------------------</span>
+<span class="sd">        The following optional parameters apply based on the selected reduction method:</span>
+
+<span class="sd">        - pca:</span>
+<span class="sd">            - num_dim : int, optional</span>
+<span class="sd">                Number of components to keep. Default is 10.</span>
+
+<span class="sd">        - tsne:</span>
+<span class="sd">            - perplexity_vals : List[float], optional</span>
+<span class="sd">                List of perplexity values. Default is range(2, 10, 2).</span>
+<span class="sd">            - metric : str, optional</span>
+<span class="sd">                Metric to use. Default is &quot;euclidean&quot;. </span>
+<span class="sd">            - circular : bool, optional</span>
+<span class="sd">                Whether to use circular metrics. Default is False.</span>
+<span class="sd">            - n_components : int, optional</span>
+<span class="sd">                Number of dimensions of the embedded space. Default is 2.</span>
+<span class="sd">            - learning_rate : float, optional</span>
+<span class="sd">                Learning rate. Default is 100.0.</span>
+<span class="sd">            - range_n_clusters : List[int], optional</span>
+<span class="sd">                Range of cluster values. Default is range(2, 10, 1).</span>
+
+<span class="sd">        - dimenfix:</span>
+<span class="sd">            - range_n_clusters : List[int], optional</span>
+<span class="sd">                Range of cluster values. Default is range(1, 10, 1).</span>
+
+<span class="sd">        - mds:</span>
+<span class="sd">            - num_dim : int, optional</span>
+<span class="sd">                Number of dimensions. Default is 2.</span>
+
+<span class="sd">        - kpca:</span>
+<span class="sd">            - circular : bool, optional</span>
+<span class="sd">                Whether to use circular metrics. Default is False.</span>
+<span class="sd">            - num_dim : int, optional</span>
+<span class="sd">                Number of components to keep. Default is 10.</span>
+<span class="sd">            - gamma : float, optional</span>
+<span class="sd">                Kernel coefficient. Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            Returns the transformed data.</span>
+
+<span class="sd">        For more information on each method, see the corresponding documentation:</span>
+<span class="sd">            - PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html</span>
+<span class="sd">            - t-SNE: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html</span>
+<span class="sd">            - DimenFix: https://github.com/visml/neo_force_scheme/tree/0.0.3</span>
+<span class="sd">            - MDS: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html</span>
+<span class="sd">            - Kernel PCA: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html</span>
+<span class="sd">            - UMAP: https://umap-learn.readthedocs.io/en/latest/</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_feat</span> <span class="o">==</span> <span class="s1">&#39;rmsd&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span> <span class="o">=</span> <span class="n">DimensionalityReductionFactory</span><span class="o">.</span><span class="n">get_reducer</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">=</span> <span class="n">method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">param_feat</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span>
+        <span class="c1"># Check if all ensemble features have the same size</span>
+        <span class="c1"># Check if all ensemble features have the same size</span>
+        <span class="k">else</span><span class="p">:</span>
+            
+            <span class="n">feature_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Features from ensembles have different sizes. Cannot concatenate.&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span> <span class="o">=</span> <span class="n">DimensionalityReductionFactory</span><span class="o">.</span><span class="n">get_reducer</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_method</span> <span class="o">=</span> <span class="n">method</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span><span class="s2">&quot;kpca&quot;</span><span class="p">):</span>
+                <span class="n">fit_on_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_concat_features</span><span class="p">(</span><span class="n">fit_on</span><span class="o">=</span><span class="n">fit_on</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">fit_on_data</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+                    <span class="n">ensemble</span><span class="o">.</span><span class="n">reduce_dim_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">features</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reduced dimensionality ensemble shape:&quot;</span><span class="p">,</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">reduce_dim_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reducer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_data</span></div>
+
+<div class="viewcode-block" id="EnsembleAnalysis.execute_pipeline"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">execute_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">subsample_size</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute the data analysis pipeline end-to-end. The pipeline includes:</span>
+<span class="sd">            1. Download from database (optional)</span>
+<span class="sd">            2. Generate trajectories</span>
+<span class="sd">            3. Randomly sample a number of conformations from trajectories (optional)</span>
+<span class="sd">            4. Perform feature extraction</span>
+<span class="sd">            5. Perform dimensionality reduction</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        featurization_params: Dict</span>
+<span class="sd">            Parameters for feature extraction. The only required parameter is &quot;featurization&quot;,</span>
+<span class="sd">            which can be &quot;phi_psi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;tr_omega&quot; or &quot;tr_phi&quot;. </span>
+<span class="sd">            Other method-specific parameters are optional.</span>
+<span class="sd">        reduce_dim_params: Dict</span>
+<span class="sd">            Parameters for dimensionality reduction. The only required parameter is &quot;method&quot;,</span>
+<span class="sd">            which can be &quot;pca&quot;, &quot;tsne&quot;, &quot;dimenfix&quot;, &quot;mds&quot; or &quot;kpca&quot;.</span>
+<span class="sd">        subsample_size: int, optional</span>
+<span class="sd">            Optional parameter that specifies the trajectory subsample size. Default is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_trajectories</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">subsample_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">random_sample_trajectories</span><span class="p">(</span><span class="n">subsample_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="o">**</span><span class="n">featurization_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reduce_features</span><span class="p">(</span><span class="o">**</span><span class="n">reduce_dim_params</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EnsembleAnalysis.get_features"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.get_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        featurization : str</span>
+<span class="sd">            The type of featurization to be applied. Supported options are &quot;phi_psi&quot;, &quot;tr_omega&quot;, &quot;tr_phi&quot;, &quot;ca_dist&quot;, &quot;a_angle&quot;, &quot;rg&quot;, &quot;prolateness&quot;, &quot;asphericity&quot;, &quot;sasa&quot;, &quot;end_to_end&quot; and &quot;flory_exponent&quot;.</span>
+
+<span class="sd">        min_sep : int, optional</span>
+<span class="sd">            Minimum sequence separation distance for &quot;ca_dist&quot;, &quot;tr_omega&quot;, and &quot;tr_phi&quot; methods. Default is 2.</span>
+
+<span class="sd">        max_sep : int or None, optional</span>
+<span class="sd">            Maximum sequence separation distance for &quot;ca_dist&quot;, &quot;tr_omega&quot;, and &quot;tr_phi&quot; methods. Default is None.</span>
+
+<span class="sd">        normalize : bool, optional</span>
+<span class="sd">            Whether to normalize the extracted features. Normalization is only supported when featurization is &quot;ca_dist&quot;. Default is False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        Dict[str, np.ndarray]</span>
+<span class="sd">            A dictionary containing the extracted features for each ensemble, where the keys are ensemble IDs and the </span>
+<span class="sd">            values are NumPy arrays containing the features.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">        -------</span>
+<span class="sd">        ValueError:</span>
+<span class="sd">            If featurization is not supported, or if normalization is requested for a featurization method other than &quot;ca_dist&quot;.</span>
+<span class="sd">            If normalization is requested and features from ensembles have different sizes.</span>
+<span class="sd">            If coarse-grained models are used with featurization methods that require atomistic detail.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">featurization</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;phi_psi&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_omega&quot;</span><span class="p">,</span> <span class="s2">&quot;tr_phi&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists_coarse_grained</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">featurization</span><span class="si">}</span><span class="s2"> feature extraction is not possible when working with coarse-grained models.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">featurization</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ca_dist&quot;</span><span class="p">,</span> <span class="s2">&quot;end_to_end&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Normalization is only supported when featurization is &#39;ca_dist&#39;.&quot;</span><span class="p">)</span>
+        
+        <span class="n">features_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">featurization</span> <span class="o">!=</span> <span class="s2">&quot;flory_exponent&quot;</span><span class="p">:</span>
+                <span class="n">features_dict</span><span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">features_dict</span><span class="p">[</span><span class="n">ensemble</span><span class="o">.</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            
+        <span class="k">if</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+            <span class="n">feature_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">features_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: Features from ensembles have different sizes. Cannot normalize data.&quot;</span><span class="p">)</span>
+            <span class="n">concat_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">features_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">std</span> <span class="o">=</span> <span class="n">concat_features</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">features</span> <span class="ow">in</span> <span class="n">features_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">features_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
+        
+        <span class="k">return</span> <span class="n">features_dict</span></div>
+    
+<div class="viewcode-block" id="EnsembleAnalysis.get_features_summary_dataframe"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.get_features_summary_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">get_features_summary_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="s2">&quot;asphericity&quot;</span><span class="p">,</span> <span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="s2">&quot;sasa&quot;</span><span class="p">,</span> <span class="s2">&quot;end_to_end&quot;</span><span class="p">,</span> <span class="s2">&quot;flory_exponent&quot;</span><span class="p">],</span> <span class="n">show_variability</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a summary DataFrame for each ensemble.</span>
+
+<span class="sd">        The DataFrame includes the ensemble code and the average for each feature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        selected_features : List[str], optional</span>
+<span class="sd">            List of feature extraction methods to be used for summarizing the ensembles.</span>
+<span class="sd">            Default is [&quot;rg&quot;, &quot;asphericity&quot;, &quot;prolateness&quot;, &quot;sasa&quot;, &quot;end_to_end&quot;, &quot;flory_exponent&quot;].</span>
+<span class="sd">        show_variability: bool, optional</span>
+<span class="sd">            If True, include a column  a measurment of variability for each</span>
+<span class="sd">            feature (e.g.: standard deviation or error).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">            DataFrame containing the summary statistics (average and std) for each feature in each ensemble.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If any feature in the selected_features is not a supported feature extraction method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">supported_features</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rg&quot;</span><span class="p">,</span> <span class="s2">&quot;asphericity&quot;</span><span class="p">,</span> <span class="s2">&quot;prolateness&quot;</span><span class="p">,</span> <span class="s2">&quot;sasa&quot;</span><span class="p">,</span> <span class="s2">&quot;end_to_end&quot;</span><span class="p">,</span> <span class="s2">&quot;ee_on_rg&quot;</span><span class="p">,</span> <span class="s2">&quot;flory_exponent&quot;</span><span class="p">}</span>
+
+        <span class="c1"># Validate the selected_features</span>
+        <span class="n">invalid_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">feature</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">selected_features</span> <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_features</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">invalid_features</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported feature extraction methods: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invalid_features</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">summary_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">ensemble</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="n">ensemble_code</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">code</span>
+            <span class="n">summary_row</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">ensemble_code</span><span class="p">,</span>
+                <span class="n">ensemble</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">n_residues</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">trajectory</span><span class="p">)</span>
+            <span class="p">]</span>
+            
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">selected_features</span><span class="p">:</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">ensemble</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="n">feature</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ensemble_features</span><span class="p">:</span>
+                    <span class="n">features_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+                    <span class="n">feature_mean</span> <span class="o">=</span> <span class="n">features_array</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                    <span class="n">feature_std</span> <span class="o">=</span> <span class="n">features_array</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+                    <span class="n">summary_row</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">feature_mean</span><span class="p">,</span> <span class="n">feature_std</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">summary_row</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            
+            <span class="n">summary_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summary_row</span><span class="p">)</span>
+
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ensemble_code&#39;</span><span class="p">,</span> <span class="s1">&#39;n_residues&#39;</span><span class="p">,</span> <span class="s1">&#39;n_conformers&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">selected_features</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ensemble_features</span><span class="p">:</span>
+                <span class="n">columns</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">_mean&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">_std&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">columns</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">feature</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">_err&quot;</span><span class="p">])</span>
+
+        <span class="n">summary_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">summary_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_variability</span><span class="p">:</span>
+            <span class="n">summary_df</span> <span class="o">=</span> <span class="n">summary_df</span><span class="p">[[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">summary_df</span><span class="o">.</span><span class="n">columns</span> \
+                                     <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;_std&quot;</span><span class="p">,</span> <span class="s2">&quot;_err&quot;</span><span class="p">))]]</span>
+        
+        <span class="k">return</span> <span class="n">summary_df</span></div>
+    
+    
+<div class="viewcode-block" id="EnsembleAnalysis.comparison_scores"><a class="viewcode-back" href="../../ensemble_analysis.html#dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores">[docs]</a>    <span class="k">def</span> <span class="nf">comparison_scores</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">score</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">feature</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">featurization_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+            <span class="n">bootstrap_iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="n">bootstrap_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">bootstrap_replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">bins</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+            <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare all pair of ensembles using divergence/distance scores.</span>
+<span class="sd">        Implemented scores are approximate average Jensen–Shannon divergence</span>
+<span class="sd">        (JSD) [https://doi.org/10.1371/journal.pcbi.1012144], and approximate</span>
+<span class="sd">        Earth Mover&#39;s Distance (EMD) [https://doi.org/10.1038/s41467-023-36443-x]</span>
+<span class="sd">        over several kinds of molecular features. The lower these scores are,</span>
+<span class="sd">        the higher the similarity between the probability distribution of the</span>
+<span class="sd">        features of the ensembles.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        score: str</span>
+<span class="sd">            Type of score used to compare ensembles. Choices: `jsd` (average</span>
+<span class="sd">            Jensen–Shannon divergence) and `emd` (Earth Mover&#39;s Distance).</span>
+<span class="sd">        feature: str</span>
+<span class="sd">            Type of feature to analyze. Choices: `ca_dist` for all sets of Ca-Ca</span>
+<span class="sd">            distances between non-neighboring residues and `alpha_angle` for </span>
+<span class="sd">            all torsion angles between four consecutive Ca atoms in a chain.</span>
+<span class="sd">        featurization_params: dict, optional</span>
+<span class="sd">            Optional dictionary to customize the featurization process for the</span>
+<span class="sd">            above features.</span>
+<span class="sd">        bootstrap_iters: int, optional</span>
+<span class="sd">            Number of bootstrap iterations. If the value is &gt; 1, each pair of</span>
+<span class="sd">            ensembles will be compared `bootstrap_iters` times by randomly</span>
+<span class="sd">            selecting (bootstrapping) conformations from it. For small protein</span>
+<span class="sd">            structural ensembles (less than 500-1,000 conformations) comparison</span>
+<span class="sd">            scores in DPED are not robust estimators of divergence/distance. By</span>
+<span class="sd">            performing bootstrapping, you can have an idea of how the size of</span>
+<span class="sd">            your ensembles impacts the comparison. Specifically, you should</span>
+<span class="sd">            look at auto-comparisons: each ensemble will be compared with itself</span>
+<span class="sd">            by bootstrapping different subsamples. The scores obtained by these</span>
+<span class="sd">            auto-comparisons give an estimate of the &quot;uncertainty&quot; related to</span>
+<span class="sd">            sample size: for large ensembles, the auto-comparison scores (on the</span>
+<span class="sd">            diagonal of the matrix) should tend to 0. For smaller ensembles you</span>
+<span class="sd">            will get increasingly higher values. Use values &gt;= 5 especially when</span>
+<span class="sd">            comparing small ensembles. When comparing large ensembles (more than</span>
+<span class="sd">            10,000 conformations) you can avoid bootstrapping.</span>
+<span class="sd">        bootstrap_frac: float, optional</span>
+<span class="sd">            Fraction of the total conformations to sample when bootstrapping.</span>
+<span class="sd">            Default value is 1.0, which results in bootstrap samples with the</span>
+<span class="sd">            same number of conformations of the original ensemble.</span>
+<span class="sd">        bootstrap_replace: bool, optional</span>
+<span class="sd">            If `True`, bootstrap will sample with replacement. Default is `True`.</span>
+<span class="sd">        bins: Union[int, str], optional</span>
+<span class="sd">            Number of bins or bin assignment rule for JSD comparisons. See the</span>
+<span class="sd">            documentation of `dpet.data.comparison.get_num_comparison_bins` for</span>
+<span class="sd">            more information.</span>
+<span class="sd">        random_seed: int, optional</span>
+<span class="sd">            Random seed used when performing bootstrapping.</span>
+<span class="sd">        verbose: bool, optional</span>
+<span class="sd">            If `True`, some information about the comparisons will be printed to</span>
+<span class="sd">            stdout.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        results: Tuple[np.ndarray, List[str]]</span>
+<span class="sd">            A tuple containing:</span>
+<span class="sd">                `score_matrix`: a (M, M, B) NumPy array storing the comparison</span>
+<span class="sd">                scores, where M is the number of ensembles being compared and B</span>
+<span class="sd">                is the number of bootstrap iterations (B will be 1 if</span>
+<span class="sd">                bootstrapping was not performed).</span>
+<span class="sd">                `codes`: a list of M strings, containing the codes of the</span>
+<span class="sd">                ensembles that were compared.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">allowed_scores</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;jsd&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ca_dist&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha_angle&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;emd&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ca_dist&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha_angle&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+        
+        <span class="c1">### Check arguments.</span>
+        <span class="k">if</span> <span class="n">score</span> <span class="o">==</span> <span class="s2">&quot;jsd&quot;</span><span class="p">:</span>
+            <span class="n">score_func</span> <span class="o">=</span> <span class="n">score_avg_jsd</span>
+        <span class="k">elif</span> <span class="n">score</span> <span class="o">==</span> <span class="s2">&quot;emd&quot;</span><span class="p">:</span>
+            <span class="n">score_func</span> <span class="o">=</span> <span class="n">score_emd_approximation</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The type of similarity score should be selected among:&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">allowed_scores</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">allowed_scores</span><span class="p">[</span><span class="n">score</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The &#39;</span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">&#39; score must be calculated based on the&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; following features: </span><span class="si">{</span><span class="n">allowed_scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">bootstrap_frac</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid bootstrap_frac: </span><span class="si">{</span><span class="n">bootstrap_frac</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1">### Check the ensembles.</span>
+        <span class="n">num_residues</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">e</span><span class="o">.</span><span class="n">get_num_residues</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_residues</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Can only compare ensembles with the same number of residues.&quot;</span>
+                <span class="s2">&quot; Ensembles in this analysis have different number of residues.&quot;</span>
+            <span class="p">)</span>
+        
+        <span class="c1">### Define the random seed.</span>
+        <span class="k">if</span> <span class="n">random_seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+            <span class="n">rand_func</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rand_func</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span>
+
+        <span class="c1">### Featurize (run it here to avoid re-calculating at every comparison).</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Compute features.</span>
+        <span class="k">for</span> <span class="n">ensemble_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensembles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">feature</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+                <span class="n">feats_i</span> <span class="o">=</span> <span class="n">ensemble_i</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span>
+                    <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;ca_dist&quot;</span><span class="p">,</span>
+                    <span class="n">min_sep</span><span class="o">=</span><span class="n">featurization_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_sep&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">max_sep</span><span class="o">=</span><span class="n">featurization_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_sep&quot;</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">feature</span> <span class="o">==</span> <span class="s2">&quot;alpha_angle&quot;</span><span class="p">:</span>
+                <span class="n">feats_i</span> <span class="o">=</span> <span class="n">ensemble_i</span><span class="o">.</span><span class="n">get_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s2">&quot;a_angle&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid feature for comparison: </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feats_i</span><span class="p">)</span>
+        
+        <span class="c1">### Performs the comparisons.</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# Scoring &#39;</span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">&#39; using features &#39;</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="n">codes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span>
+
+        <span class="c1"># Define the parameters for the evaluation.</span>
+        <span class="k">if</span> <span class="n">score</span> <span class="o">==</span> <span class="s2">&quot;jsd&quot;</span><span class="p">:</span>
+            <span class="c1"># Apply the same bin number to every comparison, based on the number</span>
+            <span class="c1"># of conformers in the smallest ensemble.</span>
+            <span class="n">num_bins</span> <span class="o">=</span> <span class="n">get_num_comparison_bins</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">features</span><span class="p">)</span>
+            <span class="n">scoring_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;bins&quot;</span><span class="p">:</span> <span class="n">num_bins</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Number of bins for all comparisons: </span><span class="si">{</span><span class="n">num_bins</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">score</span> <span class="o">==</span> <span class="s2">&quot;emd&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">feature</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;alpha_angle&quot;</span><span class="p">,</span> <span class="p">):</span>  <span class="c1"># Angular features.</span>
+                <span class="n">scoring_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;angular_l2&quot;</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Euclidean features.</span>
+                <span class="n">scoring_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;rmsd&quot;</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Distance function for comparing: </span><span class="si">{</span><span class="n">scoring_params</span><span class="p">[</span><span class="s1">&#39;metric&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+        <span class="c1"># Initialize a (n, n, bootstrap_iters) matrix.</span>
+        <span class="n">comparisons_iters</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">bootstrap_iters</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">bootstrap_iters</span>
+        <span class="n">score_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">comparisons_iters</span><span class="p">))</span>
+
+        <span class="c1"># Get the pairs to compare.</span>
+        <span class="n">pairs_to_compare</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">code_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">codes</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">code_j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">codes</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="n">i</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="n">i</span> <span class="ow">or</span> <span class="n">bootstrap_iters</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">pairs_to_compare</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;- Will perform: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pairs_to_compare</span><span class="p">)</span><span class="si">}</span><span class="s2"> (pairs of ensembles)&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; x </span><span class="si">{</span><span class="n">comparisons_iters</span><span class="si">}</span><span class="s2"> (iterations) =&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pairs_to_compare</span><span class="p">)</span><span class="o">*</span><span class="n">comparisons_iters</span><span class="si">}</span><span class="s2"> (comparisons)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Compare pairs of ensembles.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">pairs_to_compare</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">comparisons_iters</span><span class="p">):</span>
+                <span class="c1"># Use all conformers.</span>
+                <span class="k">if</span> <span class="n">bootstrap_iters</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">features_ik</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">features_jk</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="c1"># When using bootstrapping, subsample the ensembles.</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Features for ensemble i.</span>
+                    <span class="n">n_i</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">rand_ids_ik</span> <span class="o">=</span> <span class="n">rand_func</span><span class="p">(</span>
+                        <span class="n">n_i</span><span class="p">,</span>
+                        <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n_i</span><span class="o">*</span><span class="n">bootstrap_frac</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="n">replace</span><span class="o">=</span><span class="n">bootstrap_replace</span>
+                    <span class="p">)</span>
+                    <span class="n">features_ik</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">rand_ids_ik</span><span class="p">]</span>
+                    <span class="c1"># Features for ensemble j.</span>
+                    <span class="n">n_j</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">rand_ids_jk</span> <span class="o">=</span> <span class="n">rand_func</span><span class="p">(</span>
+                        <span class="n">n_j</span><span class="p">,</span>
+                        <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n_j</span><span class="o">*</span><span class="n">bootstrap_frac</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="n">replace</span><span class="o">=</span><span class="n">bootstrap_replace</span>
+                    <span class="p">)</span>
+                    <span class="n">features_jk</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">rand_ids_jk</span><span class="p">]</span>
+                <span class="c1"># Score.</span>
+                <span class="n">score_ijk</span> <span class="o">=</span> <span class="n">score_func</span><span class="p">(</span>
+                    <span class="n">features_ik</span><span class="p">,</span> <span class="n">features_jk</span><span class="p">,</span> <span class="o">**</span><span class="n">scoring_params</span>
+                <span class="p">)</span>
+                <span class="c1"># Store the results.</span>
+                <span class="n">score_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">score_ijk</span>
+                <span class="n">score_matrix</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">score_ijk</span>
+
+        <span class="k">return</span> <span class="n">score_matrix</span><span class="p">,</span> <span class="n">codes</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson, Nikola Ivanović.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

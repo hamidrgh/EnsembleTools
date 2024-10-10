@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ensemble_analysis_lib &mdash; Disordered Protein Ensemble Tools 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Disordered Protein Ensemble Tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">EnsembleTools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Disordered Protein Ensemble Tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ensemble_analysis_lib</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ensemble_analysis_lib</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span> <span class="nn">mdtraj</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+
+
+<span class="c1">########################</span>
+<span class="c1"># Main analysis class. #</span>
+<span class="c1">########################</span>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.EnsembleAnalysis">[docs]</a>
+<span class="k">class</span> <span class="nc">EnsembleAnalysis</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_dp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ens_codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize and load the xyz data from PDB files.</span>
+
+<span class="sd">        pdb_dp: directory where all the PDB files with the ensembles are.</span>
+<span class="sd">        ens_codes: codes of the ensembles to analyze. Those must be the basenames</span>
+<span class="sd">            of the PDB files in &#39;pdb_dp&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span> <span class="o">=</span> <span class="n">ens_codes</span>
+
+        <span class="c1"># Store mdtraj trajectories here.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">code_i</span> <span class="ow">in</span> <span class="n">ens_codes</span><span class="p">:</span>
+
+            <span class="n">ens_dcd_i</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdb_dp</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code_i</span><span class="si">}</span><span class="s2">.dcd&quot;</span><span class="p">)</span>
+            <span class="n">ens_top_i</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdb_dp</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code_i</span><span class="si">}</span><span class="s2">.top.pdb&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
+                <span class="n">ens_dcd_i</span>
+            <span class="p">):</span>  <span class="c1"># check whether the specified path is an existing regular file or not</span>
+                <span class="n">ens_fp_i</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdb_dp</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code_i</span><span class="si">}</span><span class="s2">.pdb&quot;</span><span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading </span><span class="si">{</span><span class="n">ens_fp_i</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ens_fp_i</span><span class="p">)</span>
+                <span class="c1"># Save as DCD file (binary format) for faster loading next time.</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;- Saving a DCD file for faster reading next time.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">ens_dcd_i</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">code_i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">ens_top_i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading </span><span class="si">{</span><span class="n">ens_dcd_i</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ens_dcd_i</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">ens_top_i</span><span class="p">)</span>
+
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">code_i</span><span class="p">])</span><span class="si">}</span><span class="s2"> conformations.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EnsembleAnalysis.featurize">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.EnsembleAnalysis.featurize">[docs]</a>
+    <span class="k">def</span> <span class="nf">featurize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">featurization</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">featurization_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Featurize the ensembles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Normalization options.</span>
+        <span class="c1"># featurization_params = {&quot;ca_dist&quot;: {&quot;seq_sep&quot;: 2, &quot;normalize&quot;: True},</span>
+        <span class="c1">#                         &quot;phi_psi&quot;: {},</span>
+        <span class="c1">#                         &quot;a_angle&quot;: {}}</span>
+
+        <span class="n">_featurization_params</span> <span class="o">=</span> <span class="n">featurization_params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;normalize&quot;</span> <span class="ow">in</span> <span class="n">_featurization_params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">featurization</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ca_dist&quot;</span><span class="p">,):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+            <span class="n">_featurization_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;normalize&quot;</span><span class="p">)</span>
+            <span class="n">use_norm</span> <span class="o">=</span> <span class="n">featurization_params</span><span class="p">[</span><span class="s2">&quot;normalize&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">use_norm</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># We will store featurized data for the ensembles in featurized_data dictioanry.</span>
+        <span class="c1"># A list of labels is built here to label the clusters made by t-sne and kmeans clustering</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">code_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Featurizing the </span><span class="si">{</span><span class="n">code_i</span><span class="si">}</span><span class="s2"> ensemble.&quot;</span><span class="p">)</span>
+            <span class="n">feat_out</span> <span class="o">=</span> <span class="n">featurize</span><span class="p">(</span>
+                <span class="n">traj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="p">[</span><span class="n">code_i</span><span class="p">],</span>
+                <span class="n">featurization</span><span class="o">=</span><span class="n">featurization</span><span class="p">,</span>
+                <span class="n">get_names</span><span class="o">=</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">_featurization_params</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="p">):</span>  <span class="c1"># When processing the first ensemble, we also get the feature names.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="n">feat_out</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">feat_out</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;- Featurized ensemble shape:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="c1"># Concatenate the data along the &quot;snapshot&quot; axis. We basically obtain a big ensemble with</span>
+        <span class="c1"># featurized representations from all the original ensembles.</span>
+        <span class="n">concat_features</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">code_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
+            <span class="n">concat_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Concatenated featurized ensemble shape:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">data_points</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">num_data_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_points</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">label</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_data_points</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">use_norm</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+                <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">code_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean</span>
+                    <span class="p">)</span> <span class="o">/</span> <span class="n">std</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.rg_calculator">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.EnsembleAnalysis.rg_calculator">[docs]</a>
+    <span class="k">def</span> <span class="nf">rg_calculator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rg_values_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">traj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trajectories</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">rg_values_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">calculate_rg_for_trajectory</span><span class="p">(</span><span class="n">traj</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rg_values_list</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="EnsembleAnalysis.fit_dimensionality_reduction">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.EnsembleAnalysis.fit_dimensionality_reduction">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit_dimensionality_reduction</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">reduce_dim_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reduce_dim_params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="p">):</span>
+        <span class="c1"># reduce_dim_params = {&quot;pca&quot;: {&quot;num_dim&quot;: None}}</span>
+        <span class="c1"># Perform actual dimensionality reduction.</span>
+        <span class="c1"># adding the tsne part here (fir_transform) using if statement</span>
+        <span class="k">if</span> <span class="n">reduce_dim_method</span> <span class="o">==</span> <span class="s2">&quot;pca&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span> <span class="o">=</span> <span class="n">fit_dimensionality_reduction</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">reduce_dim_method</span><span class="p">,</span> <span class="o">**</span><span class="n">reduce_dim_params</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Transform the ensembles using the dimensionality reduction method.</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_data</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">code_i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ens_codes</span><span class="p">:</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Transforming </span><span class="si">{</span><span class="n">code_i</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span>
+                    <span class="n">features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">featurized_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">],</span>
+                    <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span><span class="p">,</span>
+                    <span class="n">method</span><span class="o">=</span><span class="n">reduce_dim_method</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;- Reduced dimensionality ensemble shape:&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_data</span><span class="p">[</span><span class="n">code_i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">concat_reduce_dim_data</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span>
+                <span class="n">features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span><span class="p">,</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">reduce_dim_method</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">reduce_dim_method</span> <span class="o">==</span> <span class="s2">&quot;tsne&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span> <span class="o">=</span> <span class="n">fit_dimensionality_reduction</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">reduce_dim_method</span><span class="p">,</span> <span class="o">**</span><span class="n">reduce_dim_params</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">reduce_dim_method</span> <span class="o">==</span> <span class="s2">&quot;dimenfix&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span> <span class="o">=</span> <span class="n">fit_dimensionality_reduction</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">reduce_dim_method</span><span class="p">,</span> <span class="o">**</span><span class="n">reduce_dim_params</span>
+            <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">reduce_dim_method</span> <span class="o">==</span> <span class="s2">&quot;tsne-circular&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduce_dim_model</span> <span class="o">=</span> <span class="n">fit_dimensionality_reduction</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">reduce_dim_method</span><span class="p">,</span> <span class="o">**</span><span class="n">reduce_dim_params</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+</div>
+
+
+
+<span class="c1">######################################</span>
+<span class="c1"># Featurization of input structures. #</span>
+<span class="c1">######################################</span>
+
+
+<div class="viewcode-block" id="featurize">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.featurize">[docs]</a>
+<span class="k">def</span> <span class="nf">featurize</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">featurization</span><span class="p">,</span> <span class="n">get_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Featurize a whole ensemble, whose xyz coordinates are stored in</span>
+<span class="sd">    the &#39;traj&#39; object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;ca_dist&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">featurize_ca_dist</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">get_names</span><span class="o">=</span><span class="n">get_names</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;phi_psi&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">featurize_phi_psi</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">get_names</span><span class="o">=</span><span class="n">get_names</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">featurization</span> <span class="o">==</span> <span class="s2">&quot;a_angle&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">featurize_a_angle</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">get_names</span><span class="o">=</span><span class="n">get_names</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Other featurizations could be implemented here.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="featurize_ca_dist">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.featurize_ca_dist">[docs]</a>
+<span class="k">def</span> <span class="nf">featurize_ca_dist</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">seq_sep</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">get_names</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># Get all C-alpha indices.</span>
+    <span class="n">ca_ids</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;name == CA&quot;</span><span class="p">)</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="c1"># Get all pair of ids.</span>
+    <span class="n">pair_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">id_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ca_ids</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">id_j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ca_ids</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">-</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">seq_sep</span><span class="p">:</span>
+                <span class="n">pair_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">id_i</span><span class="p">,</span> <span class="n">id_j</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">get_names</span><span class="p">:</span>
+                    <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">id_i</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">id_j</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+    <span class="c1"># Calculate C-alpha - C-alpha distances.</span>
+    <span class="n">ca_dist</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_distances</span><span class="p">(</span><span class="n">traj</span><span class="o">=</span><span class="n">traj</span><span class="p">,</span> <span class="n">atom_pairs</span><span class="o">=</span><span class="n">pair_ids</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
+        <span class="n">ca_dist</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">ca_dist</span>
+    <span class="k">if</span> <span class="n">get_names</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ca_dist</span><span class="p">,</span> <span class="n">names</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ca_dist</span></div>
+
+
+
+<div class="viewcode-block" id="rg_calculator">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.rg_calculator">[docs]</a>
+<span class="k">def</span> <span class="nf">rg_calculator</span><span class="p">(</span><span class="n">traj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_rg</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ca_dmap">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.calc_ca_dmap">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_ca_dmap</span><span class="p">(</span><span class="n">traj</span><span class="p">):</span>
+    <span class="n">ca_ids</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;protein and name CA&quot;</span><span class="p">)</span>
+    <span class="n">ca_xyz</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">xyz</span><span class="p">[:,</span> <span class="n">ca_ids</span><span class="p">]</span>
+    <span class="n">dmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">ca_xyz</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">ca_xyz</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">dmap</span></div>
+
+
+
+<div class="viewcode-block" id="featurize_phi_psi">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.featurize_phi_psi">[docs]</a>
+<span class="k">def</span> <span class="nf">featurize_phi_psi</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">get_names</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">phi_ids</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_phi</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+    <span class="n">psi_ids</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_psi</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span>
+    <span class="n">phi_psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">phi</span><span class="p">,</span> <span class="n">psi</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">get_names</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">phi_ids</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-PHI&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">psi_ids</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-PSI&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">phi_psi</span><span class="p">,</span> <span class="n">names</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">phi_psi</span></div>
+
+
+
+<div class="viewcode-block" id="featurize_a_angle">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.featurize_a_angle">[docs]</a>
+<span class="k">def</span> <span class="nf">featurize_a_angle</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">get_names</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># Get all C-alpha indices.</span>
+    <span class="n">ca_ids</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;protein and name CB&quot;</span><span class="p">)</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="c1"># Get all pair of ids.</span>
+    <span class="n">tors_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ca_ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">get_names</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">atoms</span><span class="p">[</span><span class="n">ca_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
+                    <span class="n">atoms</span><span class="p">[</span><span class="n">ca_ids</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]],</span>
+                    <span class="n">atoms</span><span class="p">[</span><span class="n">ca_ids</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]],</span>
+                    <span class="n">atoms</span><span class="p">[</span><span class="n">ca_ids</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]],</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">tors_ids</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ca_ids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ca_ids</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ca_ids</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="n">ca_ids</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]))</span>
+    <span class="n">tors</span> <span class="o">=</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_dihedrals</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">tors_ids</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">get_names</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tors</span><span class="p">,</span> <span class="n">names</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tors</span></div>
+
+
+
+<span class="c1">#######################</span>
+<span class="c1"># t-SNE fro circular data. #</span>
+<span class="c1">#######################</span>
+
+
+<div class="viewcode-block" id="unit_vectorize">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.unit_vectorize">[docs]</a>
+<span class="k">def</span> <span class="nf">unit_vectorize</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an array with (*, N) angles in an array with (*, N, 2) sine and</span>
+<span class="sd">    cosine values for the N angles.&quot;&quot;&quot;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">v</span></div>
+
+
+
+<div class="viewcode-block" id="unit_vector_distance">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.unit_vector_distance">[docs]</a>
+<span class="k">def</span> <span class="nf">unit_vector_distance</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the sum of distances between two (*, N, 2) arrays storing the</span>
+<span class="sd">    sine and cosine values of N angles.&quot;&quot;&quot;</span>
+    <span class="n">v0</span> <span class="o">=</span> <span class="n">unit_vectorize</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">unit_vectorize</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+    <span class="c1"># Distance between every pair of N angles.</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">v0</span> <span class="o">-</span> <span class="n">v1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="c1"># We sum over the N angles.</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dist</span></div>
+
+
+
+<span class="c1">#############################</span>
+<span class="c1"># Dimensionality reduction. #</span>
+<span class="c1">#############################</span>
+
+
+<div class="viewcode-block" id="fit_dimensionality_reduction">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.fit_dimensionality_reduction">[docs]</a>
+<span class="k">def</span> <span class="nf">fit_dimensionality_reduction</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;pca&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fit_pca</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;tsne&quot;</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;tsne is your selected dimensionality reduction method!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fit_transform_tsne</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;dimenfix&quot;</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;dimenfix is your selected dimensionality reduction method!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fit_transform_dimenfix</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;mds&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fit_transform_mds</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;tsne-circular&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fit_transform_tsne_circular</span><span class="p">(</span><span class="n">concat_features</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;Other dimensionality reduction methods could be implemented here.&quot;</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fit_pca">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.fit_pca">[docs]</a>
+<span class="k">def</span> <span class="nf">fit_pca</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">num_dim</span><span class="p">):</span>
+    <span class="n">pca</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">num_dim</span><span class="p">)</span>
+    <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pca</span></div>
+
+
+
+<div class="viewcode-block" id="fit_transform_tsne">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.fit_transform_tsne">[docs]</a>
+<span class="k">def</span> <span class="nf">fit_transform_tsne</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">perplexityVals</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span>
+<span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+    <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;tsne is running...&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">perplexityVals</span><span class="p">:</span>
+        <span class="n">tsneObject</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span>
+            <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">perplexity</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+            <span class="n">early_exaggeration</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+            <span class="n">n_iter</span><span class="o">=</span><span class="mi">3500</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">n_iter_without_progress</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+            <span class="n">min_grad_norm</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+            <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="s2">&quot;barnes_hut&quot;</span><span class="p">,</span>
+            <span class="n">angle</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">tsne</span> <span class="o">=</span> <span class="n">tsneObject</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="nb">dir</span> <span class="o">+</span> <span class="s2">&quot;/tsnep</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tsne</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tsne file for the perplexity value of </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> is saved in </span><span class="si">{</span><span class="nb">dir</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tsne is done! All files saved in </span><span class="si">{</span><span class="nb">dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="fit_transform_tsne_circular">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.fit_transform_tsne_circular">[docs]</a>
+<span class="k">def</span> <span class="nf">fit_transform_tsne_circular</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">perplexityVals</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">metric</span><span class="o">=</span><span class="n">unit_vector_distance</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span>
+<span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+    <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;tsne for phi_psi is running...&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">perplexityVals</span><span class="p">:</span>
+        <span class="n">tsneObject</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span>
+            <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">perplexity</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+            <span class="n">early_exaggeration</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+            <span class="n">n_iter</span><span class="o">=</span><span class="mi">3500</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">n_iter_without_progress</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+            <span class="n">min_grad_norm</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
+            <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="s2">&quot;barnes_hut&quot;</span><span class="p">,</span>
+            <span class="n">angle</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">tsne</span> <span class="o">=</span> <span class="n">tsneObject</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="nb">dir</span> <span class="o">+</span> <span class="s2">&quot;/tsnep</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">tsne</span><span class="p">)</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tsne file for the perplexity value of </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> is saved in </span><span class="si">{</span><span class="nb">dir</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tsne is done! All files saved in </span><span class="si">{</span><span class="nb">dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="fit_transform_dimenfix">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.fit_transform_dimenfix">[docs]</a>
+<span class="k">def</span> <span class="nf">fit_transform_dimenfix</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">neo_force_scheme</span> <span class="kn">import</span> <span class="n">NeoForceScheme</span>
+
+    <span class="n">nfs</span> <span class="o">=</span> <span class="n">NeoForceScheme</span><span class="p">()</span>
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">nfs</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">projection</span></div>
+
+
+
+<div class="viewcode-block" id="fit_transform_mds">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.fit_transform_mds">[docs]</a>
+<span class="k">def</span> <span class="nf">fit_transform_mds</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nume_dim</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">MDS</span>
+
+    <span class="n">embedding</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">nume_dim</span><span class="p">)</span>
+    <span class="n">feature_transformed</span> <span class="o">=</span> <span class="n">embedding</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">feature_transformed</span></div>
+
+
+
+<div class="viewcode-block" id="transform">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.transform">[docs]</a>
+<span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;pca&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;Other transformation methods could be implemented here&quot;</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="c1">#######################</span>
+<span class="c1"># Score similarities. #</span>
+<span class="c1">#######################</span>
+
+
+<div class="viewcode-block" id="score_kld_approximation">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.score_kld_approximation">[docs]</a>
+<span class="k">def</span> <span class="nf">score_kld_approximation</span><span class="p">(</span><span class="n">v_true</span><span class="p">,</span> <span class="n">v_pred</span><span class="p">,</span> <span class="n">n_bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">pseudo_c</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scores an approximation of KLD by discretizing the values in</span>
+<span class="sd">    &#39;v_true&#39; (data points from a reference distribution) and &#39;v_pred&#39;</span>
+<span class="sd">    (data points from a predicted distribution).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Define bins.</span>
+    <span class="n">_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">v_true</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">v_pred</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+    <span class="n">_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">v_true</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">v_pred</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">_min</span><span class="p">,</span> <span class="n">_max</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Compute the frequencies in the bins.</span>
+    <span class="n">ht</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">v_true</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">pseudo_c</span><span class="p">)</span> <span class="o">/</span> <span class="n">v_true</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">hp</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">v_pred</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">pseudo_c</span><span class="p">)</span> <span class="o">/</span> <span class="n">v_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">kl</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ht</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">hp</span> <span class="o">/</span> <span class="n">ht</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">kl</span><span class="p">,</span> <span class="n">bins</span></div>
+
+
+
+<div class="viewcode-block" id="score_jsd_approximation">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.score_jsd_approximation">[docs]</a>
+<span class="k">def</span> <span class="nf">score_jsd_approximation</span><span class="p">(</span><span class="n">v_true</span><span class="p">,</span> <span class="n">v_pred</span><span class="p">,</span> <span class="n">n_bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">pseudo_c</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scores an approximation of JS by discretizing the values in</span>
+<span class="sd">    &#39;v_true&#39; (data points from a reference distribution) and &#39;v_pred&#39;</span>
+<span class="sd">    (data points from a predicted distribution).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Define bins.</span>
+    <span class="n">_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">v_true</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">v_pred</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
+    <span class="n">_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">v_true</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">v_pred</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">_min</span><span class="p">,</span> <span class="n">_max</span><span class="p">,</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Compute the frequencies in the bins.</span>
+    <span class="n">ht</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">v_true</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">pseudo_c</span><span class="p">)</span> <span class="o">/</span> <span class="n">v_true</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">hp</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">v_pred</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">pseudo_c</span><span class="p">)</span> <span class="o">/</span> <span class="n">v_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">hm</span> <span class="o">=</span> <span class="p">(</span><span class="n">ht</span> <span class="o">+</span> <span class="n">hp</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">kl_tm</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ht</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">hm</span> <span class="o">/</span> <span class="n">ht</span><span class="p">))</span>
+    <span class="n">kl_pm</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">hp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">hm</span> <span class="o">/</span> <span class="n">hp</span><span class="p">))</span>
+    <span class="n">js</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">kl_pm</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">kl_tm</span>
+    <span class="k">return</span> <span class="n">js</span><span class="p">,</span> <span class="n">bins</span></div>
+
+
+
+<div class="viewcode-block" id="score_akld_d">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.score_akld_d">[docs]</a>
+<span class="k">def</span> <span class="nf">score_akld_d</span><span class="p">(</span>
+    <span class="n">traj_ref</span><span class="p">:</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">,</span>
+    <span class="n">traj_hat</span><span class="p">:</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">,</span>
+    <span class="n">n_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;js&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    See the idpGAN article.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate distance maps.</span>
+    <span class="n">dmap_ref</span> <span class="o">=</span> <span class="n">calc_ca_dmap</span><span class="p">(</span><span class="n">traj_ref</span><span class="p">)</span>
+    <span class="n">dmap_hat</span> <span class="o">=</span> <span class="n">calc_ca_dmap</span><span class="p">(</span><span class="n">traj_hat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dmap_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">dmap_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Input trajectories have different number of residues:&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; ref=</span><span class="si">{</span><span class="n">dmap_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, hat=</span><span class="si">{</span><span class="n">dmap_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">n_akld_d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;kl&quot;</span><span class="p">:</span>
+        <span class="n">score_func</span> <span class="o">=</span> <span class="n">score_kld_approximation</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;js&quot;</span><span class="p">:</span>
+        <span class="n">score_func</span> <span class="o">=</span> <span class="n">score_jsd_approximation</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dmap_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dmap_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="n">j</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">kld_d_ij</span> <span class="o">=</span> <span class="n">score_func</span><span class="p">(</span><span class="n">dmap_ref</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">dmap_hat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">n_bins</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)[</span>
+                <span class="mi">0</span>
+            <span class="p">]</span>
+            <span class="n">n_akld_d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kld_d_ij</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">n_akld_d</span><span class="p">),</span> <span class="n">n_akld_d</span></div>
+
+
+
+<div class="viewcode-block" id="score_akld_t">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.score_akld_t">[docs]</a>
+<span class="k">def</span> <span class="nf">score_akld_t</span><span class="p">(</span>
+    <span class="n">traj_ref</span><span class="p">:</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">,</span>
+    <span class="n">traj_hat</span><span class="p">:</span> <span class="n">mdtraj</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">,</span>
+    <span class="n">n_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;js&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Similar to &#39;score_akld_d&#39;, but evaluate alpha torsion angles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate distance maps.</span>
+    <span class="n">tors_ref</span> <span class="o">=</span> <span class="n">featurize_a_angle</span><span class="p">(</span><span class="n">traj_ref</span><span class="p">)</span>
+    <span class="n">tors_hat</span> <span class="o">=</span> <span class="n">featurize_a_angle</span><span class="p">(</span><span class="n">traj_hat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tors_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">tors_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Input trajectories have different number torsion angles:&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; ref=</span><span class="si">{</span><span class="n">tors_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">, hat=</span><span class="si">{</span><span class="n">tors_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">n_akld_t</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;kl&quot;</span><span class="p">:</span>
+        <span class="n">score_func</span> <span class="o">=</span> <span class="n">score_kld_approximation</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;js&quot;</span><span class="p">:</span>
+        <span class="n">score_func</span> <span class="o">=</span> <span class="n">score_jsd_approximation</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tors_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">score_i</span> <span class="o">=</span> <span class="n">score_func</span><span class="p">(</span><span class="n">tors_ref</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">tors_hat</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">n_bins</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n_akld_t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score_i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">n_akld_t</span><span class="p">),</span> <span class="n">n_akld_t</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_rg_for_trajectory">
+<a class="viewcode-back" href="../ensemble_analysis_lib.html#ensemble_analysis_lib.calculate_rg_for_trajectory">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_rg_for_trajectory</span><span class="p">(</span><span class="n">trajectory</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">mdtraj</span><span class="o">.</span><span class="n">compute_rg</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">trajectory</span><span class="p">]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson, Nikola Ivanović.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
