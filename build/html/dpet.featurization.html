@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dpet.featurization package &mdash; IDPET 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            IDPET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDPET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">dpet.featurization package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dpet.featurization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dpet-featurization-package">
+<h1>dpet.featurization package<a class="headerlink" href="#dpet-featurization-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-dpet.featurization.angles">
+<span id="dpet-featurization-angles-module"></span><h2>dpet.featurization.angles module<a class="headerlink" href="#module-dpet.featurization.angles" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_a_angle">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_a_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'protein</span> <span class="pre">and</span> <span class="pre">name</span> <span class="pre">CA'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.angles.featurize_a_angle" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate Cα-based torsion angles angles from a given MD trajectory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDTraj trajectory containing the protein structure.</p></li>
+<li><p><strong>get_names</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns feature names along with the alpha angles. Default is True.</p></li>
+<li><p><strong>atom_selector</strong> (<em>str</em><em>, </em><em>optional</em>) – The atom selection string for C-alpha atoms. Default is “protein and name CA”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If <cite>get_names</cite> is True, returns a tuple with alpha angle values and feature names.
+If <cite>get_names</cite> is False, returns an array of alpha angle values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[np.ndarray, Tuple[np.ndarray, List[str]]]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates Cα-based torsion angles angles from a given MD trajectory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_phi_psi">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_phi_psi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.angles.featurize_phi_psi" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate phi (ϕ) and psi (ψ) angles from a given MD trajectory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDTraj trajectory containing the protein structure.</p></li>
+<li><p><strong>get_names</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns feature names along with the phi and psi angles. Default is True.</p></li>
+<li><p><strong>ravel</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns the angles in a flattened array. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If <cite>get_names</cite> is True, returns a tuple with phi and psi angles along with feature names.
+If <cite>get_names</cite> is False, returns an array of phi and psi angles.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[np.ndarray, Tuple[np.ndarray, List[str]]]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates phi (ϕ) and psi (ψ) angles from a given MD trajectory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_tr_angle">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_tr_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="headerlink" href="#dpet.featurization.angles.featurize_tr_angle" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate trRosetta angles between pair of residues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDtraj trajectory object.</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – The type of angle to calculate. Supported options: ‘omega’ or ‘phi’.</p></li>
+<li><p><strong>min_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum sequence separation for angle calculations. Default is 2.</p></li>
+<li><p><strong>max_sep</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>int</em><em>, </em><em>float</em><em>]</em><em>, </em><em>optional</em>) – The maximum sequence separation for angle calculations. Default is None.</p></li>
+<li><p><strong>ravel</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to flatten the output array. Default is True.</p></li>
+<li><p><strong>get_names</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return the names of the calculated features. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>angles</strong> – A numpy array storing the angle values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates trRosetta angles between pairs of residues.
+For more information, refer to the original trRosetta paper (<a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/31896580/">https://pubmed.ncbi.nlm.nih.gov/31896580/</a>).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_tr_omega">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_tr_omega</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.angles.featurize_tr_omega" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate omega angles from trRosetta. These angles are torsion angles defined
+between a pair of residues <cite>i</cite> and <cite>j</cite> and involving the following atoms:</p>
+<blockquote>
+<div><p><cite>Ca(i) – Cb(i) – Cb(j) – Ca(j)</cite></p>
+</div></blockquote>
+<p>If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDTraj trajectory containing the protein structure.</p></li>
+<li><p><strong>min_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum separation between residues for computing omega angles. Default is 2.</p></li>
+<li><p><strong>max_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum separation between residues for computing omega angles. Default is None.</p></li>
+<li><p><strong>ravel</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns a flattened array of omega angle values. Default is True.</p></li>
+<li><p><strong>get_names</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns feature names along with the omega angles. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If <cite>ravel</cite> is True, returns a flattened array of omega angle values.
+If <cite>ravel</cite> is False, returns a 3D array of omega angle values.
+If <cite>get_names</cite> is True, returns a tuple with feature names along with the omega angles.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[np.ndarray, Tuple[np.ndarray, List[str]]]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates omega angles from trRosetta for a given MD trajectory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.featurize_tr_phi">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">featurize_tr_phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.angles.featurize_tr_phi" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate phi angles from trRosetta. These angles are defined between a
+pair of residues <cite>i</cite> and <cite>j</cite> and involve the following atoms:</p>
+<blockquote>
+<div><p><cite>Ca(i) – Cb(i) – Cb(j)</cite></p>
+</div></blockquote>
+<p>If a residue does not have a Cb atom, a pseudo-Cb will be added automatically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDTraj trajectory containing the protein structure.</p></li>
+<li><p><strong>min_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum separation between residues for computing phi angles. Default is 2.</p></li>
+<li><p><strong>max_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum separation between residues for computing phi angles. Default is None.</p></li>
+<li><p><strong>ravel</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns a flattened array of phi angle values. Default is True.</p></li>
+<li><p><strong>get_names</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, returns feature names along with the phi angles. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If <cite>ravel</cite> is True, returns a flattened array of phi angle values.
+If <cite>ravel</cite> is False, returns a 3D array of phi angle values.
+If <cite>get_names</cite> is True, returns a tuple with feature names along with the phi angles.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[np.ndarray, Tuple[np.ndarray, List[str]]]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates phi angles from trRosetta for a given MD trajectory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.get_angles">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">get_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.featurization.angles.get_angles" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate planar angles defined by 3 sets of points.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.angles.get_dihedrals">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.angles.</span></span><span class="sig-name descname"><span class="pre">get_dihedrals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.featurization.angles.get_dihedrals" title="Permalink to this definition"></a></dt>
+<dd><p>calculate dihedral angles defined by 4 sets of points.</p>
+</dd></dl>
+
+</section>
+<section id="module-dpet.featurization.distances">
+<span id="dpet-featurization-distances-module"></span><h2>dpet.featurization.distances module<a class="headerlink" href="#module-dpet.featurization.distances" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.calc_ca_dmap">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">calc_ca_dmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#dpet.featurization.distances.calc_ca_dmap" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the (N, L, L) distance maps between C-alpha atoms for visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDtraj trajectory object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dmap</strong> – The distance maps of shape (N, L, L), where N is the number of frames and L is the number of C-alpha atoms.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates the distance maps between C-alpha atoms for visualization purposes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.calc_com_dmap">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">calc_com_dmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#dpet.featurization.distances.calc_com_dmap" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the (N, L, L) distance maps between center of mass (COM) atoms for visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDtraj trajectory object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dmap</strong> – The distance maps of shape (N, L, L), where N is the number of frames and L is the number of center of mass (COM) atoms.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates the distance maps between center of mass (COM) atoms for visualization purposes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.featurize_ca_dist">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">featurize_ca_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'name</span> <span class="pre">CA'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.distances.featurize_ca_dist" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate C-alpha distances between pairs of residues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDtraj trajectory object.</p></li>
+<li><p><strong>min_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum sequence separation for distance calculations. Default is 2.</p></li>
+<li><p><strong>max_sep</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The maximum sequence separation for distance calculations. Default is None.</p></li>
+<li><p><strong>inverse</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to calculate inverse distances. Default is False.</p></li>
+<li><p><strong>get_names</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return the names of the calculated features. Default is True.</p></li>
+<li><p><strong>atom_selector</strong> (<em>str</em><em>, </em><em>optional</em>) – The atom selection string. Default is “name CA”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>distances</strong> – The calculated C-alpha distances. If get_names is True, returns a tuple containing distances and corresponding feature names.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray or Tuple</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates C-alpha distances between pairs of residues.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.featurize_com_dist">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">featurize_com_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'name</span> <span class="pre">==</span> <span class="pre">CA'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.distances.featurize_com_dist" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate center of mass (COM) distances between pairs of residues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – The MDtraj trajectory object.</p></li>
+<li><p><strong>min_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum sequence separation for distance calculations. Default is 2.</p></li>
+<li><p><strong>max_sep</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The maximum sequence separation for distance calculations. Default is None.</p></li>
+<li><p><strong>inverse</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to calculate inverse distances. Default is False.</p></li>
+<li><p><strong>get_names</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return the names of the calculated features. Default is True.</p></li>
+<li><p><strong>atom_selector</strong> (<em>str</em><em>, </em><em>optional</em>) – The atom selection string. Default is “name == CA”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>distances</strong> – The calculated center of mass (COM) distances. If get_names is True, returns a tuple containing distances and corresponding feature names.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray or Tuple</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates center of mass (COM) distances between pairs of residues.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.distances.rmsd">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.distances.</span></span><span class="sig-name descname"><span class="pre">rmsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.featurization.distances.rmsd" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-dpet.featurization.ensemble_level">
+<span id="dpet-featurization-ensemble-level-module"></span><h2>dpet.featurization.ensemble_level module<a class="headerlink" href="#module-dpet.featurization.ensemble_level" title="Permalink to this heading"></a></h2>
+<p>Calculate features at the ensemble level.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.ensemble_level.calc_flory_scaling_exponent">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.ensemble_level.</span></span><span class="sig-name descname"><span class="pre">calc_flory_scaling_exponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.ensemble_level.calc_flory_scaling_exponent" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the apparent Flory scaling exponent in an ensemble. Code adapted
+from:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/KULL-Centre/_2023_Tesei_IDRome">https://github.com/KULL-Centre/_2023_Tesei_IDRome</a></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – Input trajectory object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>resuts</strong> – Tuple containing the nu (Flory scaling exponent), error on nu, R0 and
+error on R0. All values are calculated by fitting the internal scaling
+profiles. For more information see <a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/38297118/">https://pubmed.ncbi.nlm.nih.gov/38297118/</a>
+and <a class="reference external" href="https://pubs.acs.org/doi/full/10.1021/acs.jpcb.3c01619">https://pubs.acs.org/doi/full/10.1021/acs.jpcb.3c01619</a>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.ensemble_level.calc_flory_scaling_exponent_cg">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.ensemble_level.</span></span><span class="sig-name descname"><span class="pre">calc_flory_scaling_exponent_cg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.ensemble_level.calc_flory_scaling_exponent_cg" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the apparent Flory scaling exponent in an ensemble. Code adapted
+from:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/KULL-Centre/_2023_Tesei_IDRome">https://github.com/KULL-Centre/_2023_Tesei_IDRome</a></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>traj</strong> (<em>mdtraj.Trajectory</em>) – Input trajectory object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>resuts</strong> – Tuple containing the nu (Flory scaling exponent), error on nu, R0 and
+error on R0. All values are calculated by fitting the internal scaling
+profiles. For more information see <a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/38297118/">https://pubmed.ncbi.nlm.nih.gov/38297118/</a>
+and <a class="reference external" href="https://pubs.acs.org/doi/full/10.1021/acs.jpcb.3c01619">https://pubs.acs.org/doi/full/10.1021/acs.jpcb.3c01619</a>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-dpet.featurization.glob">
+<span id="dpet-featurization-glob-module"></span><h2>dpet.featurization.glob module<a class="headerlink" href="#module-dpet.featurization.glob" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.glob.compute_asphericity">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.glob.</span></span><span class="sig-name descname"><span class="pre">compute_asphericity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.featurization.glob.compute_asphericity" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.glob.compute_end_to_end_distances">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.glob.</span></span><span class="sig-name descname"><span class="pre">compute_end_to_end_distances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_selector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rg_norm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.featurization.glob.compute_end_to_end_distances" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.glob.compute_ensemble_sasa">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.glob.</span></span><span class="sig-name descname"><span class="pre">compute_ensemble_sasa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.featurization.glob.compute_ensemble_sasa" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.glob.compute_prolateness">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.glob.</span></span><span class="sig-name descname"><span class="pre">compute_prolateness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.featurization.glob.compute_prolateness" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-dpet.featurization.utils">
+<span id="dpet-featurization-utils-module"></span><h2>dpet.featurization.utils module<a class="headerlink" href="#module-dpet.featurization.utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.utils.get_max_sep">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.utils.</span></span><span class="sig-name descname"><span class="pre">get_max_sep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#dpet.featurization.utils.get_max_sep" title="Permalink to this definition"></a></dt>
+<dd><p>Get the maximum separation between indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<em>int</em>) – The size of the matrix.</p></li>
+<li><p><strong>max_sep</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>int</em><em>, </em><em>float</em><em>]</em>) – The maximum separation between indices.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The maximum separation between indices.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function calculates the maximum separation between indices based on the size of the matrix and the provided maximum separation value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.featurization.utils.get_triu_indices">
+<span class="sig-prename descclassname"><span class="pre">dpet.featurization.utils.</span></span><span class="sig-name descname"><span class="pre">get_triu_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.featurization.utils.get_triu_indices" title="Permalink to this definition"></a></dt>
+<dd><p>Get the upper triangle indices of a square matrix with specified minimum and maximum separations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<em>int</em>) – The size of the square matrix.</p></li>
+<li><p><strong>min_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum separation between indices. Default is 1.</p></li>
+<li><p><strong>max_sep</strong> (<em>Union</em><em>[</em><em>None</em><em>, </em><em>int</em><em>, </em><em>float</em><em>]</em><em>, </em><em>optional</em>) – The maximum separation between indices. Default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of lists containing the upper triangle indices of the square matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[list]</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function returns the upper triangle indices of a square matrix with the specified minimum and maximum separations.</p>
+</dd></dl>
+
+</section>
+<section id="module-dpet.featurization">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dpet.featurization" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
