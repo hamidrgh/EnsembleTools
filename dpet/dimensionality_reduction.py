@@ -102,7 +102,7 @@ class TSNEReduction(DimensionalityReduction):
     Parameters
     ----------
     perplexity_vals : List[float], optional
-        List of perplexity values. Default is [10, 20, 50, 100].
+        List of perplexity values. Default is [30].
     metric : str, optional
         Metric to use. Default is "euclidean".
     circular : bool, optional
@@ -116,12 +116,14 @@ class TSNEReduction(DimensionalityReduction):
     """
 
     def __init__(
-            self, perplexity_vals:List[float]=[10, 20, 50, 100], 
+            self,
+            perplexity_vals:List[float]=[30], 
             metric:str="euclidean", 
             circular:bool=False, 
             n_components:int=2, 
-            learning_rate:float=100.0, 
+            learning_rate:float='auto', 
             range_n_clusters:List[int] = range(2,10,1)):
+        
         self.perplexity_vals = perplexity_vals
         self.metric = unit_vector_distance if circular else metric
         self.n_components = n_components
@@ -200,7 +202,7 @@ class UMAPReduction(DimensionalityReduction):
         Range of cluster values to consider for silhouette scoring. Default is range(2, 10, 1).
     """
 
-    def __init__(self, num_dim:int=2, n_neighbors:List[int]=[20, 30, 40], circular= False,min_dist:float=0.1 , metric:str='euclidean', range_n_clusters:List[int] = range(2,10,1)):
+    def __init__(self, num_dim:int=2, n_neighbors:List[int]=[15], circular= False,min_dist:float=0.1 , metric:str='euclidean', range_n_clusters:List[int] = range(2,10,1)):
         self.num_dim = num_dim
         self.n_neighbors = n_neighbors
         self.min_dist = min_dist

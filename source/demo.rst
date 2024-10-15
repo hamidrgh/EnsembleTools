@@ -6,11 +6,9 @@
 Demo
 ==============================================
 
-The present software has been designed to facilitate the study and analysis of intrinsically disordered proteins (IDPs), a critical area of research within molecular biology. These proteins, known for their dynamic and highly variable structure, play a fundamental role in various biological processes and serve as the basis for many diseases.
+We designed the IDPET Python package to facilitate the study and analysis of conformational ensembles of intrinsically disordered proteins. These proteins, known for their dynamic and highly variable structures, play a fundamental role in various biological processes.
 
-To address the complexity of IDP structures, the software implements advanced functions for generating graphs that illustrate structures at both the global and local levels. This approach allows for the exploration of both the general configuration of IDPs and interactions and structures at smaller scales, thus providing a comprehensive and detailed view of their structures.
-
-Furthermore, to effectively manage the large volumes of data associated with these proteins, the software integrates dimensionality reduction analysis. These methods are essential for reducing data size without compromising the contained information, thereby making the analysis more efficient and manageable. Through the application of advanced techniques for dimensionality reduction, the software enables focusing on significant patterns and characteristics of IDP structures, thereby facilitating interpretation and analysis of the results.
+Here, we highlight four different types of analyses that can be performed using IDPET.
 
 
 
@@ -63,12 +61,12 @@ Furthermore, to effectively manage the large volumes of data associated with the
 
    <div class='icon-item'>
     <img src="_static/images/icons/tsne.png" alt="dimensional_reduction" title="Dimensionality reduction analysis focuses on simplifying complex data by reducing the number of independent variables needed to describe a system." onclick="redirectToPage('dimensional_reduction.html')" style="cursor: pointer;width: 200px; height: 200px;">
-    <div style="font-size: 12px; color: #001;">Dimensional Reduction analysis</div>
+    <div style="font-size: 12px; color: #001;">Dimensionality Reduction analysis</div>
    </div>
 
    <div class='icon-item'>
     <img src="_static/images/icons/comp_ensambles.png" alt="comparing_ensamble" title="We have explored techniques for comparing and analyzing datasets, focusing on the calculation of various metrics " onclick="redirectToPage('comparing_ensambles.html')" style="cursor: pointer;width: 200px; height: 200px;">
-    <div style="font-size: 12px; color: #001;">Comparing Ensambles analysis</div>
+    <div style="font-size: 12px; color: #001;">Ensemble Comparison</div>
    </div>
 
 

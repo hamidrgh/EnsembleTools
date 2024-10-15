@@ -1,23 +1,23 @@
-Dimensional Reduction Analysis
+Dimensionality Reduction Analysis
 *********************************
 
-This package also includes an analysis of dimensionality reduction, employing various methods: t-SNE, PCA, DimenFix, and UMAP. 
+This package also includes an analysis of dimensionality reduction, employing various methods: t-SNE, PCA, KernelPCA, and UMAP. 
 Each of these methods offers a different perspective on reducing data dimensions and is used to visualize and better understand the complex structures of proteins, as well as to compare the effectiveness of these methods.
 
-- **t-SNE (t-Distributed Stochastic Neighbor Embedding)**: This method preserves neighborhood relationships among points, allowing for the visualization of high-dimensional data in a two-dimensional or three-dimensional space.
+- **t-SNE (t-Distributed Stochastic Neighbor Embedding)**: t-SNE is a tool to visualize high-dimensional data. It converts similarities between data points to joint probabilities and tries to minimize the Kullback-Leibler divergence between the joint probabilities of the low-dimensional embedding and the high-dimensional data. t-SNE has a cost function that is not convex, i.e. with different initializations we can get different results.
 
-- **PCA (Principal Component Analysis)**: Used to reduce data dimensions by identifying the principal components that explain most of the variance in the data, PCA is a linear method that facilitates the interpretation of the main directions of variation.
+- **PCA (Principal Component Analysis)**: Linear dimensionality reduction using Singular Value Decomposition of the data to project it to a lower dimensional space.
 
-- **Dimenfix**: A method specifically designed for protein analysis, combining various dimensionality reduction techniques to improve the representation of protein conformations.
+- **KernelPCA (Kernel Principal component analysis)**: Non-linear dimensionality reduction through the use of kernels and specifically useful for studying angularity (Periodicity) in data
 
-- **UMAP (Uniform Manifold Approximation and Projection)**: This method aims to preserve the global and local structure of data during dimensionality reduction, proving particularly effective for clustering and visualization applications.
+- **UMAP (Uniform Manifold Approximation and Projection)**: (UMAP) is a dimension reduction technique that can be used for visualisation similarly to t-SNE, but also for general non-linear dimension reduction.
 
-However, initially, feature extraction is crucial because it allows capturing essential aspects of protein structure, which would otherwise be challenging to analyze directly in high-dimensional data. 
-The following features were extracted:
+Initially, feature extraction is crucial because it captures essential aspects of protein structure that would otherwise be difficult to analyze directly in high-dimensional data. In IDPET, two groups of features can be analyzed: **distance-based** features and **angular** features.
 
-- **Alpha Carbons (Cα)**: Alpha carbons are the central carbon atoms of each amino acid in the polypeptide chain of a protein. They are important because they represent the backbone of the protein structure, and their position determines the protein's three-dimensional conformation.
+- Distance-based features in IDPET include the pairwise RMSD matrix between conformations within an ensemble and the Cα-Cα distance matrices.
+- For angular features, IDPET offers to analyze Phi (Φ) and Psi (Ψ) angles, t-Rosetta-style angles (omega and phi), and alpha angles.
 
-- **Phi (Φ) and Psi (Ψ) Angles**: These angles are the dihedral angles describing rotation around bonds between atoms in a protein. The Phi (Φ) angle describes rotation around the bond between the amide nitrogen and the alpha carbon, while the Psi (Ψ) angle describes rotation around the bond between the alpha carbon and the carbonyl carbon. Phi and Psi angles are crucial for determining the protein's secondary structure, such as alpha helices and beta sheets, and significantly influence its overall three-dimensional conformation.
+In the next two parts of this demo we will see how we can use the dimensionality reduction modules of the IDPET: 
 
 .. raw:: html
 
@@ -54,19 +54,31 @@ The following features were extracted:
    </style>
 
    <div class='icons-container'>
+
+
+   <div class='icon-item'>
+    <img src="_static/images/icons/icon_dm.png" alt="dr_cadist" title="dimensional reduction on carbon alpha distances" onclick="redirectToPage('method_overview.html')" style="cursor: pointer; width: 200px; heigh: 200px">
+    <div style="font-size: 12px; color: #001;">Dimensionality reduction methods' overview</div>
+   </div>
+
     <div class='icon-item'>
      <img src="_static/images/icons/dr_phipsi.png" alt="dr_phipsi" title="dimensional reduction phi psi angles" onclick="redirectToPage('dr_phipsi.html')" style="cursor: pointer; width: 200px; height: 200px;">
-     <div style="font-size: 12px; color: #001;">Dimensional Reduction Phi Psi Angles</div>
+     <div style="font-size: 12px; color: #001;">Dimensionality Reduction using angular features</div>
     </div>
 
    <div class='icon-item'>
     <img src="_static/images/icons/dr_ca.png" alt="dr_cadist" title="dimensional reduction on carbon alpha distances" onclick="redirectToPage('dr_cadist.html')" style="cursor: pointer; width: 200px; heigh: 200px">
-    <div style="font-size: 12px; color: #001;">Dimensional Reduction Carbon Alpha Distances</div>
+    <div style="font-size: 12px; color: #001;">Dimensional Reduction using distance-based features</div>
    </div>
+
+
+
    
 .. toctree::
    :hidden:
 
    dr_phipsi
-
+   method_overview
    dr_cadist
+
+   
