@@ -37,9 +37,14 @@ def featurize_phi_psi(traj: mdtraj.Trajectory, get_names: bool = True, ravel: bo
 
     phi_ids, phi = mdtraj.compute_phi(traj)
     psi_ids, psi = mdtraj.compute_psi(traj)
-    if ravel:  # Will return a (N, (L-1)*2) array.
+    phi = phi[:,:-1]
+    psi = psi[:,1: ]
+    phi_ids = phi_ids[:-1]
+    psi_ids = psi_ids[1: ]
+
+    if ravel:  # Will return a (N, (L-2)*2) array.
         phi_psi = np.concatenate([phi, psi], axis=1)
-    else:  # Will return a (N, L-1, 2) array.
+    else:  # Will return a (N, L-2, 2) array.
         phi_psi = np.concatenate([phi[...,None], psi[...,None]], axis=-1)
 
     if get_names:

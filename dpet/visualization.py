@@ -11,7 +11,7 @@ from dpet.ensemble_analysis import EnsembleAnalysis
 from dpet.featurization.angles import featurize_a_angle
 from dpet.data.coord import *
 from dpet.featurization.glob import compute_asphericity, compute_prolateness
-from dpet.comparison import confidence_interval
+from dpet.comparison import scores_data, process_all_vs_all_output
 import plotly.express as px
 import pandas as pd
 PLOT_DIR = "plots"
@@ -230,45 +230,18 @@ def plot_comparison_matrix(
     with the ensemble labels.
 
     """
-    if not isinstance(comparison_out, dict):
-        raise TypeError()
-    if len(comparison_out) == 1:
-        if "scores" not in comparison_out:
-            raise KeyError()
-        mode = "single"
-        scores_mean = comparison_out["scores"][:,:,0]
-    elif len(comparison_out) == 2:
-        if "scores" not in comparison_out:
-            raise KeyError()
-        if "p_values" not in comparison_out:
-            raise KeyError()
-        mode = "bootstrap"
-        scores_mean = comparison_out["scores"].mean(axis=2)
-        conf_intervals = np.zeros((scores_mean.shape[0], scores_mean.shape[1], 2))
-        p_values = comparison_out["p_values"]
-        for i in range(conf_intervals.shape[0]):
-            for j in range(conf_intervals.shape[1]):
-                if i > j:
-                    continue
-                c_ij = confidence_interval(
-                    comparison_out["scores"][i, j],
-                    confidence_level=confidence_level
-                )
-                conf_intervals[i, j][0] = c_ij[0]
-                conf_intervals[i, j][1] = c_ij[1]
-                conf_intervals[j, i][0] = c_ij[0]
-                conf_intervals[j, i][1] = c_ij[1]
-        comparison_out["confidence_intervals"] = conf_intervals
-        p_values = comparison_out["p_values"]
-    else:
-        raise KeyError()
+    
+    comparison_out = process_all_vs_all_output(
+        comparison_out=comparison_out, confidence_level=confidence_level
+    )
+    scores_mean = comparison_out['scores_mean']
 
     ax.set_title(title)
     im = ax.imshow(scores_mean, cmap=cmap)
     plt.colorbar(im, label=cbar_label)
     ax.set_xticks(np.arange(len(codes)))
     ax.set_yticks(np.arange(len(codes)))
-    ax.set_xticklabels(codes, rotation=45)
+    ax.set_xticklabels(codes, rotation=45, ha='right', rotation_mode='anchor')
     ax.set_yticklabels(codes)
 
     threshold = 0.75
@@ -277,16 +250,19 @@ def plot_comparison_matrix(
             if isinstance(textcolors, str):
                 color_ij = textcolors
             else:
-                color_ij = textcolors[int(im.norm(scores_mean[i, j]) > threshold)]
+                text_idx = int(im.norm(scores_mean[i, j]) > threshold)
+                color_ij = textcolors[text_idx]
             kw = {"color": color_ij}
-            if mode == "single":
+            if comparison_out["mode"] == "single":
                 label_ij = f"{scores_mean[i, j]:.2f}"
                 if i == j:
                     label_ij = "-"
                 size = 10
-            elif mode == "bootstrap":
-                label_ij = f"[{conf_intervals[i, j][0]:.3f}, \n {conf_intervals[i, j][1]:.3f}]"
-                if i != j and p_values[i, j] < significance_level:
+            elif comparison_out["mode"] == "bootstrap":
+                _low_ij = comparison_out['confidence_intervals'][i, j][0]
+                _high_ij = comparison_out['confidence_intervals'][i, j][1]
+                label_ij = f"[{_low_ij:.3f}, \n {_high_ij:.3f}]"
+                if i != j and comparison_out['p_values'][i, j] < significance_level:
                     label_ij += "*"
                 size = 8
             else:
@@ -321,13 +297,15 @@ def _to_array(x):
 
 _phi_psi_offsets = {"phi": 1, "psi": 0}
 
-def _get_max_hist(min_len, feature):
+def _get_max_plots_in_grid(min_len, feature):
     if feature == "ca_dist":
         return min_len*(min_len-1)/2
     elif feature == "a_angle":
         return min_len-3
     elif feature in ("phi", "psi"):
         return min_len-1
+    elif feature in ("rama"):
+        return min_len-2
     else:
         raise KeyError(feature)
 
@@ -2545,6 +2523,17 @@ class Visualization:
 
         return axes
 
+    def _check_grid_input(self):
+        ensembles = self.analysis.ensembles
+        ens_lens = set([e.get_num_residues() for e in ensembles])
+        if len(ens_lens) != 1:
+            # May remove the limit in the future.
+            raise ValueError(
+                "Cannot build an histogram grid with proteins of different lengths"
+            )
+        min_len = min(ens_lens)  # Get the minimum number of residues.
+        return min_len
+
     def plot_histogram_grid(self,
             feature: str = "ca_dist",
             ids: Union[np.ndarray, List[list]] = None,
@@ -2599,17 +2588,11 @@ class Visualization:
         
         ### Check the ensembles.
         ensembles = self.analysis.ensembles
-        ens_lens = set([e.get_num_residues() for e in ensembles])
-        if len(ens_lens) != 1:
-            # May remove the limit in the future.
-            raise ValueError(
-                "Cannot build an histogram grid with proteins of different lengths"
-            )
-        min_len = min(ens_lens)  # Get the minimum number of residues.
+        min_len = self._check_grid_input()
         
         ### Select the features to analyze.
         n_hist = n_rows*n_cols
-        if _get_max_hist(min_len, feature) < n_hist:
+        if _get_max_plots_in_grid(min_len, feature) < n_hist:
             raise ValueError(f"Not enough residues to plot {n_hist} {feature} histograms")
         if ids is not None and n_hist != len(ids):
             raise ValueError(
@@ -2658,7 +2641,7 @@ class Visualization:
                         f"Invalid shape for residue ids for {feature} angles, received"
                         f" {tuple(rand_ids.shape)} expected (*, )"
                     )
-                if np.max(rand_ids) + 1 > min_len - (1 - _phi_psi_offsets[feature]):
+                if np.max(rand_ids) > min_len - _phi_psi_offsets[feature]:
                     raise ValueError(
                         f"Maximum residue idx ({max(rand_ids)}) exceeds the number of"
                         f" plottable {feature} angles for proteins with {min_len} residues"
@@ -2777,10 +2760,170 @@ class Visualization:
         )
         
         return ax
-    
+
+
+    def plot_rama_grid(self,
+            ids: Union[np.ndarray, List[list]] = None,
+            n_rows: int = 2,
+            n_cols: int = 3,
+            subplot_width: int = 2.0,
+            subplot_height: int = 2.2,
+            dpi: int = 90
+        ) -> plt.Axes:
+        """
+        Plot a grid if Ramachandran plots for different residues. Can only be
+        be used when analyzing ensembles of proteins with same number of
+        residues. The function will create a new matplotlib figure for the
+        scatter plot grid.
+
+        Parameters
+        ----------
+        ids: Union[list, List[list]], optional
+            Residue indices (integers starting from zero) to define the residues
+            to analyze. For angular features it must be a 1d list with N indices
+            of the residues. Each of the N indices will be plotted in an scatter
+            plot in the grid. If this argument is not provided, random indices
+            will be sampled, which is useful for quickly comparing features of
+            multiple ensembles.
+        n_rows: int, optional
+            Number of rows in the scatter grid.
+        n_cols: int, optional
+            Number of columns in the scatter grid.
+        subplot_width: int, optional
+            Use to specify the Matplotlib width of the figure. The size of the
+            figure will be calculated as: figsize = (n_cols*subplot_width, n_rows*subplot_height).
+        subplot_height: int, optional
+            See the subplot_width argument.
+        dpi: int, optional
+            DPI of the figure.
+
+        Returns
+        -------
+        ax: plt.Axes
+            The Axes object for the scatter plot grid.
+        """
+        
+        ### Check the ensembles.
+        ensembles = self.analysis.ensembles
+        min_len = self._check_grid_input()
+        if self.analysis.exists_coarse_grained():
+            raise ValueError("This analysis is not possible with coarse-grained models.")
+        
+        ### Select the features to analyze.
+        n_plots = n_rows*n_cols
+        if _get_max_plots_in_grid(min_len, "rama") < n_plots:
+            raise ValueError(
+                f"Not enough residues to make {n_plots} Ramachandran plots"
+            )
+        if ids is not None and n_plots != len(ids):
+            raise ValueError(
+                f"The number of provided ids ({len(ids)}) is incompatible with"
+                f" the number of scatter plots ({n_plots})")
+        if any([e.coarse_grained for e in ensembles]):
+            raise ValueError(
+                f"Cannot analyze rama angles when a coarse-grained"
+                " ensemble is loaded."
+            )
+        if ids is not None:
+            rand_ids = _to_array(ids)
+            if len(rand_ids.shape) != 1:
+                raise ValueError(
+                    f"Invalid shape for residue ids for Ramachandran plots,"
+                    f" received {tuple(rand_ids.shape)} expected (*, )"
+                )
+            if np.max(rand_ids) > min_len - 2:
+                raise ValueError(
+                    f"Maximum residue idx ({max(rand_ids)}) exceeds the number of"
+                    f" plottable rama angles for proteins with {min_len} residues"
+                )
+            if 0 in rand_ids:
+                raise ValueError(f"Cannot use residue idx 0 with phi angles")
+        else:
+            rand_ids = np.random.choice(min_len - 2, n_plots, replace=False) + 1
+            
+        if np.any(rand_ids < 0):
+            raise ValueError("Can only use residue indices >= 0")
+
+        ### Calculate features.
+        plot_data = []
+        for ensemble in ensembles:
+            # We end up with L-2 Ramachandran plots. We slice on axis=1
+            # to pair phi and psi angles of the same residues.
+            data_k = ensemble.get_features("phi_psi", ravel=False)
+            # Here we use -1 because phi-psi pairs start from the second
+            # residue.
+            data_k = data_k[:,rand_ids - 1,:]
+            plot_data.append(data_k)
+        
+        ### Initialize the plot.
+        # Initialize the figure.
+        figsize = (n_cols*subplot_width, n_rows*subplot_height)
+        fig = plt.figure(
+            figsize=figsize,
+            dpi=dpi,
+            layout="constrained"
+        )
+        # Initialize the subplots.
+        ax = fig.subplots(n_rows, n_cols, squeeze=False)
+        # Figure elements.
+        x_label = "phi [rad]"
+        y_label = "psi [rad]"
+        title = f"Ramachandran plots"
+        fig.suptitle(title)
+        
+        ### Plot the histograms.
+        row_c = 0
+        col_c = 0
+        # hist_args = {"histtype": "step", "density": True}
+        hist_args = {}
+        labels = [e.code for e in ensembles]
+        for m in range(n_plots):
+            
+            # Define variables to build the histograms.
+            ax[row_c][col_c].set_xlim(-np.pi, np.pi)
+            ax[row_c][col_c].set_ylim(-np.pi, np.pi)
+            text = rf"Residue {rand_ids[m]}"
+                
+            # Histogram.
+            for k in range(len(ensembles)):
+                data_km = plot_data[k][:,m]
+                ax[row_c][col_c].scatter(
+                    data_km[:,0],
+                    data_km[:,1],
+                    label=ensembles[k].code if (row_c == 0 and col_c == 0) else None,
+                    marker=".",
+                    **hist_args
+                )
+                
+            # Labels and titles.
+            default_font_size = plt.rcParams['font.size']
+            ax[row_c][col_c].set_title(text, fontsize=default_font_size)
+
+            if col_c == 0:
+                ax[row_c][col_c].set_ylabel(y_label)
+            if row_c + 1 == n_rows:
+                ax[row_c][col_c].set_xlabel(x_label)
+                
+            # Increase row and column counters.
+            col_c += 1
+            if col_c == n_cols:
+                row_c += 1
+                col_c = 0
+
+        # Legend.
+        handles, labels = ax[0, 0].get_legend_handles_labels()
+        fig.legend(
+            handles, labels,
+            loc='upper left',
+            bbox_to_anchor=(1.02, 1),
+            bbox_transform=ax[0, n_cols-1].transAxes
+        )
+        
+        return ax
+
+
     def comparison_matrix(self,
             score: str,
-            feature: str,
             featurization_params: dict = {},
             bootstrap_iters: int = None,
             bootstrap_frac: float = 1.0,
@@ -2805,7 +2948,7 @@ class Visualization:
 
         Parameters:
         -----------
-        score, feature, featurization_params, bootstrap_iters, bootstrap_frac,
+        score, featurization_params, bootstrap_iters, bootstrap_frac,
         bootstrap_replace, bins, random_seed, verbose:
             See the documentation of `EnsembleAnalysis.comparison_scores` for
             more information about these arguments.
@@ -2841,10 +2984,16 @@ class Visualization:
 
         """
 
+        ### Check input.
+        if score == "ramaJSD" and self.analysis.exists_coarse_grained():
+            raise ValueError("This analysis is not possible with coarse-grained models.")
+
         ### Score divergences.
-        comparison_out, codes = self.analysis.comparison_scores(
+        score_type, feature = scores_data[score]
+
+        codes = [e.code for e in self.analysis.ensembles]
+        comparison_out = self.analysis.comparison_scores(
             score=score,
-            feature=feature,
             featurization_params=featurization_params,
             bootstrap_iters=bootstrap_iters,
             bootstrap_frac=bootstrap_frac,
@@ -2862,20 +3011,20 @@ class Visualization:
             fig = None
         # Title.
         if title is None:
-            if score == "emd":
-                title = f"{score.upper()} based on {feature}"
-            elif score == "jsd":
+            if score_type == "jsd":
                 if feature == "ca_dist":
-                    title = "aJSD_d"
+                    title = "adaJSD"
                 elif feature == "alpha_angle":
-                    title = "aJSD_t"
+                    title = "ataJSD"
+                elif feature == "rama":
+                    title = "ramaJSD"
                 else:
-                    title = f"{score.upper()} based on {feature}"
+                    title = f"{score_type.upper()} based on {feature}"
             else:
-                raise ValueError(score)
+                raise ValueError(score_type)
         # Colorbar label.
         if cbar_label is None:
-            cbar_label = f"{score.upper()} score"
+            cbar_label = f"{score_type.upper()} score"
 
         ### Actually plots.
         plot_comparison_matrix(
