@@ -22,6 +22,7 @@ Welcome to IDPET's documentation!
    ensemble_analysis
    ensemble
    visualization
+   comparison
 
 .. automodule:: dpet
    :members:

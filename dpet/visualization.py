@@ -2221,11 +2221,13 @@ class Visualization:
                 ax = [ax]
             rama_linspace = np.linspace(linespaces[0], linespaces[1], linespaces[2])
             for ens, axis in zip(ensembles, ax):
-                phi_flat = np.degrees(mdtraj.compute_phi(ens.trajectory)[1]).ravel()
-                psi_flat = np.degrees(mdtraj.compute_psi(ens.trajectory)[1]).ravel()
+                phi_flat = np.degrees(mdtraj.compute_phi(ens.trajectory)[1])[:,:-1]
+                psi_flat = np.degrees(mdtraj.compute_psi(ens.trajectory)[1])[:,1: ]
+
+
                 hist = axis.hist2d(
-                    phi_flat,
-                    psi_flat,
+                    phi_flat.ravel(),
+                    psi_flat.ravel(),
                     cmap="viridis",
                     bins=(rama_linspace, rama_linspace), 
                     norm=colors.LogNorm(),

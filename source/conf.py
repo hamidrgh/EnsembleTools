@@ -23,6 +23,7 @@ extensions = [
     'sphinx.ext.autodoc',    # Enables autodoc
     'sphinx.ext.napoleon',   # Enables Google-style and NumPy-style docstrings
     'sphinx_rtd_theme',      # Read the Docs theme
+    'sphinx.ext.mathjax'
 ]
 
 templates_path = ['_templates']
