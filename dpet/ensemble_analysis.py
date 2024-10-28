@@ -4,7 +4,6 @@ from typing import Dict, List, Optional, Union, Tuple
 import zipfile
 from dpet.featurization.distances import rmsd
 import pandas as pd
-from scipy.stats import mannwhitneyu
 from dpet.data.api_client import APIClient
 from dpet.ensemble import Ensemble
 from dpet.data.extract_tar_gz import extract_tar_gz
@@ -14,9 +13,8 @@ import numpy as np
 from dpet.dimensionality_reduction import DimensionalityReductionFactory
 from dpet.featurization.ensemble_level import ensemble_features
 import itertools
-from dpet.comparison import (
-    score_avg_jsd, score_emd_approximation, get_num_comparison_bins
-)
+from dpet.comparison import all_vs_all_comparison
+
 
 class EnsembleAnalysis:
     """
@@ -604,7 +602,6 @@ class EnsembleAnalysis:
     def comparison_scores(
             self,
             score: str,
-            feature: str,
             featurization_params: dict = {},
             bootstrap_iters: int = None,
             bootstrap_frac: float = 1.0,
@@ -615,276 +612,17 @@ class EnsembleAnalysis:
         ) -> Tuple[np.ndarray, List[str]]:
         """
         Compare all pair of ensembles using divergence/distance scores.
-        Implemented scores are approximate average Jensen–Shannon divergence
-        (JSD) [https://doi.org/10.1371/journal.pcbi.1012144], and approximate
-        Earth Mover's Distance (EMD) [https://doi.org/10.1038/s41467-023-36443-x]
-        over several kinds of molecular features. The lower these scores are,
-        the higher the similarity between the probability distribution of the
-        features of the ensembles.
-
-        Parameters
-        ----------
-        score: str
-            Type of score used to compare ensembles. Choices: `jsd` (average
-            Jensen–Shannon divergence) and `emd` (Earth Mover's Distance).
-        feature: str
-            Type of feature to analyze. Choices: `ca_dist` for all sets of Ca-Ca
-            distances between non-neighboring residues and `alpha_angle` for 
-            all torsion angles between four consecutive Ca atoms in a chain.
-        featurization_params: dict, optional
-            Optional dictionary to customize the featurization process for the
-            above features.
-        bootstrap_iters: int, optional
-            Number of bootstrap iterations. By default its value is None. In
-            this case, IDPET will directly compare each pair of ensemble $i$ and
-            $j$ by using all of their conformers and perform the comparison only
-            once. On the other hand, if providing an integer value to this
-            argument, each pair of ensembles $i$ and $j$ will be compared
-            `bootstrap_iters` times by randomly selecting (bootstrapping)
-            conformations from them. Additionally, each ensemble will be
-            auto-compared with itself by subsampling conformers via
-            bootstrapping. Then IDPET will perform a statistical test to
-            establish if the inter-ensemble ($i != j$) scores are significantly
-            different from the intra-ensemble ($i == j$) scores. The tests work
-            as follows: for each ensemble pair $i != j$ IDPET will get their
-            inter-ensemble comparison scores obtained in bootstrapping. Then, it
-            will get the bootstrapping scores from auto-comparisons of ensemble
-            $i$ and $j$ and the scores with the higher mean here are selected as
-            reference intra-ensemble scores. Finally, the inter-ensemble and
-            intra-ensemble scores are compared via a one-sided Mann-Whitney U
-            test with the alternative hypothesis being: inter-ensemble scores
-            are stochastically greater than intra-ensemble scores. The p-values
-            obtained in these tests will additionally be returned. For small
-            protein structural ensembles (less than 500 conformations) most
-            comparison scores in IDPET are not robust estimators of
-            divergence/distance. By performing bootstrapping, you can have an
-            idea of how the size of your ensembles impacts the comparison. Use
-            values >= 50 when comparing ensembles with very few conformations
-            (less than 100). When comparing large ensembles (more than
-            1,000-5,000 conformations) you can safely avoid bootstrapping.
-        bootstrap_frac: float, optional
-            Fraction of the total conformations to sample when bootstrapping.
-            Default value is 1.0, which results in bootstrap samples with the
-            same number of conformations of the original ensemble.
-        bootstrap_replace: bool, optional
-            If `True`, bootstrap will sample with replacement. Default is `True`.
-        bins: Union[int, str], optional
-            Number of bins or bin assignment rule for JSD comparisons. See the
-            documentation of `dpet.comparison.get_num_comparison_bins` for
-            more information.
-        random_seed: int, optional
-            Random seed used when performing bootstrapping.
-        verbose: bool, optional
-            If `True`, some information about the comparisons will be printed to
-            stdout.
-
-        Returns
-        -------
-        results: Tuple[dict, List[str]]
-            A tuple containing:
-                `comparison_output`: a dictionary containing the following
-                key-value pairs:
-                    `scores`: a (M, M, B) NumPy array storing the comparison
-                        scores, where M is the number of ensembles being
-                        compared and B is the number of bootstrap iterations (B
-                        will be 1 if bootstrapping was not performed).
-                    `p_values`: a (M, M) NumPy array storing the p-values
-                        obtained in the statistical test performed when using
-                        a bootstrapping strategy (see the `bootstrap_iters`)
-                        method. Returned only when performing a bootstrapping
-                        strategy.
-                `codes`: a list of M strings, containing the codes of the
-                    ensembles that were compared.
+        See `dpet.comparison.all_vs_all_comparison` for more information.
         """
 
-        allowed_scores = {
-            "jsd": ["ca_dist", "alpha_angle"],
-            "emd": ["ca_dist", "alpha_angle"]
-        }
-        
-        ### Check arguments.
-        if score == "jsd":
-            score_func = score_avg_jsd
-        elif score == "emd":
-            score_func = score_emd_approximation
-        else:
-            raise ValueError(
-                "The type of similarity score should be selected among:"
-                f" {list(allowed_scores.keys())}"
-            )
-        if not feature in allowed_scores[score]:
-            raise ValueError(
-                f"The '{score}' score must be calculated based on the"
-                f" following features: {allowed_scores[score]}"
-            )
-
-        min_bootstrap_iters = 2
-        if isinstance(bootstrap_iters, int):
-            if bootstrap_iters < min_bootstrap_iters:
-                raise ValueError(
-                    "Need at leasts {min_bootstrap_iters} bootstrap_iters"
-                )
-            comparison_iters = bootstrap_iters
-        elif bootstrap_iters is None:
-            comparison_iters = 1
-        else:
-            raise TypeError(bootstrap_iters)
-
-        if not 0 <= bootstrap_frac <= 1:
-            raise ValueError(f"Invalid bootstrap_frac: {bootstrap_frac}")
-
-        ### Check the ensembles.
-        num_residues = set([e.get_num_residues() for e in self.ensembles])
-        if len(num_residues) != 1:
-            raise ValueError(
-                "Can only compare ensembles with the same number of residues."
-                " Ensembles in this analysis have different number of residues."
-            )
-        
-        ### Define the random seed.
-        if random_seed is not None:
-            rng = np.random.default_rng(random_seed)
-            rand_func = rng.choice
-        else:
-            rand_func = np.random.choice
-
-        ### Featurize (run it here to avoid re-calculating at every comparison).
-        features = []
-        # Compute features.
-        for ensemble_i in self.ensembles:
-            if feature == "ca_dist":
-                feats_i = ensemble_i.get_features(
-                    normalize=False,
-                    featurization="ca_dist",
-                    min_sep=featurization_params.get("min_sep", 2),
-                    max_sep=featurization_params.get("max_sep"),
-                )
-            elif feature == "alpha_angle":
-                feats_i = ensemble_i.get_features(featurization="a_angle", normalize=False)
-            else:
-                raise ValueError(f"Invalid feature for comparison: {feature}")
-            features.append(feats_i)
-        
-        ### Setup the comparisons.
-        if verbose:
-            print(f"# Scoring '{score}' using features '{feature}'")
-        codes = [e.code for e in self.ensembles]
-        n = len(codes)
-
-        # Define the parameters for the evaluation.
-        if score == "jsd":
-            # Apply the same bin number to every comparison, based on the number
-            # of conformers in the smallest ensemble.
-            num_bins = get_num_comparison_bins(bins, x=features)
-            scoring_params = {"bins": num_bins}
-            if verbose:
-                print(f"- Number of bins for all comparisons: {num_bins}")
-        elif score == "emd":
-            if feature in ("alpha_angle", ):  # Angular features.
-                scoring_params = {"metric": "angular_l2"}
-            else:  # Euclidean features.
-                scoring_params = {"metric": "rmsd"}
-            if verbose:
-                print(f"- Distance function for comparing: {scoring_params['metric']}")
-        else:
-            raise ValueError(score)
-
-        # Initialize a (n, n, *) matrices for storing the comparison scores.
-        score_matrix = np.zeros((n, n, comparison_iters))
-        
-         # Get the pairs to compare.
-        pairs_to_compare = []
-        for i, code_i in enumerate(codes):
-            for j, code_j in enumerate(codes):
-                if j > i:
-                    pairs_to_compare.append((i, j))
-                elif i == j and comparison_iters > 1:
-                    pairs_to_compare.append((i, j))
-        
-        # Get the total number of comparisons to perform.
-        if comparison_iters > 1:
-            permutation_scores = np.zeros((n, n, comparison_iters))
-            tot_comparisons = (len(pairs_to_compare) + len(pairs_to_compare))*comparison_iters
-        else:
-            tot_comparisons = len(pairs_to_compare)
-        if verbose:
-            print(
-                f"- We have {len(pairs_to_compare)} pairs of ensembles"
-                f" and will perform a total of {tot_comparisons} comparisons."
-            )
-
-        ### Perform the comparisons.
-
-        ## Use all conformers, repeat only once.
-        if comparison_iters == 1:
-            
-            for i, j in pairs_to_compare:
-                # Score.
-                score_ij = score_func(
-                    features[i], features[j], **scoring_params
-                )
-                # Store the results.
-                score_matrix[i, j, 0] = score_ij
-                score_matrix[j, i, 0] = score_ij
-
-        ## Bootstrap analysis, compare ensembles multiple times by subsampling.
-        else:
-            
-            for i, j in pairs_to_compare:
-
-                for k in range(comparison_iters):
-
-                    # Features for ensemble i.
-                    n_i = features[i].shape[0]
-                    rand_ids_ik = rand_func(
-                        n_i,
-                        max(int(n_i*bootstrap_frac), 1),
-                        replace=bootstrap_replace
-                    )
-                    features_ik = features[i][rand_ids_ik]
-                    # Features for ensemble j.
-                    n_j = features[j].shape[0]
-                    rand_ids_jk = rand_func(
-                        n_j,
-                        max(int(n_j*bootstrap_frac), 1),
-                        replace=bootstrap_replace
-                    )
-                    features_jk = features[j][rand_ids_jk]
-                    # Score.
-                    score_ijk = score_func(
-                        features_ik, features_jk, **scoring_params
-                    )
-                    # Store the results.
-                    score_matrix[i, j, k] = score_ijk
-                    score_matrix[j, i, k] = score_ijk
-
-
-        ### Prepare the output.
-        output = {"scores": score_matrix}
-        if comparison_iters > 1:
-            # Perform mannwhitneyu test to check if inter-ensembles scores are
-            # different in a statistically significant way from intra-ensemble
-            # scores.
-            p_values = np.zeros((n, n, ))
-            for i in range(n):
-                for j in range(n):
-                    if i >= j:
-                        continue
-                    scores_i = score_matrix[i, i]
-                    scores_j = score_matrix[j, j]
-                    # Get the higher intra-ensemble scores between ensemble
-                    # i and j.
-                    scores_ref = scores_i if scores_i.mean() > scores_j.mean() \
-                                          else scores_j
-                    # Run the statistical test.
-                    u_ij = mannwhitneyu(
-                        x=score_matrix[i, j],
-                        y=scores_ref,
-                        alternative='greater'
-                    )
-                    # Store p-values.
-                    p_values[i, j] = u_ij[1]
-                    p_values[j, i] = u_ij[1]
-            output["p_values"] = p_values
-
-        return output, codes
+        return all_vs_all_comparison(
+            ensembles=self.ensembles,
+            score=score,
+            featurization_params=featurization_params,
+            bootstrap_iters=bootstrap_iters,
+            bootstrap_frac=bootstrap_frac,
+            bootstrap_replace=bootstrap_replace,
+            bins=bins,
+            random_seed=random_seed,
+            verbose=verbose,
+        )

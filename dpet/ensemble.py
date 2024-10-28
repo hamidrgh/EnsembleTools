@@ -137,9 +137,8 @@ class Ensemble():
         self._select_residues()
         
     def _check_coarse_grained(self):
-        topology = self.trajectory.topology
-        atoms = topology.atoms
-        self.coarse_grained = all(atom.element.symbol == 'C' for atom in atoms)
+        residues = self.trajectory.topology.residues
+        self.coarse_grained = all(len(list(res.atoms)) == 1 for res in residues)
         self.atom_selector = "all" if self.coarse_grained else "name == CA"
 
     def random_sample_trajectory(self, sample_size: int):
