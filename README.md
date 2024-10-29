@@ -27,9 +27,9 @@ For details, you can check our user-centric documentation , **put the link to th
 - Using pip:
 Using python package managment systme "pip" you can easily install IDPensembleTools (and its dependencies if needed), upgrade or uninstall with just one terminal command. 
 
-`pip install dpet (Not sure about the names)`<br>
-`pip install --upgrade dpet`<br>
-`pip uninstall dpet`
+`pip install idpet`<br>
+`pip install --upgrade idpet`<br>
+`pip uninstall idpet`
 
 - From source:
   
@@ -38,9 +38,6 @@ git clone https://github.com/hamidrgh/EnsembleTools.git
 cd EnsembleTools
 python setup.py install
 ```
-- Using Conda:
-
-The instruction on how to use conda for the installation should be put here. 
 
 ## Python Requirements and Dependencies
 
