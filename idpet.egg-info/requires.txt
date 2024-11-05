@@ -1,9 +1,0 @@
-numpy>=1.15.4
-pandas
-mdtraj
-matplotlib
-scipy
-scikit-learn
-umap-learn
-requests
-numba
