@@ -436,7 +436,7 @@ class Visualization:
         # Manage legend for the original labels
         legend_labels = list(label_colors.keys())
         legend_handles = [plt.Line2D([0], [0], marker='o', color=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right', bbox_to_anchor=(1.09, 1.00))
 
         fig.tight_layout()
 
@@ -585,7 +585,7 @@ class Visualization:
         # Manage legend for original labels
         legend_labels = list(label_colors.keys())
         legend_handles = [Line2D([0], [0], marker='o', color='w', markerfacecolor=label_colors[label], markersize=10) for label in legend_labels]
-        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right')
+        fig.legend(legend_handles, legend_labels, title='Original Labels', loc='upper right', bbox_to_anchor=(1, 0.5))
 
         if kde_by_ensemble:
             # KDE plot for each ensemble
