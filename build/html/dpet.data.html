@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dpet.data package &mdash; IDPET 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            IDPET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">ensemble_compariosn</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDPET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">dpet.data package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dpet.data.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dpet-data-package">
+<h1>dpet.data package<a class="headerlink" href="#dpet-data-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-dpet.data.api_client">
+<span id="dpet-data-api-client-module"></span><h2>dpet.data.api_client module<a class="headerlink" href="#module-dpet.data.api_client" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dpet.data.api_client.APIClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.data.api_client.</span></span><span class="sig-name descname"><span class="pre">APIClient</span></span><a class="headerlink" href="#dpet.data.api_client.APIClient" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.data.api_client.APIClient.close_session">
+<span class="sig-name descname"><span class="pre">close_session</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.api_client.APIClient.close_session" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.data.api_client.APIClient.download_response_content">
+<span class="sig-name descname"><span class="pre">download_response_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.api_client.APIClient.download_response_content" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.data.api_client.APIClient.perform_get_request">
+<span class="sig-name descname"><span class="pre">perform_get_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.api_client.APIClient.perform_get_request" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dpet.data.coord">
+<span id="dpet-data-coord-module"></span><h2>dpet.data.coord module<a class="headerlink" href="#module-dpet.data.coord" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.calc_chain_dihedrals">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">calc_chain_dihedrals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.coord.calc_chain_dihedrals" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.contact_probability_map">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">contact_probability_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheme</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ca'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.coord.contact_probability_map" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.create_consecutive_indices_matrix">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">create_consecutive_indices_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ca_indices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.coord.create_consecutive_indices_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>This function gets the CA indices of (L,) shape and
+create all possible 4 consecutive indices with the shape (L-3, 4)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.dict_phi_psi_normal_cases">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">dict_phi_psi_normal_cases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_phi_psi</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.coord.dict_phi_psi_normal_cases" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.get_contact_map">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">get_contact_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dmap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pseudo_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.coord.get_contact_map" title="Permalink to this definition"></a></dt>
+<dd><p>Gets a trajectory of distance maps with shape (N, L, L) and
+returns a (L, L) contact probability map.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.get_distance_matrix">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">get_distance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xyz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.coord.get_distance_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Gets an ensemble of xyz conformations with shape (N, L, 3) and
+returns the corresponding distance matrices with shape (N, L, L).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.site_specific_order_parameter">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">site_specific_order_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ca_xyz_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#dpet.data.coord.site_specific_order_parameter" title="Permalink to this definition"></a></dt>
+<dd><p>Computes site-specific order parameters for a set of protein conformations.
+:param ca_xyz_dict: A dictionary where keys represent unique identifiers for proteins,
+:type ca_xyz_dict: dict
+:param and values are 3D arrays containing the coordinates of alpha-carbon:
+:type and values are 3D arrays containing the coordinates of alpha-carbon: CA</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary where keys are the same protein identifiers provided in <cite>ca_xyz_dict</cite>,
+and values are one-dimensional arrays containing the site-specific order parameters computed for each residue of the protein.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.split_dictionary_phipsiangles">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">split_dictionary_phipsiangles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.coord.split_dictionary_phipsiangles" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.coord.ss_measure_disorder">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.coord.</span></span><span class="sig-name descname"><span class="pre">ss_measure_disorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.coord.ss_measure_disorder" title="Permalink to this definition"></a></dt>
+<dd><p>This function accepts the dictionary of phi-psi arrays
+which is saved in featurized_data attribute and as an output provide
+flexibility parameter for each residue in the ensemble
+Note: this function only works on phi/psi feature</p>
+</dd></dl>
+
+</section>
+<section id="module-dpet.data.extract_tar_gz">
+<span id="dpet-data-extract-tar-gz-module"></span><h2>dpet.data.extract_tar_gz module<a class="headerlink" href="#module-dpet.data.extract_tar_gz" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.extract_tar_gz.extract_tar_gz">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.extract_tar_gz.</span></span><span class="sig-name descname"><span class="pre">extract_tar_gz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tar_gz_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.data.extract_tar_gz.extract_tar_gz" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-dpet.data.topology">
+<span id="dpet-data-topology-module"></span><h2>dpet.data.topology module<a class="headerlink" href="#module-dpet.data.topology" title="Permalink to this heading"></a></h2>
+<p>Work with topologies of protein systems.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.topology.get_ca_topology">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.topology.</span></span><span class="sig-name descname"><span class="pre">get_ca_topology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bead_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'CA'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Topology</span></span></span><a class="headerlink" href="#dpet.data.topology.get_ca_topology" title="Permalink to this definition"></a></dt>
+<dd><p>input: amino acid sequence.
+output: a mdtraj topology with one bead per residue.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.data.topology.slice_traj_to_com">
+<span class="sig-prename descclassname"><span class="pre">dpet.data.topology.</span></span><span class="sig-name descname"><span class="pre">slice_traj_to_com</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trajectory</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Trajectory</span></span></span><a class="headerlink" href="#dpet.data.topology.slice_traj_to_com" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-dpet.data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dpet.data" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
