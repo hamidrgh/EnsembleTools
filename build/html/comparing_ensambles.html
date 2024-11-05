@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparing Ensambles &mdash; IDPET 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ensemble_analysis" href="ensemble_analysis.html" />
+    <link rel="prev" title="Dimensionality reduction based on distance-based features" href="dr_cadist.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            IDPET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="demo.html">Demo</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Global_analysis.html">Global analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="local_analysis.html">Local analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dimensional_reduction.html">Dimensionality Reduction Analysis</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Comparing Ensambles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#adajsd">adaJSD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#atajsd">ataJSD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ramajsd">ramaJSD</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">ensemble_compariosn</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDPET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="demo.html">Demo</a></li>
+      <li class="breadcrumb-item active">Comparing Ensambles</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/comparing_ensambles.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="comparing-ensambles">
+<h1>Comparing Ensambles<a class="headerlink" href="#comparing-ensambles" title="Permalink to this heading"></a></h1>
+<p>IDPET implements different scores to compare protein ensembles with the same number of residues L, even if their sequences differ. These scores are based on JSD and they compare probability distributions of two interatomic distances or torsion angles.</p>
+<p>To estimate JSD between such continuous variables, values are discretized in histograms of N <sub>bins</sub> bins, similar to previous studies. If we define as P and Q the distributions of a molecular feature in two ensembles, their JSD is:</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{JSD}(P \parallel Q) = \frac{1}{2} \left( \operatorname{KLD}(P \parallel M) + \operatorname{KLD}(Q \parallel M) \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(M = \frac{1}{2} (P + Q)\)</span> is a mixture, and <span class="math notranslate nohighlight">\(KLD\)</span> is the Kullback-Leibler divergence, expressed as:</p>
+<div class="math notranslate nohighlight">
+\[KLD(X || M) = \sum_k X_k \log \left( \frac{X_k}{M_k} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(k\)</span> is the bin index and <span class="math notranslate nohighlight">\(X_k\)</span> and <span class="math notranslate nohighlight">\(M_k\)</span> are the frequencies for bin <span class="math notranslate nohighlight">\(k\)</span> estimated from histogram data, with <span class="math notranslate nohighlight">\(M_k = \frac{1}{2} (P_k + Q_k)\)</span>. No pseudo-counts are used and bins with <span class="math notranslate nohighlight">\(X_k = 0\)</span> have zero contribution. JSD scores range from 0 (both <span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(Q\)</span> have identical counts) to a maximum of <span class="math notranslate nohighlight">\(\log (2) \approx 0.6931\)</span> (no bin has at least one count from both <span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(Q\)</span>).</p>
+<p>Ensemble compariosn module can provide 3 different scores based on comparing torsion angles and interatomic distances:</p>
+<ul class="simple">
+<li><p><strong>adaJSD</strong> (carbon Alpha Distance Average JSD)</p></li>
+<li><p><strong>ataJSD</strong> (Alpha Torsion Average JSD)</p></li>
+<li><p><strong>ramaJSD</strong> (RAMAchandran plot average JSD)</p></li>
+</ul>
+<section id="adajsd">
+<h2>adaJSD<a class="headerlink" href="#adajsd" title="Permalink to this heading"></a></h2>
+<p>The adaJSD score compares Cα-Cα distances in two ensembles and is defined as:</p>
+<div class="math notranslate nohighlight">
+\[adaJSD=\frac{1}{Npairs} \sum_{j-i&gt;1}^{ } JSD( D_{ij}^{A} || D_{ij}^{B})\]</div>
+<p>where <span class="math notranslate nohighlight">\(D_{ij}^{A}\)</span> and <span class="math notranslate nohighlight">\(D_{ij}^{B}\)</span> are the distance distributions between residue i and j in ensembles A and B, and <span class="math notranslate nohighlight">\(Npairs= {(L-1)(L-2)}/{2}\)</span> is the total number of distances evaluated. For each distance, its histogram range is defined by its minimum and maximum values in the ensembles.</p>
+</section>
+<section id="atajsd">
+<span id="id1"></span><h2>ataJSD<a class="headerlink" href="#atajsd" title="Permalink to this heading"></a></h2>
+<p>The ataJSD (Alpha Torsion Average JSD) score compares α angle distributions:</p>
+<div class="math notranslate nohighlight">
+\[\text{ataJSD} = \frac{1}{N_{\alpha}} \sum_{i=2} \text{JSD}\left( T^{[A]}_{i-1,i,i+2,i+3} \parallel T^{[B]}_{i-1,i,i+2,i+3} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(N_{\alpha} = L - 3\)</span> is the number of α angles in a protein and <span class="math notranslate nohighlight">\(T^{[A]}_{i-1,i,i+2,i+3}\)</span> and <span class="math notranslate nohighlight">\(T^{[B]}_{i-1,i,i+2,i+3}\)</span> are the distributions of α angles formed by residue <span class="math notranslate nohighlight">\(i\)</span> and its neighbors. The histogram range is always <span class="math notranslate nohighlight">\(- \pi\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>.</p>
+</section>
+<section id="ramajsd">
+<span id="id2"></span><h2>ramaJSD<a class="headerlink" href="#ramajsd" title="Permalink to this heading"></a></h2>
+<p>The ramaJSD (RAMAchandran plot average JSD) score compares joint φ and ψ angle distributions:</p>
+<div class="math notranslate nohighlight">
+\[\text{ramaJSD} = \frac{1}{N_{\text{rama}}} \sum_{i=2} \text{JSD}\left( R^{[A]}_{i} \parallel R^{[B]}_{i} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(N_{\text{rama}} = L - 2\)</span> is the number of residues with both φ and ψ values and <span class="math notranslate nohighlight">\(R^{[A]}_{i}\)</span> and <span class="math notranslate nohighlight">\(R^{[B]}_{i}\)</span> are the joint distributions of φ and ψ for residue <span class="math notranslate nohighlight">\(i\)</span>. For both angles, the histogram range is always <span class="math notranslate nohighlight">\(- \pi\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span> split into <span class="math notranslate nohighlight">\(N_{\text{bins}}\)</span> bins, resulting in a 2d histogram with an effective bin number of <span class="math notranslate nohighlight">\(N_{\text{bins}}^2\)</span>.</p>
+<p>In this Demo we just simply show how you can visualize a comparison matrix based on the loaded ensembles using visualization module.
+A complete guide on ensemble comparison using IDPET has been provided in a separate jupyter notebook in the github repository.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bins</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+
+<span class="c1"># Create a figure with three panels.</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="c1"># Plot on the left panel all-vs-all adaJSD scores (compare Ca-Ca distances).</span>
+<span class="n">vis</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">(</span>
+   <span class="n">score</span><span class="o">=</span><span class="s2">&quot;adaJSD&quot;</span><span class="p">,</span>
+   <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+   <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+   <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Oranges&quot;</span><span class="p">,</span>
+   <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Plot on the right panel all-vs-all ramaJSD scores (compare phi/psi angles).</span>
+<span class="n">vis</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">(</span>
+   <span class="n">score</span><span class="o">=</span><span class="s2">&quot;ramaJSD&quot;</span><span class="p">,</span>
+   <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+   <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+   <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Purples&quot;</span><span class="p">,</span>
+   <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Plot on the right panel all-vs-all ataJSD scores (compare phi/psi angles).</span>
+<span class="n">vis</span><span class="o">.</span><span class="n">comparison_matrix</span><span class="p">(</span>
+   <span class="n">score</span><span class="o">=</span><span class="s2">&quot;ataJSD&quot;</span><span class="p">,</span>
+   <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+   <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+   <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Reds&quot;</span><span class="p">,</span>
+   <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/three_scores.png" class="align-center" src="_images/three_scores.png" />
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dr_cadist.html" class="btn btn-neutral float-left" title="Dimensionality reduction based on distance-based features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ensemble_analysis.html" class="btn btn-neutral float-right" title="ensemble_analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

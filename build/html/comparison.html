@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ensemble_compariosn &mdash; IDPET 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="visualization" href="visualization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            IDPET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ensemble_compariosn</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDPET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ensemble_compariosn</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/comparison.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-dpet.comparison">
+<span id="ensemble-compariosn"></span><h1>ensemble_compariosn<a class="headerlink" href="#module-dpet.comparison" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.all_vs_all_comparison">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">all_vs_all_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensembles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_iters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#dpet.comparison.all_vs_all_comparison" title="Permalink to this definition"></a></dt>
+<dd><p>Compare all pair of ensembles using divergence scores.
+Implemented scores are approximate average Jensen–Shannon divergence
+(JSD) over several kinds of molecular features. The lower these scores
+are, the higher the similarity between the probability distribution of
+the features of the ensembles. JSD scores here range from a minimum of 0
+to a maximum of log(2) ~= 0.6931.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ensembles</strong> (<em>List</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>]</em>) – Ensemble objectes to analyze.</p></li>
+<li><p><strong>score</strong> (<em>str</em>) – Type of score used to compare ensembles. Choices: <cite>adaJSD</cite> (carbon
+Alfa Distance Average JSD), <cite>ramaJSD</cite> (RAMAchandran average JSD) and
+<cite>ataJSD</cite> (Alpha Torsion Average JSD). <cite>adaJSD</cite> scores the average
+JSD over all Ca-Ca distance distributions of residue pairs with
+sequence separation &gt; 1. <cite>ramaJSD</cite> scores the average JSD over the
+phi-psi angle distributions of all residues. <cite>ataJSD</cite> scores the
+average JSD over all alpha torsion angles, which are the angles
+formed by four consecutive Ca atoms in a protein.</p></li>
+<li><p><strong>featurization_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional dictionary to customize the featurization process for the
+above features.</p></li>
+<li><p><strong>bootstrap_iters</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of bootstrap iterations. By default its value is None. In
+this case, IDPET will directly compare each pair of ensemble $i$ and
+$j$ by using all of their conformers and perform the comparison only
+once. On the other hand, if providing an integer value to this
+argument, each pair of ensembles $i$ and $j$ will be compared
+<cite>bootstrap_iters</cite> times by randomly selecting (bootstrapping)
+conformations from them. Additionally, each ensemble will be
+auto-compared with itself by subsampling conformers via
+bootstrapping. Then IDPET will perform a statistical test to
+establish if the inter-ensemble ($i != j$) scores are significantly
+different from the intra-ensemble ($i == j$) scores. The tests work
+as follows: for each ensemble pair $i != j$ IDPET will get their
+inter-ensemble comparison scores obtained in bootstrapping. Then, it
+will get the bootstrapping scores from auto-comparisons of ensemble
+$i$ and $j$ and the scores with the higher mean here are selected as
+reference intra-ensemble scores. Finally, the inter-ensemble and
+intra-ensemble scores are compared via a one-sided Mann-Whitney U
+test with the alternative hypothesis being: inter-ensemble scores
+are stochastically greater than intra-ensemble scores. The p-values
+obtained in these tests will additionally be returned. For small
+protein structural ensembles (less than 500 conformations) most
+comparison scores in IDPET are not robust estimators of
+divergence/distance. By performing bootstrapping, you can have an
+idea of how the size of your ensembles impacts the comparison. Use
+values &gt;= 50 when comparing ensembles with very few conformations
+(less than 100). When comparing large ensembles (more than
+1,000-5,000 conformations) you can safely avoid bootstrapping.</p></li>
+<li><p><strong>bootstrap_frac</strong> (<em>float</em><em>, </em><em>optional</em>) – Fraction of the total conformations to sample when bootstrapping.
+Default value is 1.0, which results in bootstrap samples with the
+same number of conformations of the original ensemble.</p></li>
+<li><p><strong>bootstrap_replace</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>True</cite>, bootstrap will sample with replacement. Default is <cite>True</cite>.</p></li>
+<li><p><strong>bins</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Number of bins or bin assignment rule for JSD comparisons. See the
+documentation of <cite>dpet.comparison.get_num_comparison_bins</cite> for
+more information.</p></li>
+<li><p><strong>random_seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed used when performing bootstrapping.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>True</cite>, some information about the comparisons will be printed to
+stdout.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><strong>results</strong> –</p>
+<dl class="simple">
+<dt>Aa dictionary containing the following key-value pairs:</dt><dd><dl class="simple">
+<dt><cite>scores</cite>: a (M, M, B) NumPy array storing the comparison</dt><dd><p>scores, where M is the number of ensembles being
+compared and B is the number of bootstrap iterations (B
+will be 1 if bootstrapping was not performed).</p>
+</dd>
+<dt><cite>p_values</cite>: a (M, M) NumPy array storing the p-values</dt><dd><p>obtained in the statistical test performed when using
+a bootstrapping strategy (see the <cite>bootstrap_iters</cite>)
+method. Returned only when performing a bootstrapping
+strategy.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.calc_freqs">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">calc_freqs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.calc_freqs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.calc_jsd">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">calc_jsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.calc_jsd" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates JSD between distribution p and q.
+p_h: histogram frequencies for sample p.
+q_h: histogram frequencies for sample q.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.calc_kld_for_jsd">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">calc_kld_for_jsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.calc_kld_for_jsd" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates KLD between distribution x and m.
+x_h: histogram frequencies for sample p or q.
+m_h: histogram frequencies for m = 0.5*(p+q).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.check_feature_matrices">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">check_feature_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.check_feature_matrices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.confidence_interval">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">confidence_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta_boot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_hat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'percentile'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.confidence_interval" title="Permalink to this definition"></a></dt>
+<dd><p>Returns bootstrap confidence intervals.
+Adapted from: <a class="reference external" href="https://github.com/scipy/scipy/blob/v1.14.0/scipy/stats/_resampling.py">https://github.com/scipy/scipy/blob/v1.14.0/scipy/stats/_resampling.py</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.get_adaJSD_matrix">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">get_adaJSD_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ens_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ens_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.get_adaJSD_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Utility function to calculate the adaJSD score between two ensembles and
+return a matrix with JSD scores for each pair of Ca-Ca distances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ens_1</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>ens_2</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>arguments</strong> (<em>Remaining</em>) – </p></li>
+<li><p><strong>-------------------</strong> – See <cite>dpet.comparison.score_adaJSD</cite> for more information.</p></li>
+<li><p><strong>Output</strong> – </p></li>
+<li><p><strong>------</strong> – If <cite>return_bins</cite> is False, it will return a tuple containing the
+adaJSD score and a (N, N) NumPy array (where N is the number of residues
+of the protein in the ensembles being compared) containing the JSD
+scores of individual Ca-Ca distances. If <cite>return_bins</cite> is True, it will
+return also the bin value used in all the comparisons.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.get_ataJSD_profile">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">get_ataJSD_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ens_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ens_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.get_ataJSD_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Utility function to calculate the ataJSD score between two ensembles and
+return a profile with JSD scores for each alpha angle in the proteins.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ens_1</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>ens_2</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>arguments</strong> (<em>Remaining</em>) – </p></li>
+<li><p><strong>-------------------</strong> – See <cite>dpet.comparison.score_ataJSD</cite> for more information.</p></li>
+<li><p><strong>Output</strong> – </p></li>
+<li><p><strong>------</strong> – If <cite>return_bins</cite> is False, it will return a tuple containing the
+ataJSD score and a (N-3, ) NumPy array (where N is the number of
+residues of the protein in the ensembles being compared) containing the
+JSD scores of individual alpha angles. If <cite>return_bins</cite> is True, it will
+return also the bin value used in all the comparisons.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.get_num_comparison_bins">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">get_num_comparison_bins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.get_num_comparison_bins" title="Permalink to this definition"></a></dt>
+<dd><p>Get the number of bins to be used in comparison between two ensembles using
+an histogram-based score (such as a JSD approximation).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bins</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>int</em><em>]</em>) – <p>Determines the number of bins to be used. When providing an <cite>int</cite>, the
+same value will simply be returned. When providing a string, the following
+rules to determine bin value will be applied:
+<cite>auto</cite>: applies <cite>sqrt</cite> if the size of the smallest ensemble is &lt;</p>
+<blockquote>
+<div><p><cite>dpet.comparison.min_samples_auto_hist</cite>. If it &gt;= than this
+value, returns <cite>dpet.comparison.num_default_bins</cite>.</p>
+</div></blockquote>
+<dl class="simple">
+<dt><cite>sqrt</cite>: applies the square root rule for determining bin number using</dt><dd><p>the size of the smallest ensemble (<a class="reference external" href="https://en.wikipedia.org/wiki/Histogram#Square-root_choice">https://en.wikipedia.org/wiki/Histogram#Square-root_choice</a>).</p>
+</dd>
+<dt><cite>sturges</cite>: applies Sturge’s formula for determining bin number using</dt><dd><p>the size of the smallest ensemble (<a class="reference external" href="https://en.wikipedia.org/wiki/Histogram#Sturges's_formula">https://en.wikipedia.org/wiki/Histogram#Sturges’s_formula</a>).</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>x</strong> (<em>List</em><em>[</em><em>np.ndarray</em><em>]</em><em>, </em><em>optional</em>) – List of M feature matrices (one for each ensembles) of shape (N_i, <a href="#id1"><span class="problematic" id="id2">*</span></a>).
+N_i values are the number of structures in each ensemble. The minimum
+N_i will be used to apply bin assignment rule when the <cite>bins</cite> argument
+is a string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>num_bins</strong> – Number of bins.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.get_ramaJSD_profile">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">get_ramaJSD_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ens_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ens_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.get_ramaJSD_profile" title="Permalink to this definition"></a></dt>
+<dd><p>Utility function to calculate the ramaJSD score between two ensembles and
+return a profile with JSD scores for the Ramachandran plots of pair of
+corresponding residue in the proteins.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ens_1</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>ens_2</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>arguments</strong> (<em>Remaining</em>) – </p></li>
+<li><p><strong>-------------------</strong> – See <cite>dpet.comparison.score_ramaJSD</cite> for more information.</p></li>
+<li><p><strong>Output</strong> – </p></li>
+<li><p><strong>------</strong> – If <cite>return_bins</cite> is False, it will return a tuple containing the
+ramaJSD score and a (N-2, ) NumPy array (where N is the number of
+residues of the protein in the ensembles being compared) containing the
+JSD scores of individual residues. If <cite>return_bins</cite> is True, it will
+return also the bin value used in all the comparisons.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.percentile_func">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">percentile_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.percentile_func" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.process_all_vs_all_output">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">process_all_vs_all_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comparison_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.process_all_vs_all_output" title="Permalink to this definition"></a></dt>
+<dd><p>Takes as input a dictionary produced as output of the <cite>all_vs_all_comparison</cite>
+function. If a bootstrap analysis was performed in <cite>all_vs_all_comparison</cite>,
+this function will assign bootstrap confidence intervals.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.score_adaJSD">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">score_adaJSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ens_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ens_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.score_adaJSD" title="Permalink to this definition"></a></dt>
+<dd><p>Utility function to calculate the adaJSD (carbon Alfa Distance Average JSD)
+score between two ensembles. The score evaluates the divergence between
+distributions of Ca-Ca distances of the ensembles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ens_1</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em><em>,</em>) – Two Ensemble or mdtraj.Trajectory objects storing the ensemble data to
+compare.</p></li>
+<li><p><strong>ens_2</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em><em>,</em>) – Two Ensemble or mdtraj.Trajectory objects storing the ensemble data to
+compare.</p></li>
+<li><p><strong>bins</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>int</em><em>]</em><em>, </em><em>optional</em>) – Determines the number of bins to be used when constructing histograms.
+See <cite>dpet.comparison.get_num_comparison_bins</cite> for more information.</p></li>
+<li><p><strong>return_bins</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>True</cite>, returns the number of bins used in the calculation.</p></li>
+<li><p><strong>return_scores</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>True</cite>, returns the a tuple with with (avg_score, all_scores), where
+all_scores is an array with all the F scores (one for each feature) used
+to compute the average score.</p></li>
+<li><p><strong>featurization_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional dictionary to customize the featurization process to calculate
+Ca-Ca distances. See the <cite>Ensemble.get_features</cite> function for more
+information.</p></li>
+<li><p><strong>output</strong> (<em>Remaining arguments and</em>) – </p></li>
+<li><p><strong>------------------------------</strong> – See <cite>dpet.comparison.score_avg_jsd</cite> for more information.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.score_ataJSD">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">score_ataJSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ens_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ens_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.score_ataJSD" title="Permalink to this definition"></a></dt>
+<dd><p>Utility function to calculate the ataJSD (Alpha Torsion Average JSD) score
+between two ensembles. The score evaluates the divergence between
+distributions of alpha torsion angles (the angles formed by four consecutive
+Ca atoms in a protein) of the ensembles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ens_1</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>ens_2</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>output</strong> (<em>Remaining arguments and</em>) – </p></li>
+<li><p><strong>------------------------------</strong> – See <cite>dpet.comparison.score_avg_jsd</cite> for more information.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.score_avg_2d_angle_jsd">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">score_avg_2d_angle_jsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.score_avg_2d_angle_jsd" title="Permalink to this definition"></a></dt>
+<dd><p>Takes as input two (<a href="#id3"><span class="problematic" id="id4">*</span></a>, F, 2) bidimensional feature matrices and computes an
+average JSD score over all F bidimensional features by discretizing them
+in 2d histograms. The features in this functions are supposed to be angles
+whose values range from -math.pi to math.pi. For example, int the
+<cite>score_ramaJSD</cite> function the F features represent the phi-psi values of F
+residues in a protein of length L=F+2 (first and last residues don’t have
+both phi and psi values).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p_data</strong> (<em>np.ndarray</em>) – NumPy arrays of shape (<a href="#id5"><span class="problematic" id="id6">*</span></a>, F, 2) containing samples from F bi-dimensional
+distributions to be compared.</p></li>
+<li><p><strong>q_data</strong> (<em>np.ndarray</em>) – NumPy arrays of shape (<a href="#id7"><span class="problematic" id="id8">*</span></a>, F, 2) containing samples from F bi-dimensional
+distributions to be compared.</p></li>
+<li><p><strong>bins</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Determines the number of bins to be used when constructing histograms.
+See <cite>dpet.comparison.get_num_comparison_bins</cite> for more information. The
+range spanned by the bins will be -math.pi to math.pi. Note that the
+effective number of bins used in the functio will be the square of
+the number returned by <cite>dpet.comparison.get_num_comparison_bins</cite>, since
+we are building a 2d histogram.</p></li>
+<li><p><strong>return_bins</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>True</cite>, returns the square root of the effective number of bins used
+in the calculation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>results</strong> – If <cite>return_bins</cite> is <cite>False</cite>, only returns a float value for the JSD
+score. The score will range from 0 (no common support) to log(2)
+(same distribution). If <cite>return_bins</cite> is <cite>True</cite>, returns a tuple with
+the JSD score and the number of bins. If <cite>return_scores</cite> is <cite>True</cite> it
+will also return the F scores used to compute the average JSD score.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[float, Tuple[float, np.ndarray]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.score_avg_jsd">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">score_avg_jsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.score_avg_jsd" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.score_histogram_jsd">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">score_histogram_jsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.comparison.score_histogram_jsd" title="Permalink to this definition"></a></dt>
+<dd><p>Scores an approximation of Jensen-Shannon divergence by discretizing in a
+histogram the values two 1d samples provided as input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p_data</strong> (<em>np.ndarray</em>) – NumPy arrays of shape (<a href="#id9"><span class="problematic" id="id10">*</span></a>, ) containing samples from two mono-dimensional
+distribution to be compared.</p></li>
+<li><p><strong>q_data</strong> (<em>np.ndarray</em>) – NumPy arrays of shape (<a href="#id11"><span class="problematic" id="id12">*</span></a>, ) containing samples from two mono-dimensional
+distribution to be compared.</p></li>
+<li><p><strong>limits</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em>) – <p>Define the method to calculate the minimum and maximum values of the
+range spanned by the bins. Accepted values are:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>”m”: will use the minimum and maximum values observed by</dt><dd><p>concatenating samples in <cite>p_data</cite> and <cite>q_data</cite>.</p>
+</dd>
+<dt>”p”: will use the minimum and maximum values observed by</dt><dd><p>concatenating samples in <cite>p_data</cite>. If <cite>q_data</cite> contains values
+outside that range, new bins of the same size will be added to
+cover all values of q. Currently, this is not used in any IDPET
+functionality. Note that the <cite>bins</cite> argument will determine
+only the bins originally spanned by <cite>p_data</cite>.</p>
+</dd>
+<dt>”a”: limits for scoring angular features. Will use a</dt><dd><p>(-math.pi, math.pi) range for scoring such features.</p>
+</dd>
+<dt>(float, float): provide a custom range. Currently, not used in any</dt><dd><p>IDPET functionality.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
+<li><p><strong>bins</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Determines the number of bins to be used when constructing histograms.
+See <cite>dpet.comparison.get_num_comparison_bins</cite> for more information. The
+range spanned by the bins will be define by the <cite>limits</cite> argument.</p></li>
+<li><p><strong>return_bins</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>True</cite>, returns the bins used in the calculation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>results</strong> – If <cite>return_bins</cite> is <cite>False</cite>, only returns a float value for the JSD
+score. The score will range from 0 (no common support) to log(2)
+(same distribution). If <cite>return_bins</cite> is <cite>True</cite>, returns a tuple with
+the JSD score and the number of bins.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[float, Tuple[float, np.ndarray]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.score_ramaJSD">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">score_ramaJSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ens_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ens_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.score_ramaJSD" title="Permalink to this definition"></a></dt>
+<dd><p>Utility unction to calculate the ramaJSD (Ramachandran plot average JSD)
+score between two ensembles. The score evaluates the divergence between
+distributions of phi-psi torsion angles of every residue in the ensembles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ens_1</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>ens_2</strong> (<em>Union</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>, </em><em>mdtraj.Trajectory</em><em>]</em>) – Two Ensemble objects storing the ensemble data to compare.</p></li>
+<li><p><strong>output</strong> (<em>Remaining arguments and</em>) – </p></li>
+<li><p><strong>------------------------------</strong> – See <cite>dpet.comparison.score_avg_jsd</cite> for more information.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.sqrt_rule">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">sqrt_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.sqrt_rule" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dpet.comparison.sturges_rule">
+<span class="sig-prename descclassname"><span class="pre">dpet.comparison.</span></span><span class="sig-name descname"><span class="pre">sturges_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.comparison.sturges_rule" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="visualization.html" class="btn btn-neutral float-left" title="visualization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

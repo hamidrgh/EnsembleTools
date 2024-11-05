@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dimensionality reduction based on angular-based features &mdash; IDPET 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Methods’ overview" href="method_overview.html" />
+    <link rel="prev" title="Dimensionality Reduction Analysis" href="dimensional_reduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            IDPET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="demo.html">Demo</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Global_analysis.html">Global analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="local_analysis.html">Local analysis</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="dimensional_reduction.html">Dimensionality Reduction Analysis</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Dimensionality reduction based on angular-based features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="method_overview.html">Methods’ overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dr_cadist.html">Dimensionality reduction based on distance-based features</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="comparing_ensambles.html">Comparing Ensambles</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble_analysis.html">ensemble_analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">ensemble_compariosn</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDPET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="demo.html">Demo</a></li>
+          <li class="breadcrumb-item"><a href="dimensional_reduction.html">Dimensionality Reduction Analysis</a></li>
+      <li class="breadcrumb-item active">Dimensionality reduction based on angular-based features</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dr_phipsi.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dimensionality-reduction-based-on-angular-based-features">
+<h1>Dimensionality reduction based on angular-based features<a class="headerlink" href="#dimensionality-reduction-based-on-angular-based-features" title="Permalink to this heading"></a></h1>
+<p>Here, we demonstrate the application of various dimensionality reduction methods to visualize angular features in a reduced-dimensional space. As an example, we will focus specifically on three selected PED ensembles for N-terminal SH3 domain of Drk protein.</p>
+<ul class="simple">
+<li><p><strong>PED00156</strong>: This ensemble consists of conformations generated randomly and optimized through an iterative process.</p></li>
+<li><p><strong>PED00157</strong>: This ensemble includes conformations generated using the ENSEMBLE method, which creates a variety of realistic conformations of an unfolded protein.</p></li>
+<li><p><strong>PED00158</strong>: This ensemble is a combination of conformations from the RANDOM and ENSEMBLE pools</p></li>
+</ul>
+<p>1- <strong>The first step is to extract the specific feature we wish to analyze.</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">featurization</span><span class="o">=</span><span class="s1">&#39;phi_psi&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/extraction1.png"><img alt="_images/extraction1.png" class="align-center" src="_images/extraction1.png" style="width: 429.0px; height: 105.0px;" /></a>
+<p><strong>PARAMETERS:</strong></p>
+<p>The <em>extract_features</em> method of the analysis object is designed to extract specific features from the loaded ensembles.</p>
+<p>The parameters we can set to extract different angular data are:</p>
+<p><em>“featurization”: Choose between “phi_psi”, “a_angle”, “tr_omega”, and “tr_phi” for angular data</em>.</p>
+<p><em>“min_sep”: Minimum separation distance for “tr_omega”, and “tr_phi” methods. Default is 2.</em></p>
+<p><em>“max_sep”: Maximum separation distance for “tr_omega”, and “tr_phi” methods. Default is None.</em></p>
+<p>2- <strong>The second step is choosing dimensionality reduction method and hyperparameters.</strong></p>
+<p>After selecting the feature to extract, we can apply various dimensionality reduction methods using the <strong>reduce_features</strong> function. The parameters that can be set for this function are numerous and vary depending on the chosen reduction method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">reduce_features</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;umap&#39;</span><span class="p">,</span> <span class="n">n_neighbors</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">]</span> <span class="p">,</span><span class="n">circular</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">range_n_clusters</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">));</span>
+<span class="c1"># In this example we chose umap as the dimensionality reduction method and other hyperparameters with respect to that.</span>
+</pre></div>
+</div>
+<p><strong>PARAMETERS:</strong></p>
+<p><em>“method”: Choose between “pca”, “tsne”, “kpca” and “umap”.</em></p>
+<p><em>“fit_on”: If method is “pca” or “kpca”, specifies on which ensembles the models should be fit. The model will then be used to transform all ensembles. The default is None</em></p>
+<p><strong>ADDITIONAL PARAMETERS (Based on the chosen method):</strong></p>
+<p><strong>PCA:</strong></p>
+<ul class="simple">
+<li><p><em>“num_dim”:Number of components to keep. Default is 10.</em></p></li>
+</ul>
+<p>For more information, visit the <a class="reference external" href="https://scikit-learn.org/dev/modules/generated/sklearn.decomposition.PCA.html">scikit-learn documentation</a>.</p>
+<p><strong>t-SNE:</strong></p>
+<ul class="simple">
+<li><p><em>“perplexity_vals”: A list of perplexity values. The default is [30]. This list can contain multiple values, but each value must be less than the total number of conformations. If a list of values is provided, the package will determine the optimal perplexity by evaluating all combinations of cluster numbers and perplexity values, selecting the one that achieves the best clustering based on the Silhouette score.</em></p></li>
+<li><p><em>“metric”: Metric to use. Default is “euclidean”.</em></p></li>
+<li><p><em>“circular”: Indicates whether to use circular metrics. This should be set to True when analyzing angular data. The default value is False.</em></p></li>
+<li><p><em>“n_components”: Number of dimensions of the embedded space. Default is 2.</em></p></li>
+<li><p><em>“learning_rate”: Learning rate. Default is ‘auto’.</em></p></li>
+<li><p><em>“range_n_clusters”: Range of cluster values. Default is range(2, 10, 1).</em></p></li>
+</ul>
+<p>For more information, visit the <a class="reference external" href="https://scikit-learn.org/1.5/modules/generated/sklearn.manifold.TSNE.html">scikit-learn documentation</a>.</p>
+<p><strong>KernelPCA:</strong></p>
+<ul class="simple">
+<li><p><em>“circular”: Indicates whether to use circular metrics. This should be set to True when analyzing angular data. The default value is False.</em></p></li>
+<li><p><em>“num_dim”: Number of components to keep. Default is 10.</em></p></li>
+<li><p><em>“gamma”: Kernel coefficient. Default is None. If gamma is None, then it is set to 1/n_features</em></p></li>
+</ul>
+<p>For more information, visit the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html">scikit-learn documentation</a>.</p>
+<p><strong>UMAP:</strong></p>
+<ul class="simple">
+<li><p><em>num_dim: Number of dimensions for the reduced space. Default is 2.</em></p></li>
+<li><p><em>n_neighbors:  Number of neighbors to consider for each point in the input data. This can be a list of numbers. Default is [15]</em></p></li>
+<li><p><em>circular: Indicates whether to use circular metrics. This should be set to True when analyzing angular data. The default value is False.</em></p></li>
+<li><p><em>min_dist: The minimum distance between embedded points. Default is 0.1.</em></p></li>
+<li><p><em>metric: The metric to use for distance calculation. Default is ‘euclidean’</em></p></li>
+<li><p><em>range_n_clusters: Range of cluster values to consider for silhouette scoring. Default is range(2, 10, 1).</em></p></li>
+</ul>
+<p>For more information, visit the <a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/">UMAP documentation</a>.</p>
+<p>3- <strong>The third step is the visualization of the results.</strong></p>
+<p>After performing dimensionality reduction on your data, you can visualize the results using various methods from the visualization module. The primary function for representing the output of <cite>t-SNE</cite> and <cite>UMAP</cite> is the <strong>dimensionality_reduction_scatter</strong>, which creates a scatter plot of the reduced data in 2D or 3D space, effectively showcasing cluster separation and relationships.</p>
+<p>For <cite>PCA</cite> and <cite>KernelPCA</cite> outputs, additional specialized visualization methods are available to provide deeper insights:</p>
+<ul class="simple">
+<li><p><strong>pca_2d_landscapes</strong>: Generates a 2D landscape plot of the principal components, helping to identify clusters and patterns in the reduced space.</p></li>
+<li><p><strong>pca_cumulative_explained_variance</strong>: Displays the cumulative explained variance by the principal components, which helps assess how much variance is captured by the chosen number of components.</p></li>
+<li><p><strong>pca_1d_histograms</strong>: Produces 1D histograms for individual principal components, offering insights into the distribution of the data along each component.</p></li>
+<li><p><strong>pca_rg_correlation</strong>: Plots the correlation between the principal components and the radius of gyration (Rg), which can help reveal structural properties.</p></li>
+<li><p><strong>pca_residue_correlation</strong>: Visualizes the correlation between individual residues and the principal components, providing a more detailed understanding of how specific regions contribute to the overall structural variability.</p></li>
+</ul>
+<p>In the first example you can see the results of <strong>UMAP</strong> on the phi and psi angles as features</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">vis</span><span class="o">.</span><span class="n">dimensionality_reduction_scatter</span><span class="p">(</span><span class="n">color_by</span><span class="o">=</span><span class="s1">&#39;rg&#39;</span><span class="p">,</span> <span class="n">kde_by_ensemble</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">n_comp</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">plotly</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/umap_plotly.png"><img alt="_images/umap_plotly.png" class="align-center" src="_images/umap_plotly.png" style="width: 759.6px; height: 271.2px;" /></a>
+<a class="reference internal image-reference" href="_images/scatter_phi_psi.png"><img alt="_images/scatter_phi_psi.png" class="align-center" src="_images/scatter_phi_psi.png" style="width: 809.0px; height: 196.0px;" /></a>
+<p><strong>PARAMETERS:</strong></p>
+<ul class="simple">
+<li><p><em>color_by: Specifies the feature used to color points in the scatter plot. Options include: “rg” (radius of gyration), “prolateness”, “asphericity”, “sasa” (solvent accessible surface area), and “end_to_end”. Default is “rg”.</em></p></li>
+<li><p><em>save: If True, the plot will be saved to the data directory. Default is False.</em></p></li>
+<li><p><em>ax: A list of Axes objects to plot on. If None, new axes are created. Default is None.</em></p></li>
+<li><p><em>kde_by_ensemble: If True, a separate KDE (Kernel Density Estimate) plot will be generated for each ensemble. If False, a single KDE plot for all concatenated ensembles will be produced. Default is False.</em></p></li>
+<li><p><em>size: Specifies the marker size for scatter plot points. Default is 10.</em></p></li>
+<li><p><em>plotly: If True, an interactive Plotly scatter plot is generated. Hovering over points reveals model numbers in the ensemble, 2D embeddings, and the selected ensemble property based on the color_by value. Default is False.</em></p></li>
+<li><p><em>n_comp: If the dimensionality reduction method yields 3 components, a 3D plot will be visualized; otherwise, a 2D plot is generated.</em></p></li>
+</ul>
+<p>In the second example we are using <strong>KernelPCA</strong> as the dimensionality reduction method to show phi and psi features. Then using <cite>pca_2d_landscapes</cite> method we can plot the result.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">analysis</span><span class="o">.</span><span class="n">reduce_features</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;kpca&quot;</span><span class="p">,</span> <span class="n">circular</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+<span class="n">vis</span><span class="o">.</span><span class="n">pca_2d_landscapes</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/pca_2d_new.png"><img alt="_images/pca_2d_new.png" class="align-center" src="_images/pca_2d_new.png" style="width: 278.4px; height: 1148.3999999999999px;" /></a>
+<p>You can also generate a 1D histogram to visualize the distribution of the data across different dimensions or components. This provides an overview of how the data is distributed along specific axes, helping to identify patterns or trends in the dataset.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">vis</span><span class="o">.</span><span class="n">pca_1d_histograms</span><span class="p">(</span><span class="n">sel_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/pca_1d_new.png"><img alt="_images/pca_1d_new.png" class="align-center" src="_images/pca_1d_new.png" style="width: 279.59999999999997px; height: 424.2px;" /></a>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dimensional_reduction.html" class="btn btn-neutral float-left" title="Dimensionality Reduction Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="method_overview.html" class="btn btn-neutral float-right" title="Methods’ overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ensemble_analysis &mdash; IDPET 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ensemble" href="ensemble.html" />
+    <link rel="prev" title="Comparing Ensambles" href="comparing_ensambles.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            IDPET
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">Demo</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ensemble_analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-dpet.ensemble_analysis">EnsembleAnalysis class</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">ensemble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">ensemble_compariosn</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">IDPET</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ensemble_analysis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ensemble_analysis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ensemble-analysis">
+<h1>ensemble_analysis<a class="headerlink" href="#ensemble-analysis" title="Permalink to this heading"></a></h1>
+<section id="module-dpet.ensemble_analysis">
+<span id="ensembleanalysis-class"></span><h2>EnsembleAnalysis class<a class="headerlink" href="#module-dpet.ensemble_analysis" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dpet.ensemble_analysis.</span></span><span class="sig-name descname"><span class="pre">EnsembleAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ensembles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><span class="pre">Ensemble</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Data analysis pipeline for ensemble data.</p>
+<p>Initializes with a list of ensemble objects and a directory path
+for storing data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ensembles</strong> (<em>List</em><em>[</em><a class="reference internal" href="ensemble.html#dpet.ensemble.Ensemble" title="dpet.ensemble.Ensemble"><em>Ensemble</em></a><em>]</em><em>)</em>) – List of ensembles.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em>) – Directory path for storing data.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores">
+<span class="sig-name descname"><span class="pre">comparison_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_iters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_frac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bootstrap_replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.comparison_scores" title="Permalink to this definition"></a></dt>
+<dd><p>Compare all pair of ensembles using divergence/distance scores.
+See <cite>dpet.comparison.all_vs_all_comparison</cite> for more information.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.ens_codes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ens_codes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.ens_codes" title="Permalink to this definition"></a></dt>
+<dd><p>Get the ensemble codes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of ensemble codes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline">
+<span class="sig-name descname"><span class="pre">execute_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dim_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.execute_pipeline" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Execute the data analysis pipeline end-to-end. The pipeline includes:</dt><dd><ol class="arabic simple">
+<li><p>Download from database (optional)</p></li>
+<li><p>Generate trajectories</p></li>
+<li><p>Randomly sample a number of conformations from trajectories (optional)</p></li>
+<li><p>Perform feature extraction</p></li>
+<li><p>Perform dimensionality reduction</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>featurization_params</strong> (<em>Dict</em>) – Parameters for feature extraction. The only required parameter is “featurization”,
+which can be “phi_psi”, “ca_dist”, “a_angle”, “tr_omega” or “tr_phi”.
+Other method-specific parameters are optional.</p></li>
+<li><p><strong>reduce_dim_params</strong> (<em>Dict</em>) – Parameters for dimensionality reduction. The only required parameter is “method”,
+which can be “pca”, “tsne” or “kpca”.</p></li>
+<li><p><strong>subsample_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Optional parameter that specifies the trajectory subsample size. Default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained">
+<span class="sig-name descname"><span class="pre">exists_coarse_grained</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.exists_coarse_grained" title="Permalink to this definition"></a></dt>
+<dd><p>Check if at least one of the loaded ensembles is coarse-grained after loading trajectories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if at least one ensemble is coarse-grained, False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.extract_features">
+<span class="sig-name descname"><span class="pre">extract_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.extract_features" title="Permalink to this definition"></a></dt>
+<dd><p>Extract the selected feature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>featurization</strong> (<em>str</em>) – Choose between “phi_psi”, “ca_dist”, “a_angle”, “tr_omega”, “tr_phi”, “rmsd”.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to normalize the data. Only applicable to the “ca_dist” method. Default is False.</p></li>
+<li><p><strong>min_sep</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Minimum separation distance for “ca_dist”, “tr_omega”, and “tr_phi” methods. Default is 2.</p></li>
+<li><p><strong>max_sep</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum separation distance for “ca_dist”, “tr_omega”, and “tr_phi” methods. Default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.features">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">features</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.features" title="Permalink to this definition"></a></dt>
+<dd><p>Get the features associated with each ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.get_features">
+<span class="sig-name descname"><span class="pre">get_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.get_features" title="Permalink to this definition"></a></dt>
+<dd><p>Extract features for each ensemble without modifying any fields in the EnsembleAnalysis class.</p>
+<dl class="simple">
+<dt>featurization<span class="classifier">str</span></dt><dd><p>The type of featurization to be applied. Supported options are “phi_psi”, “tr_omega”, “tr_phi”, “ca_dist”, “a_angle”, “rg”, “prolateness”, “asphericity”, “sasa”, “end_to_end” and “flory_exponent”.</p>
+</dd>
+<dt>min_sep<span class="classifier">int, optional</span></dt><dd><p>Minimum sequence separation distance for “ca_dist”, “tr_omega”, and “tr_phi” methods. Default is 2.</p>
+</dd>
+<dt>max_sep<span class="classifier">int or None, optional</span></dt><dd><p>Maximum sequence separation distance for “ca_dist”, “tr_omega”, and “tr_phi” methods. Default is None.</p>
+</dd>
+<dt>normalize<span class="classifier">bool, optional</span></dt><dd><p>Whether to normalize the extracted features. Normalization is only supported when featurization is “ca_dist”. Default is False.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Dict[str, np.ndarray]</dt><dd><p>A dictionary containing the extracted features for each ensemble, where the keys are ensemble IDs and the
+values are NumPy arrays containing the features.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ValueError:</dt><dd><p>If featurization is not supported, or if normalization is requested for a featurization method other than “ca_dist”.
+If normalization is requested and features from ensembles have different sizes.
+If coarse-grained models are used with featurization methods that require atomistic detail.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.get_features_summary_dataframe">
+<span class="sig-name descname"><span class="pre">get_features_summary_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['rg',</span> <span class="pre">'asphericity',</span> <span class="pre">'prolateness',</span> <span class="pre">'sasa',</span> <span class="pre">'end_to_end',</span> <span class="pre">'flory_exponent']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_variability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.get_features_summary_dataframe" title="Permalink to this definition"></a></dt>
+<dd><p>Create a summary DataFrame for each ensemble.</p>
+<p>The DataFrame includes the ensemble code and the average for each feature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selected_features</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – List of feature extraction methods to be used for summarizing the ensembles.
+Default is [“rg”, “asphericity”, “prolateness”, “sasa”, “end_to_end”, “flory_exponent”].</p></li>
+<li><p><strong>show_variability</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, include a column  a measurment of variability for each
+feature (e.g.: standard deviation or error).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame containing the summary statistics (average and std) for each feature in each ensemble.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If any feature in the selected_features is not a supported feature extraction method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.load_trajectories">
+<span class="sig-name descname"><span class="pre">load_trajectories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.load_trajectories" title="Permalink to this definition"></a></dt>
+<dd><p>Load trajectories for all ensembles.</p>
+<p>This method iterates over each ensemble in the <cite>ensembles</cite> list and downloads
+data files if they are not already available.
+Trajectories are then loaded for each ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, mdtraj.Trajectory]</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method assumes that the <cite>output_dir</cite> attribute of the class specifies the directory
+where trajectory files will be saved or extracted.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories">
+<span class="sig-name descname"><span class="pre">random_sample_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.random_sample_trajectories" title="Permalink to this definition"></a></dt>
+<dd><p>Sample a defined random number of conformations from the ensemble
+trajectory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample_size</strong> (<em>int</em>) – Number of conformations sampled from the ensemble.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.reduce_dim_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reduce_dim_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.reduce_dim_data" title="Permalink to this definition"></a></dt>
+<dd><p>Get the transformed data associated with each ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary where keys are ensemble IDs and values are the corresponding feature arrays.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.reduce_features">
+<span class="sig-name descname"><span class="pre">reduce_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.reduce_features" title="Permalink to this definition"></a></dt>
+<dd><p>Perform dimensionality reduction on the extracted features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>The following optional parameters apply based on the selected reduction</em>) – Choose between “pca”, “tsne”, “kpca” and “umap”.</p></li>
+<li><p><strong>fit_on</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – if method is “pca” or “kpca”, specifies on which ensembles the models should be fit.
+The model will then be used to transform all ensembles.</p></li>
+<li><p><strong>Parameters</strong> (<em>Additional</em>) – </p></li>
+<li><p><strong>---------------------</strong> – </p></li>
+<li><p><strong>method</strong> – </p></li>
+<li><p><strong>pca</strong> (<em>-</em>) – <ul>
+<li><dl class="simple">
+<dt>num_dim<span class="classifier">int, optional</span></dt><dd><p>Number of components to keep. Default is 10.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+<li><p><strong>tsne</strong> (<em>-</em>) – <ul>
+<li><dl class="simple">
+<dt>perplexity_vals<span class="classifier">List[float], optional</span></dt><dd><p>List of perplexity values. Default is range(2, 10, 2).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>metric<span class="classifier">str, optional</span></dt><dd><p>Metric to use. Default is “euclidean”.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>circular<span class="classifier">bool, optional</span></dt><dd><p>Whether to use circular metrics. Default is False.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>n_components<span class="classifier">int, optional</span></dt><dd><p>Number of dimensions of the embedded space. Default is 2.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>learning_rate<span class="classifier">float, optional</span></dt><dd><p>Learning rate. Default is 100.0.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>range_n_clusters<span class="classifier">List[int], optional</span></dt><dd><p>Range of cluster values. Default is range(2, 10, 1).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+<li><p><strong>kpca</strong> (<em>-</em>) – <ul>
+<li><dl class="simple">
+<dt>circular<span class="classifier">bool, optional</span></dt><dd><p>Whether to use circular metrics. Default is False.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>num_dim<span class="classifier">int, optional</span></dt><dd><p>Number of components to keep. Default is 10.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>gamma<span class="classifier">float, optional</span></dt><dd><p>Kernel coefficient. Default is None.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>np.ndarray</em> – Returns the transformed data.</p></li>
+<li><p><em>For more information on each method, see the corresponding documentation</em> –</p>
+<ul>
+<li><p>PCA: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html</a></p></li>
+<li><p>t-SNE: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html</a></p></li>
+<li><p>Kernel PCA: <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html">https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.KernelPCA.html</a></p></li>
+<li><p>UMAP: <a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/">https://umap-learn.readthedocs.io/en/latest/</a></p></li>
+</ul>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="dpet.ensemble_analysis.EnsembleAnalysis.trajectories">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">trajectories</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Trajectory</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dpet.ensemble_analysis.EnsembleAnalysis.trajectories" title="Permalink to this definition"></a></dt>
+<dd><p>Get the trajectories associated with each ensemble.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary where keys are ensemble IDs and values are the corresponding MDTraj trajectories.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, mdtraj.Trajectory]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="comparing_ensambles.html" class="btn btn-neutral float-left" title="Comparing Ensambles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ensemble.html" class="btn btn-neutral float-right" title="ensemble" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hamidreza Ghafouri, Giacomo Janson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
